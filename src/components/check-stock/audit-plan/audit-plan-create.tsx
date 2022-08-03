@@ -44,6 +44,7 @@ import ModalValidateImport from '../../sale-limit-time/modal-validate-import';
 import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
 import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
 import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
+import { clearCalculate } from "../../../store/slices/stock-adjust-calculate-slice";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -485,6 +486,7 @@ export default function ModalCreateAuditPlan({
       branchName: dataDetail.branchName,
     };
     await dispatch(updateDataDetail(dataDetailSAUpdate));
+    await dispatch(clearCalculate());
     setOpenSA(true);
   };
 

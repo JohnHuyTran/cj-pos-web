@@ -126,7 +126,7 @@ const stockAdjustCalculateSlice = createSlice({
     updateReload: (state, action: any) => {
       state.reload = action.payload;
     },
-    clearCalculate: () => initialState,
+    clearCalculate: (state) => initialState,
   },
   extraReducers: (builer) => {
     builer.addCase(getBarcodeCalculate.pending, () => {
