@@ -23,20 +23,12 @@ export const expenseTypes = [
 
 export const expenseStatusList = [
   { key: 'ALL', text: 'ทั้งหมด', stepperGrp: 1 },
-  { key: 'DRAFT', text: 'บันทึก', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH, allowShowSummary: false },
   {
-    key: 'SEND_BACK_EDIT',
-    text: 'ส่งกลับแก้ไข',
+    key: 'DRAFT',
+    text: 'บันทึก',
     stepperGrp: 1,
     groupAllow: PERMISSION_GROUP.BRANCH,
-    allowShowSummary: false,
-  },
-  {
-    key: 'WAITTING_EDIT_ATTACH_FILE',
-    text: 'รอแก้ไขเอกสาร',
-    stepperGrp: 1,
-    groupAllow: PERMISSION_GROUP.BRANCH,
-    allowShowSummary: false,
+    allowShowSummary: false
   },
   {
     key: 'WAITTING_APPROVAL1',
@@ -66,7 +58,35 @@ export const expenseStatusList = [
     groupAllow: PERMISSION_GROUP.ACCOUNT_MANAGER,
     allowShowSummary: true,
   },
-  { key: 'APPROVED', text: 'อนุมัติ', stepperGrp: 4 },
+  { 
+    key: 'APPROVED',
+    text: 'อนุมัติ',
+    stepperGrp: 4
+  },
+  { 
+    key: 'CLOSED',
+    text: 'ปิดงาน',
+    stepperGrp: 4
+  },
+  { 
+    key: 'SAP_ERROR',
+    text: 'ส่ง SAP ไม่สำเร็จ',
+    stepperGrp: 4
+  },
+  {
+    key: 'SEND_BACK_EDIT',
+    text: 'ส่งกลับแก้ไข',
+    stepperGrp: 1,
+    groupAllow: PERMISSION_GROUP.BRANCH,
+    allowShowSummary: false,
+  },
+  {
+    key: 'WAITTING_EDIT_ATTACH_FILE',
+    text: 'รอแก้ไขเอกสาร',
+    stepperGrp: 1,
+    groupAllow: PERMISSION_GROUP.BRANCH,
+    allowShowSummary: false,
+  }
 ];
 
 export const getExpenseStatus = (key: string) => expenseStatusList.find((item) => item.key === key);
