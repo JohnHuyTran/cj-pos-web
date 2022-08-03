@@ -401,3 +401,73 @@ export interface BranchCodeInfo {
   code: string;
   name: string;
 }
+
+//open-end
+export interface ViewOpenEndResponse {
+  timestamp: string;
+  ref: string;
+  code: number;
+  message: string;
+  data: ViewOpenEndInfo;
+}
+
+export interface ViewOpenEndInfo {
+  branchCode: string;
+  branchName: string;
+  docNo: string;
+  shiftDate: string;
+  noOfSaleBill: number;
+  bypass: string;
+  settlementFiles: FileType;
+  summarizeCashDeposite: SummarizeCashDeposite;
+  income: Income;
+  externalIncome: ExternalIncome;
+  cashPayment: CashPayment;
+  shiftCodes: [];
+  status: string;
+  comment: string;
+}
+
+export interface CashPayment {
+  totalPayAmount: number;
+  iceAmount: number;
+  yakultAmount: number;
+  coffeeExpenseAmount: number;
+  frontExpenseAmount: number;
+}
+
+export interface ExternalIncome {
+  totalExIncomeAmount: number;
+  items: Item[];
+}
+
+export interface Item {
+  code: string;
+  name: string;
+  amount: number;
+  noItem?: boolean;
+  isSettlementFile?: boolean;
+}
+
+export interface Income {
+  totalIncomeAmount: number;
+  cashAmount: number;
+  diffAmount: number;
+  paymentTypeItems: Item[];
+  totalTypeAmount: number;
+  typeItems: Item[];
+  totalAmount: number;
+  netAmount: number;
+  netAmountNonVat: number;
+}
+
+export interface SummarizeCashDeposite {
+  dailyIncomeAmount: number;
+  cashOverShortAmount: number;
+  totalCashAmount: number;
+  cdmAmount: number;
+  totalPayAmount: number;
+  depositeAmount: number;
+  nextCDMAmount: number;
+  diffDepositeAmount: number;
+}

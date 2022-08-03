@@ -17,6 +17,9 @@
   },
   "title": {
     "documentSearch": "ค่าใช้จ่าย",
-    "closeSaleShift": "ปิดรหัสการขาย"
+    "closeSaleShift": "ปิดรหัสการขาย",
+    "cashPayment": {
+      "": ""
+    }
   }
 }
