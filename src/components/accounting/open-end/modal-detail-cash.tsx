@@ -17,8 +17,9 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
   const _ = require('lodash');
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['expense', 'common']);
+  const viewOpenEndResponse = useAppSelector((state) => state.viewOpenEndSlice.viewOpenEnd);
+  const data: any = viewOpenEndResponse.data ? viewOpenEndResponse.data : null;
   const incomes: any = null;
-
   return (
     <React.Fragment>
       <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>

@@ -408,7 +408,7 @@ export interface ViewOpenEndResponse {
   ref: string;
   code: number;
   message: string;
-  data: ViewOpenEndInfo;
+  data: ViewOpenEndInfo | null;
 }
 
 export interface ViewOpenEndInfo {
