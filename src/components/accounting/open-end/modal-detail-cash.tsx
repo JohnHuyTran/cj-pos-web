@@ -17,7 +17,7 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
   const _ = require('lodash');
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['expense', 'common']);
-  const incomes: Income = null;
+  const incomes: any = null;
 
   return (
     <React.Fragment>
@@ -34,26 +34,27 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                 borderRadius: '7px',
               }}>
               <Grid container spacing={2} mr={1} mt={'11px'}>
-                {incomes.paymentTypeItems.map((element: Item, index: number) => {
-                  return (
-                    <>
-                      <Grid item xs={5}>
-                        <Typography>{element.name}</Typography>
-                      </Grid>
-                      <Grid item xs={7}>
-                        <NumberFormat
-                          value={String(element.amount)}
-                          thousandSeparator={true}
-                          decimalScale={2}
-                          className={classes.MtextFieldNumber}
-                          disabled={true}
-                          customInput={TextField}
-                          fixedDecimalScale
-                        />
-                      </Grid>
-                    </>
-                  );
-                })}
+                {incomes &&
+                  incomes.paymentTypeItems.map((element: Item, index: number) => {
+                    return (
+                      <>
+                        <Grid item xs={5}>
+                          <Typography>{element.name}</Typography>
+                        </Grid>
+                        <Grid item xs={7}>
+                          <NumberFormat
+                            value={String(element.amount)}
+                            thousandSeparator={true}
+                            decimalScale={2}
+                            className={classes.MtextFieldNumber}
+                            disabled={true}
+                            customInput={TextField}
+                            fixedDecimalScale
+                          />
+                        </Grid>
+                      </>
+                    );
+                  })}
               </Grid>
             </Grid>
 
@@ -68,26 +69,27 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                 container
                 spacing={2}
                 mb={3}>
-                {incomes.typeItems.map((element: Item, index: number) => {
-                  return (
-                    <>
-                      <Grid item xs={5}>
-                        <Typography>{element.name}</Typography>
-                      </Grid>
-                      <Grid item xs={7}>
-                        <NumberFormat
-                          value={String(element.amount)}
-                          thousandSeparator={true}
-                          decimalScale={2}
-                          className={classes.MtextFieldNumber}
-                          disabled={true}
-                          customInput={TextField}
-                          fixedDecimalScale
-                        />
-                      </Grid>
-                    </>
-                  );
-                })}
+                {incomes &&
+                  incomes.typeItems.map((element: Item, index: number) => {
+                    return (
+                      <>
+                        <Grid item xs={5}>
+                          <Typography>{element.name}</Typography>
+                        </Grid>
+                        <Grid item xs={7}>
+                          <NumberFormat
+                            value={String(element.amount)}
+                            thousandSeparator={true}
+                            decimalScale={2}
+                            className={classes.MtextFieldNumber}
+                            disabled={true}
+                            customInput={TextField}
+                            fixedDecimalScale
+                          />
+                        </Grid>
+                      </>
+                    );
+                  })}
               </Grid>
               <Grid
                 sx={{

@@ -1,4 +1,4 @@
-import { Fragment, ReactElement, useState } from "react";
+import { Fragment, ReactElement, useState } from 'react';
 import { useStyles } from 'styles/makeTheme';
 import { HighlightOff } from '@mui/icons-material';
 import {
@@ -10,18 +10,17 @@ import {
   DialogContent,
   Typography,
   TextField,
-  CircularProgress } from '@mui/material'
-import { LoadingButton } from "@mui/lab";
-import {
-  DataGrid,
-  GridColDef,
-} from '@mui/x-data-grid';
-import { formatNumber } from 'utils/utils'
+  CircularProgress,
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { formatNumber } from 'utils/utils';
 import { useTranslation } from 'react-i18next';
 
 // Call API
 import { updateConfirmShiftCloses } from 'services/accounting';
-
+import store, { useAppDispatch, useAppSelector } from '../../../store/store';
+import { featchCloseSaleShiptListAsync } from 'store/slices/accounting/close-saleshift-slice';
 interface ModalSaveCloseShiftKeyProps {
   open: boolean;
   payload: any;
@@ -29,81 +28,77 @@ interface ModalSaveCloseShiftKeyProps {
 }
 
 interface TableSaveCloseShiftKeyProps {
-  rowData: any
+  rowData: any;
 }
 
 export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProps): ReactElement {
+  const dispatch = useAppDispatch();
   // Props
   const { open, payload, onClose } = props;
 
   const classes = useStyles();
   const { t } = useTranslation(['error']);
-  
+
   // Set state data
-  const [barcode, setBarcode] = useState('')
-  const [errorCode, setErrorCode] = useState('')
-  const [isOpenLoading, setIsOpenLoading] = useState(false)
-  
+  const [barcode, setBarcode] = useState('');
+  const [errorCode, setErrorCode] = useState('');
+  const [isOpenLoading, setIsOpenLoading] = useState(false);
+
   const handleSave = async () => {
     if (barcode) {
-      setIsOpenLoading(true)
+      setIsOpenLoading(true);
       try {
-        const res = await updateConfirmShiftCloses(payload?.shiftCode, {shiftKey: barcode})
-        // console.log('dispatch', res)
-        handleClose()
+        const res = await updateConfirmShiftCloses(payload?.shiftCode, { shiftKey: barcode });
+
+        handleClose();
       } catch (err) {
-        setErrorCode(err.code || err.httpStatus)
+        setErrorCode(err.code || err.httpStatus);
       } finally {
-        setIsOpenLoading(false)
+        const payloadSearch = store.getState().closeSaleShiftSlice.payloadSearch;
+        await dispatch(featchCloseSaleShiptListAsync(payloadSearch));
+        setIsOpenLoading(false);
       }
     }
-  }
+  };
 
   const handleClose = () => {
-    setErrorCode('')
-    setBarcode('')
-    onClose()
-  }
+    setErrorCode('');
+    setBarcode('');
+    onClose();
+  };
 
-  return(
+  return (
     <Fragment>
-      <Dialog
-      id="ModalSaveCloseShiftKey"
-      open={open}
-      fullWidth={true} 
-      maxWidth="md"
-      >
-        <Box id="Card" sx={{ m: '10px 10px 20px'}}>
-          <DialogContent 
-            id="CloseButton"
-            sx={{ textAlign: 'right', padding: 0 }}>
-            <IconButton ria-label="close" onClick={handleClose} disabled={isOpenLoading} sx={{color: '#bdbdbd'}} >
-              <HighlightOff fontSize="large" />
+      <Dialog id='ModalSaveCloseShiftKey' open={open} fullWidth={true} maxWidth='md'>
+        <Box id='Card' sx={{ m: '10px 10px 20px' }}>
+          <DialogContent id='CloseButton' sx={{ textAlign: 'right', padding: 0 }}>
+            <IconButton ria-label='close' onClick={handleClose} disabled={isOpenLoading} sx={{ color: '#bdbdbd' }}>
+              <HighlightOff fontSize='large' />
             </IconButton>
           </DialogContent>
 
           <TableSaveCloseShiftKey rowData={payload} />
 
-          <DialogActions sx={{ justifyContent: 'center', marginTop: '15px'}}>
-            <Box sx={{ textAlign: 'center',mr: '30px', maxWidth: '450px'}}>
+          <DialogActions sx={{ justifyContent: 'center', marginTop: '15px' }}>
+            <Box sx={{ textAlign: 'center', mr: '30px', maxWidth: '450px' }}>
               <Typography component='span' color='primary'>
                 กรุณาสแกน Barcode เพื่อเพิ่มรหัสปิดรอบ
               </Typography>
               <TextField
-                name="accountNameTh"
-                size="small"
+                name='accountNameTh'
+                size='small'
                 error={!!errorCode}
                 value={barcode}
-                onKeyPress={(e) => (
-                  (e.key === "Enter" && barcode) ? handleSave() : ''
-                )}
+                onKeyPress={(e) => (e.key === 'Enter' && barcode ? handleSave() : '')}
                 onChange={(e) => setBarcode(e.target.value)}
                 className={classes.MtextField}
-                sx={{mt: 1}}
+                sx={{ mt: 1 }}
                 fullWidth
               />
               {errorCode && (
-                <Typography component='div' color='error' sx={{mt: 1}}>{t(errorCode)}</Typography>
+                <Typography component='div' color='error' sx={{ mt: 1 }}>
+                  {t(errorCode)}
+                </Typography>
               )}
             </Box>
             <LoadingButton
@@ -117,7 +112,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
                   กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                 </Typography>
               }
-              sx={{ borderRadius: 2, width: 100, mt: '32px', mb:  'auto'}}
+              sx={{ borderRadius: 2, width: 100, mt: '32px', mb: 'auto' }}
               onClick={handleSave}>
               บันทึกรหัส
             </LoadingButton>
@@ -125,12 +120,12 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
         </Box>
       </Dialog>
     </Fragment>
-  )
+  );
 }
 
 const TableSaveCloseShiftKey = (props: TableSaveCloseShiftKeyProps) => {
   // Props
-  const { rowData } = props
+  const { rowData } = props;
   // Custom style
   const classes = useStyles();
   // Variable
@@ -183,24 +178,24 @@ const TableSaveCloseShiftKey = (props: TableSaveCloseShiftKeyProps) => {
         <Box component='div' sx={{ marginLeft: 'auto' }}>
           {formatNumber(params.value, 2)}
         </Box>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
-  const rows = [{
-    id: 1,
-    posUser: rowData?.posUser || '-',
-    posCode: rowData?.posCode || '-',
-    shiftCode: rowData?.shiftCode || '-',
-    shiftAmount: rowData?.shiftAmount || 0,
-    billAmount: rowData?.billAmount|| 0
-  }]
-  
-  return(
-    <Box className={classes.MdataGridNoPagination}
-      style={{ width: '75%', margin: 'auto', textAlign: 'center' }}
-    >
-      <Typography component='div' sx={{ mt:1, mb:2, fontWeight: 600 }}>
+  const rows = [
+    {
+      id: 1,
+      posUser: rowData?.posUser || '-',
+      posCode: rowData?.posCode || '-',
+      shiftCode: rowData?.shiftCode || '-',
+      shiftAmount: rowData?.shiftAmount || 0,
+      billAmount: rowData?.billAmount || 0,
+    },
+  ];
+
+  return (
+    <Box className={classes.MdataGridNoPagination} style={{ width: '75%', margin: 'auto', textAlign: 'center' }}>
+      <Typography component='div' sx={{ mt: 1, mb: 2, fontWeight: 600 }}>
         บันทึกรหัสปิดรอบ
       </Typography>
       <DataGrid
@@ -213,5 +208,5 @@ const TableSaveCloseShiftKey = (props: TableSaveCloseShiftKeyProps) => {
         hideFooter
       />
     </Box>
-  )
-}
+  );
+};
