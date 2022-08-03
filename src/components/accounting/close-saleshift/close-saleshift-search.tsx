@@ -28,6 +28,7 @@ import { shiftClose } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 import { ACTIONS } from 'utils/enum/permission-enum';
 import ModalDetailCash from '../open-end/modal-detail-cash';
+import { featchOpenEndDeatilAsync } from 'store/slices/accounting/open-end-slice';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
@@ -176,7 +177,8 @@ function CloseSaleShiftSearch() {
     handleOpenLoading('open', false);
   };
   const handleOnBypass = () => {};
-  const handleOnupdate = () => {
+  const handleOnupdate = async () => {
+    await dispatch(featchOpenEndDeatilAsync('123'));
     setTestModal(true);
   };
   const handleChange = (event: any) => {
@@ -260,7 +262,7 @@ function CloseSaleShiftSearch() {
               startIcon={<UpdateIcon />}
               onClick={handleOnupdate}
               sx={{ minWidth: 100, display: disableBtnManage ? 'none' : '' }}
-              disabled={true}
+              disabled={false}
               className={classes.MbtnSearch}>
               อัพเดท
             </Button>
