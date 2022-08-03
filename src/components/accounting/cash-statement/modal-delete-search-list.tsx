@@ -1,9 +1,10 @@
 import React, { Fragment } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Box, Button, Dialog, DialogActions, DialogContent, TextField, Typography } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 //css
 import { useStyles } from '../../../styles/makeTheme';
+import NumberFormat from 'react-number-format';
 
 interface Props {
   open: boolean;
@@ -61,6 +62,29 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <NumberFormat
+            value={String(params.value)}
+            thousandSeparator={true}
+            decimalScale={2}
+            disabled={true}
+            customInput={TextField}
+            sx={{
+              '.MuiInputBase-input.Mui-disabled': {
+                WebkitTextFillColor: '#000',
+                textAlign: 'end',
+                fontSize: '14px',
+              },
+              '.MuiOutlinedInput-notchedOutline': {
+                border: 'none',
+              },
+            }}
+            fixedDecimalScale
+            type="text"
+          />
+        );
+      },
     },
     {
       field: 'cashOver',
@@ -70,6 +94,29 @@ function ModalDeleteSearchList({ open, onClose, payloadDelete, onConfirmDelete }
       headerAlign: 'center',
       align: 'right',
       sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <NumberFormat
+            value={String(params.value)}
+            thousandSeparator={true}
+            decimalScale={2}
+            disabled={true}
+            customInput={TextField}
+            sx={{
+              '.MuiInputBase-input.Mui-disabled': {
+                WebkitTextFillColor: '#000',
+                textAlign: 'end',
+                fontSize: '14px',
+              },
+              '.MuiOutlinedInput-notchedOutline': {
+                border: 'none',
+              },
+            }}
+            fixedDecimalScale
+            type="text"
+          />
+        );
+      },
     },
   ];
 
