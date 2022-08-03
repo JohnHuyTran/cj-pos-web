@@ -69,50 +69,38 @@ interface Props {}
 export default function Sidebar({}: Props): ReactElement {
   const location = useLocation();
   const selectedByPath = (path: string) => {
-    const pathname = location.pathname.split('/')[1]
+    const pathname = location.pathname.split('/')[1];
     if (!!path && pathname.length !== 0) {
-      return pathname.includes(path)
+      return pathname.includes(path);
     } else if (!path && pathname.length === 0) {
-      return true
+      return true;
     }
-  }
+  };
   const [open, setOpen] = useState(true);
   const [openSellMenu, setOpenSellMenu] = useState(
-    selectedByPath('sale-limit-time') ||
-    selectedByPath('barcode-discount') ||
-    selectedByPath('tax-invoice')
+    selectedByPath('sale-limit-time') || selectedByPath('barcode-discount') || selectedByPath('tax-invoice')
   );
   const [openPickUpMenu, setOpenPickUpMenu] = useState(
-    selectedByPath('check-order') ||
-    selectedByPath('dc-check-order') ||
-    selectedByPath('supplier-check-order')
+    selectedByPath('check-order') || selectedByPath('dc-check-order') || selectedByPath('supplier-check-order')
   );
   const [openTransferMenu, setOpenTransferMenu] = useState(
-    selectedByPath('stock-transfer-rt') ||
-    selectedByPath('stock-transfer')
+    selectedByPath('stock-transfer-rt') || selectedByPath('stock-transfer')
   );
   const [openWithDrawMenu, setOpenWithDrawMenu] = useState(
     selectedByPath('transfer-out-destroy') ||
-    selectedByPath('transfer-out') ||
-    selectedByPath('transfer-out-raw-masterial') ||
-    selectedByPath('create-purchase-branch')
+      selectedByPath('transfer-out') ||
+      selectedByPath('transfer-out-raw-masterial') ||
+      selectedByPath('create-purchase-branch')
   );
   const [openProductInfoMenu, setOpenProductInfoMenu] = useState(
-    selectedByPath('product-master') ||
-    selectedByPath('stock-balance') ||
-    selectedByPath('stock-movement')
+    selectedByPath('product-master') || selectedByPath('stock-balance') || selectedByPath('stock-movement')
   );
   const [openExpenseMenu, setOpenExpenseMenu] = useState(
-    selectedByPath('expense') ||
-    selectedByPath('cash-statement') ||
-    selectedByPath('close-saleshift')
+    selectedByPath('expense') || selectedByPath('cash-statement') || selectedByPath('close-saleshift')
   );
-  const [openSettingsMenu, setOpenSettingsMenu] = useState(
-    selectedByPath('reserves')
-  );
+  const [openSettingsMenu, setOpenSettingsMenu] = useState(selectedByPath('reserves'));
   const [openCheckStockMenu, setOpenCheckStockMenu] = useState(
-    selectedByPath('audit-plan') ||
-    selectedByPath('stock-count')
+    selectedByPath('audit-plan') || selectedByPath('stock-count') || selectedByPath('stock-adjustment')
   );
 
   const navState = useAppSelector((state) => state.navigator.state);
@@ -218,10 +206,7 @@ export default function Sidebar({}: Props): ReactElement {
 
       <List sx={{ marginTop: 2 }}>
         <Link to='/' style={{ textDecoration: 'none', color: '#676767' }}>
-          <ListItemButton
-            key='HOME'
-            selected={selectedByPath('')}
-            id='mainMenuHome'>
+          <ListItemButton key='HOME' selected={selectedByPath('')} id='mainMenuHome'>
             <ListItemIcon>
               <HomeOutlinedIcon />
             </ListItemIcon>
@@ -242,7 +227,8 @@ export default function Sidebar({}: Props): ReactElement {
         </Link> */}
         {/*sell menu start*/}
         {/* <ListItemButton key='SELL' onClick={handleClickSell} sx={{ display: disableSellMainMenu ? 'none' : '' }}></ListItemButton> */}
-        <ListItemButton key='SELL'
+        <ListItemButton
+          key='SELL'
           onClick={() => setOpenSellMenu(!openSellMenu)}
           style={{ display: disableMainMenuSell ? 'none' : '' }}>
           <ListItemIcon>
@@ -302,10 +288,7 @@ export default function Sidebar({}: Props): ReactElement {
               to='/check-order'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuOROrderReceive ? 'none' : '' }}
               id='subMenuCheckOrder'>
-              <ListItemButton
-                key='SALE'
-                selected={selectedByPath('check-order')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='SALE' selected={selectedByPath('check-order')} sx={{ pl: 7 }}>
                 <ListItemText primary='รับสินค้า' />
               </ListItemButton>
             </Link>
@@ -313,10 +296,7 @@ export default function Sidebar({}: Props): ReactElement {
               to='/dc-check-order'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuORStockDiff ? 'none' : '' }}
               id='subMenuDCCheckOrder'>
-              <ListItemButton
-                key='dcConfirmOrder'
-                selected={selectedByPath('dc-check-order')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='dcConfirmOrder' selected={selectedByPath('dc-check-order')} sx={{ pl: 7 }}>
                 <ListItemText primary='ตรวจสอบผลต่างการรับสินค้า' />
               </ListItemButton>
             </Link>
@@ -324,10 +304,7 @@ export default function Sidebar({}: Props): ReactElement {
               to='/supplier-check-order'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuORSupplier ? 'none' : '' }}
               id='subMenuSupplierCheckOrder'>
-              <ListItemButton
-                key='supplierCheckOrder'
-                selected={selectedByPath('supplier-check-order')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='supplierCheckOrder' selected={selectedByPath('supplier-check-order')} sx={{ pl: 7 }}>
                 <ListItemText primary='รับสินค้า จากผู้จำหน่าย' />
               </ListItemButton>
             </Link>
@@ -350,10 +327,7 @@ export default function Sidebar({}: Props): ReactElement {
               to='/stock-transfer-rt'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuSTStockRequest ? 'none' : '' }}
               id='subMenuStockTransferRt'>
-              <ListItemButton
-                key='StockTransferRt'
-                selected={selectedByPath('stock-transfer-rt')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='StockTransferRt' selected={selectedByPath('stock-transfer-rt')} sx={{ pl: 7 }}>
                 <ListItemText primary='สร้างแผนโอนสินค้าระหว่างสาขา/คลัง' />
               </ListItemButton>
             </Link>
@@ -361,10 +335,7 @@ export default function Sidebar({}: Props): ReactElement {
               to='/stock-transfer'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuSTStockTransfer ? 'none' : '' }}
               id='subMenuStockTransfer'>
-              <ListItemButton
-                key='StockTransfer'
-                selected={selectedByPath('stock-transfer')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='StockTransfer' selected={selectedByPath('stock-transfer')} sx={{ pl: 7 }}>
                 <ListItemText primary='โอนสินค้าระหว่างสาขา/คลัง' />
               </ListItemButton>
             </Link>
@@ -449,10 +420,7 @@ export default function Sidebar({}: Props): ReactElement {
                 display: disableSubMenuProductMaster ? 'none' : '',
               }}
               id='subMenuProductMaster'>
-              <ListItemButton
-                key='ProductMaster'
-                selected={selectedByPath('product-master')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='ProductMaster' selected={selectedByPath('product-master')} sx={{ pl: 7 }}>
                 <ListItemText primary='รายละเอียดสินค้า' />
               </ListItemButton>
             </Link>
@@ -460,10 +428,7 @@ export default function Sidebar({}: Props): ReactElement {
               to='/stock-balance'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockBalance ? 'none' : '' }}
               id='subMenuStockBalance'>
-              <ListItemButton
-                key='StockBalance'
-                selected={selectedByPath('stock-balance')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='StockBalance' selected={selectedByPath('stock-balance')} sx={{ pl: 7 }}>
                 <ListItemText primary='สินค้าคงคลัง' />
               </ListItemButton>
             </Link>
@@ -471,10 +436,7 @@ export default function Sidebar({}: Props): ReactElement {
               to='/stock-movement'
               style={{ textDecoration: 'none', color: '#676767', display: disableSubMenuStockMovement ? 'none' : '' }}
               id='subMenuStockMovement'>
-              <ListItemButton
-                key='StockMovement'
-                selected={selectedByPath('stock-movement')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='StockMovement' selected={selectedByPath('stock-movement')} sx={{ pl: 7 }}>
                 <ListItemText primary='ความเคลื่อนไหวของสินค้า' />
               </ListItemButton>
             </Link>
@@ -500,10 +462,7 @@ export default function Sidebar({}: Props): ReactElement {
                 display: disableSubMenuExpense ? 'none' : '',
               }}
               id='subMenuExpense'>
-              <ListItemButton
-                key='Expense'
-                selected={selectedByPath('expense')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='Expense' selected={selectedByPath('expense')} sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่าย' />
               </ListItemButton>
             </Link>
@@ -515,10 +474,7 @@ export default function Sidebar({}: Props): ReactElement {
                 display: disableSubMenuCashStatement ? 'none' : '',
               }}
               id='subMenuCashStatement'>
-              <ListItemButton
-                key='CashStatement'
-                selected={selectedByPath('cash-statement')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='CashStatement' selected={selectedByPath('cash-statement')} sx={{ pl: 7 }}>
                 <ListItemText primary='เงินฝากขาด - เกิน' />
               </ListItemButton>
             </Link>
@@ -530,10 +486,7 @@ export default function Sidebar({}: Props): ReactElement {
                 display: disableSubMenuCloseSaleShift ? 'none' : '',
               }}
               id='subMenuCloseSaleShift'>
-              <ListItemButton
-                key='CloseSaleShift'
-                selected={selectedByPath('close-saleshift')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='CloseSaleShift' selected={selectedByPath('close-saleshift')} sx={{ pl: 7 }}>
                 <ListItemText primary='ปิดรหัสการขาย' />
               </ListItemButton>
             </Link>
@@ -559,10 +512,7 @@ export default function Sidebar({}: Props): ReactElement {
                 display: disableSubMenuSettings ? 'none' : '',
               }}
               id='subMenuSettings'>
-              <ListItemButton
-                key='Settings'
-                selected={selectedByPath('reserves')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='Settings' selected={selectedByPath('reserves')} sx={{ pl: 7 }}>
                 <ListItemText primary='ค่าใช้จ่ายสำรอง' />
               </ListItemButton>
             </Link>
@@ -589,10 +539,7 @@ export default function Sidebar({}: Props): ReactElement {
                 // display: disableSubMenuAuditPlan ? 'none' : '',
               }}
               id='subMenuAuditPlan'>
-              <ListItemButton
-                key='AuditPlan'
-                selected={selectedByPath('audit-plan')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='AuditPlan' selected={selectedByPath('audit-plan')} sx={{ pl: 7 }}>
                 <ListItemText primary='สร้างแผนตรวจนับสต๊อก' />
               </ListItemButton>
             </Link>
@@ -603,11 +550,23 @@ export default function Sidebar({}: Props): ReactElement {
                 color: '#676767',
               }}
               id='subMenuStockCount'>
-              <ListItemButton
-                key='StockCount'
-                selected={selectedByPath('stock-count')}
-                sx={{ pl: 7 }}>
+              <ListItemButton key='StockCount' selected={selectedByPath('stock-count')} sx={{ pl: 7 }}>
                 <ListItemText primary='ตรวจนับสต๊อก (SC)' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/stock-adjustment'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+              }}
+              id='subMenuStockAdjustment'>
+              <ListItemButton
+                key='StockAdjustment'
+                selected={selectedByPath('stock-adjustment')}
+                // onClick={() => handleListItemClick(17)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รายละเอียดตรวจนับสต๊อก (SA)' />
               </ListItemButton>
             </Link>
           </List>

@@ -302,7 +302,7 @@ export default function ModalCreateToDestroyDiscount({
               item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนทำลายจริง';
+              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
             }
           }
         } else {

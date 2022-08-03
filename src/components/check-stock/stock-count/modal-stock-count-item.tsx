@@ -14,7 +14,7 @@ import {
   updateErrorList,
 } from '../../../store/slices/stock-count-slice';
 import { handleNumberBeforeUse, stringNullOrEmpty } from '../../../utils/utils';
-import { Action, TOStatus } from '../../../utils/enum/common-enum';
+import { Action, StockActionStatus, TOStatus } from '../../../utils/enum/common-enum';
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import { StockCountDetail } from '../../../models/stock-count-model';
 
@@ -54,9 +54,15 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           unit: item.unitName,
           unitCode: item.unitCode || '',
           barFactor: item.baseUnit || 0,
-          quantity: stringNullOrEmpty(item.qty) ? null : item.qty,
+          quantity:
+            stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.CONFIRM
+              ? 0
+              : stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.DRAFT
+              ? null
+              : item.qty,
           errorQty: '',
-          skuCode: item.skuCode
+          skuCode: item.skuCode,
+          skuName: item.skuName
         };
       });
       setDtTable(rows);
@@ -74,7 +80,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           unitName: item.unit,
           productName: item.barcodeName,
           sku: item.skuCode,
-          canNotCount: item.checked
+          canNotCount: item.checked,
+          skuName: item.skuName
         };
       });
       dispatch(save({ ...payloadStockCount, products: products }));
@@ -129,7 +136,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission || viewMode}
+          disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission}
           onClick={(e) => onCheckCell(e, params.row.index, params.row.skuCode)}
         />
       ),

@@ -31,9 +31,10 @@ import { StepItem } from "../../../models/step-item-model";
 import ModalStockCountItem from "./modal-stock-count-item";
 import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
-import { cancelStockCount, confirmStockCount } from "../../../services/stock-count";
+import { cancelStockCount, confirmStockCount, getSCDetail } from "../../../services/stock-count";
 import ModalConfirmSC from './modal-confirm-SC';
 import { getUserInfo } from '../../../store/sessionStore';
+import { getUserGroup, isChannelBranch, isGroupAuditParam } from '../../../utils/role-permission';
 
 
 interface Props {
@@ -70,14 +71,17 @@ export default function ModalCreateStockCount({
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalConfirmConfirm, setOpenModalConfirmConfirm] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
+  const [openModalErrorExit, setOpenModalErrorExit] = React.useState<boolean>(false);
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
   const [status, setStatus] = React.useState<string>('');
   const payloadStockCount = useAppSelector((state) => state.stockCountSlice.createDraft);
   const dataDetail = useAppSelector((state) => state.stockCountSlice.dataDetail);
   const checkEdit = useAppSelector((state) => state.stockCountSlice.checkEdit);
   const stockCountDetail = useAppSelector((state) => state.stockCountDetailSlice.stockCountDetail.data);
-  const userName = getUserInfo().preferred_username ? getUserInfo().preferred_username : '';
+  const userGroups = getUserInfo().groups ? getUserInfo().groups : [];
+  const _group = getUserGroup(userGroups);
   //permission
+  const [groupBranch, setGroupBranch] = React.useState(isChannelBranch);
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
@@ -93,7 +97,7 @@ export default function ModalCreateStockCount({
   const handleOpenModalConfirm = () => {
     if (!validate()) {
       setOpenModalError(true);
-      setAlertTextError('ไม่สามารถนับได้');
+      setAlertTextError('กรุณาระบุจำนวนนับ');
       return;
     } else {
 
@@ -112,6 +116,11 @@ export default function ModalCreateStockCount({
   const handleCloseModalError = () => {
     setOpenModalError(false);
   };
+
+  const handleCloseModalErrorExit = () => {
+    setOpenModalErrorExit(false)
+    handleClose()
+  }
 
   const handleClose = async () => {
     dispatch(updateErrorList([]));
@@ -182,8 +191,9 @@ export default function ModalCreateStockCount({
             qty: item.quantity || null,
             skuCode: item.sku,
             canNotCount: item.canNotCount,
+            skuName: item.skuName
           });
-        }
+        }      
         dispatch(updateAddItemsState(lstProductDetail));
       }
     }
@@ -221,32 +231,42 @@ export default function ModalCreateStockCount({
     setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
     handleOpenLoading('open', true);
     try {
-      const payload = {
-        id: dataDetail.id,
-        product: payloadStockCount.products,
-      };
-      const rs = await confirmStockCount(payload);
-      if (rs.code === 20000) {
-        dispatch(
-          updateDataDetail({
-            ...dataDetail,
-            status: StockActionStatus.CONFIRM,
-          })
-        );
-        setOpenPopup(true);
-        setPopupMsg('คุณได้ยืนยันตรวจนับสต๊อก (SC) เรียบร้อยแล้ว');
-        await dispatch(getAuditPlanDetail(dataDetail.APId));
-        if (!objectNullOrEmpty(auditPlanDetail.data)) {
-          setOpenDetailAPAdmin(true);
+      const resuilt = await getSCDetail(dataDetail.id);
+      if (resuilt) {
+        const payload = {
+          id: dataDetail.id,
+          product: payloadStockCount.products,
+        };
+        const rs = await confirmStockCount(payload);
+        if (rs.code === 20000) {
+          dispatch(
+            updateDataDetail({
+              ...dataDetail,
+              status: StockActionStatus.CONFIRM,
+            })
+          );
+          setOpenPopup(true);
+          setPopupMsg('คุณได้ยืนยันตรวจนับสต๊อก (SC) เรียบร้อยแล้ว');
+          handleClose();
+          if (onSearchMain) onSearchMain();
+        } else if (rs.code == 40016) {
+          setOpenModalError(true);
+          setAlertTextError('ไม่สามารถดำเนินการได้\nเนื่องจากเอกสาร AP ถูกยกเลิก');
+        } else {
+          setOpenModalError(true);
         }
-      } else if (rs.code == 40016){
-        setOpenModalError(true);
-        setAlertTextError('ไม่สามารถดำเนินการได้\nเนื่องจากเอกสาร AP ถูกยกเลิก');
+      } else {
+        setOpenModalErrorExit(true);
+        if (onSearchMain) onSearchMain();
+      }
+    } catch (error) {
+      const er: any = error;
+      if (er.code == 50000) {
+        setOpenModalErrorExit(true);
+        if (onSearchMain) onSearchMain();
       } else {
         setOpenModalError(true);
       }
-    } catch (error) {
-      setOpenModalError(true);
     }
     handleOpenLoading('open', false);
   };
@@ -301,7 +321,6 @@ export default function ModalCreateStockCount({
   };
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
-  const [openDetailAPAdmin, setOpenDetailAPAdmin] = React.useState(false)
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -420,7 +439,8 @@ export default function ModalCreateStockCount({
                   sx={{ width: 172 }}
                   style={{
                     display:
-                      userName != 'posaudit' ? 'none' : undefined,
+                      (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) 
+                      || !isGroupAuditParam(_group) || !groupBranch ? 'none' : undefined,
                   }}>
                   คลิกใส่ 0 สินค้าที่ไม่พบ
                 </Button>
@@ -433,7 +453,14 @@ export default function ModalCreateStockCount({
                 sx={{ margin: '0 17px' }}
                 disabled={(!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
                   || (payloadStockCount.products && payloadStockCount.products.length === 0)}
-                style={{ display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) || !managePermission ) ? 'none' : undefined }}
+                style={{
+                  display:
+                    (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
+                    !managePermission ||
+                    !groupBranch 
+                      ? 'none'
+                      : undefined,
+                }}
                 startIcon={<CheckCircleOutlineIcon/>}
                 onClick={handleOpenModalConfirm}
                 className={classes.MbtnSearch}>
@@ -444,7 +471,7 @@ export default function ModalCreateStockCount({
                 variant='contained'
                 color='error'
                 disabled={stringNullOrEmpty(status)}
-                style={{ display: (!managePermission ) ? 'none' : undefined }}
+                style={{ display: !managePermission || !groupBranch  ? 'none' : undefined }}
                 startIcon={<HighlightOffIcon/>}
                 onClick={handleOpenCancel}
                 className={classes.MbtnSearch}>
@@ -472,19 +499,6 @@ export default function ModalCreateStockCount({
           viewMode={true}
         />
       )}
-      {openDetailAPAdmin && (
-        <ModalCreateAuditPlan
-          isOpen={openDetailAPAdmin}
-          onClickClose={() => {
-            setOpenDetailAPAdmin(false)
-          }}
-          action={Action.UPDATE}
-          setPopupMsg={setPopupMsg}
-          setOpenPopup={setOpenPopup}
-          userPermission={userPermission}
-          isRedirect={true}
-        />
-      )}
       <ModelConfirm
         open={openModalCancel}
         onClose={handleCloseModalCancel}
@@ -498,6 +512,11 @@ export default function ModalCreateStockCount({
         open={openModalError}
         onClose={handleCloseModalError}
         textError={alertTextError}
+      />
+      <AlertError
+        open={openModalErrorExit}
+        onClose={handleCloseModalErrorExit}
+        textError={'ไม่สามารถดำเนินการได้\nเนื่องจากเอกสาร AP ถูกยกเลิก'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
     </div>

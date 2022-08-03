@@ -23,14 +23,13 @@ export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactE
   const [pageSize, setPageSize] = React.useState<number>(10);
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const dispatch = useAppDispatch();
-
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
   useEffect(() => {
     if (Object.keys(payloadAddTypeProduct).length !== 0) {
-      let rows = payloadAddTypeProduct
-        .filter((el: any) => el.selectedType === 2)
+      let listProducts = _.uniqBy(payloadAddTypeProduct.filter((el: any) => el.selectedType === 2), 'skuName')
+      let rows = _.sortBy(listProducts, 'skuCode')
         .map((item: any, index: number) => {
           return {
             id: `${index}-${item.barcode}`,
@@ -38,7 +37,7 @@ export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactE
             barcode: item.barcode,
             skuCode: item.skuCode,
             unitName: item.unitName,
-            productName: item.barcodeName,
+            productName: item.skuName,
             categoryTypeCode: item.categoryTypeCode,
           };
         });

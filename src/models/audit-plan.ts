@@ -44,6 +44,7 @@ export interface AuditPlan {
   branchCode: string;
   branchName: string;
   createdBy: string;
+  createdByGroup: string;
   documentNumber: string;
   status: string;
   createdDate: string;

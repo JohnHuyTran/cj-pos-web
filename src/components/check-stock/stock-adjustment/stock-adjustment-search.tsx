@@ -18,12 +18,13 @@ import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { BranchListOptionType } from '../../../models/branch-model';
-import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
-import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
-import StockCountList from "./stock-count-list";
+import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment-search-slice";
+// import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
+import StockAdjustmentList from "./stock-adjustment-list";
 import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
 import { isChannelBranch } from "../../../utils/role-permission";
 import { StockCountSearchRequest } from "../../../models/stock-count-model";
+import { StockAdjustmentSearchRequest } from '../../../models/stock-adjustment-model';
 
 const _ = require('lodash');
 
@@ -40,7 +41,7 @@ interface loadingModalState {
   open: boolean;
 }
 
-const StockCountSearch = () => {
+const StockAdjustmentSearch = () => {
   const classes = useStyles();
   const { t } = useTranslation(['barcodeDiscount', 'common']);
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -50,8 +51,8 @@ const StockCountSearch = () => {
 
   const dispatch = useAppDispatch();
   const page = '1';
-  const limit = useAppSelector((state) => state.stockCountSearchSlice.toSearchResponse.perPage);
-  const stockCountSearchSlice = useAppSelector((state) => state.stockCountSearchSlice);
+  const limit = useAppSelector((state) => state.stockAdjustmentSearchSlice.toSearchResponse.perPage);
+  const stockAdjustmentSearchSlice = useAppSelector((state) => state.stockAdjustmentSearchSlice);
   const [requestPermission, setRequestPermission] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
     open: false,
@@ -87,11 +88,9 @@ const StockCountSearch = () => {
 
   useEffect(() => {
     if (groupBranch) {
-      setOwnBranch(getUserInfo().branch
-        ? getBranchName(branchList, getUserInfo().branch)
-          ? getUserInfo().branch
-          : ''
-        : '');
+      setOwnBranch(
+        getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
+      );
       setBranchOptions({
         code: ownBranch,
         name: branchName ? branchName : '',
@@ -153,17 +152,17 @@ const StockCountSearch = () => {
       endDate: new Date(),
     });
 
-    const payload: StockCountSearchRequest = {
+    const payload: StockAdjustmentSearchRequest = {
       perPage: (limit ? limit : 10).toString(),
       page: page,
-      query: values.documentNumber,
+      docNo: values.documentNumber,
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.startDate).startOf('day').toISOString(),
-      endDate: moment(values.endDate).endOf('day').toISOString(),
+      creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
+      creationDateTo: moment(values.endDate).endOf('day').toISOString(),
       clearSearch: true
     };
-    dispatch(getStockCountSearch(payload));
+    dispatch(getStockAdjustmentSearch(payload));
     if (!requestPermission) {
       setListBranchSelect([]);
     }
@@ -191,29 +190,29 @@ const StockCountSearch = () => {
     } else {
       limits = limit ? limit.toString() : '10';
     }
-    const payload: StockCountSearchRequest = {
+    const payload: StockAdjustmentSearchRequest = {
       perPage: limits,
       page: page,
-      query: values.documentNumber.trim(),
+      docNo: values.documentNumber.trim(),
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.startDate).startOf('day').toISOString(),
-      endDate: moment(values.endDate).endOf('day').toISOString(),
+      creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
+      creationDateTo: moment(values.endDate).endOf('day').toISOString(),
     };
 
     handleOpenLoading('open', true);
-    await dispatch(getStockCountSearch(payload));
-    await dispatch(saveSearchCriteriaSC(payload));
+    await dispatch(getStockAdjustmentSearch(payload));
+    // await dispatch(saveSearchCriteriaSC(payload));
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };
 
   let dataTable;
-  const res = stockCountSearchSlice.toSearchResponse;
+  const res = stockAdjustmentSearchSlice.toSearchResponse;
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <StockCountList onSearch={onSearch} type={values.type}/>;
+      dataTable = <StockAdjustmentList onSearch={onSearch} type={values.type}/>;
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent='center'>
@@ -243,7 +242,7 @@ const StockCountSearch = () => {
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
               fullWidth
-              placeholder={'เลขที่เอกสาร SC'}
+              placeholder={'เลขที่เอกสาร SA'}
             />
           </Grid>
           <Grid item xs={4}>
@@ -342,4 +341,4 @@ const StockCountSearch = () => {
   );
 };
 
-export default StockCountSearch;
+export default StockAdjustmentSearch;

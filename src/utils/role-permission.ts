@@ -110,6 +110,10 @@ export const isGroupBranchParam = (group: string) => {
   return group === PERMISSION_GROUP.BRANCH;
 };
 
+export const isGroupAuditParam = (group: string) => {
+  return group === PERMISSION_GROUP.AUDIT;
+};
+
 export const isPreferredUsername = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.preferred_username;
