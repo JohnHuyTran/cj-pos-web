@@ -258,7 +258,7 @@ function CloseSaleShiftSearch() {
               startIcon={<UpdateIcon />}
               onClick={handleOnupdate}
               sx={{ minWidth: 100, display: disableBtnManage ? 'none' : '' }}
-              disabled={false}
+              disabled={true}
               className={classes.MbtnSearch}>
               อัพเดท
             </Button>
