@@ -27,12 +27,16 @@ import StepperBar from "../../commons/ui/stepper-bar";
 import { StepItem } from "../../../models/step-item-model";
 import { clearDataFilter, getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
-import { cancelStockCount, confirmStockCount } from "../../../services/stock-count";
 import ModalStockAdjustmentItem from "./modal-stock-adjustment-item";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import ModalAddStockCount from "./modal-add-stock-count";
 import SaveIcon from "@mui/icons-material/Save";
-import { saveDraftStockAdjust } from "../../../services/stock-adjustment";
+import {
+  cancelStockAdjust,
+  confirmStockAdjust,
+  getCalculateSkuStats,
+  saveDraftStockAdjust
+} from "../../../services/stock-adjustment";
 import SnackbarStatus from "../../commons/ui/snackbar-status";
 import IconButton from "@mui/material/IconButton";
 import { HighlightOff, Replay } from "@mui/icons-material";
@@ -40,6 +44,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import ModelConfirmStockAdjust from "./modal-confirm-stock-adjust";
 import { clearCalculate, updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
+import { saveDraftAuditPlan } from "../../../services/audit-plan";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -98,7 +103,17 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     setOpenModalCancel(false);
   };
 
-  const handleOpenModalConfirm = () => {
+  const handleOpenModalConfirm = async () => {
+    await dispatch(getAuditPlanDetail(dataDetail.APId));
+    let rsStats = await getCalculateSkuStats(dataDetail.id);
+    if (rsStats && rsStats.data) {
+      await dispatch(updateDataDetail({
+        ...dataDetail,
+        skuDifferenceEqual: rsStats.data.numberOfEqualDifference,
+        skuDifferenceNegative: rsStats.data.numberOfNegativeDifference,
+        skuDifferencePositive: rsStats.data.numberOfPositiveDifference,
+      }));
+    }
     setOpenModalConfirmConfirm(true);
   };
 
@@ -106,8 +121,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     setOpenModalConfirmConfirm(false);
     if (confirm) {
       setOpenModalConfirmConfirm(false);
-      // handleConfirm();
-      // handle create AP
+      //handle save recheck in SA
+      handleCreateDraft(relatedSCs);
+      //confirm SA
+      handleConfirm();
     }
   };
 
@@ -197,7 +214,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     try {
       const payload = {
         ...dataDetail,
-        relatedSCs: relatedSCsParam
+        relatedSCs: relatedSCsParam,
       };
       const rs = await saveDraftStockAdjust(payload);
       if (rs.code === 20000) {
@@ -210,6 +227,8 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             id: rs.data.id,
             documentNumber: rs.data.documentNumber,
             status: StockActionStatus.DRAFT,
+            relatedSCs: rs.data.relatedSCs ? rs.data.relatedSCs : relatedSCs,
+            recheckSkus: rs.data.recheckSkus ? rs.data.recheckSkus : [],
           })
         );
         handleRefresh();
@@ -227,7 +246,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
       const payload = {
         id: dataDetail.id,
       };
-      const rs = await confirmStockCount(payload);
+      const rs = await confirmStockAdjust(payload);
       if (rs.code === 20000) {
         dispatch(
           updateDataDetail({
@@ -235,6 +254,17 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             status: StockActionStatus.CONFIRM,
           })
         );
+        // handle create AP when have recheck SA
+        if (dataDetail.recheckSkus && dataDetail.recheckSkus.length > 0) {
+          const body = {
+            branchCode: dataDetail.branchCode,
+            branchName: dataDetail.branchName,
+            countingDate: moment(new Date()).endOf('day').toISOString(true),
+            stockCounter: dataDetailAP.stockCounter,
+            product: dataDetail.recheckSkus,
+          };
+          saveDraftAuditPlan(body);
+        }
         setOpenPopup(true);
         setPopupMsg('คุณได้ทำการยืนยันตรวจนับสต๊อกรวม (SA) \n เรียบร้อยแล้ว');
         handleClose();
@@ -251,7 +281,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     if (!stringNullOrEmpty(status)) {
       try {
-        const rs = await cancelStockCount(dataDetail.id);
+        const rs = await cancelStockAdjust(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
           setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกรวม (SA) เรียบร้อยแล้ว');
@@ -422,7 +452,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   variant='contained'
                   color='warning'
                   startIcon={<SaveIcon/>}
-                  disabled={!(dataDetail.relatedSCs && dataDetail.relatedSCs.length > 0)}
+                  disabled={!(relatedSCs && relatedSCs.length > 0)}
                   style={{ display: (!managePermission || viewMode) ? 'none' : undefined }}
                   onClick={() => handleCreateDraft(relatedSCs)}
                   className={classes.MbtnSearch}
@@ -440,7 +470,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                       || !managePermission || viewMode) ? 'none' : undefined
                   }}
                   startIcon={<CheckCircleOutlineIcon/>}
-                  // onClick={handleOpenModalConfirm}
+                  onClick={handleOpenModalConfirm}
                   className={classes.MbtnSearch}>
                   ยืนยัน
                 </Button>
@@ -454,7 +484,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                       || !managePermission || viewMode) ? 'none' : undefined
                   }}
                   startIcon={<HighlightOffIcon/>}
-                  // onClick={handleOpenCancel}
+                  onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
                 </Button>
