@@ -31,7 +31,7 @@ export default function ModalDownloadErrorFile({
     var a = document.createElement('a');
     a.href = window.URL.createObjectURL(blob);
 
-    a.download = `RT_TEMPLATE_${moment(new Date()).format('YYYYMMDDhhmmss')}.xlsx`;
+    a.download = `FINANCE_RESULT_${moment(new Date()).format('YYYYMMDDhhmmss')}.xlsx`;
     a.click();
     onClickClose();
   };
