@@ -30,7 +30,7 @@ import {
 } from '../../../store/slices/search-type-product-slice';
 import { updateAddTypeAndProductState } from '../../../store/slices/add-type-product-slice';
 import LoadingModal from './loading-modal';
-import { getProductByType } from '../../../services/product-master';
+import { getAllProductByBarcode, getProductByType } from '../../../services/product-master';
 import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
 import { FindProductProps, FindProductRequest } from '../../../models/product-model';
 
@@ -78,7 +78,8 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
     },
   });
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
-  const productResponse = useAppSelector((state) => state.searchTypeAndProduct.itemList);
+  // const productResponse = useAppSelector((state) => state.searchTypeAndProduct.itemList);
+  const [productItems, setProductItems] = React.useState<any>();
   const productTypeResponse = useAppSelector((state) => state.searchTypeAndProduct.productTypeList);
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const searchDebouceRef = useRef<any>();
@@ -111,7 +112,16 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
           search: keyword,
           payload: payloadBody,
         };
-        await dispatch(newSearchAllProductAsync(payload));
+        // await dispatch(newSearchAllProductAsync(payload));
+        const rs = await getAllProductByBarcode(payload);
+        if (rs) {
+          if (rs.data.length === 1) {
+            handleChangeProduct('', rs.data[0]);
+            setProductItems([]);
+          } else {
+            setProductItems(rs.data);
+          }
+        }
       } else {
         clearData();
       }
@@ -156,11 +166,7 @@ const ModalAddTypeProduct: React.FC<Props> = (props) => {
   };
 
   let productOptions: any = [];
-  if (searchItem)
-    productOptions =
-      !objectNullOrEmpty(productResponse) && productResponse.data && productResponse.data.length > 0
-        ? productResponse.data
-        : [];
+  if (searchItem) productOptions = !objectNullOrEmpty(productItems) && productItems.length > 0 ? productItems : [];
   const filterProductOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode,
   });
