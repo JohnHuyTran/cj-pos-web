@@ -18,7 +18,7 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['expense', 'common']);
   const cashPayment: any = null;
-  const arr = Object.entries(cashPayment);
+  const arr: any[] = [];
 
   return (
     <React.Fragment>
