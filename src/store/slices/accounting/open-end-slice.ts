@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { get } from 'adapters/posback-adapter';
 import { environment } from 'environment-base';
+import { featchViewOpenEndRsMockup } from 'mockdata/branch-accounting';
 import { ViewOpenEndResponse } from 'models/branch-accounting-model';
 import { getPathExpenseDetail } from 'services/accounting';
 
@@ -23,7 +24,8 @@ const initialState: State = {
 export const featchOpenEndDeatilAsync = createAsyncThunk('OpenEndDeatil', async (docNo: string) => {
   try {
     const apiRootPath = getPathExpenseDetail(docNo, environment.branchAccounting.expense.detail.url);
-    return await get(apiRootPath).then();
+    return featchViewOpenEndRsMockup();
+    // return await get(apiRootPath).then();
   } catch (error) {
     throw error;
   }

@@ -19,30 +19,42 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
   const { t } = useTranslation(['expense', 'common']);
   const viewOpenEndResponse = useAppSelector((state) => state.viewOpenEndSlice.viewOpenEnd);
   const data: any = viewOpenEndResponse.data ? viewOpenEndResponse.data : null;
-  const incomes: any = null;
+  const incomes: Income = data ? data.income : null;
   return (
     <React.Fragment>
-      <Dialog open={isOpen} maxWidth='xl' fullWidth={true}>
+      <Dialog open={isOpen} maxWidth='lg' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClose}></BootstrapDialogTitle>
-        <DialogContent sx={{ minHeight: '70vh' }}>
-          <Grid container spacing={1} padding={2} minWidth={'1000px'}>
-            <Grid
-              item
-              xs={7}
-              sx={{
-                backgroundColor: '#f3fbf8',
-                border: '1px solid #BFF1C4',
-                borderRadius: '7px',
-              }}>
-              <Grid container spacing={2} mr={1} mt={'11px'}>
+        <DialogContent>
+          <Grid container spacing={2.5} padding={2} minWidth={'1000px'}>
+            <Grid item mt={1} xs={7}>
+              <Grid
+                container
+                spacing={2}
+                mb={3}
+                sx={{
+                  // backgroundColor: '#f3fbf8',
+                  border: '1px solid #EAEBEB',
+                  borderRadius: '7px',
+                  padding: '10px 40px 20px 10px',
+                }}>
+                {incomes && incomes.paymentTypeItems.length > 0 && (
+                  <Grid item xs={12}>
+                    <Typography sx={{ fontWeight: 'bold' }}>รายรับตามประเภทชำระ</Typography>
+                  </Grid>
+                )}
+
                 {incomes &&
+                  incomes.paymentTypeItems.length > 0 &&
                   incomes.paymentTypeItems.map((element: Item, index: number) => {
                     return (
                       <>
+                        <Grid item xs={1}>
+                          <Typography></Typography>
+                        </Grid>
                         <Grid item xs={5}>
                           <Typography>{element.name}</Typography>
                         </Grid>
-                        <Grid item xs={7}>
+                        <Grid item xs={6} justifyContent='flex-end'>
                           <NumberFormat
                             value={String(element.amount)}
                             thousandSeparator={true}
@@ -62,22 +74,31 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
             <Grid item xs={5} mt={1}>
               <Grid
                 sx={{
-                  backgroundColor: '#f3fbf8',
-                  border: '1px solid #BFF1C4',
+                  // backgroundColor: '#f3fbf8',
+                  border: '1px solid #EAEBEB',
                   borderRadius: '7px',
-                  padding: '20px 40px 20px 10px',
+                  padding: '10px 40px 20px 10px',
                 }}
                 container
                 spacing={2}
                 mb={3}>
+                {incomes && incomes.typeItems.length > 0 && (
+                  <Grid item xs={12}>
+                    <Typography sx={{ fontWeight: 'bold' }}>รายรับตามประเภท</Typography>
+                  </Grid>
+                )}
                 {incomes &&
+                  incomes.typeItems.length > 0 &&
                   incomes.typeItems.map((element: Item, index: number) => {
                     return (
                       <>
+                        <Grid item xs={1}>
+                          <Typography></Typography>
+                        </Grid>
                         <Grid item xs={5}>
                           <Typography>{element.name}</Typography>
                         </Grid>
-                        <Grid item xs={7}>
+                        <Grid item xs={6}>
                           <NumberFormat
                             value={String(element.amount)}
                             thousandSeparator={true}
@@ -93,14 +114,61 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                   })}
               </Grid>
               <Grid
-                sx={{
-                  backgroundColor: '#f3fbf8',
-                  border: '1px solid #BFF1C4',
-                  borderRadius: '7px',
-                  padding: '0px 40px 20px 10px',
-                }}
+                sx={
+                  {
+                    // backgroundColor: '#f3fbf8',
+                    // border: '1px solid #BFF1C4',
+                    // borderRadius: '7px',
+                    //padding: '0px 40px 20px 10px',
+                  }
+                }
                 container
-                spacing={2}></Grid>
+                spacing={2}
+                alignContent='flex-end'
+                alignItems={'flex-end'}>
+                <Grid item xs={6}>
+                  <Typography>รวมยอดขาย(ยกเว้นภาษี)</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <NumberFormat
+                    value={String(incomes && incomes.totalAmount ? incomes.totalAmount : 0)}
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    className={classes.MtextFieldNumber}
+                    disabled={true}
+                    customInput={TextField}
+                    fixedDecimalScale
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>ยอดขายก่อนภาษี</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <NumberFormat
+                    value={String(incomes && incomes.netAmount ? incomes.netAmount : 0)}
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    className={classes.MtextFieldNumber}
+                    disabled={true}
+                    customInput={TextField}
+                    fixedDecimalScale
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>ยอดขายยกเว้นภาษี</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <NumberFormat
+                    value={String(incomes && incomes.netAmountNonVat ? incomes.netAmountNonVat : 0)}
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    className={classes.MtextFieldNumber}
+                    disabled={true}
+                    customInput={TextField}
+                    fixedDecimalScale
+                  />
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </DialogContent>
