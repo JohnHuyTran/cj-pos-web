@@ -27,6 +27,7 @@ import ModalCloseSale from './modal-close-sale';
 import { shiftClose } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 import { ACTIONS } from 'utils/enum/permission-enum';
+import ModalDetailCash from '../open-end/modal-detail-cash';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
@@ -82,7 +83,7 @@ function CloseSaleShiftSearch() {
   const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState('');
   const [disableBtnSearch, setDisableBtnSearch] = React.useState(true);
   const [disableBtnManage, setDisableBtnManage] = React.useState(true);
-
+  const [teseModal, setTestModal] = React.useState(false);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -175,7 +176,9 @@ function CloseSaleShiftSearch() {
     handleOpenLoading('open', false);
   };
   const handleOnBypass = () => {};
-  const handleOnupdate = () => {};
+  const handleOnupdate = () => {
+    setTestModal(true);
+  };
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
@@ -320,6 +323,12 @@ function CloseSaleShiftSearch() {
         onClose={() => setOpenModalCloseSale(false)}
         noOfShiftKey={noOfShiftKey}
         docNo={docNo}
+      />
+      <ModalDetailCash
+        isOpen={teseModal}
+        onClose={function (): void {
+          setTestModal(false);
+        }}
       />
     </>
   );

@@ -101,7 +101,7 @@ function CloseSaleShiftSearchList() {
         const shiftAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
         const isDiff = shiftAmount != billAmount;
         const _status = params.getValue(params.id, 'status');
-        if (shiftAmount > 0) {
+        if (!stringNullOrEmpty(params.value)) {
           return (
             <NumberFormat
               value={String(params.value)}
@@ -132,7 +132,7 @@ function CloseSaleShiftSearchList() {
         const billAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
         const isDiff = shiftAmount != billAmount;
         const _status = params.getValue(params.id, 'status');
-        if (billAmount > 0) {
+        if (!stringNullOrEmpty(params.value)) {
           return (
             <NumberFormat
               value={String(params.value)}
@@ -158,7 +158,7 @@ function CloseSaleShiftSearchList() {
       sortable: false,
       renderCell: (params) => {
         const value = Number(params.value || 0);
-        if (value > 0) {
+        if (!stringNullOrEmpty(params.value)) {
           return (
             <NumberFormat
               value={String(params.value)}
@@ -254,7 +254,7 @@ function CloseSaleShiftSearchList() {
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
-    if (shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
+    if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
       handleOpenLoading('open', true);
       const payload: CloseSaleShiftInfo = {
         branchCode: params.row.branchCode,
@@ -267,8 +267,8 @@ function CloseSaleShiftSearchList() {
         noOfSaleBill: params.row.noOfSaleBill,
         noOfReturnBill: params.row.noOfReturnBill,
         status: '',
-        posCode: '',
-        posUser: '',
+        posCode: params.row.posCode,
+        posUser: params.row.posUser,
       };
       setPayloadCloseShiftKey(payload);
       handleOpenLoading('open', false);
