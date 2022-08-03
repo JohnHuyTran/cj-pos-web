@@ -8,6 +8,7 @@ import {
 } from "../../models/stock-adjustment-model";
 import { stringNullOrEmpty } from "../../utils/utils";
 import { environment } from "../../environment-base";
+import { ContentType } from "../../utils/enum/common-enum";
 
 type State = {
   barcodeCalculateCriteria: SACalculateRequest;
@@ -15,6 +16,7 @@ type State = {
   barcodeCalculateResponse: SABarcodeCalculateResponse;
   skuCalculateResponse: SASkuCalculateResponse;
   refresh: boolean;
+  reload: boolean;
 };
 
 const initialState: State = {
@@ -51,6 +53,7 @@ const initialState: State = {
     totalPage: 0,
   },
   refresh: false,
+  reload: false,
 };
 
 export const getSkuCalculate = createAsyncThunk(
@@ -72,7 +75,7 @@ export const getSkuCalculate = createAsyncThunk(
         perPage: 0,
         totalPage: 0,
       };
-      response = await get(path).then();
+      response = await get(path, ContentType.JSON, 30000).then();
       return response;
     } catch (error) {
       throw error;
@@ -99,7 +102,7 @@ export const getBarcodeCalculate = createAsyncThunk(
         perPage: 0,
         totalPage: 0,
       };
-      response = await get(path).then();
+      response = await get(path, ContentType.JSON, 30000).then();
       return response;
     } catch (error) {
       throw error;
@@ -120,6 +123,10 @@ const stockAdjustCalculateSlice = createSlice({
     updateRefresh: (state, action: any) => {
       state.refresh = action.payload;
     },
+    updateReload: (state, action: any) => {
+      state.reload = action.payload;
+    },
+    clearCalculate: (state) => initialState,
   },
   extraReducers: (builer) => {
     builer.addCase(getBarcodeCalculate.pending, () => {
@@ -146,6 +153,8 @@ const stockAdjustCalculateSlice = createSlice({
 export const {
   saveBarcodeCalculateCriteria,
   saveSkuCalculateCriteria,
-  updateRefresh
+  updateRefresh,
+  updateReload,
+  clearCalculate
 } = stockAdjustCalculateSlice.actions;
 export default stockAdjustCalculateSlice.reducer;

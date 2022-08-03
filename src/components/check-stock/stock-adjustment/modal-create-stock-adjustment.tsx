@@ -25,7 +25,7 @@ import ModelConfirm from "../../barcode-discount/modal-confirm";
 import { updateCheckStock } from "../../../store/slices/stock-balance-check-slice";
 import StepperBar from "../../commons/ui/stepper-bar";
 import { StepItem } from "../../../models/step-item-model";
-import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
+import { clearDataFilter, getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
 import { cancelStockCount, confirmStockCount } from "../../../services/stock-count";
 import ModalStockAdjustmentItem from "./modal-stock-adjustment-item";
@@ -39,7 +39,7 @@ import { HighlightOff, Replay } from "@mui/icons-material";
 import DialogTitle from "@mui/material/DialogTitle";
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import ModelConfirmStockAdjust from "./modal-confirm-stock-adjust";
-import { updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
+import { clearCalculate, updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -116,6 +116,11 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   };
 
   const handleClose = async () => {
+    //clear state detail AP
+    dispatch(clearDataFilter());
+    //clear calculate
+    dispatch(clearCalculate());
+
     dispatch(updateErrorList([]));
     dispatch(updateCheckStock([]));
     dispatch(
@@ -320,6 +325,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             data-testid='testid-title-btnClose'
             aria-label='close'
             onClick={handleRefresh}
+            disabled={stringNullOrEmpty(dataDetail.id)}
             sx={{
               position: 'absolute',
               right: 55,

@@ -17,7 +17,7 @@ import { BarcodeCalculate, SACalculateRequest, SkuCalculate } from "../../../mod
 import {
   getBarcodeCalculate, getSkuCalculate,
   saveBarcodeCalculateCriteria, saveSkuCalculateCriteria,
-  updateRefresh
+  updateRefresh, updateReload
 } from "../../../store/slices/stock-adjust-calculate-slice";
 import LoadingModal from "../../commons/ui/loading-modal";
 import { numberWithCommas, stringNullOrEmpty } from "../../../utils/utils";
@@ -72,6 +72,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   const dispatch = useAppDispatch();
   const dataDetail = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
   const refreshCalculate = useAppSelector((state) => state.stockAdjustCalculateSlice.refresh);
+  const reloadCalculate = useAppSelector((state) => state.stockAdjustCalculateSlice.reload);
   const skuCalculateResponse = useAppSelector((state) => state.stockAdjustCalculateSlice.skuCalculateResponse);
   const barcodeCalculateResponse = useAppSelector((state) => state.stockAdjustCalculateSlice.barcodeCalculateResponse);
   const skuCalculateData = useAppSelector((state) => state.stockAdjustCalculateSlice.skuCalculateResponse.data);
@@ -170,14 +171,43 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   useEffect(() => {
     if (refreshCalculate) {
       handleOpenLoading('open', true);
-      handleCalculate().then(() => {
+      handleRefreshCalculate().then(() => {
         handleOpenLoading('open', false);
       });
       dispatch(updateRefresh(false));
     }
   }, [refreshCalculate]);
 
-  const handleCalculate = async () => {
+  const handleRefreshCalculate = async () => {
+    let skuCalculateCriteriaNew = {
+      perPage: 10,
+      page: 1,
+      id: dataDetail.id,
+      filterDifference: '',
+    };
+    await dispatch(saveSkuCalculateCriteria(skuCalculateCriteriaNew));
+    await dispatch(getSkuCalculate(skuCalculateCriteriaNew));
+    let barcodeCalculateCriteriaNew = {
+      perPage: 10,
+      page: 1,
+      id: dataDetail.id,
+      filterDifference: '',
+    };
+    await dispatch(saveBarcodeCalculateCriteria(barcodeCalculateCriteriaNew));
+    await dispatch(getBarcodeCalculate(barcodeCalculateCriteriaNew));
+  };
+
+  useEffect(() => {
+    if (reloadCalculate) {
+      handleOpenLoading('open', true);
+      handleReloadCalculate().then(() => {
+        handleOpenLoading('open', false);
+      });
+      dispatch(updateReload(false));
+    }
+  }, [reloadCalculate]);
+
+  const handleReloadCalculate = async () => {
     if (values.valueTab === 0) {
       let filterDifference0 = '';
       if (values.differenceEqual0) {
@@ -290,7 +320,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
 
   const onCheckDifferenceFilter = async (e: any, fieldName: string) => {
     await setValues({ ...values, [fieldName + values.valueTab]: e.target.checked });
-    dispatch(updateRefresh(true));
+    dispatch(updateReload(true));
   };
 
   const onCheckCell = async (params: GridRenderCellParams, event: any) => {
