@@ -235,7 +235,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
     return {
       id: data.id,
       index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
-      branchCode: data.branchCode,
+      branchCode: data.branchCode?.name ? data.branchCode?.name : '',
       cashDate: convertUtcToBkkDate(data.cashDate),
       salesDate: convertUtcToBkkDate(data.salesDate),
       cashOver: data.cashOver,

@@ -612,16 +612,25 @@ export const environment = {
       edit: {
         url: 'accounting/cash-statement/edit',
       },
+      downloadTemplate: {
+        url: 'accounting/cash-statement/download-template',
+      },
       import: {
         url: 'accounting/cash-statement/import',
       },
       delete: {
         url: 'accounting/cash-statement/delete/{id}',
       },
+      approve: {
+        url: 'accounting/cash-statement/approve-list',
+      },
     },
     openEnd: {
       search: {
         url: 'accounting/open-end',
+      },
+      view: {
+        url: 'accounting/open-end/{docNo}',
       },
     },
   },

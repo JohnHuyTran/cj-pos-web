@@ -19,5 +19,12 @@
     "documentSearch": "ค่าใช้จ่าย",
     "closeSaleShift": "ปิดรหัสการขาย",
     "openEnd": "ปิดรอบการขาย"
+  },
+  "cashPayment": {
+    "totalPayAmount": "รวมเงินสดจ่าย",
+    "iceAmount": "ค่าน้ำแข็ง",
+    "yakultAmount": "ค่ายาคูลท์",
+    "coffeeExpenseAmount": "เงินอนุมัติสำรองร้านกาแฟ",
+    "frontExpenseAmount": "เงินอนุมัติสำรองหน้าร้าน"
   }
 }

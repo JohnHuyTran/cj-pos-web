@@ -7,10 +7,9 @@ import { useStyles } from 'styles/makeTheme';
 import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
 import { Box, Grid, TextField, Typography } from '@mui/material';
 import { Download, UploadFile } from '@mui/icons-material';
-import { fetchDownloadTemplateRT } from 'services/stock-transfer';
 import moment from 'moment';
 import { ApiUploadError } from 'models/api-error-model';
-import { importCashStatement } from 'services/accounting';
+import { downloadTemplateCS, importCashStatement } from 'services/accounting';
 
 interface Props {
   open: boolean;
@@ -31,7 +30,7 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
 
   const handleDownloadTemplate = async () => {
     setOpenLoadingModal(true);
-    await fetchDownloadTemplateRT()
+    await downloadTemplateCS()
       .then((value) => {
         var a = document.createElement('a');
         a.href = window.URL.createObjectURL(value.data);
@@ -39,7 +38,7 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
         a.click();
       })
       .catch((error: any) => {
-        console.log('fetchDownloadTemplateRT:', error);
+        console.log('downloadTemplateCS:', error);
       });
 
     setOpenLoadingModal(false);
@@ -202,90 +201,12 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
                 startIcon={<Download />}
                 onClick={handleUpLoadFile}
                 className={classes.MbtnSearch}
-                sx={{ minWidth: 200 }}>
+                sx={{ minWidth: 200 }}
+                disabled={fileName === ''}>
                 อัพโหลดเอกสาร
               </Button>
             </Grid>
           </Grid>
-
-          {/* <Grid item xs={12} mt={2} mb={4}>
-            <div>
-              {errorBrowseFile === true && (
-                <>
-                  <TextField
-                    error
-                    name='browserTxf'
-                    className={classes.MtextFieldUpload}
-                    value={fileName}
-                    placeholder='แนบไฟล์ .xlsx'
-                    helperText={msgErrorBrowseFile}
-                  />
-                </>
-              )}
-
-              {errorBrowseFile === false && (
-                <>
-                  <TextField
-                    name='browserTxf'
-                    className={classes.MtextFieldUpload}
-                    value={fileName}
-                    placeholder='กรุณาเลือกไฟล์ที่ต้องการนำเข้า'
-                    helperText='แนบไฟล์ .xlsx'
-                  />
-                </>
-              )}
-
-              {errorUploadFile === true && (
-                <>
-                  <input
-                    id='btnBrowse'
-                    type='file'
-                    accept='.xlsx'
-                    onChange={handleFileInputChange}
-                    style={{ display: 'none' }}
-                  />
-                </>
-              )}
-
-              {errorUploadFile === false && (
-                <>
-                  <input
-                    id='btnBrowse'
-                    type='file'
-                    accept='.xlsx'
-                    onChange={handleFileInputChange}
-                    style={{ display: 'none' }}
-                  />
-                </>
-              )}
-
-              <label htmlFor={'btnBrowse'}>
-                <Button
-                  id='btnPrint'
-                  color='primary'
-                  variant='contained'
-                  component='span'
-                  startIcon={<Download />}
-                  className={classes.MbtnSearch}
-                  style={{ marginLeft: 10, textTransform: 'none', minWidth: 200 }}>
-                  แนบไฟล์
-                </Button>
-              </label>
-            </div>
-          </Grid> */}
-
-          {/* <Grid item xs={12} mt={2} sx={{ textAlign: 'center' }}>
-            <Button
-              id='btnImport'
-              variant='contained'
-              color='primary'
-              startIcon={<Download />}
-              onClick={handleUpLoadFile}
-              className={classes.MbtnSearch}
-              sx={{ width: '27%' }}>
-              อัพโหลดเอกสาร
-            </Button>
-          </Grid> */}
         </DialogContent>
       </Dialog>
 

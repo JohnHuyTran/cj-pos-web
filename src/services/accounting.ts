@@ -1,4 +1,4 @@
-import { post, put } from '../adapters/posback-adapter';
+import { get, getFile, post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import {
   AccountAccountExpenses,
@@ -12,6 +12,7 @@ import {
 } from '../models/branch-accounting-model';
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
+import { env } from '../adapters/environmentConfigs';
 
 export async function expenseSave(payload: ExpenseSaveRequest, files: File[]) {
   const bodyFormData = new FormData();
@@ -277,4 +278,34 @@ export async function cashStatementDelete(id: string) {
       throw error;
     });
   return response;
+}
+
+export async function cashStatementApprove(payload: any) {
+  const response = await post(
+    environment.branchAccounting.cashStatement.approve.url,
+    payload,
+    ContentType.JSON,
+    env.backEnd.timeoutpurchasebranch
+  )
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
+
+export async function downloadTemplateCS() {
+  try {
+    const response = await getFile(environment.branchAccounting.cashStatement.downloadTemplate.url).then(
+      (result: any) => result
+    );
+
+    // const response = await get(environment.branchAccounting.cashStatement.downloadTemplate.url).then(
+    //   (result: any) => result
+    // );
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
 }

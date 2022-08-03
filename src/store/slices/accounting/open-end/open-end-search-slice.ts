@@ -66,10 +66,8 @@ export const featchSearchOpenEndAsync = createAsyncThunk('searchOpenEndList', as
       totalPage: 0,
     };
 
-    //   if (!payload.clearSearch) {
-    console.log('path: ', path);
     response = await get(path).then();
-    //   }
+
     return response;
   } catch (error) {
     throw error;

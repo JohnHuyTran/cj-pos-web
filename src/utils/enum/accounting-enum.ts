@@ -23,17 +23,9 @@ export const expenseTypes = [
 
 export const expenseStatusList = [
   { key: 'ALL', text: 'ทั้งหมด', stepperGrp: 1 },
-  { key: 'DRAFT', text: 'บันทึก', stepperGrp: 1, groupAllow: PERMISSION_GROUP.BRANCH, allowShowSummary: false },
   {
-    key: 'SEND_BACK_EDIT',
-    text: 'ส่งกลับแก้ไข',
-    stepperGrp: 1,
-    groupAllow: PERMISSION_GROUP.BRANCH,
-    allowShowSummary: false,
-  },
-  {
-    key: 'WAITTING_EDIT_ATTACH_FILE',
-    text: 'รอแก้ไขเอกสาร',
+    key: 'DRAFT',
+    text: 'บันทึก',
     stepperGrp: 1,
     groupAllow: PERMISSION_GROUP.BRANCH,
     allowShowSummary: false,
@@ -66,7 +58,35 @@ export const expenseStatusList = [
     groupAllow: PERMISSION_GROUP.ACCOUNT_MANAGER,
     allowShowSummary: true,
   },
-  { key: 'APPROVED', text: 'อนุมัติ', stepperGrp: 4 },
+  {
+    key: 'APPROVED',
+    text: 'อนุมัติ',
+    stepperGrp: 4,
+  },
+  {
+    key: 'CLOSED',
+    text: 'ปิดงาน',
+    stepperGrp: 4,
+  },
+  {
+    key: 'SAP_ERROR',
+    text: 'ส่ง SAP ไม่สำเร็จ',
+    stepperGrp: 4,
+  },
+  {
+    key: 'SEND_BACK_EDIT',
+    text: 'ส่งกลับแก้ไข',
+    stepperGrp: 1,
+    groupAllow: PERMISSION_GROUP.BRANCH,
+    allowShowSummary: false,
+  },
+  {
+    key: 'WAITTING_EDIT_ATTACH_FILE',
+    text: 'รอแก้ไขเอกสาร',
+    stepperGrp: 1,
+    groupAllow: PERMISSION_GROUP.BRANCH,
+    allowShowSummary: false,
+  },
 ];
 
 export const getExpenseStatus = (key: string) => expenseStatusList.find((item) => item.key === key);
@@ -74,11 +94,15 @@ export const getExpenseStatus = (key: string) => expenseStatusList.find((item) =
 // export const getExpenseTypes = (key: string) => expenseTypes.find((item) => item.key === key)?.text;
 // expenseStatusList.find((item) => item.key === key)?.text;
 // return stockTransferStatus.filter((item) => item.type === type || item.type === 'ALL');
-
+export enum CLOSE_SALE_SHIFT_ENUM {
+  DRAFT = 'DRAFT',
+  PENDDING_REVIEW = 'PENDDING_REVIEW',
+  CORRECT = 'CORRECT',
+}
 export const closeSaleShift = [
-  { key: 'DRAFT', text: 'บันทึก' },
-  { key: 'WAIT_CHECKING', text: 'รอตรวจสอบ' },
-  { key: 'CORRECT', text: 'ถูกต้อง' },
+  { key: CLOSE_SALE_SHIFT_ENUM.DRAFT, text: 'บันทึก' },
+  { key: CLOSE_SALE_SHIFT_ENUM.PENDDING_REVIEW, text: 'รอตรวจสอบ' },
+  { key: CLOSE_SALE_SHIFT_ENUM.CORRECT, text: 'ถูกต้อง' },
 ];
 
 export const openEndStatus = [
