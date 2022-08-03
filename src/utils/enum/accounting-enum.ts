@@ -28,7 +28,7 @@ export const expenseStatusList = [
     text: 'บันทึก',
     stepperGrp: 1,
     groupAllow: PERMISSION_GROUP.BRANCH,
-    allowShowSummary: false
+    allowShowSummary: false,
   },
   {
     key: 'WAITTING_APPROVAL1',
@@ -58,20 +58,20 @@ export const expenseStatusList = [
     groupAllow: PERMISSION_GROUP.ACCOUNT_MANAGER,
     allowShowSummary: true,
   },
-  { 
+  {
     key: 'APPROVED',
     text: 'อนุมัติ',
-    stepperGrp: 4
+    stepperGrp: 4,
   },
-  { 
+  {
     key: 'CLOSED',
     text: 'ปิดงาน',
-    stepperGrp: 4
+    stepperGrp: 4,
   },
-  { 
+  {
     key: 'SAP_ERROR',
     text: 'ส่ง SAP ไม่สำเร็จ',
-    stepperGrp: 4
+    stepperGrp: 4,
   },
   {
     key: 'SEND_BACK_EDIT',
@@ -86,7 +86,7 @@ export const expenseStatusList = [
     stepperGrp: 1,
     groupAllow: PERMISSION_GROUP.BRANCH,
     allowShowSummary: false,
-  }
+  },
 ];
 
 export const getExpenseStatus = (key: string) => expenseStatusList.find((item) => item.key === key);
@@ -94,9 +94,13 @@ export const getExpenseStatus = (key: string) => expenseStatusList.find((item) =
 // export const getExpenseTypes = (key: string) => expenseTypes.find((item) => item.key === key)?.text;
 // expenseStatusList.find((item) => item.key === key)?.text;
 // return stockTransferStatus.filter((item) => item.type === type || item.type === 'ALL');
-
+export enum CLOSE_SALE_SHIFT_ENUM {
+  DRAFT = 'DRAFT',
+  WAIT_CHECKING = 'WAIT_CHECKING',
+  CORRECT = 'CORRECT',
+}
 export const closeSaleShift = [
-  { key: 'DRAFT', text: 'บันทึก' },
-  { key: 'WAIT_CHECKING', text: 'รอตรวจสอบ' },
-  { key: 'CORRECT', text: 'ถูกต้อง' },
+  { key: CLOSE_SALE_SHIFT_ENUM.DRAFT, text: 'บันทึก' },
+  { key: CLOSE_SALE_SHIFT_ENUM.WAIT_CHECKING, text: 'รอตรวจสอบ' },
+  { key: CLOSE_SALE_SHIFT_ENUM.CORRECT, text: 'ถูกต้อง' },
 ];

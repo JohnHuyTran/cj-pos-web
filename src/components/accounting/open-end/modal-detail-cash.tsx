@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material';
 import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
-import { CashPayment } from 'models/branch-accounting-model';
+import { CashPayment, Income, Item } from 'models/branch-accounting-model';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import NumberFormat from 'react-number-format';
@@ -17,8 +17,7 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
   const _ = require('lodash');
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['expense', 'common']);
-  const cashPayment: any = null;
-  const arr = Object.entries(cashPayment);
+  const incomes: any = null;
 
   return (
     <React.Fragment>
@@ -34,7 +33,29 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                 border: '1px solid #BFF1C4',
                 borderRadius: '7px',
               }}>
-              <Grid container spacing={2} mr={1} mt={'11px'}></Grid>
+              <Grid container spacing={2} mr={1} mt={'11px'}>
+                {incomes &&
+                  incomes.paymentTypeItems.map((element: Item, index: number) => {
+                    return (
+                      <>
+                        <Grid item xs={5}>
+                          <Typography>{element.name}</Typography>
+                        </Grid>
+                        <Grid item xs={7}>
+                          <NumberFormat
+                            value={String(element.amount)}
+                            thousandSeparator={true}
+                            decimalScale={2}
+                            className={classes.MtextFieldNumber}
+                            disabled={true}
+                            customInput={TextField}
+                            fixedDecimalScale
+                          />
+                        </Grid>
+                      </>
+                    );
+                  })}
+              </Grid>
             </Grid>
 
             <Grid item xs={5} mt={1}>
@@ -48,27 +69,27 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                 container
                 spacing={2}
                 mb={3}>
-                {arr.map((element: any, index: number) => {
-                  const label = element[0];
-                  return (
-                    <>
-                      <Grid item xs={5}>
-                        <Typography>{label}</Typography>
-                      </Grid>
-                      <Grid item xs={7}>
-                        <NumberFormat
-                          value={String(element[1])}
-                          thousandSeparator={true}
-                          decimalScale={2}
-                          className={classes.MtextFieldNumber}
-                          disabled={true}
-                          customInput={TextField}
-                          fixedDecimalScale
-                        />
-                      </Grid>
-                    </>
-                  );
-                })}
+                {incomes &&
+                  incomes.typeItems.map((element: Item, index: number) => {
+                    return (
+                      <>
+                        <Grid item xs={5}>
+                          <Typography>{element.name}</Typography>
+                        </Grid>
+                        <Grid item xs={7}>
+                          <NumberFormat
+                            value={String(element.amount)}
+                            thousandSeparator={true}
+                            decimalScale={2}
+                            className={classes.MtextFieldNumber}
+                            disabled={true}
+                            customInput={TextField}
+                            fixedDecimalScale
+                          />
+                        </Grid>
+                      </>
+                    );
+                  })}
               </Grid>
               <Grid
                 sx={{
