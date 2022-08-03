@@ -28,7 +28,8 @@ export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactE
   };
   useEffect(() => {
     if (Object.keys(payloadAddTypeProduct).length !== 0) {
-      let rows = _.uniqBy(payloadAddTypeProduct.filter((el: any) => el.selectedType === 2), 'skuName')
+      let listProducts = _.uniqBy(payloadAddTypeProduct.filter((el: any) => el.selectedType === 2), 'skuName')
+      let rows = _.sortBy(listProducts, 'skuCode')
         .map((item: any, index: number) => {
           return {
             id: `${index}-${item.barcode}`,
