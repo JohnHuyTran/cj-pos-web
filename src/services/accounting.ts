@@ -12,6 +12,7 @@ import {
 } from '../models/branch-accounting-model';
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
+import { env } from '../adapters/environmentConfigs';
 
 export async function expenseSave(payload: ExpenseSaveRequest, files: File[]) {
   const bodyFormData = new FormData();
@@ -280,7 +281,12 @@ export async function cashStatementDelete(id: string) {
 }
 
 export async function cashStatementApprove(payload: any) {
-  const response = await post(environment.branchAccounting.cashStatement.approve.url, payload, ContentType.JSON)
+  const response = await post(
+    environment.branchAccounting.cashStatement.approve.url,
+    payload,
+    ContentType.JSON,
+    env.backEnd.timeoutpurchasebranch
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
