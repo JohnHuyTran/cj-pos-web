@@ -84,7 +84,18 @@ function LoginForm() {
           <Box id='logo' sx={{display: 'flex'}}>
             <img src={logoImage} alt='' width='50' />
           </Box>
-          <Box sx={{mt: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <Box id='errorMessage'
+            sx={{
+              width: '255px',  margin: '15px auto', minHeight: '30px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+            {(error || isValidate) && (
+              <Typography color="error" variant="caption" >
+                {isValidate ? 'กรุณากรอกรหัสของท่านให้ถูกต้อง' : error}
+              </Typography>
+            )}
+          </Box>
+          <Box sx={{mb: '55px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
             <FormControl sx={{ m: 0 }} className={clsx(classes.textField)} variant='outlined'>
               <FormHelperText id='OutlinedUserIdText' sx={{ ml: 0 }}>
                 รหัสผู้ใช้งาน
@@ -129,17 +140,6 @@ function LoginForm() {
                 }
               />
             </FormControl>
-          </Box>
-          <Box id='errorMessage'
-            sx={{
-              width: '255px',  margin: '15px auto', minHeight: '30px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-            {(error || isValidate) && (
-              <Typography color="error" variant="caption" >
-                {isValidate ? 'กรุณากรอกรหัสของท่านให้ถูกต้อง' : error}
-              </Typography>
-            )}
           </Box>
           <Box>
             <LoadingButton
