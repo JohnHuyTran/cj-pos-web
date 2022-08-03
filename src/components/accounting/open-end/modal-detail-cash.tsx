@@ -26,7 +26,7 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClose}></BootstrapDialogTitle>
         <DialogContent>
           <Grid container spacing={2.5} padding={2} minWidth={'1000px'}>
-            <Grid item mt={1} xs={7}>
+            <Grid item mt={1} xs={6}>
               <Grid
                 container
                 spacing={2}
@@ -51,10 +51,10 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                         <Grid item xs={1}>
                           <Typography></Typography>
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid item xs={6}>
                           <Typography>{element.name}</Typography>
                         </Grid>
-                        <Grid item xs={6} justifyContent='flex-end'>
+                        <Grid item xs={5} justifyContent='flex-end'>
                           <NumberFormat
                             value={String(element.amount)}
                             thousandSeparator={true}
@@ -71,7 +71,7 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
               </Grid>
             </Grid>
 
-            <Grid item xs={5} mt={1}>
+            <Grid item xs={6} mt={1}>
               <Grid
                 sx={{
                   // backgroundColor: '#f3fbf8',
@@ -95,10 +95,10 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                         <Grid item xs={1}>
                           <Typography></Typography>
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid item xs={6}>
                           <Typography>{element.name}</Typography>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={5}>
                           <NumberFormat
                             value={String(element.amount)}
                             thousandSeparator={true}
@@ -114,22 +114,21 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                   })}
               </Grid>
               <Grid
-                sx={
-                  {
-                    // backgroundColor: '#f3fbf8',
-                    // border: '1px solid #BFF1C4',
-                    // borderRadius: '7px',
-                    //padding: '0px 40px 20px 10px',
-                  }
-                }
+                sx={{
+                  // backgroundColor: '#f3fbf8',
+                  // border: '1px solid #BFF1C4',
+                  // borderRadius: '7px',
+                  padding: '0px 40px 20px 10px',
+                }}
                 container
-                spacing={2}
-                alignContent='flex-end'
-                alignItems={'flex-end'}>
+                spacing={2}>
+                <Grid item xs={1}>
+                  <Typography></Typography>
+                </Grid>
                 <Grid item xs={6}>
                   <Typography>รวมยอดขาย(ยกเว้นภาษี)</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <NumberFormat
                     value={String(incomes && incomes.totalAmount ? incomes.totalAmount : 0)}
                     thousandSeparator={true}
@@ -140,10 +139,13 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                     fixedDecimalScale
                   />
                 </Grid>
+                <Grid item xs={1}>
+                  <Typography></Typography>
+                </Grid>
                 <Grid item xs={6}>
                   <Typography>ยอดขายก่อนภาษี</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <NumberFormat
                     value={String(incomes && incomes.netAmount ? incomes.netAmount : 0)}
                     thousandSeparator={true}
@@ -154,10 +156,13 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                     fixedDecimalScale
                   />
                 </Grid>
+                <Grid item xs={1}>
+                  <Typography></Typography>
+                </Grid>
                 <Grid item xs={6}>
                   <Typography>ยอดขายยกเว้นภาษี</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <NumberFormat
                     value={String(incomes && incomes.netAmountNonVat ? incomes.netAmountNonVat : 0)}
                     thousandSeparator={true}
