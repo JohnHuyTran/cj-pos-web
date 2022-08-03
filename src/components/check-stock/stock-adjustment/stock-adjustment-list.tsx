@@ -235,18 +235,18 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
     setLoading(false);
   };
 
-//   const onSearchAgain = async () => {
-//     const payloadNew: StockAdjustmentSearchRequest = {
-//       perPage: payload.perPage,
-//       page: payload.page,
-//       query: payload.query,
-//       branch: payload.branch,
-//       status: payload.status,
-//       startDate: payload.startDate,
-//       endDate: payload.endDate,
-//     };
-//     await dispatch(getStockCountSearch(payloadNew));
-//   };
+  const onSearchAgain = async () => {
+    const payloadNew: StockAdjustmentSearchRequest = {
+      perPage: payload.perPage,
+      page: payload.page,
+      docNo: payload.docNo,
+      branch: payload.branch,
+      status: payload.status,
+      creationDateFrom: payload.creationDateFrom,
+      creationDateTo: payload.creationDateTo,
+    };
+    await dispatch(getStockAdjustmentSearch(payloadNew));
+  };
 
   const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
   const currentlySelected = async (params: GridCellParams) => {
@@ -303,6 +303,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
+          onSearchMain={onSearchAgain}
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />

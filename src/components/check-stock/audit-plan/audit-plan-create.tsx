@@ -677,6 +677,7 @@ export default function ModalCreateAuditPlan({
                   }
                   style={{
                     display: !manageSAPermission || viewMode || status == StockActionStatus.CANCEL
+                            || (isGroupAuditParam(_group) && STOCK_COUNTER_TYPE.BRANCH === values.stockCounter)
                         ? 'none'
                         : undefined,
                   }}>
