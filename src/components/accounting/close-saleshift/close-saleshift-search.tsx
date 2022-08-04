@@ -24,7 +24,7 @@ import {
 import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
 import moment from 'moment';
 import ModalCloseSale from './modal-close-sale';
-import { shiftClose } from '../../../services/accounting';
+import { shiftClose, shiftCloseCheckInfo } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 import { ACTIONS } from 'utils/enum/permission-enum';
 import ModalDetailCash from '../open-end/modal-detail-cash';
@@ -121,13 +121,15 @@ function CloseSaleShiftSearch() {
       const _noOfShiftKey = store.getState().closeSaleShiftSlice.closeSaleShift.total;
       if (datas && datas.length > 0) {
         setNoOfShiftKey(_noOfShiftKey.toString());
-        let notCorrect = false;
-        datas.map((item: CloseSaleShiftInfo, index: number) => {
-          if (item.status !== CLOSE_SALE_SHIFT_ENUM.CORRECT) {
-            notCorrect = true;
-          }
-        });
-        setDisableCloseShiftKey(notCorrect);
+        await shiftCloseCheckInfo(payload)
+          .then(async (value) => {
+            if (value.data) {
+              setDisableCloseShiftKey(!value.data.canProceedEnd);
+            }
+          })
+          .catch((error: ApiError) => {});
+      } else {
+        setDisableCloseShiftKey(true);
       }
 
       setFlagSearch(true);
@@ -202,7 +204,7 @@ function CloseSaleShiftSearch() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               สาขา
             </Typography>
             <BranchListDropDown
@@ -215,18 +217,17 @@ function CloseSaleShiftSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               สถานะรหัส
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="status"
-                name="status"
+                id='status'
+                name='status'
                 value={values.status}
                 onChange={handleChange}
                 disabled={true}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -238,11 +239,11 @@ function CloseSaleShiftSearch() {
           </Grid>
 
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่ยอดขาย
             </Typography>
             <DatePickerAllComponent
-              type="TO"
+              type='TO'
               onClickDate={handleStartDatePicker}
               value={startDate}
               disabled={groupBranch ? true : false}
@@ -257,60 +258,55 @@ function CloseSaleShiftSearch() {
         <Grid container spacing={2} mt={4} mb={2}>
           <Grid item xs={5}>
             <Button
-              id="btnImport"
-              variant="contained"
-              color="primary"
+              id='btnImport'
+              variant='contained'
+              color='primary'
               startIcon={<UpdateIcon />}
               onClick={handleOnupdate}
               sx={{ minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               disabled={true}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               อัพเดท
             </Button>
             <Button
-              id="btnImport"
-              variant="contained"
-              color="primary"
+              id='btnImport'
+              variant='contained'
+              color='primary'
               onClick={handleOnBypass}
               sx={{ ml: 2, minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnSearch}
               disabled={true}
-              startIcon={<ArrowBackIcon />}
-            >
+              startIcon={<ArrowBackIcon />}>
               Bypass
             </Button>
           </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
-              id="btnCreateStockTransferModal"
-              variant="contained"
+              id='btnCreateStockTransferModal'
+              variant='contained'
               onClick={handleOpenCloseSale}
               sx={{ width: 150, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnClear}
-              color="secondary"
-              disabled={disableCloseShiftKey || !isGroupBranch()}
-            >
+              color='secondary'
+              disabled={disableCloseShiftKey}>
               ปิดรอบยอดการขาย
             </Button>
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               onClick={onClickClearBtn}
               sx={{ width: 110, ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
-            >
+              color='cancelColor'>
               เคลียร์
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickSearch}
               sx={{ width: 110, ml: 2, display: disableBtnSearch ? 'none' : '' }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>
@@ -318,10 +314,10 @@ function CloseSaleShiftSearch() {
       </Box>
       {flagSearch && items.data.length > 0 && <CloseSaleShiftSearchList />}
       {flagSearch && items.data.length === 0 && (
-        <Grid container xs={12} justifyContent="center">
-          <Box color="#CBD4DB" justifyContent="center">
+        <Grid container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB' justifyContent='center'>
             <h2>
-              ไม่มีข้อมูล <SearchOff fontSize="large" />
+              ไม่มีข้อมูล <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>

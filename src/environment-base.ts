@@ -604,6 +604,9 @@ export const environment = {
       updateConfirmShiftCloses: {
         url: 'sale/shift-closes/confirm/{shiftCode}',
       },
+      checkInfo: {
+        url: 'sale/shift-closes/check-info',
+      },
     },
     cashStatement: {
       search: {
