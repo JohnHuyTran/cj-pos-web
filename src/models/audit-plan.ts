@@ -14,6 +14,7 @@ export interface PayloadCounting {
     documentNumber: string;
     branchCode: string | any;
     branchName: string | any;
+    stockCounter: number;
   };
   storeType: number;
 }

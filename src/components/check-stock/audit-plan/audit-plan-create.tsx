@@ -45,6 +45,7 @@ import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-a
 import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
 import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
 import { clearCalculate } from "../../../store/slices/stock-adjust-calculate-slice";
+import LoadingModal from '../../commons/ui/loading-modal';
 
 interface Props {
   action: Action | Action.INSERT;
@@ -123,6 +124,8 @@ export default function ModalCreateAuditPlan({
   });
   const [reSave, setReSave] = React.useState(false);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
+  const [openSADetail, setOpenSADetail] = React.useState<boolean>(false)
 
   //permission
   const userInfo = getUserInfo();
@@ -226,13 +229,14 @@ export default function ModalCreateAuditPlan({
           documentNumber: values.documentNumber,
           branchCode: values.branch,
           branchName: getBranchName(branchList, values.branch),
+          stockCounter: values.stockCounter
         },
         storeType: store,
       };
       const rs = await countingAuditPlan(payload);
       if (rs.code == 20000) {
         dispatch(setCheckEdit(false));
-        // setOpenPopupModal(true);
+        // setOpenPopupModal(true); 
         // setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
 
         setStatus(StockActionStatus.COUNTING);
@@ -493,8 +497,19 @@ export default function ModalCreateAuditPlan({
   const handleUpdateAgainDetailAP = () => {
     dispatch(getAuditPlanDetail(dataDetail.id));
   };
-
-  const handleOpenAP = () => {}
+  const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
+  const handleOpenAP = async () => {
+    setOpenLoadingModal(true);
+    try {
+      await dispatch(getStockAdjustmentDetail(dataDetail.relatedSaDocuments[0].id));
+      if (stockAdjustDetail) {
+        setOpenSADetail(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setOpenLoadingModal(false);
+  };
 
   return (
     <div>
@@ -604,15 +619,15 @@ export default function ModalCreateAuditPlan({
               )}
             </Grid>
             {/*line 3*/}
-            <Grid item container xs={4} mb={5} pl={2}>
-            {steps.indexOf(status) > 1 && dataDetail.relatedSaDocuments && (
+            <Grid item container xs={4} mb={5}>
+            {steps.indexOf(status) > 1 && dataDetail.relatedSaDocuments && dataDetail.relatedSaDocuments.length > 0 && (
                 <>
                   <Grid item xs={3}>
                     เอกสาร SA :
                   </Grid>
                   <Grid item xs={8}>
                   <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenAP}>
-                  {/* {dataDetail.APDocumentNumber} */}
+                  {dataDetail.relatedSaDocuments[0].documentNumber}
                 </Link>
                   </Grid>
                 </>
@@ -829,6 +844,18 @@ export default function ModalCreateAuditPlan({
         />
       )}
 
+      {openSADetail && ( 
+        <ModalCreateStockAdjustment
+          isOpen={openSADetail}
+          openFromAP={true}
+          onClickClose={() => setOpenSADetail(false)}
+          action={Action.UPDATE}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          userPermission={userPermission}
+        />
+      )}
+
       <ModelConfirm
         open={openModalConfirm}
         onClose={() => handleCloseModalConfirm(false)}
@@ -867,6 +894,7 @@ export default function ModalCreateAuditPlan({
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
       <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }
