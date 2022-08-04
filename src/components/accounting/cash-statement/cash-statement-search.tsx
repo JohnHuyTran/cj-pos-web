@@ -270,7 +270,7 @@ export default function CashStatementSearch() {
           setTimeout(() => {
             onClickSearchBtn();
             setOpenImportModal(false);
-          }, 1000);
+          }, 300);
         })
         .catch((error: ApiUploadError) => {
           if (error.code === 40001) {
