@@ -180,7 +180,7 @@ function CloseSaleShiftSearch() {
   };
   const handleOnBypass = () => {};
   const handleOnupdate = async () => {
-    await dispatch(featchOpenEndDeatilAsync('123'));
+    // await dispatch(featchOpenEndDeatilAsync('OE22080101-012'));
     setTestModal(true);
   };
   const handleChange = (event: any) => {
