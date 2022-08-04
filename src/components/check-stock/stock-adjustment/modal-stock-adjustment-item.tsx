@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
-import { Action } from '../../../utils/enum/common-enum';
+import { Action, StockActionStatus } from '../../../utils/enum/common-enum';
 import { KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
 import { getUserInfo } from "../../../store/sessionStore";
 import { BarcodeCalculate, SACalculateRequest, SkuCalculate } from "../../../models/stock-adjustment-model";
@@ -117,16 +117,16 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           index: index + 1,
           skuName: item.skuName,
           sku: item.sku,
-          saleCounting: checked ? '' : item.saleCounting,
-          stockMovement: checked ? '' : item.stockMovement,
-          storeFrontCount: checked ? '' : item.storeFrontCount,
-          storeBackCount: checked ? '' : item.storeBackCount,
-          totalCount: checked ? '' : (item.storeFrontCount + item.storeBackCount),
-          availableStock: checked ? '' : item.availableStock,
-          difference: checked ? '' : item.difference,
-          tempStock: checked ? '' : item.tempStock,
-          unitName: checked ? '' : item.unitName,
-          adjustedPrice: checked ? '' : 0,
+          saleCounting: item.saleCounting,
+          stockMovement: item.stockMovement,
+          storeFrontCount: item.storeFrontCount,
+          storeBackCount: item.storeBackCount,
+          totalCount: (item.storeFrontCount + item.storeBackCount),
+          availableStock: item.availableStock,
+          difference: item.difference,
+          tempStock: item.tempStock,
+          unitName: item.unitName,
+          adjustedPrice: 0,
           remark: checked ? ('นับทวนใหม่จาก ' + dataDetail.documentNumber) : '',
         };
       });
@@ -151,15 +151,15 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           barcode: item.barcode,
           productName: item.productName,
           sku: item.sku,
-          saleCounting: checked ? '' : item.saleCounting,
-          stockMovement: checked ? '' : item.stockMovement,
-          storeFrontCount: checked ? '' : item.storeFrontCount,
-          storeBackCount: checked ? '' : item.storeBackCount,
-          totalCount: checked ? '' : (item.storeFrontCount + item.storeBackCount),
-          availableStock: checked ? '' : item.availableStock,
-          difference: checked ? '' : item.difference,
-          tempStock: checked ? '' : item.tempStock,
-          unitName: checked ? '' : item.unitName,
+          saleCounting: item.saleCounting,
+          stockMovement: item.stockMovement,
+          storeFrontCount: item.storeFrontCount,
+          storeBackCount: item.storeBackCount,
+          totalCount: (item.storeFrontCount + item.storeBackCount),
+          availableStock: item.availableStock,
+          difference: item.difference,
+          tempStock: item.tempStock,
+          unitName: item.unitName,
         };
       });
       setBarcodeTable(rows2);
@@ -355,7 +355,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={!auditPermission}
+          disabled={!auditPermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != StockActionStatus.DRAFT}
           onClick={onCheckCell.bind(this, params)}
         />
       ),
@@ -725,7 +725,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     } else if (value > 0) {
       colorValue = '#446EF2';
     }
-    return checked ? '' : <Typography variant='body2' sx={{ color: colorValue }}>{numberWithCommas(value)}</Typography>;
+    return <Typography variant='body2' sx={{ color: colorValue }}>{numberWithCommas(value)}</Typography>;
   };
 
   const FilterPanel = (props: FilterPanelProps) => {

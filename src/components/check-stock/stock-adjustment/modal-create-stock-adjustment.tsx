@@ -155,7 +155,9 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         branchName: '',
         APId: '',
         APDocumentNumber: '',
-        relatedSCs: []
+        relatedSCs: [],
+        notCountableSkus: [],
+        stockCounter: '',
       })
     );
     dispatch(updateCheckEdit(false));
@@ -208,6 +210,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           skuDifferenceEqual: 0,
           skuDifferenceNegative: 0,
           skuDifferencePositive: 0,
+          stockCounter: stockAdjustDetail.stockCounter,
         })
       );
     }
