@@ -84,7 +84,7 @@ function CloseSaleShiftSearch() {
   const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState('');
   const [disableBtnSearch, setDisableBtnSearch] = React.useState(true);
   const [disableBtnManage, setDisableBtnManage] = React.useState(true);
-  const [teseModal, setTestModal] = React.useState(false);
+  const [openModalCashDetail, setOpenModalCashDetail] = React.useState(false);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -181,7 +181,7 @@ function CloseSaleShiftSearch() {
   const handleOnBypass = () => {};
   const handleOnupdate = async () => {
     // await dispatch(featchOpenEndDeatilAsync('OE22080101-012'));
-    setTestModal(true);
+    setOpenModalCashDetail(true);
   };
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -331,9 +331,9 @@ function CloseSaleShiftSearch() {
         docNo={docNo}
       />
       <ModalDetailCash
-        isOpen={teseModal}
+        isOpen={openModalCashDetail}
         onClose={function (): void {
-          setTestModal(false);
+          setOpenModalCashDetail(false);
         }}
       />
     </>
