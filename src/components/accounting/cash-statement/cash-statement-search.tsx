@@ -194,6 +194,7 @@ export default function CashStatementSearch() {
         setContentMsg('คุณได้อนุมัติรายการเรียบร้อยแล้ว');
 
         setTimeout(() => {
+          onClickSearchBtn();
           setopenModalApprove(false);
         }, 300);
       })
@@ -267,6 +268,7 @@ export default function CashStatementSearch() {
           setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
 
           setTimeout(() => {
+            onClickSearchBtn();
             setOpenImportModal(false);
           }, 1000);
         })
