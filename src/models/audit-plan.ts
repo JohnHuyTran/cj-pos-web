@@ -51,7 +51,8 @@ export interface AuditPlan {
   countingDate: string;
   stockCounter: number;
   product: AuditPlanProductDetail[];
-  relatedDocuments: RelatedDocument[];
+  relatedScDocuments: relatedScDocuments[];
+  relatedSaDocuments: relatedSaDocuments[];
 }
 
 export interface AuditPlanProductDetail {
@@ -66,8 +67,16 @@ export interface AuditPlanDetailResponse {
   data: AuditPlan;
 }
 
-export interface RelatedDocument {
+export interface relatedScDocuments {
   countingTime: number;
   documentNumber: string;
   id: string;
+  status: string;
+  storeType: number;
+}
+
+export interface relatedSaDocuments {
+  documentNumber: string;
+  id: string;
+  status: string;
 }
