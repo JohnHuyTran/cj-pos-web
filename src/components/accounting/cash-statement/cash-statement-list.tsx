@@ -329,6 +329,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const onCloseModalEdit = () => {
+    dispatch(featchSearchCashStatementAsync(payload));
     setOpenModalEdit(false);
   };
 
