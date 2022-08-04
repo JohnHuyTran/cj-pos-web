@@ -272,3 +272,122 @@ export function featchCloseSaleShiftRsMockup() {
     resolve(closeSaleShiftRs);
   });
 }
+
+const viewOpenEndRs = {
+  timestamp: '2022-08-02T04:10:31.965+0000',
+  ref: '62e8a3b7f3948986e2d51bdc',
+  code: 20000,
+  message: 'success',
+  data: {
+    branchCode: 'B005',
+    branchName: 'สำนักงานใหญ่สีลม Operation',
+    docNo: 'mock-003',
+    shiftDate: '2022-07-20T17:00:00Z',
+    noOfSaleBill: 5,
+    bypass: 'NONE',
+    settlementFiles: null,
+    summarizeCashDeposite: {
+      dailyIncomeAmount: 33850.5,
+      cashOverShortAmount: 50,
+      totalCashAmount: 0,
+      cdmAmount: 25,
+      totalPayAmount: 0,
+      depositeAmount: 100515,
+      nextCDMAmount: 15,
+      diffDepositeAmount: -66664.5,
+    },
+    income: {
+      totalIncomeAmount: 15000,
+      cashAmount: 0,
+      diffAmount: 0,
+      paymentTypeItems: [
+        {
+          code: '01',
+          name: 'บัตรประชารัฐ(KTB)',
+          amount: 100,
+        },
+        {
+          code: '02',
+          name: 'บัตรประชารัฐ E-Money',
+          amount: 34,
+        },
+        {
+          code: '05',
+          name: 'บัตรเครดิตey',
+          amount: 300,
+          isSettlementFile: true,
+        },
+        {
+          code: '11',
+          name: 'บัตรประชารัฐ(KTB)',
+          amount: 100,
+        },
+        {
+          code: '12',
+          name: 'บัตรประชารัฐ E-Money',
+          amount: 34,
+        },
+        {
+          code: '15',
+          name: 'บัตรเครดิตey',
+          amount: 300,
+          isSettlementFile: true,
+        },
+        {
+          code: '21',
+          name: 'บัตรประชารัฐ(KTB)',
+          amount: 100,
+        },
+        {
+          code: '22',
+          name: 'บัตรประชารัฐ E-Money',
+          amount: 34,
+        },
+        {
+          code: '25',
+          name: 'บัตรเครดิตey',
+          amount: 300,
+          isSettlementFile: true,
+        },
+      ],
+      totalTypeAmount: 0,
+      typeItems: [
+        {
+          code: '07',
+          name: 'ค่าเดินทาง',
+          amount: 54,
+        },
+      ],
+      totalAmount: 0,
+      netAmount: 0,
+      netAmountNonVat: 0,
+    },
+    externalIncome: {
+      totalExIncomeAmount: 350,
+      items: [
+        {
+          code: '03',
+          name: 'Center Topping',
+          amount: 350,
+          noItem: false,
+        },
+      ],
+    },
+    cashPayment: {
+      totalPayAmount: 4750,
+      iceAmount: 150,
+      yakultAmount: 100,
+      coffeeExpenseAmount: 1500,
+      frontExpenseAmount: 3000,
+    },
+    shiftCodes: null,
+    status: 'DRAFT',
+    comment: 'comment test',
+  },
+};
+
+export function featchViewOpenEndRsMockup() {
+  return new Promise((resolve, reject) => {
+    resolve(viewOpenEndRs);
+  });
+}
