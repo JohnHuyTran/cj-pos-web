@@ -298,6 +298,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
       {openDetail && (
         <ModalCreateStockAdjustment
           isOpen={openDetail}
+          openFromAP={false}
           onClickClose={handleCloseDetail}
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
