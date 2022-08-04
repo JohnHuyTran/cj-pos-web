@@ -24,11 +24,11 @@ import {
 import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
 import moment from 'moment';
 import ModalCloseSale from './modal-close-sale';
-import { shiftClose } from '../../../services/accounting';
+import { shiftClose, shiftCloseCheckInfo } from '../../../services/accounting';
 import { ApiError } from '../../../models/api-error-model';
 import { ACTIONS } from 'utils/enum/permission-enum';
 import ModalDetailCash from '../open-end/modal-detail-cash';
-import { featchOpenEndDeatilAsync } from 'store/slices/accounting/open-end-slice';
+import { featchOpenEndDeatilAsync } from 'store/slices/accounting/open-end/open-end-slice';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
@@ -121,13 +121,15 @@ function CloseSaleShiftSearch() {
       const _noOfShiftKey = store.getState().closeSaleShiftSlice.closeSaleShift.total;
       if (datas && datas.length > 0) {
         setNoOfShiftKey(_noOfShiftKey.toString());
-        let notCorrect = false;
-        datas.map((item: CloseSaleShiftInfo, index: number) => {
-          if (item.status !== CLOSE_SALE_SHIFT_ENUM.CORRECT) {
-            notCorrect = true;
-          }
-        });
-        setDisableCloseShiftKey(notCorrect);
+        await shiftCloseCheckInfo(payload)
+          .then(async (value) => {
+            if (value.data) {
+              setDisableCloseShiftKey(!value.data.canProceedEnd);
+            }
+          })
+          .catch((error: ApiError) => {});
+      } else {
+        setDisableCloseShiftKey(true);
       }
 
       setFlagSearch(true);
@@ -178,7 +180,7 @@ function CloseSaleShiftSearch() {
   };
   const handleOnBypass = () => {};
   const handleOnupdate = async () => {
-    await dispatch(featchOpenEndDeatilAsync('123'));
+    // await dispatch(featchOpenEndDeatilAsync('OE22080101-012'));
     setTestModal(true);
   };
   const handleChange = (event: any) => {
@@ -286,7 +288,7 @@ function CloseSaleShiftSearch() {
               sx={{ width: 150, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnClear}
               color='secondary'
-              disabled={disableCloseShiftKey || !isGroupBranch()}>
+              disabled={disableCloseShiftKey}>
               ปิดรอบยอดการขาย
             </Button>
             <Button

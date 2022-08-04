@@ -129,6 +129,7 @@ export default function Sidebar({}: Props): ReactElement {
   const [disableSubMenuSettings, setDisableSubMenuSettings] = useState(true);
   const [disableSubMenuCloseSaleShift, setDisableSubMenuCloseSaleShift] = useState(true);
   const [disableSubMenuCashStatement, setDisableSubMenuCashStatement] = useState(true);
+  const [disableSubMenuOpenEnd, setDisableSubMenuOpenEnd] = useState(true);
 
   const [disableSubMenuSaleSaleLimit, setDisableSubMenuSaleSaleLimit] = useState(true);
   const [disableSubMenuSaleDiscount, setDisableSubMenuSaleDiscount] = useState(true);
@@ -173,6 +174,7 @@ export default function Sidebar({}: Props): ReactElement {
 
     setDisableSubMenuCreatePurchaseBranch(isAllowSubMenuPermission(SUBMENU.PR_CREATE_PURCHASE_BRANCH));
     setDisableSubMenuCloseSaleShift(isAllowSubMenuPermission(SUBMENU.EX_CLOSE_SALE_SHIFT));
+    setDisableSubMenuOpenEnd(isAllowSubMenuPermission(SUBMENU.EX_OPEN_END));
   }, [navState]);
 
   const dispatch = useAppDispatch();
@@ -488,6 +490,18 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuCloseSaleShift'>
               <ListItemButton key='CloseSaleShift' selected={selectedByPath('close-saleshift')} sx={{ pl: 7 }}>
                 <ListItemText primary='ปิดรหัสการขาย' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/open-end'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+                display: disableSubMenuOpenEnd ? 'none' : '',
+              }}
+              id='subMenuCashStatement'>
+              <ListItemButton key='CashStatement' selected={selectedByPath('open-end')} sx={{ pl: 7 }}>
+                <ListItemText primary='ปิดรอบการขาย' />
               </ListItemButton>
             </Link>
           </List>

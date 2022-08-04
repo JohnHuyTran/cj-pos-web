@@ -101,7 +101,8 @@ import auditPlanDetailSlice from './slices/audit-plan-detail-slice';
 import auditPlanSearchSlice from './slices/audit-plan-search-slice';
 import searchCashStatementSlice from './slices/accounting/cash-statement/cash-search-slice';
 import saveCashStatementSearchRequest from './slices/accounting/cash-statement/save-cash-search-slice';
-import viewOpenEndSlice from './slices/accounting/open-end-slice';
+import searchOpenEndSlice from './slices/accounting/open-end/open-end-search-slice';
+import viewOpenEndSlice from './slices/accounting/open-end/open-end-slice';
 
 const store = configureStore({
   reducer: {
@@ -206,6 +207,7 @@ const store = configureStore({
     closeSaleShiftSlice: closeSaleShiftSlice,
     searchCashStatement: searchCashStatementSlice,
     saveCashStatementSearchRequest: saveCashStatementSearchRequest,
+    searchOpenEndSlice: searchOpenEndSlice,
     viewOpenEndSlice: viewOpenEndSlice,
   },
 });

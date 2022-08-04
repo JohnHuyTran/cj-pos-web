@@ -39,6 +39,7 @@ import CloseSaleShift from './pages/accounting/close-saleshift';
 import StockCount from './pages/check-stock/stock-count';
 import StockAdjustment from './pages/check-stock/stock-adjustment';
 
+import OpenEnd from './pages/accounting/open-end';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -124,6 +125,7 @@ export default function App2() {
           <Route path='/close-saleshift' component={CloseSaleShift} />
           <Route path='/cash-statement' component={CashStatement} />
           <Route path='/stock-adjustment' component={StockAdjustment} />
+          <Route path='/open-end' component={OpenEnd} />
         </Switch>
       </Main>
     </Box>

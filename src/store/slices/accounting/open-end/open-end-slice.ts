@@ -23,9 +23,9 @@ const initialState: State = {
 
 export const featchOpenEndDeatilAsync = createAsyncThunk('OpenEndDeatil', async (docNo: string) => {
   try {
-    const apiRootPath = getPathExpenseDetail(docNo, environment.branchAccounting.expense.detail.url);
-    return featchViewOpenEndRsMockup();
-    // return await get(apiRootPath).then();
+    const apiRootPath = getPathExpenseDetail(docNo, environment.branchAccounting.openEnd.view.url);
+    // return featchViewOpenEndRsMockup();
+    return await get(apiRootPath).then();
   } catch (error) {
     throw error;
   }
