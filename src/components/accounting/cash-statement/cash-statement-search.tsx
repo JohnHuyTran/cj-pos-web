@@ -348,7 +348,7 @@ export default function CashStatementSearch() {
             <FormControl fullWidth className={classes.Mselect}>
               <Select
                 id='selPiType'
-                name='statuses'
+                name='status'
                 value={values.status}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}>
