@@ -450,7 +450,7 @@ export interface ViewOpenEndInfo {
   shiftDate: string;
   noOfSaleBill: number;
   bypass: string;
-  settlementFiles: FileType;
+  settlementFiles: FilesSettlement | null;
   summarizeCashDeposite: SummarizeCashDeposite;
   income: Income;
   externalIncome: ExternalIncome;
@@ -459,28 +459,22 @@ export interface ViewOpenEndInfo {
   status: string;
   comment: string;
 }
-
-export interface CashPayment {
+export interface FilesSettlement {
+  fileKey: string;
+  fileName: string;
+  mimeType: string;
+  branchCode: string;
+}
+export interface SummarizeCashDeposite {
+  dailyIncomeAmount: number;
+  cashOverShortAmount: number;
+  totalCashAmount: number;
+  cdmAmount: number;
   totalPayAmount: number;
-  iceAmount: number;
-  yakultAmount: number;
-  coffeeExpenseAmount: number;
-  frontExpenseAmount: number;
+  depositeAmount: number;
+  nextCDMAmount: number;
+  diffDepositeAmount: number;
 }
-
-export interface ExternalIncome {
-  totalExIncomeAmount: number;
-  items: Item[];
-}
-
-export interface Item {
-  code: string;
-  name: string;
-  amount: number;
-  noItem?: boolean;
-  isSettlementFile?: boolean;
-}
-
 export interface Income {
   totalIncomeAmount: number;
   cashAmount: number;
@@ -492,14 +486,22 @@ export interface Income {
   netAmount: number;
   netAmountNonVat: number;
 }
+export interface ExternalIncome {
+  totalExIncomeAmount: number;
+  items: Item[];
+}
+export interface Item {
+  code: string;
+  name: string;
+  amount: number;
+  noItem?: boolean;
+  isSettlementFile?: boolean;
+}
 
-export interface SummarizeCashDeposite {
-  dailyIncomeAmount: number;
-  cashOverShortAmount: number;
-  totalCashAmount: number;
-  cdmAmount: number;
+export interface CashPayment {
   totalPayAmount: number;
-  depositeAmount: number;
-  nextCDMAmount: number;
-  diffDepositeAmount: number;
+  iceAmount: number;
+  yakultAmount: number;
+  coffeeExpenseAmount: number;
+  frontExpenseAmount: number;
 }

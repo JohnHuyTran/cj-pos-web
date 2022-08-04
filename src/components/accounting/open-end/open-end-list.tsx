@@ -222,7 +222,7 @@ function OpenEndList() {
   const currentlySelected = async (params: GridCellParams) => {
     const docNo = params.row.docNo;
     console.log('params: ', docNo);
-    await dispatch(featchOpenEndDeatilAsync('mock-003'));
+    await dispatch(featchOpenEndDeatilAsync('OE22080101-012'));
   };
 
   return (
