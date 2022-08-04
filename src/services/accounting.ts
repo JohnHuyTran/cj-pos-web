@@ -216,6 +216,14 @@ export async function shiftClose(payload: CloseSaleShiftRequest) {
     });
   return response;
 }
+export async function shiftCloseCheckInfo(payload: CloseSaleShiftRequest) {
+  const response = await post(environment.branchAccounting.closeSaleShift.checkInfo.url, payload, ContentType.JSON)
+    .then((result: any) => result)
+    .catch((error) => {
+      throw error;
+    });
+  return response;
+}
 
 export async function updateConfirmShiftCloses(shiftCode: string, payload: any) {
   const getPathUpdateConfirmShiftCloses = (shiftCode: string, path: string) => {
