@@ -49,6 +49,7 @@ import { saveDraftAuditPlan } from "../../../services/audit-plan";
 interface Props {
   action: Action | Action.INSERT;
   isOpen: boolean;
+  openFromAP: boolean;
   setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
   setPopupMsg?: any;
@@ -66,6 +67,7 @@ const _ = require('lodash');
 export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const {
     isOpen,
+    openFromAP,
     onClickClose,
     setOpenPopup,
     action,
@@ -85,7 +87,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
   const [openAddSC, setOpenAddSC] = React.useState(false);
   const [status, setStatus] = React.useState<string>('');
-  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+  const [alertTextError, setAlertTextError] = React.useState('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
 
   const dataDetail = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
   const checkEdit = useAppSelector((state) => state.stockAdjustmentSlice.checkEdit);
@@ -105,6 +107,8 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
 
   const handleOpenModalConfirm = async () => {
     await dispatch(getAuditPlanDetail(dataDetail.APId));
+    //handle save recheck in SA
+    await handleCreateDraft(relatedSCs, true);
     let rsStats = await getCalculateSkuStats(dataDetail.id);
     if (rsStats && rsStats.data) {
       await dispatch(updateDataDetail({
@@ -121,8 +125,6 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     setOpenModalConfirmConfirm(false);
     if (confirm) {
       setOpenModalConfirmConfirm(false);
-      //handle save recheck in SA
-      handleCreateDraft(relatedSCs);
       //confirm SA
       handleConfirm();
     }
@@ -133,8 +135,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   };
 
   const handleClose = async () => {
-    //clear state detail AP
-    dispatch(clearDataFilter());
+    if (!openFromAP) {
+      //clear state detail AP
+      dispatch(clearDataFilter());
+    }
     //clear calculate
     dispatch(clearCalculate());
 
@@ -209,8 +213,8 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     }
   }, [stockAdjustDetail]);
 
-  const handleCreateDraft = async (relatedSCsParam: any) => {
-    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+  const handleCreateDraft = async (relatedSCsParam: any, withoutNotice: boolean) => {
+    setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     try {
       const payload = {
         ...dataDetail,
@@ -218,9 +222,11 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
       };
       const rs = await saveDraftStockAdjust(payload);
       if (rs.code === 20000) {
-        dispatch(updateCheckEdit(false));
-        setOpenSnackBar(true);
-        setTextSnackBar('คุณได้ทำการบันทีกข้อมูลเรียบร้อยแล้ว');
+        if (!withoutNotice) {
+          dispatch(updateCheckEdit(false));
+          setOpenSnackBar(true);
+          setTextSnackBar('คุณได้ทำการบันทีกข้อมูลเรียบร้อยแล้ว');
+        }
         await dispatch(
           updateDataDetail({
             ...dataDetail,
@@ -231,7 +237,9 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             recheckSkus: rs.data.recheckSkus ? rs.data.recheckSkus : [],
           })
         );
-        handleRefresh();
+        if (!withoutNotice) {
+          handleRefresh();
+        }
       } else {
         setOpenModalError(true);
       }
@@ -241,7 +249,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   };
 
   const handleConfirm = async () => {
-    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     try {
       const payload = {
         id: dataDetail.id,
@@ -340,7 +348,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const onHandleAfterAddSC = (selectedSCs: any) => {
     setRelatedSCs(selectedSCs);
     setOpenAddSC(false);
-    handleCreateDraft(selectedSCs);
+    handleCreateDraft(selectedSCs, false);
   };
 
   const handleRefresh = () => {
@@ -434,7 +442,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon/>}
                   disabled={!managePermission}
-                  style={{ display: (!managePermission || viewMode) ? 'none' : undefined }}
+                  style={{
+                    display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
+                      || !managePermission || viewMode) ? 'none' : undefined
+                  }}
                   onClick={() => {
                     setOpenAddSC(true)
                   }}
@@ -453,8 +464,11 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   color='warning'
                   startIcon={<SaveIcon/>}
                   disabled={!(relatedSCs && relatedSCs.length > 0)}
-                  style={{ display: (!managePermission || viewMode) ? 'none' : undefined }}
-                  onClick={() => handleCreateDraft(relatedSCs)}
+                  style={{
+                    display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
+                      || !managePermission || viewMode) ? 'none' : undefined
+                  }}
+                  onClick={() => handleCreateDraft(relatedSCs, false)}
                   className={classes.MbtnSearch}
                 >
                   บันทึก

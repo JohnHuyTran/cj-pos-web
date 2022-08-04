@@ -818,6 +818,7 @@ export default function ModalCreateAuditPlan({
       {openSA && (
         <ModalCreateStockAdjustment
           isOpen={openSA}
+          openFromAP={true}
           onClickClose={async () => {
             setOpenSA(false);
           }}
