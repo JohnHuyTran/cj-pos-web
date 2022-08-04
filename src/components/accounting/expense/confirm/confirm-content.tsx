@@ -30,7 +30,7 @@ export default function confirmContent({
 }: Props): ReactElement {
   const classes = useStyles();
 
-  const [periodData, setPeriodData] = React.useState<State>({ startDate: startPeriod, endDate: endPeriod });
+  const [periodData, setPeriodData] = React.useState<State>({ startDate: null, endDate: null });
 
   const handleStartDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });

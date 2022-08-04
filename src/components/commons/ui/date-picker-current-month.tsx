@@ -72,7 +72,8 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         InputAdornmentProps={{
           position: 'start',
         }}
-        minDate={today}
+        minDate={props.minDateTo}
+        // minDate={today}
         // maxDate={lastDay}
         placeholder='กรุณาเลือกวันที่'
         minDateMessage={'วันที่มีค่ามากกว่าเท่ากับ วันที่ปัจจุบัน'}
