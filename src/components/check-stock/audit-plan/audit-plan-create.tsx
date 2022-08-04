@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
-import { Button, Dialog, DialogContent, FormControl, Grid, Input, MenuItem, Select, Typography } from '@mui/material';
+import { Button, Dialog, DialogContent, FormControl, Grid, Input, Link, MenuItem, Select, Typography } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -259,7 +259,7 @@ export default function ModalCreateAuditPlan({
 
   const handleOpenCancel = async () => {
     await dispatch(getAuditPlanDetail(values.id));
-    if (dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0) {
+    if (dataDetail.relatedScDocuments && dataDetail.relatedScDocuments.length > 0) {
       setOpenModalError(true);
       setAlertTextError('กรุณายกเลิกเอกสารที่เกี่ยวข้องก่อนดำเนินการ');
     } else {
@@ -494,6 +494,8 @@ export default function ModalCreateAuditPlan({
     dispatch(getAuditPlanDetail(dataDetail.id));
   };
 
+  const handleOpenAP = () => {}
+
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth>
@@ -590,23 +592,31 @@ export default function ModalCreateAuditPlan({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
-              {steps.indexOf(status) > 1 && dataDetail.relatedDocuments && (
+              {steps.indexOf(status) > 1 && dataDetail.relatedScDocuments && (
                 <>
                   <Grid item xs={3}>
                     เอกสาร SC :
                   </Grid>
                   <Grid item xs={8}>
-                    <DocumentList viewMode={viewMode} handleUpdateAgain={handleUpdateAgainDetailAP}/>
+                    <DocumentList viewMode={viewMode} handleUpdateAgain={handleUpdateAgainDetailAP} relatedDocuments={dataDetail.relatedScDocuments} type={'SC'}/>
                   </Grid>
                 </>
               )}
             </Grid>
             {/*line 3*/}
             <Grid item container xs={4} mb={5} pl={2}>
-              {/* <Grid item xs={4}>
-                เอกสาร SA :
-              </Grid> */}
-              <Grid item xs={8}></Grid>
+            {steps.indexOf(status) > 1 && dataDetail.relatedSaDocuments && (
+                <>
+                  <Grid item xs={3}>
+                    เอกสาร SA :
+                  </Grid>
+                  <Grid item xs={8}>
+                  <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenAP}>
+                  {/* {dataDetail.APDocumentNumber} */}
+                </Link>
+                  </Grid>
+                </>
+              )}
             </Grid>
             {/*line 3*/}
             <Grid container item xs={4} mb={5} mt={-1}>
@@ -672,12 +682,13 @@ export default function ModalCreateAuditPlan({
                   onClick={handleOpenSA}
                   sx={{ width: 150 , height: '36.5px', mr: '17px'}}
                   disabled={
-                    !(dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0
-                    && dataDetail.relatedDocuments.filter((it:any) => it.status === StockActionStatus.CONFIRM).length > 0)
+                    !(dataDetail.relatedScDocuments && dataDetail.relatedScDocuments.length > 0
+                    && dataDetail.relatedScDocuments.filter((it:any) => it.status === StockActionStatus.CONFIRM).length > 0)
                   }
                   style={{
                     display: !manageSAPermission || viewMode || status == StockActionStatus.CANCEL
                             || (isGroupAuditParam(_group) && STOCK_COUNTER_TYPE.BRANCH === values.stockCounter)
+                            || (dataDetail.relatedSaDocuments && dataDetail.relatedSaDocuments.length > 0)
                         ? 'none'
                         : undefined,
                   }}>
@@ -699,7 +710,7 @@ export default function ModalCreateAuditPlan({
                     disableCounting ||
                     values.branch == '' ||
                     values.stockCounter == 0 || 
-                    _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])
+                    (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
                   }
                   style={{
                     display:
@@ -729,8 +740,8 @@ export default function ModalCreateAuditPlan({
                       steps.indexOf(status) >= 1 ||
                       !managePermission ||
                       viewMode ||
-                      status == StockActionStatus.CANCEL ||
-                      _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])
+                      status == StockActionStatus.CANCEL || 
+                      (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
                         ? 'none'
                         : undefined,
                   }}

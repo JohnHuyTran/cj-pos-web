@@ -65,9 +65,9 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           product: data.product,
           createrName: data.createdBy,
           branch: `${data.branchCode}-${data.branchName}`,
-          relatedDocuments:
-            data.relatedDocuments && data.relatedDocuments.length
-              ? _.uniqBy(data.relatedDocuments, 'documentNumber')
+          relatedScDocuments:
+            data.relatedScDocuments && data.relatedScDocuments.length
+              ? _.uniqBy(data.relatedScDocuments, 'documentNumber')
                   .map((item: any) => item.documentNumber)
                   .join(', ')
               : '',
@@ -120,7 +120,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       minWidth: 180,
     },
     {
-      field: 'relatedDocuments',
+      field: 'relatedScDocuments',
       headerName: 'เลขที่เอกสารอ้างอิง',
       headerAlign: 'center',
       sortable: false,
