@@ -626,6 +626,9 @@ export const environment = {
       },
     },
     openEnd: {
+      search: {
+        url: 'accounting/open-end',
+      },
       view: {
         url: 'accounting/open-end/{docNo}',
       },

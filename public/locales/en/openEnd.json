@@ -1,0 +1,12 @@
+{
+  "status": {
+    "DRAFT": "บันทึก",
+    "REQUEST_APPROVE": "ขออนุมัติ",
+    "APPROVED": "อนุมัติ"
+  },
+  "documentTitle": "ปิดรอบการขาย",
+  "documentSearchBranch": "สาขา",
+  "documentSearchStartDate": "ตั้งแต่วันที่ยอดขาย",
+  "documentSearchEndDate": "ถึงวันที่ยอดขาย",
+  "documentSearchStatus": "สถานะ"
+}

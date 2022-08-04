@@ -191,6 +191,7 @@ const permission = {
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
         SUBMENU.EX_EXPENSE,
         SUBMENU.EX_CLOSE_SALE_SHIFT,
+        SUBMENU.EX_OPEN_END,
       ],
     },
     action: [
@@ -335,7 +336,7 @@ const permission = {
   finance: {
     menu: {
       mainmenu: [MAINMENU.EXPENSE],
-      submenu: [SUBMENU.CASH_STATEMENT],
+      submenu: [SUBMENU.CASH_STATEMENT, SUBMENU.EX_OPEN_END],
     },
     action: [
       ACTIONS.ACCOUNTING_CS_IMPORT,
