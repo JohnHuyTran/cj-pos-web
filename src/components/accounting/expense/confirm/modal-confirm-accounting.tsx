@@ -162,6 +162,10 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
 
       setColumnsList(columns);
     }
+    if (periodProps) {
+      setStartDate(periodProps.startDate);
+      setEndDate(periodProps.endDate);
+    }
   }, [open === true]);
 
   return (
