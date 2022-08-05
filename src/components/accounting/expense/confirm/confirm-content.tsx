@@ -8,8 +8,8 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useStyles } from '../../../../styles/makeTheme';
 
 interface Props {
-  startPeriod: string;
-  endPeriod: string;
+  // startPeriod: string;
+  // endPeriod: string;
   title: string;
   columnsList?: GridColDef[];
   rowList?: any[];
@@ -21,8 +21,8 @@ interface State {
 }
 
 export default function confirmContent({
-  startPeriod,
-  endPeriod,
+  // startPeriod,
+  // endPeriod,
   title,
   columnsList,
   rowList,
@@ -33,13 +33,14 @@ export default function confirmContent({
   const [periodData, setPeriodData] = React.useState<State>({ startDate: null, endDate: null });
 
   const handleStartDatePicker = async (value: any) => {
-    setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
-    // await handleDate(periodData ? periodData : null);
-    await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
+    // setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
+    // await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
+
+    setPeriodData({ startDate: moment(value).startOf('day').toISOString(), endDate: null });
+    await handleDate(moment(value).startOf('day').toISOString(), null);
   };
   const handleEndDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, endDate: moment(value).startOf('day').toISOString() });
-    // await handleDate(periodData ? periodData : null);
     await handleDate(periodData.startDate, moment(value).startOf('day').toISOString());
   };
 
