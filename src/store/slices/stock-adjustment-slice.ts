@@ -24,6 +24,7 @@ const initialState: ItemsState = {
     skuDifferenceEqual: 0,
     skuDifferenceNegative: 0,
     skuDifferencePositive: 0,
+    stockCounter: '',
   },
   errorList: [],
   checkStock: [],

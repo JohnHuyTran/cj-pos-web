@@ -154,7 +154,7 @@ export default function ModalCreateAuditPlan({
   const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
   const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
   const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
-  
+
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
@@ -473,7 +473,7 @@ export default function ModalCreateAuditPlan({
         displayCounting = undefined;
       } else {
         displayCounting = 'none';
-      } 
+      }
     }
     return displayCounting;
   };
@@ -488,6 +488,7 @@ export default function ModalCreateAuditPlan({
       APDocumentNumber: dataDetail.documentNumber,
       branchCode: dataDetail.branchCode,
       branchName: dataDetail.branchName,
+      stockCounter: dataDetail.stockCounter,
     };
     await dispatch(updateDataDetail(dataDetailSAUpdate));
     await dispatch(clearCalculate());
@@ -704,6 +705,7 @@ export default function ModalCreateAuditPlan({
                     display: !manageSAPermission || viewMode || status == StockActionStatus.CANCEL
                             || (isGroupAuditParam(_group) && STOCK_COUNTER_TYPE.BRANCH === values.stockCounter)
                             || (dataDetail.relatedSaDocuments && dataDetail.relatedSaDocuments.length > 0)
+                            || !groupBranch
                         ? 'none'
                         : undefined,
                   }}>
@@ -724,7 +726,7 @@ export default function ModalCreateAuditPlan({
                     (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
                     disableCounting ||
                     values.branch == '' ||
-                    values.stockCounter == 0 || 
+                    values.stockCounter == 0 ||
                     (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
                   }
                   style={{
@@ -755,7 +757,7 @@ export default function ModalCreateAuditPlan({
                       steps.indexOf(status) >= 1 ||
                       !managePermission ||
                       viewMode ||
-                      status == StockActionStatus.CANCEL || 
+                      status == StockActionStatus.CANCEL ||
                       (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
                         ? 'none'
                         : undefined,
