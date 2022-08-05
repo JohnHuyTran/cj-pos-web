@@ -20,7 +20,7 @@ import {
 } from '../../../store/slices/stock-count-slice';
 import AlertError from '../../commons/ui/alert-error';
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
-import { Action, StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
+import { Action, StockActionStatus, STOCK_COUNTER_TYPE, STORE_TYPE } from '../../../utils/enum/common-enum';
 import ConfirmCloseModel from '../../commons/ui/confirm-exit-model';
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import ModelConfirm from "../../barcode-discount/modal-confirm";
@@ -34,7 +34,7 @@ import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
 import { cancelStockCount, confirmStockCount, getSCDetail } from "../../../services/stock-count";
 import ModalConfirmSC from './modal-confirm-SC';
 import { getUserInfo } from '../../../store/sessionStore';
-import { getUserGroup, isChannelBranch, isGroupAuditParam } from '../../../utils/role-permission';
+import { getUserGroup, isChannelBranch, isGroupAuditParam, isGroupBranchParam } from '../../../utils/role-permission';
 
 
 interface Props {
@@ -137,6 +137,7 @@ export default function ModalCreateStockCount({
         storeType: '',
         countingTime: '',
         APDocumentNumber: '',
+        stockCounter: 0,
         APId: ''
       })
     );
@@ -174,7 +175,8 @@ export default function ModalCreateStockCount({
           APDocumentNumber: stockCountDetail.APDocumentNumber,
           APId: stockCountDetail.APId,
           storeType: stockCountDetail.storeType,
-          branch: stockCountDetail.branchCode + ' - ' + stockCountDetail.branchName
+          branch: stockCountDetail.branchCode + ' - ' + stockCountDetail.branchName,
+          stockCounter: stockCountDetail.stockCounter
         })
       );
       //set value for products
@@ -286,7 +288,13 @@ export default function ModalCreateStockCount({
           setOpenModalCancel(false);
         }
       } catch (error) {
-        setOpenModalError(true);
+        const er:any = error;
+        if (er.code == 40002){
+          setOpenModalError(true);
+          setAlertTextError('กรุณายกเลิกเอกสารที่เกี่ยวข้องก่อนดำเนินการ');
+        } else {
+          setOpenModalError(true);
+        }
         setOpenModalCancel(false);
       }
     } else {
@@ -439,8 +447,12 @@ export default function ModalCreateStockCount({
                   sx={{ width: 172 }}
                   style={{
                     display:
-                      (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) 
-                      || !isGroupAuditParam(_group) || !groupBranch ? 'none' : undefined,
+                      (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
+                      !isGroupAuditParam(_group) ||
+                      dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH ||
+                      !groupBranch
+                        ? 'none'
+                        : undefined,
                   }}>
                   คลิกใส่ 0 สินค้าที่ไม่พบ
                 </Button>
@@ -457,7 +469,8 @@ export default function ModalCreateStockCount({
                   display:
                     (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
                     !managePermission ||
-                    !groupBranch 
+                    !groupBranch || (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) 
+                    || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
                       ? 'none'
                       : undefined,
                 }}
@@ -471,7 +484,15 @@ export default function ModalCreateStockCount({
                 variant='contained'
                 color='error'
                 disabled={stringNullOrEmpty(status)}
-                style={{ display: !managePermission || !groupBranch  ? 'none' : undefined }}
+                style={{
+                  display:
+                    !managePermission ||
+                    !groupBranch ||
+                    (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
+                    (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+                      ? 'none'
+                      : undefined,
+                }}
                 startIcon={<HighlightOffIcon/>}
                 onClick={handleOpenCancel}
                 className={classes.MbtnSearch}>
