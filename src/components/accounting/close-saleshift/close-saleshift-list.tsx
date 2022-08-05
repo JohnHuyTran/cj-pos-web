@@ -46,7 +46,7 @@ function CloseSaleShiftSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -79,11 +79,11 @@ function CloseSaleShiftSearchList() {
       renderCell: (params) => {
         const _status = params.getValue(params.id, 'status');
         if (_status === 'DRAFT') {
-          return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+          return <Chip label={params.value} size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (_status === 'CORRECT') {
-          return <Chip label={params.value} size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+          return <Chip label={params.value} size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
         } else if (_status === 'PENDDING_REVIEW') {
-          return <Chip label={params.value} size='small' sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
+          return <Chip label={params.value} size="small" sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
         }
       },
     },
@@ -306,7 +306,7 @@ function CloseSaleShiftSearchList() {
         pageSize={pageSize}
         rowsPerPageOptions={[10, 20, 50, 100]}
         rowCount={items.total}
-        paginationMode='server'
+        paginationMode="server"
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onCellClick={currentlySelected}

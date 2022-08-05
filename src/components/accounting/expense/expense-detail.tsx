@@ -1299,7 +1299,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                           <Typography variant='body2'>
                             <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
                             <span style={{ color: '#AEAEAE' }}>
-                              {getExpenseStatus(e.status)?.text || e.status} : {convertUtcToBkkDate(e.commentDate)}
+                              {getExpenseStatus(e.status)?.text || e.status} : {convertUtcToBkkDate(e.commentDate)}{' '}
+                              {moment(e.commentDate).format('HH:mm ')}
                             </span>
                           </Typography>
                           <Typography variant='body2'> {e.comment}</Typography>
