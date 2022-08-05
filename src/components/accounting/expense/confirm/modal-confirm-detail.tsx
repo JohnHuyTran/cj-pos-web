@@ -31,12 +31,12 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const date = new Date();
-  const [startDate, setStartDate] = React.useState(String(date));
-  const [endDate, setEndDate] = React.useState(String(date));
+  // const date = new Date();
+  // const [startDate, setStartDate] = React.useState(String(date));
+  // const [endDate, setEndDate] = React.useState(String(date));
   const [periodData, setPeriodData] = React.useState({
-    startDate: startDate,
-    endDate: endDate,
+    startDate: null,
+    endDate: null,
   });
 
   const handleConfirm = async () => {
@@ -58,15 +58,15 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
   const [columnsList, setColumnsList] = React.useState<GridColDef[]>([]);
   const [rowList, setRowList] = React.useState<any[]>([]);
   useEffect(() => {
-    if (periodProps) {
-      setStartDate(periodProps?.startDate);
-      setEndDate(periodProps?.endDate);
+    // if (periodProps) {
+    //   setStartDate(periodProps?.startDate);
+    //   setEndDate(periodProps?.endDate);
 
-      setPeriodData({
-        startDate: periodProps?.startDate,
-        endDate: periodProps?.endDate,
-      });
-    }
+    //   setPeriodData({
+    //     startDate: periodProps?.startDate,
+    //     endDate: periodProps?.endDate,
+    //   });
+    // }
 
     if (payload) {
       let _newExpenseAllList: any[] = [];
@@ -191,8 +191,8 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
           <ConfirmContent
-            startPeriod={startDate}
-            endPeriod={endDate}
+            // startPeriod={startDate}
+            // endPeriod={endDate}
             handleDate={handleDate}
             title='1 สาขา'
             columnsList={columnsList}
@@ -214,7 +214,8 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
             variant='contained'
             color='primary'
             sx={{ borderRadius: 2, width: 120 }}
-            onClick={handleConfirm}>
+            onClick={handleConfirm}
+            disabled={!periodData.startDate || !periodData.endDate}>
             ยืนยัน
           </Button>
         </DialogActions>

@@ -8,8 +8,8 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useStyles } from '../../../../styles/makeTheme';
 
 interface Props {
-  startPeriod: string;
-  endPeriod: string;
+  // startPeriod: string;
+  // endPeriod: string;
   title: string;
   columnsList?: GridColDef[];
   rowList?: any[];
@@ -21,8 +21,8 @@ interface State {
 }
 
 export default function confirmContent({
-  startPeriod,
-  endPeriod,
+  // startPeriod,
+  // endPeriod,
   title,
   columnsList,
   rowList,
