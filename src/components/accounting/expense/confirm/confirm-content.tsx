@@ -33,13 +33,14 @@ export default function confirmContent({
   const [periodData, setPeriodData] = React.useState<State>({ startDate: null, endDate: null });
 
   const handleStartDatePicker = async (value: any) => {
-    setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
-    // await handleDate(periodData ? periodData : null);
-    await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
+    // setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
+    // await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
+
+    setPeriodData({ startDate: moment(value).startOf('day').toISOString(), endDate: null });
+    await handleDate(moment(value).startOf('day').toISOString(), null);
   };
   const handleEndDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, endDate: moment(value).startOf('day').toISOString() });
-    // await handleDate(periodData ? periodData : null);
     await handleDate(periodData.startDate, moment(value).startOf('day').toISOString());
   };
 
