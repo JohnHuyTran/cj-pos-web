@@ -68,6 +68,11 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
     //   });
     // }
 
+    setPeriodData({
+      startDate: null,
+      endDate: null,
+    });
+
     if (payload) {
       let _newExpenseAllList: any[] = [];
       let sumValue = 0;

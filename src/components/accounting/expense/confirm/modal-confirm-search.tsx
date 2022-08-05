@@ -80,6 +80,11 @@ export default function ModelConfirmSearch({
     //   });
     // }
 
+    setPeriodData({
+      startDate: null,
+      endDate: null,
+    });
+
     if (summarizList) {
       let _newExpenseAllList: any[] = [];
       summarizList.sumItems.map((i: ExpenseInfo) => {
