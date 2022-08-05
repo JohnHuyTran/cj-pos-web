@@ -78,29 +78,42 @@ export default function Sidebar({}: Props): ReactElement {
   };
   const [open, setOpen] = useState(true);
   const [openSellMenu, setOpenSellMenu] = useState(
-    selectedByPath('sale-limit-time') || selectedByPath('barcode-discount') || selectedByPath('tax-invoice')
+    selectedByPath('sale-limit-time') ||
+    selectedByPath('barcode-discount') ||
+    selectedByPath('tax-invoice')
   );
   const [openPickUpMenu, setOpenPickUpMenu] = useState(
-    selectedByPath('check-order') || selectedByPath('dc-check-order') || selectedByPath('supplier-check-order')
+    selectedByPath('check-order') ||
+    selectedByPath('dc-check-order') ||
+    selectedByPath('supplier-check-order')
   );
   const [openTransferMenu, setOpenTransferMenu] = useState(
-    selectedByPath('stock-transfer-rt') || selectedByPath('stock-transfer')
+    selectedByPath('stock-transfer-rt') ||
+    selectedByPath('stock-transfer')
   );
   const [openWithDrawMenu, setOpenWithDrawMenu] = useState(
     selectedByPath('transfer-out-destroy') ||
-      selectedByPath('transfer-out') ||
-      selectedByPath('transfer-out-raw-masterial') ||
-      selectedByPath('create-purchase-branch')
+    selectedByPath('transfer-out') ||
+    selectedByPath('transfer-out-raw-masterial') ||
+    selectedByPath('create-purchase-branch')
   );
   const [openProductInfoMenu, setOpenProductInfoMenu] = useState(
-    selectedByPath('product-master') || selectedByPath('stock-balance') || selectedByPath('stock-movement')
+    selectedByPath('product-master') ||
+    selectedByPath('stock-balance') ||
+    selectedByPath('stock-movement')
   );
   const [openExpenseMenu, setOpenExpenseMenu] = useState(
-    selectedByPath('expense') || selectedByPath('cash-statement') || selectedByPath('close-saleshift')
+    selectedByPath('expense') ||
+    selectedByPath('cash-statement') ||
+    selectedByPath('close-saleshift') ||
+    selectedByPath('open-end')
   );
-  const [openSettingsMenu, setOpenSettingsMenu] = useState(selectedByPath('reserves'));
+  const [openSettingsMenu, setOpenSettingsMenu] = useState(
+    selectedByPath('reserves')
+  );
   const [openCheckStockMenu, setOpenCheckStockMenu] = useState(
-    selectedByPath('audit-plan') || selectedByPath('stock-count')
+    selectedByPath('audit-plan') ||
+    selectedByPath('stock-count')
   );
 
   const navState = useAppSelector((state) => state.navigator.state);
