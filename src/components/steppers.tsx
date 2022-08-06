@@ -70,14 +70,14 @@ const QontoConnector = styled(StepConnector)(({ theme }) => ({
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
-    borderColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#eaeaf0',
+    borderColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#EAEBEB',
     borderTopWidth: 3,
     borderRadius: 1,
   },
 }));
 
 const QontoStepIconRoot = styled('div')<QontoStepIconRootProps>(({ theme, activeState }) => ({
-  color: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#eaeaf0',
+  color: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#EAEBEB',
   display: 'flex',
   height: 22,
   alignItems: 'center',

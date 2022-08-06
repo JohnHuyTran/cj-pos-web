@@ -1,4 +1,5 @@
 import { ReactNode, ReactElement, Fragment, useState, useRef } from "react";
+import NumberFormat from 'react-number-format';
 import { HighlightOff } from '@mui/icons-material';
 import { useStyles } from 'styles/makeTheme';
 import {
@@ -14,12 +15,16 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {
+  ArrowForwardIos,
+  CheckCircleOutline,
+  Save
+} from '@mui/icons-material'
 
 // Components
 import CardHeader from 'components/card-header'
 
-// Hooks func
+// Hooks function
 import useScrollTop from 'hooks/useScrollTop'
 
 interface ModalSaleShiftDetailsProps {
@@ -28,9 +33,21 @@ interface ModalSaleShiftDetailsProps {
   onClose: () => void;
 }
 
+interface InputNumberLayoutProps {
+  id: string,
+  name?: string,
+  value: string | number,
+  decimal?: number,
+  children?: ReactNode,
+  disable?: boolean,
+  validate?: boolean,
+  onChange: (value: any) => void
+}
+/* 
 interface InputProps {
   inputForm: any
-}
+  setInputForm: (value: any) => void
+} */
 
 interface DetailsProps {
   detailsData: any
@@ -44,7 +61,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const classes = useStyles();
   const TopLine = { 
     mt:'30px',
-    borderTop: '2px solid #e1e1e1',
+    borderTop: '2px solid #EAEBEB',
     paddingTop: '15px'
   }
   
@@ -55,20 +72,25 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     date: '20/06/2565',
     bypass: 'ไม่มี'
   }
-
-  // Set state data
-  const CardContent = useRef<HTMLElement>(null);
-  const [inputForm, setInputForm] = useState({
+  const initialSearchState = {
     summaryAmoun: {
       test: 'test'
     },
     cashReceived: {
-      test2: 'test2'
+      test2: 'test2',
+      result: '',
+      boonterm: '',
+      aj: ''
     },
     cashPayment: {
       test3: 'test3'
     }
-  })
+  }
+
+  // Set state data
+  const CardContent = useRef<HTMLElement>(null);
+  const [summaryAmoun, setSummaryAmoun] = useState(initialSearchState.summaryAmoun)
+  const [cashReceived, setCashReceived] = useState(initialSearchState.cashReceived)
   const [isOpenLoading, setIsOpenLoading] = useState(false);
   const [scrollTop, scrollProps] = useScrollTop();
   
@@ -86,7 +108,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
 
   return (
     <Fragment>
-      <Dialog id='ModalSaveCloseShiftKey' open={open} fullWidth={true} maxWidth='xl'>
+      <Dialog id='ModalSaveCloseShiftKey' open={open} fullWidth={true} maxWidth='lg'>
         <Box id='Card'>
           <CardHeader
             onClose={handleClose}
@@ -99,7 +121,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
           </CardHeader>
           <DialogContent id='CardContent'
             {...(typeof scrollProps === 'object' ? scrollProps : {})}
-            sx={{ maxHeight: '99ch', padding: 0 }}
+            sx={{ maxHeight: 'calc(100vh - 230px)', padding: 0 }}
           >
             <Box ref={CardContent} sx={{ display: 'flex', flexDirection: 'column', padding: '20px 24px' }}>
               <Box id='DetailsSection'>
@@ -109,13 +131,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='warning'
+                    startIcon={<Save />}
                     loading={isOpenLoading}
                     loadingIndicator={
                       <Typography component='span' sx={{ fontSize: '11px' }}>
                         กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                       </Typography>
                     }
-                    sx={{ borderRadius: 2, width: 100}}
+                    sx={{ borderRadius: 2, height: 40, width: 110}}
                     onClick={(e) => {console.log(e)}}>
                     บันทึก
                   </LoadingButton>
@@ -123,13 +146,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='primary'
+                    startIcon={<CheckCircleOutline />}
                     loading={isOpenLoading}
                     loadingIndicator={
                       <Typography component='span' sx={{ fontSize: '11px' }}>
                         กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                       </Typography>
                     }
-                    sx={{ borderRadius: 2, width: 100}}
+                    sx={{ borderRadius: 2, height: 40, width: 110}}
                     onClick={(e) => {console.log(e)}}>
                     ขออนุมัติ
                   </LoadingButton>
@@ -140,21 +164,37 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                 <Typography component='label' sx={{ fontSize: '18px' }}>
                   <b>สรุปยอดเงินที่ต้องนำฝาก</b>
                 </Typography>
-                <SummaryAmoun inputForm={inputForm.summaryAmoun} />
+                {/* <SummaryAmoun inputForm={inputForm.summaryAmoun} setInputForm={setInputForm} /> */}
               </Box>
               
-              <Box id='CashReceived' sx={TopLine}>
+              <Box id='CashReceivedSection' sx={TopLine}>
                 <Typography component='label' sx={{ fontSize: '18px' }}>
                   <b>รายการเงินสดรับภายนอก</b>
                 </Typography>
-                <CashReceived inputForm={inputForm.cashReceived} />
+                <Grid container rowSpacing={1} columnSpacing={7} mt={'10px'}>
+                  <InputNumberLayout id={'result'} name={'result'}
+                    value={cashReceived.result}
+                    onChange={(value) => setCashReceived({...cashReceived, result: value})}>
+                    รวม
+                  </InputNumberLayout>
+                  <InputNumberLayout id={'boonterm'} name={'boonterm'}
+                    value={cashReceived.boonterm}
+                    onChange={(value) => setCashReceived({...cashReceived, boonterm: value})}>
+                    บุญเติม
+                  </InputNumberLayout>
+                  <InputNumberLayout id={'aj'} name={'aj'}
+                    value={cashReceived.aj}
+                    onChange={(value) => setCashReceived({...cashReceived, aj: value})}>
+                    AJ เติมสบาย
+                  </InputNumberLayout>
+                </Grid>
               </Box>
 
-              <Box id='CashPayment' sx={TopLine}>
+              <Box id='CashPaymentSection' sx={TopLine}>
                 <Typography component='label' sx={{ fontSize: '18px' }}>
                   <b>รายการเงินสดจ่าย</b>
                 </Typography>
-                <CashPayment inputForm={inputForm.cashPayment} />
+                {/* <CashPayment inputForm={inputForm.cashPayment} setInputForm={setInputForm} /> */}
               </Box>
 
               { !!scrollTop && (
@@ -164,7 +204,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                   right: '40px',
                   bottom: '15px'}}>
                   <IconButton sx={{width: 'fit-content', margin: 'auto'}} onClick={goTopModal}>
-                    <ArrowForwardIosIcon
+                    <ArrowForwardIos
                       sx={{
                         fontSize: '41px',
                         padding: '6px',
@@ -204,6 +244,37 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   )
 }
 
+const InputNumberLayout = (props: InputNumberLayoutProps) => {
+  const classes = useStyles();
+  const { id, name, value, onChange, children, disable = false, validate, decimal = 0 } = props
+  return (
+    <Grid container item xs={12} sx={{alignItems: 'center'}}>
+      <Grid xs={3} sx={{textAlign: 'right'}}>
+        {children}
+        { validate && (
+          <Typography component='span' color='red'> * </Typography>
+        )}
+        <Typography component='span'> : </Typography>
+      </Grid>
+      <Grid xs={9} sx={{pl: '40px'}}>
+        <NumberFormat
+          id={id}
+          name={name}
+          value={''+value}
+          onChange={(e: any) => onChange(e.target.value)}
+          decimalScale={decimal}
+          className={classes.MtextFieldNumber}
+          disabled={disable}
+          customInput={TextField}
+          fixedDecimalScale
+          autoComplete='off'
+          thousandSeparator={true}
+        />
+      </Grid>
+    </Grid>
+  )
+}
+
 const Details = (props: DetailsProps) => {
   const { detailsData } = props
   return (
@@ -232,17 +303,36 @@ const Details = (props: DetailsProps) => {
   )
 }
 
-const SummaryAmoun = (props: InputProps) => {
-  const { inputForm } = props
+/* const SummaryAmoun = (props: InputProps) => {
+  const { inputForm, setInputForm } = props
   return (
-    <Box></Box>
+    <Grid container rowSpacing={1} columnSpacing={7} mt={'10px'}>
+      <InputNumberLayout id={'test'} name={'test'} value={inputForm.result} validate
+        onChange={(value) => setInputForm(value)}
+      >
+        มูลค่ายอดประจำวัน
+      </InputNumberLayout>
+      <InputNumberLayout id={'test'} name={'test'} decimal={2} value={inputForm.result} onChange={(value) => inputForm}>
+        เงินฝากขาดเกินจากทางการเงิน
+      </InputNumberLayout>
+    </Grid>
   )
 }
 
 const CashReceived = (props: InputProps) => {
   const { inputForm } = props
   return (
-    <Box></Box>
+    <Grid container rowSpacing={1} columnSpacing={7} mt={'10px'}>
+      <InputNumberLayout id={'result'} name={'result'} value={inputForm.result} onChange={(value) => inputForm}>
+        รวม
+      </InputNumberLayout>
+      <InputNumberLayout id={'boonterm'} name={'boonterm'} value={inputForm.result} onChange={(value) => inputForm}>
+        บุญเติม
+      </InputNumberLayout>
+      <InputNumberLayout id={'AJ'} name={'AJ'} value={inputForm.result} onChange={(value) => inputForm}>
+        AJ เติมสบาย
+      </InputNumberLayout>
+    </Grid>
   )
 }
 
@@ -251,4 +341,4 @@ const CashPayment = (props: InputProps) => {
   return (
     <Box></Box>
   )
-}
+} */

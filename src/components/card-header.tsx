@@ -32,7 +32,9 @@ export default function CardHeader (props: CardHeaderProps) {
     sx={{ 
         boxShadow: scrollTop > 0 ? "0 0 10px rgba(0,0,0,0.4)" : "none" ,
         position: 'sticky',
-        top: 0, 
+        top: 0,
+        background: 'white',
+        zIndex: 1,
         transition: 'all 0.5s linear'
       }}>
       <DialogContent id='Topic'
