@@ -794,7 +794,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             className={classes.MbtnPrint}
             onClick={handleAddExpenseTransactionBtn}
             startIcon={<ControlPoint />}
-            sx={{ width: 200 }}>
+            sx={{ width: 200 }}
+            disabled={status === STATUS.WAITTING_EDIT_ATTACH_FILE ? true : false}>
             เพิ่มรายการจ่าย
           </Button>
         </Grid>

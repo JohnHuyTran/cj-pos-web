@@ -55,7 +55,7 @@ import {
   getSummarizeByCriteria,
   getSummarizeByNo,
 } from 'services/accounting';
-import { ApiError } from 'models/api-error-model';
+import { ApiError, ErrorDetailResponse, Header } from 'models/api-error-model';
 import AlertError from 'components/commons/ui/alert-error';
 import {
   addNewItem,
@@ -143,6 +143,7 @@ export default function SearchExpense() {
   const [isOpenLoading, setIsOpenLoading] = useState(false);
   const [openFailAlert, setOpenFailAlert] = useState(false);
   const [textFail, setTextFail] = useState('');
+  const [payloadError, setPayloadError] = useState<ErrorDetailResponse | null>();
 
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const branchAccountingList = items.branchAccountingList.data ? items.branchAccountingList.data : [];
@@ -395,8 +396,25 @@ export default function SearchExpense() {
         dispatch(featchBranchAccountingListAsync(payloadSearch));
       })
       .catch((error: ApiError) => {
-        setTextFail(error.message);
-        setOpenFailAlert(true);
+        if (String(error.code) === '40020') {
+          const header: Header = {
+            field1: false,
+            field2: false,
+            field3: true,
+            field4: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: error.error_details,
+          };
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(payload);
+        } else {
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(null);
+        }
       });
 
     setIsOpenLoading(false);
@@ -426,8 +444,25 @@ export default function SearchExpense() {
         dispatch(featchBranchAccountingListAsync(payloadSearch));
       })
       .catch((error: ApiError) => {
-        setTextFail(error.message);
-        setOpenFailAlert(true);
+        if (String(error.code) === '40020') {
+          const header: Header = {
+            field1: false,
+            field2: false,
+            field3: true,
+            field4: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: error.error_details,
+          };
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(payload);
+        } else {
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(null);
+        }
       });
 
     setIsOpenLoading(false);
@@ -633,7 +668,7 @@ export default function SearchExpense() {
         summarizTitle={summarizTitle}
         summarizList={summarizList}
       />
-      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} payload={payloadError} />
 
       <SnackbarStatus
         open={showSnackBar}

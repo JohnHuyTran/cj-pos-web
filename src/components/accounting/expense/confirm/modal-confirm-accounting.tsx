@@ -35,8 +35,8 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
   };
 
   const date = new Date();
-  const [startDate, setStartDate] = React.useState(String(date));
-  const [endDate, setEndDate] = React.useState(String(date));
+  const [startDate, setStartDate] = React.useState(String(periodProps?.startDate));
+  const [endDate, setEndDate] = React.useState(String(periodProps?.endDate));
 
   const handleConfirm = async () => {
     handleOpenLoading('open', true);
@@ -161,6 +161,10 @@ export default function ModelConfirm({ open, onClose, onConfirm, payload, period
       });
 
       setColumnsList(columns);
+    }
+    if (periodProps) {
+      setStartDate(periodProps.startDate);
+      setEndDate(periodProps.endDate);
     }
   }, [open === true]);
 
