@@ -206,6 +206,7 @@ export default function NotificationReminder(props: Props) {
 
   const listTask = listData.map((item: any, index: number) => {
     let content, statusDisplay, branchCode;
+    let periodContent = 'กำหนดดำเนินการ'
     switch (item.type) {
       case 'REJECT_BARCODE':
         {
@@ -228,6 +229,7 @@ export default function NotificationReminder(props: Props) {
         break;
       case 'PRINT_BARCODE':
         content = 'ส่วนลดสินค้า';
+        periodContent = `พิมพ์ครั้งที่ ${item.documentNumber.split('_')[1]}`
         branchCode = item.payload.branchCode;
         statusDisplay = genStatusValue('พิมพ์บาร์โค้ดแล้ว', {
           color: '#676767',
@@ -332,7 +334,7 @@ export default function NotificationReminder(props: Props) {
             </HtmlTooltip>
             <Box>
               <Typography style={{ color: theme.palette.grey[500], fontSize: '11px' }}>
-                กำหนดดำเนินการ {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
+                {periodContent} {moment(item.createdDate).add(543, 'y').format(DateFormat.DATE_FORMAT)}
               </Typography>
             </Box>
           </Box>
