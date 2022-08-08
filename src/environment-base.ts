@@ -239,6 +239,9 @@ export const environment = {
       exportFile: {
         url: '/purchase/purchase-note/export/{pnNo}',
       },
+      deletePN: {
+        url: '/purchase/purchase-note/{pnNo}/delete',
+      },
     },
     purchaseBranchRequest: {
       search: {

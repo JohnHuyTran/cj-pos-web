@@ -39,6 +39,7 @@ import ConfirmModalExit from '../commons/ui/confirm-exit-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import {
   approvePurchaseCreditNote,
+  deletePN,
   delFileUrlHuawei,
   draftPurchaseCreditNote,
   getPathReportPI,
@@ -63,6 +64,7 @@ import { numberWithCommas } from '../../utils/utils';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
+import ModelDelConfirm from '../commons/ui/modal-delete-confirm-item';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -585,6 +587,18 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
     }
   };
 
+  const [openDelPNModal, setOpenDelPNModal] = React.useState(false);
+  const handleDeletePN = () => {
+    setOpenDelPNModal(true);
+  };
+  const onCloseModalDelPN = async (value: boolean) => {
+    if (value) {
+      await deletePN(pnNo);
+    }
+
+    setOpenDelPNModal(false);
+  };
+
   return (
     <div>
       {' '}
@@ -723,6 +737,17 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                 >
                   ยืนยัน
                 </Button>
+
+                <Button
+                  id="btnDelete"
+                  variant="contained"
+                  color="error"
+                  className={classes.MbtnApprove}
+                  sx={{ width: 200 }}
+                  onClick={handleDeletePN}
+                >
+                  ยกเลิก
+                </Button>
               </Grid>
             </Grid>
           )}
@@ -821,6 +846,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         fileName={formatFileNam(pnNo, pnStatus)}
         btnPrintName="พิมพ์เอกสาร"
       />
+      <ModelDelConfirm open={openDelPNModal} onClose={onCloseModalDelPN} />
       <LoadingModal open={openLoadingModal} />
     </div>
   );
