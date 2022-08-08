@@ -22,6 +22,7 @@ const initialState: ItemsState = {
     storeType: '',
     countingTime: '',
     APDocumentNumber: '',
+    stockCounter: 0,
     APId: ''
   },
   errorList: [],

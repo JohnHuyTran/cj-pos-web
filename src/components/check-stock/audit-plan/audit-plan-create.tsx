@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
-import { Button, Dialog, DialogContent, FormControl, Grid, Input, MenuItem, Select, Typography } from '@mui/material';
+import { Button, Dialog, DialogContent, FormControl, Grid, Input, Link, MenuItem, Select, Typography } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -45,6 +45,7 @@ import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-a
 import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
 import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
 import { clearCalculate } from "../../../store/slices/stock-adjust-calculate-slice";
+import LoadingModal from '../../commons/ui/loading-modal';
 
 interface Props {
   action: Action | Action.INSERT;
@@ -123,6 +124,8 @@ export default function ModalCreateAuditPlan({
   });
   const [reSave, setReSave] = React.useState(false);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
+  const [openSADetail, setOpenSADetail] = React.useState<boolean>(false)
 
   //permission
   const userInfo = getUserInfo();
@@ -151,7 +154,7 @@ export default function ModalCreateAuditPlan({
   const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
   const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
   const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
-  
+
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
@@ -226,13 +229,14 @@ export default function ModalCreateAuditPlan({
           documentNumber: values.documentNumber,
           branchCode: values.branch,
           branchName: getBranchName(branchList, values.branch),
+          stockCounter: values.stockCounter
         },
         storeType: store,
       };
       const rs = await countingAuditPlan(payload);
       if (rs.code == 20000) {
         dispatch(setCheckEdit(false));
-        // setOpenPopupModal(true);
+        // setOpenPopupModal(true); 
         // setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
 
         setStatus(StockActionStatus.COUNTING);
@@ -259,7 +263,7 @@ export default function ModalCreateAuditPlan({
 
   const handleOpenCancel = async () => {
     await dispatch(getAuditPlanDetail(values.id));
-    if (dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0) {
+    if (dataDetail.relatedScDocuments && dataDetail.relatedScDocuments.length > 0) {
       setOpenModalError(true);
       setAlertTextError('กรุณายกเลิกเอกสารที่เกี่ยวข้องก่อนดำเนินการ');
     } else {
@@ -469,7 +473,7 @@ export default function ModalCreateAuditPlan({
         displayCounting = undefined;
       } else {
         displayCounting = 'none';
-      } 
+      }
     }
     return displayCounting;
   };
@@ -484,6 +488,7 @@ export default function ModalCreateAuditPlan({
       APDocumentNumber: dataDetail.documentNumber,
       branchCode: dataDetail.branchCode,
       branchName: dataDetail.branchName,
+      stockCounter: dataDetail.stockCounter,
     };
     await dispatch(updateDataDetail(dataDetailSAUpdate));
     await dispatch(clearCalculate());
@@ -492,6 +497,19 @@ export default function ModalCreateAuditPlan({
 
   const handleUpdateAgainDetailAP = () => {
     dispatch(getAuditPlanDetail(dataDetail.id));
+  };
+  const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
+  const handleOpenAP = async () => {
+    setOpenLoadingModal(true);
+    try {
+      await dispatch(getStockAdjustmentDetail(dataDetail.relatedSaDocuments[0].id));
+      if (stockAdjustDetail) {
+        setOpenSADetail(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setOpenLoadingModal(false);
   };
 
   return (
@@ -590,23 +608,31 @@ export default function ModalCreateAuditPlan({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
-              {steps.indexOf(status) > 1 && dataDetail.relatedDocuments && (
+              {steps.indexOf(status) > 1 && dataDetail.relatedScDocuments && (
                 <>
                   <Grid item xs={3}>
                     เอกสาร SC :
                   </Grid>
                   <Grid item xs={8}>
-                    <DocumentList viewMode={viewMode} handleUpdateAgain={handleUpdateAgainDetailAP}/>
+                    <DocumentList viewMode={viewMode} handleUpdateAgain={handleUpdateAgainDetailAP} relatedDocuments={dataDetail.relatedScDocuments} type={'SC'}/>
                   </Grid>
                 </>
               )}
             </Grid>
             {/*line 3*/}
-            <Grid item container xs={4} mb={5} pl={2}>
-              {/* <Grid item xs={4}>
-                เอกสาร SA :
-              </Grid> */}
-              <Grid item xs={8}></Grid>
+            <Grid item container xs={4} mb={5}>
+            {steps.indexOf(status) > 1 && dataDetail.relatedSaDocuments && dataDetail.relatedSaDocuments.length > 0 && (
+                <>
+                  <Grid item xs={3}>
+                    เอกสาร SA :
+                  </Grid>
+                  <Grid item xs={8}>
+                  <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenAP}>
+                  {dataDetail.relatedSaDocuments[0].documentNumber}
+                </Link>
+                  </Grid>
+                </>
+              )}
             </Grid>
             {/*line 3*/}
             <Grid container item xs={4} mb={5} mt={-1}>
@@ -672,11 +698,14 @@ export default function ModalCreateAuditPlan({
                   onClick={handleOpenSA}
                   sx={{ width: 150 , height: '36.5px', mr: '17px'}}
                   disabled={
-                    !(dataDetail.relatedDocuments && dataDetail.relatedDocuments.length > 0
-                    && dataDetail.relatedDocuments.filter((it:any) => it.status === StockActionStatus.CONFIRM).length > 0)
+                    !(dataDetail.relatedScDocuments && dataDetail.relatedScDocuments.length > 0
+                    && dataDetail.relatedScDocuments.filter((it:any) => it.status === StockActionStatus.CONFIRM).length > 0)
                   }
                   style={{
                     display: !manageSAPermission || viewMode || status == StockActionStatus.CANCEL
+                            || (isGroupAuditParam(_group) && STOCK_COUNTER_TYPE.BRANCH === values.stockCounter)
+                            || (dataDetail.relatedSaDocuments && dataDetail.relatedSaDocuments.length > 0)
+                            || !groupBranch
                         ? 'none'
                         : undefined,
                   }}>
@@ -697,8 +726,8 @@ export default function ModalCreateAuditPlan({
                     (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
                     disableCounting ||
                     values.branch == '' ||
-                    values.stockCounter == 0 || 
-                    _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])
+                    values.stockCounter == 0 ||
+                    (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
                   }
                   style={{
                     display:
@@ -729,7 +758,7 @@ export default function ModalCreateAuditPlan({
                       !managePermission ||
                       viewMode ||
                       status == StockActionStatus.CANCEL ||
-                      _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])
+                      (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
                         ? 'none'
                         : undefined,
                   }}
@@ -806,10 +835,23 @@ export default function ModalCreateAuditPlan({
       {openSA && (
         <ModalCreateStockAdjustment
           isOpen={openSA}
+          openFromAP={true}
           onClickClose={async () => {
             setOpenSA(false);
           }}
           action={Action.INSERT}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          userPermission={userPermission}
+        />
+      )}
+
+      {openSADetail && ( 
+        <ModalCreateStockAdjustment
+          isOpen={openSADetail}
+          openFromAP={true}
+          onClickClose={() => setOpenSADetail(false)}
+          action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
@@ -854,6 +896,7 @@ export default function ModalCreateAuditPlan({
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
       <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <LoadingModal open={openLoadingModal} />
     </div>
   );
 }

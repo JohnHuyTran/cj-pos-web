@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
-import { Action } from '../../../utils/enum/common-enum';
+import { Action, StockActionStatus } from '../../../utils/enum/common-enum';
 import { KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
 import { getUserInfo } from "../../../store/sessionStore";
 import { BarcodeCalculate, SACalculateRequest, SkuCalculate } from "../../../models/stock-adjustment-model";
@@ -117,17 +117,17 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           index: index + 1,
           skuName: item.skuName,
           sku: item.sku,
-          saleCounting: checked ? '' : item.saleCounting,
-          stockMovement: checked ? '' : item.stockMovement,
-          storeFrontCount: checked ? '' : item.storeFrontCount,
-          storeBackCount: checked ? '' : item.storeBackCount,
-          totalCount: checked ? '' : (item.storeFrontCount + item.storeBackCount),
-          availableStock: checked ? '' : item.availableStock,
-          difference: checked ? '' : item.difference,
-          tempStock: checked ? '' : item.tempStock,
-          unitName: checked ? '' : item.unitName,
-          adjustedPrice: checked ? '' : 0,
-          remark: '',
+          saleCounting: item.saleCounting,
+          stockMovement: item.stockMovement,
+          storeFrontCount: item.storeFrontCount,
+          storeBackCount: item.storeBackCount,
+          totalCount: (item.storeFrontCount + item.storeBackCount),
+          availableStock: item.availableStock,
+          difference: item.difference,
+          tempStock: item.tempStock,
+          unitName: item.unitName,
+          adjustedPrice: 0,
+          remark: checked ? ('นับทวนใหม่จาก ' + dataDetail.documentNumber) : '',
         };
       });
       setSkuTable(rows);
@@ -151,15 +151,15 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           barcode: item.barcode,
           productName: item.productName,
           sku: item.sku,
-          saleCounting: checked ? '' : item.saleCounting,
-          stockMovement: checked ? '' : item.stockMovement,
-          storeFrontCount: checked ? '' : item.storeFrontCount,
-          storeBackCount: checked ? '' : item.storeBackCount,
-          totalCount: checked ? '' : (item.storeFrontCount + item.storeBackCount),
-          availableStock: checked ? '' : item.availableStock,
-          difference: checked ? '' : item.difference,
-          tempStock: checked ? '' : item.tempStock,
-          unitName: checked ? '' : item.unitName,
+          saleCounting: item.saleCounting,
+          stockMovement: item.stockMovement,
+          storeFrontCount: item.storeFrontCount,
+          storeBackCount: item.storeBackCount,
+          totalCount: (item.storeFrontCount + item.storeBackCount),
+          availableStock: item.availableStock,
+          difference: item.difference,
+          tempStock: item.tempStock,
+          unitName: item.unitName,
         };
       });
       setBarcodeTable(rows2);
@@ -179,22 +179,8 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
   }, [refreshCalculate]);
 
   const handleRefreshCalculate = async () => {
-    let skuCalculateCriteriaNew = {
-      perPage: 10,
-      page: 1,
-      id: dataDetail.id,
-      filterDifference: '',
-    };
-    await dispatch(saveSkuCalculateCriteria(skuCalculateCriteriaNew));
-    await dispatch(getSkuCalculate(skuCalculateCriteriaNew));
-    let barcodeCalculateCriteriaNew = {
-      perPage: 10,
-      page: 1,
-      id: dataDetail.id,
-      filterDifference: '',
-    };
-    await dispatch(saveBarcodeCalculateCriteria(barcodeCalculateCriteriaNew));
-    await dispatch(getBarcodeCalculate(barcodeCalculateCriteriaNew));
+    await handleCallCalculateSku();
+    await handleCallCalculateBarcode();
   };
 
   useEffect(() => {
@@ -209,44 +195,52 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
 
   const handleReloadCalculate = async () => {
     if (values.valueTab === 0) {
-      let filterDifference0 = '';
-      if (values.differenceEqual0) {
-        filterDifference0 += '0';
-      }
-      if (values.differenceNegative0) {
-        filterDifference0 += stringNullOrEmpty(filterDifference0) ? '-1' : ',-1';
-      }
-      if (values.differencePositive0) {
-        filterDifference0 += stringNullOrEmpty(filterDifference0) ? '1' : ',1';
-      }
-      let skuCalculateCriteriaNew = {
-        perPage: skuCalculateCriteria.perPage,
-        page: skuCalculateCriteria.page,
-        id: dataDetail.id,
-        filterDifference: filterDifference0,
-      };
-      await dispatch(saveSkuCalculateCriteria(skuCalculateCriteriaNew));
-      await dispatch(getSkuCalculate(skuCalculateCriteriaNew));
+      await handleCallCalculateSku();
     } else if (values.valueTab === 1) {
-      let filterDifference1 = '';
-      if (values.differenceEqual1) {
-        filterDifference1 += '0';
-      }
-      if (values.differenceNegative1) {
-        filterDifference1 += stringNullOrEmpty(filterDifference1) ? '-1' : ',-1';
-      }
-      if (values.differencePositive1) {
-        filterDifference1 += stringNullOrEmpty(filterDifference1) ? '1' : ',1';
-      }
-      let barcodeCalculateCriteriaNew = {
-        perPage: barcodeCalculateCriteria.perPage,
-        page: barcodeCalculateCriteria.page,
-        id: dataDetail.id,
-        filterDifference: filterDifference1,
-      };
-      await dispatch(saveBarcodeCalculateCriteria(barcodeCalculateCriteriaNew));
-      await dispatch(getBarcodeCalculate(barcodeCalculateCriteriaNew));
+      await handleCallCalculateBarcode();
     }
+  };
+
+  const handleCallCalculateSku = async () => {
+    let filterDifference0 = '';
+    if (values.differenceEqual0) {
+      filterDifference0 += '0';
+    }
+    if (values.differenceNegative0) {
+      filterDifference0 += stringNullOrEmpty(filterDifference0) ? '-1' : ',-1';
+    }
+    if (values.differencePositive0) {
+      filterDifference0 += stringNullOrEmpty(filterDifference0) ? '1' : ',1';
+    }
+    let skuCalculateCriteriaNew = {
+      perPage: skuCalculateCriteria.perPage,
+      page: skuCalculateCriteria.page,
+      id: dataDetail.id,
+      filterDifference: filterDifference0,
+    };
+    await dispatch(saveSkuCalculateCriteria(skuCalculateCriteriaNew));
+    await dispatch(getSkuCalculate(skuCalculateCriteriaNew));
+  };
+
+  const handleCallCalculateBarcode = async () => {
+    let filterDifference1 = '';
+    if (values.differenceEqual1) {
+      filterDifference1 += '0';
+    }
+    if (values.differenceNegative1) {
+      filterDifference1 += stringNullOrEmpty(filterDifference1) ? '-1' : ',-1';
+    }
+    if (values.differencePositive1) {
+      filterDifference1 += stringNullOrEmpty(filterDifference1) ? '1' : ',1';
+    }
+    let barcodeCalculateCriteriaNew = {
+      perPage: barcodeCalculateCriteria.perPage,
+      page: barcodeCalculateCriteria.page,
+      id: dataDetail.id,
+      filterDifference: filterDifference1,
+    };
+    await dispatch(saveBarcodeCalculateCriteria(barcodeCalculateCriteriaNew));
+    await dispatch(getBarcodeCalculate(barcodeCalculateCriteriaNew));
   };
 
   const handlePageChangeSku = async (newPage: number) => {
@@ -325,6 +319,9 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
 
   const onCheckCell = async (params: GridRenderCellParams, event: any) => {
     let skuRechecks = _.cloneDeep(dataDetail.recheckSkus);
+    if (skuRechecks === undefined || skuRechecks === null) {
+      skuRechecks = [];
+    }
     let skuTableHandle = _.cloneDeep(skuTable);
     for (let item of skuTableHandle) {
       if (item.id === params.row.id) {
@@ -358,7 +355,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={!auditPermission}
+          disabled={!auditPermission || stringNullOrEmpty(dataDetail.status) || dataDetail.status != StockActionStatus.DRAFT}
           onClick={onCheckCell.bind(this, params)}
         />
       ),
@@ -532,7 +529,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     {
       field: 'remark',
       headerName: 'หมายเหตุ',
-      flex: 1,
+      flex: 1.3,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
@@ -728,7 +725,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     } else if (value > 0) {
       colorValue = '#446EF2';
     }
-    return checked ? '' : <Typography variant='body2' sx={{ color: colorValue }}>{numberWithCommas(value)}</Typography>;
+    return <Typography variant='body2' sx={{ color: colorValue }}>{numberWithCommas(value)}</Typography>;
   };
 
   const FilterPanel = (props: FilterPanelProps) => {

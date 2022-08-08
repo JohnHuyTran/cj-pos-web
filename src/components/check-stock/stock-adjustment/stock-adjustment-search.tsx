@@ -19,12 +19,11 @@ import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment-search-slice";
-// import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 import StockAdjustmentList from "./stock-adjustment-list";
 import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
 import { isChannelBranch } from "../../../utils/role-permission";
-import { StockCountSearchRequest } from "../../../models/stock-count-model";
 import { StockAdjustmentSearchRequest } from '../../../models/stock-adjustment-model';
+import { saveSearchCriteriaSA } from "../../../store/slices/stock-adjustment-criteria-search-slice";
 
 const _ = require('lodash');
 
@@ -202,7 +201,7 @@ const StockAdjustmentSearch = () => {
 
     handleOpenLoading('open', true);
     await dispatch(getStockAdjustmentSearch(payload));
-    // await dispatch(saveSearchCriteriaSC(payload));
+    await dispatch(saveSearchCriteriaSA(payload));
     setFlagSearch(true);
     handleOpenLoading('open', false);
   };

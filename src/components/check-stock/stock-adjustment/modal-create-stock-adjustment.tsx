@@ -27,12 +27,16 @@ import StepperBar from "../../commons/ui/stepper-bar";
 import { StepItem } from "../../../models/step-item-model";
 import { clearDataFilter, getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 import ModalCreateAuditPlan from "../audit-plan/audit-plan-create";
-import { cancelStockCount, confirmStockCount } from "../../../services/stock-count";
 import ModalStockAdjustmentItem from "./modal-stock-adjustment-item";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import ModalAddStockCount from "./modal-add-stock-count";
 import SaveIcon from "@mui/icons-material/Save";
-import { saveDraftStockAdjust } from "../../../services/stock-adjustment";
+import {
+  cancelStockAdjust,
+  confirmStockAdjust,
+  getCalculateSkuStats,
+  saveDraftStockAdjust
+} from "../../../services/stock-adjustment";
 import SnackbarStatus from "../../commons/ui/snackbar-status";
 import IconButton from "@mui/material/IconButton";
 import { HighlightOff, Replay } from "@mui/icons-material";
@@ -40,10 +44,12 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import ModelConfirmStockAdjust from "./modal-confirm-stock-adjust";
 import { clearCalculate, updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
+import { saveDraftAuditPlan } from "../../../services/audit-plan";
 
 interface Props {
   action: Action | Action.INSERT;
   isOpen: boolean;
+  openFromAP: boolean;
   setOpenPopup: (openPopup: boolean) => void;
   onClickClose: () => void;
   setPopupMsg?: any;
@@ -61,6 +67,7 @@ const _ = require('lodash');
 export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const {
     isOpen,
+    openFromAP,
     onClickClose,
     setOpenPopup,
     action,
@@ -80,7 +87,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
   const [openAddSC, setOpenAddSC] = React.useState(false);
   const [status, setStatus] = React.useState<string>('');
-  const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+  const [alertTextError, setAlertTextError] = React.useState('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
 
   const dataDetail = useAppSelector((state) => state.stockAdjustmentSlice.dataDetail);
   const checkEdit = useAppSelector((state) => state.stockAdjustmentSlice.checkEdit);
@@ -98,7 +105,19 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     setOpenModalCancel(false);
   };
 
-  const handleOpenModalConfirm = () => {
+  const handleOpenModalConfirm = async () => {
+    await dispatch(getAuditPlanDetail(dataDetail.APId));
+    //handle save recheck in SA
+    await handleCreateDraft(relatedSCs, true);
+    let rsStats = await getCalculateSkuStats(dataDetail.id);
+    if (rsStats && rsStats.data) {
+      await dispatch(updateDataDetail({
+        ...dataDetail,
+        skuDifferenceEqual: rsStats.data.numberOfEqualDifference,
+        skuDifferenceNegative: rsStats.data.numberOfNegativeDifference,
+        skuDifferencePositive: rsStats.data.numberOfPositiveDifference,
+      }));
+    }
     setOpenModalConfirmConfirm(true);
   };
 
@@ -106,8 +125,8 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     setOpenModalConfirmConfirm(false);
     if (confirm) {
       setOpenModalConfirmConfirm(false);
-      // handleConfirm();
-      // handle create AP
+      //confirm SA
+      handleConfirm();
     }
   };
 
@@ -116,8 +135,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   };
 
   const handleClose = async () => {
-    //clear state detail AP
-    dispatch(clearDataFilter());
+    if (!openFromAP) {
+      //clear state detail AP
+      dispatch(clearDataFilter());
+    }
     //clear calculate
     dispatch(clearCalculate());
 
@@ -134,7 +155,9 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         branchName: '',
         APId: '',
         APDocumentNumber: '',
-        relatedSCs: []
+        relatedSCs: [],
+        notCountableSkus: [],
+        stockCounter: '',
       })
     );
     dispatch(updateCheckEdit(false));
@@ -187,32 +210,39 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           skuDifferenceEqual: 0,
           skuDifferenceNegative: 0,
           skuDifferencePositive: 0,
+          stockCounter: stockAdjustDetail.stockCounter,
         })
       );
     }
   }, [stockAdjustDetail]);
 
-  const handleCreateDraft = async (relatedSCsParam: any) => {
-    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+  const handleCreateDraft = async (relatedSCsParam: any, withoutNotice: boolean) => {
+    setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     try {
       const payload = {
         ...dataDetail,
-        relatedSCs: relatedSCsParam
+        relatedSCs: relatedSCsParam,
       };
       const rs = await saveDraftStockAdjust(payload);
       if (rs.code === 20000) {
-        dispatch(updateCheckEdit(false));
-        setOpenSnackBar(true);
-        setTextSnackBar('คุณได้ทำการบันทีกข้อมูลเรียบร้อยแล้ว');
+        if (!withoutNotice) {
+          dispatch(updateCheckEdit(false));
+          setOpenSnackBar(true);
+          setTextSnackBar('คุณได้ทำการบันทีกข้อมูลเรียบร้อยแล้ว');
+        }
         await dispatch(
           updateDataDetail({
             ...dataDetail,
             id: rs.data.id,
             documentNumber: rs.data.documentNumber,
             status: StockActionStatus.DRAFT,
+            relatedSCs: rs.data.relatedSCs ? rs.data.relatedSCs : relatedSCs,
+            recheckSkus: rs.data.recheckSkus ? rs.data.recheckSkus : [],
           })
         );
-        handleRefresh();
+        if (!withoutNotice) {
+          handleRefresh();
+        }
       } else {
         setOpenModalError(true);
       }
@@ -222,12 +252,12 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   };
 
   const handleConfirm = async () => {
-    setAlertTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+    setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     try {
       const payload = {
         id: dataDetail.id,
       };
-      const rs = await confirmStockCount(payload);
+      const rs = await confirmStockAdjust(payload);
       if (rs.code === 20000) {
         dispatch(
           updateDataDetail({
@@ -235,6 +265,17 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             status: StockActionStatus.CONFIRM,
           })
         );
+        // handle create AP when have recheck SA
+        if (dataDetail.recheckSkus && dataDetail.recheckSkus.length > 0) {
+          const body = {
+            branchCode: dataDetail.branchCode,
+            branchName: dataDetail.branchName,
+            countingDate: moment(new Date()).endOf('day').toISOString(true),
+            stockCounter: dataDetailAP.stockCounter,
+            product: dataDetail.recheckSkus,
+          };
+          saveDraftAuditPlan(body);
+        }
         setOpenPopup(true);
         setPopupMsg('คุณได้ทำการยืนยันตรวจนับสต๊อกรวม (SA) \n เรียบร้อยแล้ว');
         handleClose();
@@ -251,7 +292,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     if (!stringNullOrEmpty(status)) {
       try {
-        const rs = await cancelStockCount(dataDetail.id);
+        const rs = await cancelStockAdjust(dataDetail.id);
         if (rs.status === 200) {
           setOpenPopup(true);
           setPopupMsg('คุณได้ยกเลิกตรวจนับสต๊อกรวม (SA) เรียบร้อยแล้ว');
@@ -310,7 +351,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const onHandleAfterAddSC = (selectedSCs: any) => {
     setRelatedSCs(selectedSCs);
     setOpenAddSC(false);
-    handleCreateDraft(selectedSCs);
+    handleCreateDraft(selectedSCs, false);
   };
 
   const handleRefresh = () => {
@@ -404,7 +445,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon/>}
                   disabled={!managePermission}
-                  style={{ display: (!managePermission || viewMode) ? 'none' : undefined }}
+                  style={{
+                    display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
+                      || !managePermission || viewMode) ? 'none' : undefined
+                  }}
                   onClick={() => {
                     setOpenAddSC(true)
                   }}
@@ -422,9 +466,12 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   variant='contained'
                   color='warning'
                   startIcon={<SaveIcon/>}
-                  disabled={!(dataDetail.relatedSCs && dataDetail.relatedSCs.length > 0)}
-                  style={{ display: (!managePermission || viewMode) ? 'none' : undefined }}
-                  onClick={() => handleCreateDraft(relatedSCs)}
+                  disabled={!(relatedSCs && relatedSCs.length > 0)}
+                  style={{
+                    display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
+                      || !managePermission || viewMode) ? 'none' : undefined
+                  }}
+                  onClick={() => handleCreateDraft(relatedSCs, false)}
                   className={classes.MbtnSearch}
                 >
                   บันทึก
@@ -440,7 +487,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                       || !managePermission || viewMode) ? 'none' : undefined
                   }}
                   startIcon={<CheckCircleOutlineIcon/>}
-                  // onClick={handleOpenModalConfirm}
+                  onClick={handleOpenModalConfirm}
                   className={classes.MbtnSearch}>
                   ยืนยัน
                 </Button>
@@ -454,7 +501,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                       || !managePermission || viewMode) ? 'none' : undefined
                   }}
                   startIcon={<HighlightOffIcon/>}
-                  // onClick={handleOpenCancel}
+                  onClick={handleOpenCancel}
                   className={classes.MbtnSearch}>
                   ยกเลิก
                 </Button>

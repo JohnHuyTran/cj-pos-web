@@ -32,8 +32,8 @@ export const ModalAddStockCount = (props: DataGridProps) => {
   const dataDetailAP = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   useEffect(() => {
-    if (dataDetailAP && dataDetailAP.relatedDocuments && dataDetailAP.relatedDocuments.length > 0) {
-      let lstSCConfirmed = dataDetailAP.relatedDocuments.filter((itF: any) => StockActionStatus.CONFIRM === itF.status);
+    if (dataDetailAP && dataDetailAP.relatedScDocuments && dataDetailAP.relatedScDocuments.length > 0) {
+      let lstSCConfirmed = dataDetailAP.relatedScDocuments.filter((itF: any) => StockActionStatus.CONFIRM === itF.status);
       if (lstSCConfirmed && lstSCConfirmed.length > 0) {
         let rows = lstSCConfirmed.map((item: any, index: number) => {
           let inSelectedSCs = selectedSCs.filter((it: any) => (it.documentNumber === item.documentNumber && it.countingTime === item.countingTime));

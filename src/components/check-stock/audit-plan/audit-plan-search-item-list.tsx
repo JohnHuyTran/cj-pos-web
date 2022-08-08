@@ -56,6 +56,12 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
     const listAuditPlan = apSearchResponse.data;
     if (listAuditPlan != null && listAuditPlan.length > 0) {
       let rows = listAuditPlan.map((data: AuditPlan, index: number) => {
+        const docNoSA = data.relatedSaDocuments && data.relatedSaDocuments.length ? `, ${data.relatedSaDocuments[0].documentNumber}` : ''
+        const docNoSC = data.relatedScDocuments && data.relatedScDocuments.length
+        ? _.uniqBy(data.relatedScDocuments, 'documentNumber')
+            .map((item: any) => item.documentNumber)
+            .join(', ')
+        : ''
         return {
           id: data.id,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
@@ -65,12 +71,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           product: data.product,
           createrName: data.createdBy,
           branch: `${data.branchCode}-${data.branchName}`,
-          relatedDocuments:
-            data.relatedDocuments && data.relatedDocuments.length
-              ? _.uniqBy(data.relatedDocuments, 'documentNumber')
-                  .map((item: any) => item.documentNumber)
-                  .join(', ')
-              : '',
+          relatedScDocuments: docNoSC + docNoSA,
         };
       });
       setLstAuditPlan(rows);
@@ -120,7 +121,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       minWidth: 180,
     },
     {
-      field: 'relatedDocuments',
+      field: 'relatedScDocuments',
       headerName: 'เลขที่เอกสารอ้างอิง',
       headerAlign: 'center',
       sortable: false,

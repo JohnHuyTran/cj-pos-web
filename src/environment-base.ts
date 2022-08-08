@@ -452,6 +452,15 @@ export const environment = {
           url: '/stock/stock-adjust/barcodes',
         },
       },
+      statsSku: {
+        url: '/stock/stock-adjust/stats/{id}',
+      },
+      confirm: {
+        url: '/stock/stock-adjust/confirm',
+      },
+      cancel: {
+        url: '/stock/stock-adjust/{id}',
+      },
     },
   },
   master: {
