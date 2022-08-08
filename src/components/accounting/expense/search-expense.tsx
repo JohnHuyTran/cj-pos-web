@@ -182,7 +182,12 @@ export default function SearchExpense() {
   const handleClearSearch = async () => {
     setIsOpenLoading(true);
     setSearch({ ...initialSearchState });
-    !groupBranch && seClearBranchDropDown(!clearBranchDropDown);
+    if (groupBranch) { // หากเข้ามาเป็น Branch ไม่ต้องเคลียร์ DropDown
+      setBranchFromCode(ownBranch);
+      setSearch({ ...search, branchCode: ownBranch });
+    } else { // หากเป็น HQ ให้เคลียร์ DropDown
+      seClearBranchDropDown(!clearBranchDropDown)
+    }
     setIsValidate(false);
     setIsSearch(false);
 
