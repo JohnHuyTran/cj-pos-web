@@ -59,16 +59,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}
-        >
-          <HighlightOff fontSize="large" />
+          }}>
+          <HighlightOff fontSize='large' />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -84,7 +83,7 @@ const columns: GridColDef[] = [
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component="div" sx={{ paddingLeft: '20px' }}>
+      <Box component='div' sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -107,8 +106,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2">{params.value}</Typography>
-        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -138,9 +137,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnQuantityActual"
-        type="number"
+        variant='outlined'
+        name='txnQuantityActual'
+        type='number'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
@@ -154,7 +153,7 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -196,7 +195,7 @@ const columns: GridColDef[] = [
         {params.getValue(params.id, 'piType') === 0 && <div></div>}
         {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 1 && <div></div>}
         {params.getValue(params.id, 'piType') === 1 && params.getValue(params.id, 'piStatus') === 0 && (
-          <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />
+          <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
         )}
       </div>
     ),
@@ -374,6 +373,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [vat, setVat] = React.useState(0);
   const [vatRate, setVatRate] = React.useState(0);
   const [grandTotalAmount, setGrandTotalAmount] = React.useState(0);
+  const [roundAmount, setRoundAmount] = React.useState(0);
   const [flagCalculate, setFlagCalculate] = React.useState(false);
 
   const setItemCal = async () => {
@@ -437,8 +437,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   if (rows.length === 0) {
     if (totalAmount !== 0) setTotalAmount(0);
     if (vat !== 0) setVat(0);
-    if (vatRate != 0) setVatRate(0);
+    if (vatRate !== 0) setVatRate(0);
     if (grandTotalAmount !== 0) setGrandTotalAmount(0);
+    if (roundAmount !== 0) setRoundAmount(0);
   }
 
   if (purchaseDetail.piStatus === 0) {
@@ -725,6 +726,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         setVat(value.data.amountText.vat);
         setVatRate(value.data.amountText.vatRate);
         setGrandTotalAmount(value.data.amountText.grandTotalAmount);
+        setRoundAmount(value.data.amountText.roundAmount);
 
         let calItem = value.data.items;
         const items: any = [];
@@ -801,8 +803,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
   return (
     <div>
-      <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <Dialog open={open} maxWidth='xl' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
           <Typography sx={{ fontSize: '1em' }}>ใบรับสินค้าจากผู้จำหน่าย</Typography>
           {piStatus !== 9 && <Steppers status={piStatus} stepsList={['บันทึก', 'อนุมัติ']}></Steppers>}
           {piStatus === 9 && <Steppers status={piStatus} stepsList={['บันทึก', 'ยกเลิก']}></Steppers>}
@@ -812,22 +814,22 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           <Box mt={4} sx={{ flexGrow: 1 }}>
             <Grid container mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่ใบสั่งซื้อ PO :</Typography>
+                <Typography variant='body2'>เลขที่ใบสั่งซื้อ PO :</Typography>
               </Grid>
               <Grid item lg={4}>
-                {piType !== 1 && <Typography variant="body2">{purchaseDetail.docNo}</Typography>}
-                {piType === 1 && <Typography variant="body2">-</Typography>}
+                {piType !== 1 && <Typography variant='body2'>{purchaseDetail.docNo}</Typography>}
+                {piType === 1 && <Typography variant='body2'>-</Typography>}
               </Grid>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่บิลผู้จำหน่าย :</Typography>
+                <Typography variant='body2'>เลขที่บิลผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4}>
                 <TextField
-                  id="txtParamQuery"
-                  name="paramQuery"
-                  size="small"
+                  id='txtParamQuery'
+                  name='paramQuery'
+                  size='small'
                   value={billNo}
-                  placeholder="กรุณากรอก เลขที่บิลผู้จำหน่าย"
+                  placeholder='กรุณากรอก เลขที่บิลผู้จำหน่าย'
                   onChange={handleChangeBillNo}
                   className={classes.MtextFieldDetail}
                   disabled={piStatus !== 0}
@@ -839,17 +841,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
             <Grid container mb={2} sx={{ mt: -4 }}>
               <Grid item lg={2}>
-                <Typography variant="body2">เลขที่เอกสาร PI :</Typography>
+                <Typography variant='body2'>เลขที่เอกสาร PI :</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant="body2">{piNo}</Typography>
+                <Typography variant='body2'>{piNo}</Typography>
               </Grid>
               <Grid item lg={6}></Grid>
             </Grid>
 
             <Grid container mb={1}>
               <Grid item lg={2}>
-                <Typography variant="body2">ผู้จัดจำหน่าย:</Typography>
+                <Typography variant='body2'>ผู้จัดจำหน่าย:</Typography>
               </Grid>
               <Grid item lg={4}>
                 <div
@@ -859,37 +861,34 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     maxWidth: 250,
                     background: '#EAEBEB',
                     padding: 2,
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: '#263238' }}>
+                  }}>
+                  <Typography variant='body2' sx={{ color: '#263238' }}>
                     {purchaseDetail.supplierName}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#AEAEAE', fontSize: 12 }}>
+                  <Typography variant='body2' sx={{ color: '#AEAEAE', fontSize: 12 }}>
                     {purchaseDetail.supplierTaxNo}
                   </Typography>
                 </div>
               </Grid>
               <Grid item lg={2} sx={{ mt: -3 }}>
-                <Typography variant="body2">แนบเอกสารจากผู้จำหน่าย :</Typography>
+                <Typography variant='body2'>แนบเอกสารจากผู้จำหน่าย :</Typography>
               </Grid>
               <Grid item lg={4} sx={{ mt: -3 }}>
                 {piStatus === 1 && (
                   <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
                     <Button
-                      id="btnPrint"
-                      color="primary"
-                      variant="contained"
-                      component="span"
+                      id='btnPrint'
+                      color='primary'
+                      variant='contained'
+                      component='span'
                       className={classes.MbtnBrowse}
-                      disabled
-                    >
+                      disabled>
                       แนบไฟล์
                     </Button>
 
                     <Typography
-                      variant="overline"
-                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}
-                    >
+                      variant='overline'
+                      sx={{ ml: 1, color: theme.palette.cancelColor.main, lineHeight: '120%' }}>
                       แนบไฟล์ .pdf/.jpg ขนาดไม่เกิน 5 mb
                     </Typography>
                   </Box>
@@ -897,7 +896,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
 
                 {piStatus === 1 && files.length > 0 && <AccordionHuaweiFile files={files} />}
                 {piStatus === 1 && (
-                  <Link component="button" variant="body2" onClick={handleLinkDocument}>
+                  <Link component='button' variant='body2' onClick={handleLinkDocument}>
                     เรียกดูเอกสารใบรับสินค้า
                   </Link>
                 )}
@@ -917,18 +916,17 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           </Box>
 
           <Box mt={4} mb={2}>
-            <Grid container spacing={2} display="flex" justifyContent="space-between">
+            <Grid container spacing={2} display='flex' justifyContent='space-between'>
               <Grid item xl={2}>
                 {piType == 1 && piStatus !== 1 && (
                   <Button
-                    id="btnAddItem"
-                    variant="contained"
-                    color="info"
+                    id='btnAddItem'
+                    variant='contained'
+                    color='info'
                     className={classes.MbtnPrint}
                     onClick={handleAddItems}
                     startIcon={<ControlPoint />}
-                    sx={{ width: 200 }}
-                  >
+                    sx={{ width: 200 }}>
                     เพิ่มสินค้า
                   </Button>
                 )}
@@ -937,29 +935,27 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               <Grid item xl={10} sx={{ textAlign: 'end' }}>
                 {piStatus === 0 && (
                   <Button
-                    id="btnSave"
-                    variant="contained"
-                    color="warning"
+                    id='btnSave'
+                    variant='contained'
+                    color='warning'
                     className={classes.MbtnSave}
                     onClick={handleSaveButton}
                     startIcon={<SaveIcon />}
                     sx={{ width: 200 }}
-                    disabled={rows.length == 0}
-                  >
+                    disabled={rows.length == 0}>
                     บันทึก
                   </Button>
                 )}
                 {piStatus === 0 && (
                   <Button
-                    id="btnApprove"
-                    variant="contained"
-                    color="primary"
+                    id='btnApprove'
+                    variant='contained'
+                    color='primary'
                     className={classes.MbtnApprove}
                     onClick={handlConfirmButton}
                     startIcon={<CheckCircleOutline />}
                     sx={{ width: 200 }}
-                    disabled={rows.length == 0}
-                  >
+                    disabled={rows.length == 0}>
                     ยืนยัน
                   </Button>
                 )}
@@ -967,11 +963,10 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
             </Grid>
           </Box>
 
-          <Box mt={2} bgcolor="background.paper">
+          <Box mt={2} bgcolor='background.paper'>
             <div
               style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }}
-              className={classes.MdataGridDetail}
-            >
+              className={classes.MdataGridDetail}>
               <DataGrid
                 rows={rows}
                 columns={columns}
@@ -991,14 +986,14 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           <Box mt={3}>
             <Grid container spacing={2} mb={1}>
               <Grid item lg={4}>
-                <Typography variant="body2">หมายเหตุ:</Typography>
+                <Typography variant='body2'>หมายเหตุ:</Typography>
                 <TextField
                   multiline
                   fullWidth
                   rows={5}
                   onChange={handleChangeComment}
                   defaultValue={comment}
-                  placeholder="ความยาวไม่เกิน 255 ตัวอักษร"
+                  placeholder='ความยาวไม่เกิน 255 ตัวอักษร'
                   className={classes.MtextFieldRemark}
                   inputProps={{ maxLength: maxCommentLength }}
                   sx={{ maxWidth: 350 }}
@@ -1012,26 +1007,25 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     width: '100%',
                     maxWidth: 350,
                     textAlign: 'right',
-                  }}
-                >
+                  }}>
                   {characterCount}/{maxCommentLength}
                 </div>
               </Grid>
 
               <Grid item lg={4}></Grid>
               <Grid item lg={4}>
-                <Grid container spacing={2} justifyContent="flex-end" mb={1}>
+                <Grid container spacing={2} justifyContent='flex-end' mb={1}>
                   <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems="flex-end">
-                    <Typography variant="body2" pt={1}>
+                  <Grid item lg={3} alignItems='flex-end'>
+                    <Typography variant='body2' pt={1}>
                       ยอดรวม
                     </Typography>
                   </Grid>
                   <Grid item md={4}>
                     <TextField
-                      id="txtParamQuery"
-                      name="paramQuery"
-                      size="small"
+                      id='txtParamQuery'
+                      name='paramQuery'
+                      size='small'
                       value={totalAmount}
                       className={classes.MtextFieldNumber}
                       fullWidth
@@ -1040,18 +1034,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     />
                   </Grid>
                 </Grid>
-                <Grid container spacing={2} justifyContent="flex-end" mb={1}>
+                <Grid container spacing={2} justifyContent='flex-end' mb={1}>
                   <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems="flex-end">
-                    <Typography variant="body2" pt={1}>
+                  <Grid item lg={3} alignItems='flex-end'>
+                    <Typography variant='body2' pt={1}>
                       ภาษี({vatRate}%)
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>
                     <TextField
-                      id="txtParamQuery"
-                      name="paramQuery"
-                      size="small"
+                      id='txtParamQuery'
+                      name='paramQuery'
+                      size='small'
                       value={vat}
                       className={classes.MtextFieldNumber}
                       fullWidth
@@ -1061,18 +1055,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Grid>
                 </Grid>
 
-                <Grid container spacing={2} justifyContent="flex-end" mb={1}>
+                <Grid container spacing={2} justifyContent='flex-end' mb={1}>
                   <Grid item lg={5}></Grid>
-                  <Grid item lg={3} alignItems="flex-end">
-                    <Typography variant="body2" pt={1}>
+                  <Grid item lg={3} alignItems='flex-end'>
+                    <Typography variant='body2' pt={1}>
                       <b>ยอดรวมทั้งสิ้น</b>
                     </Typography>
                   </Grid>
                   <Grid item lg={4}>
                     <TextField
-                      id="txtParamQuery"
-                      name="paramQuery"
-                      size="small"
+                      id='txtParamQuery'
+                      name='paramQuery'
+                      size='small'
                       value={grandTotalAmount}
                       className={classes.MtextFieldNumber}
                       fullWidth
@@ -1081,6 +1075,29 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     />
                   </Grid>
                 </Grid>
+
+                {Number(purchaseDetail.isFrontPay) === 1 && Number(piType) === 1 && (
+                  <Grid container spacing={2} justifyContent='flex-end' mb={1}>
+                    <Grid item lg={5}></Grid>
+                    <Grid item lg={3} alignItems='flex-end'>
+                      <Typography variant='body2' pt={1}>
+                        <b>ยอดจ่ายจริง</b>
+                      </Typography>
+                    </Grid>
+                    <Grid item lg={4}>
+                      <TextField
+                        id='txtParamQuery'
+                        name='paramQuery'
+                        size='small'
+                        value={roundAmount}
+                        className={classes.MtextFieldNumber}
+                        fullWidth
+                        disabled
+                        sx={{ background: '#E7FFE9' }}
+                      />
+                    </Grid>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -1128,9 +1145,9 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         onClose={handleModelPreviewDocument}
         url={getPathReportPI(piNo)}
         statusFile={statusFile}
-        sdImageFile=""
+        sdImageFile=''
         fileName={formatFileNam(piNo, piStatus)}
-        btnPrintName="พิมพ์เอกสาร"
+        btnPrintName='พิมพ์เอกสาร'
       />
 
       <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
