@@ -50,7 +50,9 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
       fontSize: '14px',
-      textAlignLast: 'end !important',
+      '& input': {
+        textAlign: 'right !important',
+      }
     },
     '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
       color: '#263238 !important',
