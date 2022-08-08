@@ -33,7 +33,6 @@ export default function confirmContent({
 
   const [periodData, setPeriodData] = React.useState<State>({ startDate: null, endDate: null, minDate: null });
   const today = new Date();
-
   const handleStartDatePicker = async (value: any) => {
     // setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
     // await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
@@ -41,7 +40,7 @@ export default function confirmContent({
     const d = moment(value).startOf('day').toISOString();
     const day = new Date(d);
 
-    if (Number(day.getDate()) < Number(today.getDay())) {
+    if (Number(day.getDate()) < Number(today.getDate())) {
       const dayNow = moment(today).startOf('day').toISOString();
       setPeriodData({
         startDate: moment(value).startOf('day').toISOString(),
