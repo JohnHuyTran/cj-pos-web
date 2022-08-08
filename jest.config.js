@@ -44,6 +44,7 @@ module.exports = {
     'src/components/dc-check-orders/*.tsx',
     'src/components/stock/stock-movement/*.tsx',
     'src/components/stock-transfer/*.tsx',
+    'src/components/accounting/close-saleshift/*.tsx',
   ],
   // coverageDirectory: '<rootDir>/src/tests/coverage/',
   collectCoverage: true,

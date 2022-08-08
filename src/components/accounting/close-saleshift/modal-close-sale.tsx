@@ -7,9 +7,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
   noOfShiftKey: string;
-  docNo: string;
 }
-function ModalCloseSale({ open, onClose, noOfShiftKey, docNo }: Props) {
+function ModalCloseSale({ open, onClose, noOfShiftKey }: Props) {
   const classes = useStyles();
   const onSubmit = () => {
     onClose();
@@ -22,7 +21,7 @@ function ModalCloseSale({ open, onClose, noOfShiftKey, docNo }: Props) {
         </BootstrapDialogTitle>
         <DialogContent sx={{ justifyContent: 'center' }}>
           <Box>
-            <Grid container>
+            <Grid container data-testid='testid-label-noOfShiftKey'>
               <Grid item xs={5}>
                 <Typography variant='body2'>จำนวนรหัสปิดรอบ:</Typography>
               </Grid>
@@ -34,7 +33,8 @@ function ModalCloseSale({ open, onClose, noOfShiftKey, docNo }: Props) {
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', mb: 3, mr: 5, ml: 5, mt: 5 }}>
           <Button
-            id='btnSearch'
+            data-testid='testid-btnSubmit'
+            id='btnSubmit'
             variant='contained'
             color='primary'
             onClick={onSubmit}
