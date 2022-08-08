@@ -96,7 +96,10 @@ export default function Sidebar({}: Props): ReactElement {
     selectedByPath('product-master') || selectedByPath('stock-balance') || selectedByPath('stock-movement')
   );
   const [openExpenseMenu, setOpenExpenseMenu] = useState(
-    selectedByPath('expense') || selectedByPath('cash-statement') || selectedByPath('close-saleshift')
+    selectedByPath('expense') ||
+      selectedByPath('cash-statement') ||
+      selectedByPath('close-saleshift') ||
+      selectedByPath('open-end')
   );
   const [openSettingsMenu, setOpenSettingsMenu] = useState(selectedByPath('reserves'));
   const [openCheckStockMenu, setOpenCheckStockMenu] = useState(
