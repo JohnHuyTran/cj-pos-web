@@ -184,7 +184,7 @@ export default function SearchExpense() {
     setSearch({ ...initialSearchState });
     if (groupBranch) { // หากเข้ามาเป็น Branch ไม่ต้องเคลียร์ DropDown
       setBranchFromCode(ownBranch);
-      setSearch({ ...search, branchCode: ownBranch });
+      setSearch({ ...initialSearchState, branchCode: ownBranch });
     } else { // หากเป็น HQ ให้เคลียร์ DropDown
       seClearBranchDropDown(!clearBranchDropDown)
     }
