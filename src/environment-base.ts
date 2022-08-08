@@ -225,6 +225,9 @@ export const environment = {
       delFileHuawei: {
         url: '/purchase/remove-file',
       },
+      deletePI: {
+        url: '/purchase-invoice/{piNo}/delete',
+      },
     },
     purchaseNote: {
       detail: {

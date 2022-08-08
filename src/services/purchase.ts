@@ -260,3 +260,20 @@ export const getPathSendPurchaseBR = (docNo: string) => {
     docNo: docNo,
   });
 };
+
+export async function deleteSupplierPI(piNo: string) {
+  try {
+    const path = `${getPathDeleteSupplierPI(piNo)}`;
+    const response = await post(path).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
+}
+
+export const getPathDeleteSupplierPI = (piNo: string) => {
+  return getPathUrl(`${env.backEnd.url}${environment.purchase.supplierOrder.deletePI.url}`, {
+    piNo: piNo,
+  });
+};

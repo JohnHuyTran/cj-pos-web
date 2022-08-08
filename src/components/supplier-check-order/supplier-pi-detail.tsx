@@ -23,7 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { CalculatePurchasePIRequest, FileType, SavePurchasePIRequest } from '../../models/supplier-check-order-model';
 import LoadingModal from '../commons/ui/loading-modal';
 import { ApiError } from '../../models/api-error-model';
-import { calculateSupplierPI, delFileUrlHuawei, saveSupplierPI } from '../../services/purchase';
+import { calculateSupplierPI, deleteSupplierPI, delFileUrlHuawei, saveSupplierPI } from '../../services/purchase';
 import SnackbarStatus from '../commons/ui/snackbar-status';
 import ConfirmModelExit from '../commons/ui/confirm-exit-model';
 import ModelConfirm from './modal-confirm';
@@ -415,6 +415,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
+  const [titleConfirm, setTitleConfirm] = React.useState('');
+  const [actionConfirm, setActionConfirm] = React.useState('');
   const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState(false);
   const [items, setItems] = React.useState<any>([]);
@@ -490,6 +492,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
               setTextFail(error.message);
             });
         }
+        setActionConfirm('approve');
+        setTitleConfirm('ยืนยันอนุมัติใบสั่งซื้อ Supplier');
         setOpenModelConfirm(true);
       }
     }
@@ -598,7 +602,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     let msg = '';
 
     if (issuccess) {
-      msg = 'คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว';
+      if (actionConfirm === 'approve') msg = 'คุณได้อนุมัติข้อมูล เรียบร้อยแล้ว';
+      else if (actionConfirm === 'delete') msg = 'คุณได้ยกเลิกข้อมูล เรียบร้อยแล้ว';
       setShowSnackBar(true);
       setContentMsg(msg);
       setSnackbarIsStatus(true);
@@ -726,6 +731,12 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
           return setUploadFileFlag(false);
         });
     }
+  };
+
+  const handleCancleButton = async () => {
+    setActionConfirm('delete');
+    setTitleConfirm('ยืนยันยกเลิกใบสั่งซื้อ Supplier');
+    setOpenModelConfirm(true);
   };
 
   return (
@@ -876,6 +887,18 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   disabled={rows.length == 0}>
                   ยืนยัน
                 </Button>
+
+                {piStatus === 0 && (
+                  <Button
+                    id='btnCancle'
+                    variant='contained'
+                    color='error'
+                    className={classes.MbtnSearch}
+                    onClick={handleCancleButton}
+                    sx={{ ml: 1, width: 100 }}>
+                    ยกเลิก
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -1042,6 +1065,8 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
         piType={piType}
         items={items}
         piDetail={true}
+        title={titleConfirm}
+        action={actionConfirm}
       />
 
       <ModelDeleteConfirm
