@@ -225,6 +225,9 @@ export const environment = {
       delFileHuawei: {
         url: '/purchase/remove-file',
       },
+      deletePI: {
+        url: '/purchase-invoice/{piNo}/delete',
+      },
     },
     purchaseNote: {
       detail: {
@@ -238,6 +241,9 @@ export const environment = {
       },
       exportFile: {
         url: '/purchase/purchase-note/export/{pnNo}',
+      },
+      deletePN: {
+        url: '/purchase/purchase-note/{pnNo}/delete',
       },
     },
     purchaseBranchRequest: {
