@@ -5,7 +5,6 @@ module.exports = {
   // The root of your source code, typically /src
   // `<rootDir>` is a token Jest substitutes
   roots: ['<rootDir>/src', '<rootDir>/src/tests'],
-
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
   transform: {
@@ -49,4 +48,5 @@ module.exports = {
   // coverageDirectory: '<rootDir>/src/tests/coverage/',
   collectCoverage: true,
   testMatch: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
+  moduleDirectories: ['node_modules', 'src'],
 };
