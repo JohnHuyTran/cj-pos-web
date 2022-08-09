@@ -277,6 +277,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
     setSupplierCode(payloadSupplier.supplier.code);
     setSupplierName(payloadSupplier.supplier.name);
     setSupplierTaxNo(payloadSupplier.supplier.taxNo);
+    setSupplierIsFrontPay(payloadSupplier.supplier.isFrontPay);
   }, [open]);
 
   let rows: any = [];
@@ -339,6 +340,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
   const [supplierCode, setSupplierCode] = React.useState('');
   const [supplierName, setSupplierName] = React.useState('');
   const [supplierTaxNo, setSupplierTaxNo] = React.useState('');
+  const [supplierIsFrontPay, setSupplierIsFrontPay] = React.useState(false);
   const [piType, setPiType] = React.useState(1);
   const [piStatus, setPiStatus] = React.useState(0);
   const [totalAmount, setTotalAmount] = React.useState(0);
@@ -1019,7 +1021,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                   </Grid>
                 </Grid>
 
-                {Number(purchaseDetail.isFrontPay) === 1 && Number(piType) === 1 && (
+                {(supplierIsFrontPay || Number(purchaseDetail.isFrontPay) === 1) && Number(piType) === 1 && (
                   <Grid container spacing={2} justifyContent='flex-end' mb={1}>
                     <Grid item lg={5}></Grid>
                     <Grid item lg={3} alignItems='flex-end'>
