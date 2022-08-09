@@ -897,7 +897,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                     color='error'
                     className={classes.MbtnSearch}
                     onClick={handleCancleButton}
-                    sx={{ ml: 1, width: 100 }}>
+                    sx={{ ml: 1, width: 100, display: `${piStatus === 0 ? '' : 'none'}` }}>
                     ยกเลิก
                   </Button>
                 )}
