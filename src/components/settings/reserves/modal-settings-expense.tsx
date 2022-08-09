@@ -395,15 +395,15 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               </Typography>
             </Grid>
             <Grid item xs={4} mb={3}>
-              <TextField
-                //   id="txt"
+              <NumberFormat
                 name="accountCode"
-                size="small"
-                type="number"
                 value={values.accountCode}
-                onChange={handleChange}
                 className={classes.MtextField}
+                customInput={TextField}
+                onChange={handleChange}
                 fullWidth
+                type="text"
+                allowNegative={false}
               />
             </Grid>
             <Grid item xs={2} mb={2}>
