@@ -596,7 +596,8 @@ export default function ModalCreateAuditPlan({
                         (action == Action.UPDATE &&
                           !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
                           currentName != 'posaudit') || 
-                          (action == Action.UPDATE && !isGroupAuditParam(dataDetail.createdByGroup))
+                          (action == Action.UPDATE && !isGroupAuditParam(dataDetail.createdByGroup)) || 
+                          (status == StockActionStatus.CANCEL)
                       }
                       onChange={handleChangeStockCounter}
                       inputProps={{ 'aria-label': 'Without label' }}

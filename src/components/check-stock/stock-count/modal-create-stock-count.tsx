@@ -100,7 +100,6 @@ export default function ModalCreateStockCount({
       setAlertTextError('กรุณาระบุจำนวนนับ');
       return;
     } else {
-
       setOpenModalConfirmConfirm(true);
     }
   };
@@ -108,7 +107,6 @@ export default function ModalCreateStockCount({
   const handleCloseModalConfirm = (confirm: boolean) => {
     setOpenModalConfirmConfirm(false);
     if (confirm) {
-      setOpenModalConfirmConfirm(false);
       handleConfirm();
     }
   };
@@ -120,6 +118,7 @@ export default function ModalCreateStockCount({
   const handleCloseModalErrorExit = () => {
     setOpenModalErrorExit(false)
     handleClose()
+    if (onSearchMain) onSearchMain();
   }
 
   const handleClose = async () => {
@@ -265,7 +264,6 @@ export default function ModalCreateStockCount({
       const er: any = error;
       if (er.code == 50000) {
         setOpenModalErrorExit(true);
-        if (onSearchMain) onSearchMain();
       } else {
         setOpenModalError(true);
       }
