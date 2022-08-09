@@ -226,7 +226,7 @@ export const environment = {
         url: '/purchase/remove-file',
       },
       deletePI: {
-        url: '/purchase-invoice/{piNo}/delete',
+        url: '/purchase/purchase-invoice/{piNo}/delete',
       },
     },
     purchaseNote: {

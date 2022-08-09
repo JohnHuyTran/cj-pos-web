@@ -231,11 +231,14 @@ export default function CashStatementSearch() {
   };
 
   const [openImportModal, setOpenImportModal] = React.useState(false);
+  const [errorUploadFile, setErrorUploadFile] = React.useState(false);
   const onClickImportBtn = async () => {
+    setErrorUploadFile(!errorUploadFile);
     setOpenImportModal(true);
   };
 
   const handleCloseImport = async () => {
+    setErrorUploadFile(!errorUploadFile);
     setOpenImportModal(false);
   };
 
@@ -269,10 +272,12 @@ export default function CashStatementSearch() {
 
           setTimeout(() => {
             onClickSearchBtn();
+            setErrorUploadFile(!errorUploadFile);
             setOpenImportModal(false);
           }, 300);
         })
         .catch((error: ApiUploadError) => {
+          setErrorUploadFile(!errorUploadFile);
           if (error.code === 40001) {
             setOpenAlertFile(true);
             setOpenAlert(true);
@@ -439,6 +444,7 @@ export default function CashStatementSearch() {
           open={openImportModal}
           onClickClose={handleCloseImport}
           onConfirm={handleConfirmImport}
+          errorUploadFile={errorUploadFile}
         />
 
         {!openAlertFile && openAlert && (
