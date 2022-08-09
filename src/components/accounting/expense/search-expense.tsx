@@ -142,6 +142,7 @@ export default function SearchExpense() {
   const [branchFromCode, setBranchFromCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
   const [openFailAlert, setOpenFailAlert] = useState(false);
+  const [clearBranchDropDown, seClearBranchDropDown] = useState(false);
   const [textFail, setTextFail] = useState('');
   const [payloadError, setPayloadError] = useState<ErrorDetailResponse | null>();
 
@@ -181,6 +182,12 @@ export default function SearchExpense() {
   const handleClearSearch = async () => {
     setIsOpenLoading(true);
     setSearch({ ...initialSearchState });
+    if (groupBranch) { // หากเข้ามาเป็น Branch ไม่ต้องเคลียร์ DropDown
+      setBranchFromCode(ownBranch);
+      setSearch({ ...initialSearchState, branchCode: ownBranch });
+    } else { // หากเป็น HQ ให้เคลียร์ DropDown
+      seClearBranchDropDown(!clearBranchDropDown)
+    }
     setIsValidate(false);
     setIsSearch(false);
 
@@ -490,7 +497,7 @@ export default function SearchExpense() {
             valueBranch={valuebranchFrom}
             sourceBranchCode={branchFromCode}
             onChangeBranch={(value) => setSearch({ ...search, branchCode: value })}
-            isClear={false}
+            isClear={clearBranchDropDown}
             disable={groupBranch || isOpenLoading}
             isFilterAuthorizedBranch={groupBranch ? false : true}
           />

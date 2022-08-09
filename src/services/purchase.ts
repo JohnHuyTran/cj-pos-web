@@ -268,6 +268,13 @@ export async function deleteSupplierPI(piNo: string) {
     return response;
   } catch (error) {
     console.log('error = ', error);
+  }
+}
+export async function deletePN(piNo: string) {
+  try {
+    const response = await post(getPathDeletePN(piNo), ContentType.JSON).then((result: any) => result);
+    return response;
+  } catch (error) {
     throw error;
   }
 }
@@ -275,5 +282,10 @@ export async function deleteSupplierPI(piNo: string) {
 export const getPathDeleteSupplierPI = (piNo: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.purchase.supplierOrder.deletePI.url}`, {
     piNo: piNo,
+  });
+};
+export const getPathDeletePN = (pnNo: string) => {
+  return getPathUrl(`${environment.purchase.purchaseNote.deletePN.url}`, {
+    pnNo: pnNo,
   });
 };
