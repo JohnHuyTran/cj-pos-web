@@ -178,6 +178,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
         size='small'
         fullWidth
         onMouseDown={handleOnMouseDown}
+        onChange={handleOnMouseDown}
       />
     );
   };
@@ -220,6 +221,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
         setNewAddItemListArray(itemsList);
       }
       clearInput();
+      // setItemList(_itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : []);
     } else {
       clearData();
     }
