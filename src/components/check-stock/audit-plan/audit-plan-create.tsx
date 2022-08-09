@@ -552,6 +552,7 @@ export default function ModalCreateAuditPlan({
                     steps.indexOf(status) > 0 ||
                     (action == Action.UPDATE &&
                       _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
+                    || status == StockActionStatus.CANCEL
                   }
                   placeHolder={'กรุณาเลือก'}
                   disableMinDateMsg={true}
@@ -595,8 +596,8 @@ export default function ModalCreateAuditPlan({
                           currentName == 'posaudit') ||
                         (action == Action.UPDATE &&
                           !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-                          currentName != 'posaudit') || 
-                          (action == Action.UPDATE && !isGroupAuditParam(dataDetail.createdByGroup)) || 
+                          currentName != 'posaudit') ||
+                          (action == Action.UPDATE && !isGroupAuditParam(dataDetail.createdByGroup)) ||
                           (status == StockActionStatus.CANCEL)
                       }
                       onChange={handleChangeStockCounter}
@@ -862,7 +863,7 @@ export default function ModalCreateAuditPlan({
         />
       )}
 
-      {openSADetail && ( 
+      {openSADetail && (
         <ModalCreateStockAdjustment
           isOpen={openSADetail}
           openFromAP={true}
