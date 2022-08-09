@@ -44,6 +44,7 @@ import { updateCheckStock } from '../../store/slices/stock-balance-check-slice';
 import { checkStockBalance } from '../../services/common';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import ModalShowBeforeAfterFile from "../commons/ui/modal-show-before-after-file";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -112,6 +113,10 @@ export default function ModalCreateTransferOutDestroy({
     getUserInfo().branch ? getUserInfo().branch : ''
   );
   const [typeDestroy, setTypeDestroy] = React.useState<any>(null);
+  const [openShowFile, setOpenShowFile] = React.useState<boolean>(false);
+  const [lstAttachFileBeforeShow, setLstAttachFileBeforeShow] = React.useState<any>([]);
+  const [lstAttachFileAfterShow, setLstAttachFileAfterShow] = React.useState<any>([]);
+  const [currentFileOpenKey, setCurrentFileOpenKey] = React.useState<any>('');
 
   const handleOpenAddItems = () => {
     if (stringNullOrEmpty(typeDestroy)) {
@@ -447,17 +452,17 @@ export default function ModalCreateTransferOutDestroy({
           const allAttachFileBefore = await handleAllAttachFile(true);
           const body = !!dataDetail.id
             ? {
-                ...payloadTransferOut,
-                id: dataDetail.id,
-                documentNumber: dataDetail.documentNumber,
-                beforeAttachFiles: allAttachFileBefore,
-                type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
-              }
+              ...payloadTransferOut,
+              id: dataDetail.id,
+              documentNumber: dataDetail.documentNumber,
+              beforeAttachFiles: allAttachFileBefore,
+              type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
+            }
             : {
-                ...payloadTransferOut,
-                beforeAttachFiles: allAttachFileBefore,
-                type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
-              };
+              ...payloadTransferOut,
+              beforeAttachFiles: allAttachFileBefore,
+              type: TO_TYPE.TO_WITHOUT_DISCOUNT === typeDestroy ? TO_TYPE.TO_WITHOUT_DISCOUNT : TO_TYPE.TO_DEFECT,
+            };
           const rs = await saveDraftTransferOut(body);
           if (rs.code === 201) {
             if (!sendRequest) {
@@ -726,12 +731,21 @@ export default function ModalCreateTransferOutDestroy({
     return valueRender;
   };
 
+  const onShowBeforeAfterFile = (fileKey: string | undefined) => {
+    let allBeforeFile: any[] = _.cloneDeep(attachFileBeforeOlds);
+    let allAfterFile: any[] = _.cloneDeep(attachFileAfterOlds);
+    setLstAttachFileBeforeShow(allBeforeFile);
+    setLstAttachFileAfterShow(allAfterFile);
+    setCurrentFileOpenKey(fileKey);
+    setOpenShowFile(true);
+  }
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียดเอกสารทำลาย</Typography>
-          <StepperBar activeStep={status} setActiveStep={setStatus} />
+          <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container mt={1} mb={-1}>
@@ -837,6 +851,7 @@ export default function ModalCreateTransferOutDestroy({
                   }
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
+                  onShowOtherType={(fileKey) => onShowBeforeAfterFile(fileKey)}
                 />
               </Grid>
             </Grid>
@@ -856,6 +871,7 @@ export default function ModalCreateTransferOutDestroy({
                   enabledControl={TOStatus.APPROVED === status && !approvePermission}
                   warningMessage={attachFileError}
                   deletePermission={TOStatus.DRAFT === status}
+                  onShowOtherType={(fileKey) => onShowBeforeAfterFile(fileKey)}
                 />
               </Grid>
             </Grid>
@@ -868,7 +884,7 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   color='info'
                   className={classes.MbtnSearch}
-                  startIcon={<AddCircleOutlineOutlinedIcon />}
+                  startIcon={<AddCircleOutlineOutlinedIcon/>}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126 }}
                   style={{
@@ -887,7 +903,7 @@ export default function ModalCreateTransferOutDestroy({
                   id='btnSaveDraft'
                   variant='contained'
                   color='warning'
-                  startIcon={<SaveIcon />}
+                  startIcon={<SaveIcon/>}
                   disabled={
                     (!stringNullOrEmpty(status) && status != TOStatus.DRAFT) ||
                     (payloadTransferOut.products && payloadTransferOut.products.length === 0)
@@ -918,7 +934,7 @@ export default function ModalCreateTransferOutDestroy({
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleSendRequest}
                   className={classes.MbtnSearch}
                 >
@@ -935,7 +951,7 @@ export default function ModalCreateTransferOutDestroy({
                         ? 'none'
                         : undefined,
                   }}
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
                   className={classes.MbtnSearch}
                 >
@@ -947,7 +963,7 @@ export default function ModalCreateTransferOutDestroy({
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   variant='contained'
                   color='primary'
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmApprove}
                   className={classes.MbtnSearch}
                 >
@@ -958,7 +974,7 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   style={{ display: status == TOStatus.WAIT_FOR_APPROVAL && approvePermission ? undefined : 'none' }}
                   color='error'
-                  startIcon={<HighlightOffIcon />}
+                  startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenModalReject}
                   className={classes.MbtnSearch}
                 >
@@ -969,7 +985,7 @@ export default function ModalCreateTransferOutDestroy({
                   variant='contained'
                   style={{ display: status != TOStatus.APPROVED || approvePermission ? 'none' : undefined }}
                   color='info'
-                  startIcon={<CheckCircleOutlineIcon />}
+                  startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirmEnd}
                   className={classes.MbtnSearch}
                 >
@@ -978,11 +994,19 @@ export default function ModalCreateTransferOutDestroy({
               </Box>
             </Box>
             <Box>
-              <ModalTransferOutDestroyItem id='' action={action} userPermission={userPermission} />
+              <ModalTransferOutDestroyItem id='' action={action} userPermission={userPermission}/>
             </Box>
           </Box>
         </DialogContent>
       </Dialog>
+
+      <ModalShowBeforeAfterFile
+        open={openShowFile}
+        onClose={() => setOpenShowFile(false)}
+        attachFileBefore={lstAttachFileBeforeShow}
+        attachFileAfter={lstAttachFileAfterShow}
+        currentFileOpenKey={currentFileOpenKey}
+      />
 
       <ModalAddItems
         open={openModelAddItems}
@@ -1010,8 +1034,8 @@ export default function ModalCreateTransferOutDestroy({
         headerTitle={'ยืนยันยกเลิกเบิกทำลาย'}
         documentField={'เลขที่เอกสารเบิก'}
       />
-      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
-      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
+      <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup}/>
+      <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError}/>
       <ModalCheckStock
         open={openCheckStock}
         onClose={() => {
@@ -1019,7 +1043,7 @@ export default function ModalCreateTransferOutDestroy({
         }}
         headerTitle={'เบิกสินค้ามากกว่าที่มีในคลัง โปรดตรวจสอบ'}
       />
-      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose} />
+      <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
       <ModelConfirm
         open={openModalConfirmApprove}
         onClose={() => handleCloseModalConfirmApprove(false)}
