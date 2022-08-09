@@ -543,12 +543,16 @@ export default function ModalCreateAuditPlan({
                 กำหนดตรวจนับภายในวันที่ :
               </Grid>
               <Grid item xs={8}>
-                <DatePickerAllComponent
+              <DatePickerAllComponent
                   onClickDate={onChangeDate.bind(values.countingDate, setValues, values, 'countingDate')}
                   type={'TO'}
                   minDateTo={new Date()}
                   value={values.countingDate}
-                  disabled={steps.indexOf(status) > 0}
+                  disabled={
+                    steps.indexOf(status) > 0 ||
+                    (action == Action.UPDATE &&
+                      _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
+                  }
                   placeHolder={'กรุณาเลือก'}
                   disableMinDateMsg={true}
                 />
@@ -591,7 +595,8 @@ export default function ModalCreateAuditPlan({
                           currentName == 'posaudit') ||
                         (action == Action.UPDATE &&
                           !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
-                          currentName != 'posaudit')
+                          currentName != 'posaudit') || 
+                          (action == Action.UPDATE && !isGroupAuditParam(dataDetail.createdByGroup))
                       }
                       onChange={handleChangeStockCounter}
                       inputProps={{ 'aria-label': 'Without label' }}
@@ -653,7 +658,11 @@ export default function ModalCreateAuditPlan({
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenAddItems}
                   sx={{ width: 126, mr: '17px'}}
-                  disabled={steps.indexOf(status) > 0}
+                  disabled={
+                    steps.indexOf(status) > 0 ||
+                    (action == Action.UPDATE &&
+                      _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
+                  }
                   style={{
                     display:
                       steps.indexOf(status) > 0 || !managePermission || viewMode || status == StockActionStatus.CANCEL
@@ -803,7 +812,13 @@ export default function ModalCreateAuditPlan({
               </Box>
             </Box>
             <Box>
-              <AuditPlanCreateItem status={status} viewMode={viewMode} />
+            <AuditPlanCreateItem
+                status={status}
+                viewMode={
+                  viewMode ||
+                  (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
+                }
+              />
             </Box>
           </Box>
         </DialogContent>
