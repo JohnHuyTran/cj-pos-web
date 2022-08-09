@@ -9,11 +9,15 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 //css
 import { useStyles } from '../../../styles/makeTheme';
 import { Box, Chip, Link, TextField } from '@mui/material';
-import { OpenEndSearchInfo } from '../../../models/branch-accounting-model';
+import { OpenEndSearchInfo, OpenEndSearchRequest } from '../../../models/branch-accounting-model';
 import { featchOpenEndDeatilAsync } from '../../../store/slices/accounting/open-end/open-end-slice';
 
 //utils
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
+import {
+  featchSearchOpenEndAsync,
+  savePayloadSearch,
+} from '../../../store/slices/accounting/open-end/open-end-search-slice';
 
 function OpenEndList() {
   const { t } = useTranslation(['openEnd', 'common']);
@@ -32,7 +36,7 @@ function OpenEndList() {
     {
       field: 'index',
       headerName: 'ลำดับ',
-      width: 80,
+      width: 65,
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
@@ -52,7 +56,7 @@ function OpenEndList() {
     {
       field: 'docNo',
       headerName: 'เลขที่เอกสาร',
-      minWidth: 120,
+      minWidth: 130,
       flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -72,7 +76,7 @@ function OpenEndList() {
     {
       field: 'noOfSaleBill',
       headerName: 'จำนวนรอบขาย',
-      minWidth: 120,
+      minWidth: 110,
       flex: 1.2,
       headerAlign: 'center',
       align: 'right',
@@ -81,7 +85,7 @@ function OpenEndList() {
     {
       field: 'dailyIncomeAmount',
       headerName: 'มูลค่ารวมยอดขาย',
-      minWidth: 120,
+      minWidth: 125,
       flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -112,7 +116,7 @@ function OpenEndList() {
     {
       field: 'depositeAmount',
       headerName: 'ยอดที่ต้องนำฝาก',
-      minWidth: 120,
+      minWidth: 125,
       flex: 1.2,
       headerAlign: 'center',
       sortable: false,
@@ -174,10 +178,10 @@ function OpenEndList() {
     {
       field: 'status',
       headerName: 'สถานะ',
-      minWidth: 70,
+      minWidth: 100,
       flex: 0.65,
       headerAlign: 'center',
-      align: 'left',
+      align: 'center',
       sortable: false,
       renderCell: (params) => {
         if (params.value === 'DRAFT' || params.value === 'REQUEST_APPROVE') {
@@ -199,6 +203,51 @@ function OpenEndList() {
         }
       },
     },
+    {
+      field: 'bypass',
+      headerName: 'การ By pass',
+      minWidth: 100,
+      flex: 0.65,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => {
+        if (params.value === 'NONE') {
+          return (
+            <Chip
+              label={t(`statusByPass.${params.value}`)}
+              size="small"
+              sx={{ color: '#AEAEAE', backgroundColor: '#EEEEEE' }}
+            />
+          );
+        } else if (params.value === 'PENDING_REVIEW') {
+          return (
+            <Chip
+              label={t(`statusByPass.${params.value}`)}
+              size="small"
+              sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+            />
+          );
+        } else if (params.value === 'REVIEWED') {
+          return (
+            <Chip
+              label={t(`statusByPass.${params.value}`)}
+              size="small"
+              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+            />
+          );
+        }
+      },
+    },
+    {
+      field: 'comment',
+      headerName: 'หมายเหตุ',
+      minWidth: 120,
+      flex: 1.2,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+    },
   ];
 
   let rows: any = items.data.map((item: OpenEndSearchInfo, indexs: number) => {
@@ -213,16 +262,48 @@ function OpenEndList() {
       depositeAmount: item.depositeAmount,
       diffDepositeAmount: item.diffDepositeAmount,
       status: item.status,
+      bypass: item.bypass,
+      comment: item.comment,
     };
   });
 
-  console.log('items data: ', items.data);
-  console.log('rows: ', rows);
-
   const currentlySelected = async (params: GridCellParams) => {
     const docNo = params.row.docNo;
-    console.log('params: ', docNo);
-    await dispatch(featchOpenEndDeatilAsync('OE22080101-012'));
+    await dispatch(featchOpenEndDeatilAsync(docNo));
+  };
+
+  const handlePageSizeChange = async (pageSize: number) => {
+    setPageSize(pageSize.toString());
+    setLoading(true);
+
+    const payloadNewpage: OpenEndSearchRequest = {
+      branchCode: payloadOpenEndSearch.branchCode,
+      status: payloadOpenEndSearch.status,
+      dateFrom: payloadOpenEndSearch.dateFrom,
+      dateTo: payloadOpenEndSearch.dateTo,
+      limit: pageSize.toString(),
+      page: '1',
+    };
+    await dispatch(featchSearchOpenEndAsync(payloadNewpage));
+    await dispatch(savePayloadSearch(payloadNewpage));
+    setLoading(false);
+  };
+
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true);
+    let page: string = (newPage + 1).toString();
+    const payloadNewpage: OpenEndSearchRequest = {
+      limit: pageSize,
+      page: page,
+      branchCode: payloadOpenEndSearch.branchCode,
+      status: payloadOpenEndSearch.status,
+      dateFrom: payloadOpenEndSearch.dateFrom,
+      dateTo: payloadOpenEndSearch.dateTo,
+    };
+
+    await dispatch(featchSearchOpenEndAsync(payloadNewpage));
+    await dispatch(savePayloadSearch(payloadNewpage));
+    setLoading(false);
   };
 
   return (
@@ -239,8 +320,8 @@ function OpenEndList() {
         rowsPerPageOptions={[10, 20, 50, 100]}
         rowCount={items.total}
         paginationMode="server"
-        // onPageChange={handlePageChange}
-        // onPageSizeChange={handlePageSizeChange}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
         onCellClick={currentlySelected}
         loading={loading}
         rowHeight={65}

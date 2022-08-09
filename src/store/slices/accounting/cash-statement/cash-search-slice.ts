@@ -41,7 +41,7 @@ export const featchSearchCashStatementAsync = createAsyncThunk(
         path = path + `&dateTo=${payload.dateTo}`;
       }
       if (payload.status !== 'ALL') {
-        path = path + `&statuses=${payload.status}`;
+        path = path + `&status=${payload.status}`;
       }
 
       let response: CashStatementSearchResponse = {

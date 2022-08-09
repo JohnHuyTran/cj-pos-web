@@ -154,6 +154,7 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
                 onChange={handleChange}
                 fullWidth
                 fixedDecimalScale
+                allowNegative={false}
                 type="text"
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -181,6 +182,7 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
                 onChange={handleChange}
                 fullWidth
                 fixedDecimalScale
+                allowNegative={false}
                 type="text"
                 sx={{
                   '& .MuiOutlinedInput-root': {

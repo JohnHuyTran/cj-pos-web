@@ -194,6 +194,7 @@ export default function CashStatementSearch() {
         setContentMsg('คุณได้อนุมัติรายการเรียบร้อยแล้ว');
 
         setTimeout(() => {
+          onClickSearchBtn();
           setopenModalApprove(false);
         }, 300);
       })
@@ -230,11 +231,14 @@ export default function CashStatementSearch() {
   };
 
   const [openImportModal, setOpenImportModal] = React.useState(false);
+  const [errorUploadFile, setErrorUploadFile] = React.useState(false);
   const onClickImportBtn = async () => {
+    setErrorUploadFile(!errorUploadFile);
     setOpenImportModal(true);
   };
 
   const handleCloseImport = async () => {
+    setErrorUploadFile(!errorUploadFile);
     setOpenImportModal(false);
   };
 
@@ -267,10 +271,13 @@ export default function CashStatementSearch() {
           setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
 
           setTimeout(() => {
+            onClickSearchBtn();
+            setErrorUploadFile(!errorUploadFile);
             setOpenImportModal(false);
-          }, 1000);
+          }, 300);
         })
         .catch((error: ApiUploadError) => {
+          setErrorUploadFile(!errorUploadFile);
           if (error.code === 40001) {
             setOpenAlertFile(true);
             setOpenAlert(true);
@@ -346,7 +353,7 @@ export default function CashStatementSearch() {
             <FormControl fullWidth className={classes.Mselect}>
               <Select
                 id='selPiType'
-                name='statuses'
+                name='status'
                 value={values.status}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}>
@@ -437,6 +444,7 @@ export default function CashStatementSearch() {
           open={openImportModal}
           onClickClose={handleCloseImport}
           onConfirm={handleConfirmImport}
+          errorUploadFile={errorUploadFile}
         />
 
         {!openAlertFile && openAlert && (

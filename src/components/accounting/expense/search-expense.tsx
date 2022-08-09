@@ -55,7 +55,7 @@ import {
   getSummarizeByCriteria,
   getSummarizeByNo,
 } from 'services/accounting';
-import { ApiError } from 'models/api-error-model';
+import { ApiError, ErrorDetailResponse, Header } from 'models/api-error-model';
 import AlertError from 'components/commons/ui/alert-error';
 import {
   addNewItem,
@@ -142,7 +142,9 @@ export default function SearchExpense() {
   const [branchFromCode, setBranchFromCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
   const [openFailAlert, setOpenFailAlert] = useState(false);
+  const [clearBranchDropDown, seClearBranchDropDown] = useState(false);
   const [textFail, setTextFail] = useState('');
+  const [payloadError, setPayloadError] = useState<ErrorDetailResponse | null>();
 
   const items = useAppSelector((state) => state.searchBranchAccounting);
   const branchAccountingList = items.branchAccountingList.data ? items.branchAccountingList.data : [];
@@ -180,6 +182,12 @@ export default function SearchExpense() {
   const handleClearSearch = async () => {
     setIsOpenLoading(true);
     setSearch({ ...initialSearchState });
+    if (groupBranch) { // หากเข้ามาเป็น Branch ไม่ต้องเคลียร์ DropDown
+      setBranchFromCode(ownBranch);
+      setSearch({ ...initialSearchState, branchCode: ownBranch });
+    } else { // หากเป็น HQ ให้เคลียร์ DropDown
+      seClearBranchDropDown(!clearBranchDropDown)
+    }
     setIsValidate(false);
     setIsSearch(false);
 
@@ -395,8 +403,25 @@ export default function SearchExpense() {
         dispatch(featchBranchAccountingListAsync(payloadSearch));
       })
       .catch((error: ApiError) => {
-        setTextFail(error.message);
-        setOpenFailAlert(true);
+        if (String(error.code) === '40020') {
+          const header: Header = {
+            field1: false,
+            field2: false,
+            field3: true,
+            field4: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: error.error_details,
+          };
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(payload);
+        } else {
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(null);
+        }
       });
 
     setIsOpenLoading(false);
@@ -426,8 +451,25 @@ export default function SearchExpense() {
         dispatch(featchBranchAccountingListAsync(payloadSearch));
       })
       .catch((error: ApiError) => {
-        setTextFail(error.message);
-        setOpenFailAlert(true);
+        if (String(error.code) === '40020') {
+          const header: Header = {
+            field1: false,
+            field2: false,
+            field3: true,
+            field4: false,
+          };
+          const payload: ErrorDetailResponse = {
+            header: header,
+            error_details: error.error_details,
+          };
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(payload);
+        } else {
+          setOpenFailAlert(true);
+          setTextFail(error.message);
+          setPayloadError(null);
+        }
       });
 
     setIsOpenLoading(false);
@@ -455,7 +497,7 @@ export default function SearchExpense() {
             valueBranch={valuebranchFrom}
             sourceBranchCode={branchFromCode}
             onChangeBranch={(value) => setSearch({ ...search, branchCode: value })}
-            isClear={false}
+            isClear={clearBranchDropDown}
             disable={groupBranch || isOpenLoading}
             isFilterAuthorizedBranch={groupBranch ? false : true}
           />
@@ -633,7 +675,7 @@ export default function SearchExpense() {
         summarizTitle={summarizTitle}
         summarizList={summarizList}
       />
-      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} />
+      <AlertError open={openFailAlert} onClose={handleCloseFailAlert} textError={textFail} payload={payloadError} />
 
       <SnackbarStatus
         open={showSnackBar}

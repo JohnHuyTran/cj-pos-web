@@ -8,8 +8,8 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useStyles } from '../../../../styles/makeTheme';
 
 interface Props {
-  startPeriod: string;
-  endPeriod: string;
+  // startPeriod: string;
+  // endPeriod: string;
   title: string;
   columnsList?: GridColDef[];
   rowList?: any[];
@@ -18,11 +18,12 @@ interface Props {
 interface State {
   startDate: any;
   endDate: any;
+  minDate?: any;
 }
 
 export default function confirmContent({
-  startPeriod,
-  endPeriod,
+  // startPeriod,
+  // endPeriod,
   title,
   columnsList,
   rowList,
@@ -30,16 +31,33 @@ export default function confirmContent({
 }: Props): ReactElement {
   const classes = useStyles();
 
-  const [periodData, setPeriodData] = React.useState<State>({ startDate: startPeriod, endDate: endPeriod });
-
+  const [periodData, setPeriodData] = React.useState<State>({ startDate: null, endDate: null, minDate: null });
+  const today = new Date();
   const handleStartDatePicker = async (value: any) => {
-    setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
-    // await handleDate(periodData ? periodData : null);
-    await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
+    // setPeriodData({ ...periodData, startDate: moment(value).startOf('day').toISOString() });
+    // await handleDate(moment(value).startOf('day').toISOString(), periodData.endDate);
+
+    const d = moment(value).startOf('day').toISOString();
+    const day = new Date(d);
+
+    if (Number(day.getDate()) < Number(today.getDate())) {
+      const dayNow = moment(today).startOf('day').toISOString();
+      setPeriodData({
+        startDate: moment(value).startOf('day').toISOString(),
+        endDate: null,
+        minDate: dayNow,
+      });
+    } else {
+      setPeriodData({
+        startDate: moment(value).startOf('day').toISOString(),
+        endDate: null,
+        minDate: moment(value).startOf('day').toISOString(),
+      });
+      await handleDate(moment(value).startOf('day').toISOString(), null);
+    }
   };
   const handleEndDatePicker = async (value: any) => {
     setPeriodData({ ...periodData, endDate: moment(value).startOf('day').toISOString() });
-    // await handleDate(periodData ? periodData : null);
     await handleDate(periodData.startDate, moment(value).startOf('day').toISOString());
   };
 
@@ -77,7 +95,7 @@ export default function confirmContent({
             onClickDate={handleEndDatePicker}
             value={periodData.endDate}
             type={'TO'}
-            minDateTo={periodData.startDate}
+            minDateTo={periodData.minDate}
           />
         </Grid>
       </Grid>

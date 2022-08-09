@@ -187,11 +187,13 @@ const columns: GridColDef[] = [
     align: 'center',
     sortable: false,
     renderCell: (params) => {
-      return (
-        <div>
-          <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
-        </div>
-      );
+      if (params.getValue(params.id, 'status') === 'DRAFT') {
+        return (
+          <div>
+            <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+          </div>
+        );
+      }
     },
   },
 ];
@@ -327,6 +329,7 @@ function CashStatementList({ onSelectRows }: DataGridProps) {
   };
 
   const onCloseModalEdit = () => {
+    dispatch(featchSearchCashStatementAsync(payload));
     setOpenModalEdit(false);
   };
 

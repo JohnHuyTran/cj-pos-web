@@ -41,12 +41,12 @@ export default function ModelConfirmSearch({
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const date = new Date();
-  const [startDate, setStartDate] = React.useState(String(date));
-  const [endDate, setEndDate] = React.useState(String(date));
+  // const date = new Date();
+  // const [startDate, setStartDate] = React.useState(String(date));
+  // const [endDate, setEndDate] = React.useState(String(date));
   const [periodData, setPeriodData] = React.useState({
-    startDate: startDate,
-    endDate: endDate,
+    startDate: null,
+    endDate: null,
   });
 
   const handleConfirm = async () => {
@@ -70,15 +70,20 @@ export default function ModelConfirmSearch({
   const [columnsList, setColumnsList] = React.useState<GridColDef[]>([]);
   const [rowList, setRowList] = React.useState<any[]>([]);
   useEffect(() => {
-    if (items.length > 0 && items[0].expensePeriod) {
-      setStartDate(items[0].expensePeriod.startDate);
-      setEndDate(items[0].expensePeriod.endDate);
+    // if (items.length > 0 && items[0].expensePeriod) {
+    //   setStartDate(items[0].expensePeriod.startDate);
+    //   setEndDate(items[0].expensePeriod.endDate);
 
-      setPeriodData({
-        startDate: String(items[0].expensePeriod.startDate),
-        endDate: String(items[0].expensePeriod.endDate),
-      });
-    }
+    //   setPeriodData({
+    //     startDate: String(items[0].expensePeriod.startDate),
+    //     endDate: String(items[0].expensePeriod.endDate),
+    //   });
+    // }
+
+    setPeriodData({
+      startDate: null,
+      endDate: null,
+    });
 
     if (summarizList) {
       let _newExpenseAllList: any[] = [];
@@ -210,8 +215,8 @@ export default function ModelConfirmSearch({
         PaperProps={{ sx: { minWidth: 900 } }}>
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
           <ConfirmContent
-            startPeriod={startDate}
-            endPeriod={endDate}
+            // startPeriod={startDate}
+            // endPeriod={endDate}
             handleDate={handleDate}
             title={summarizTitle}
             columnsList={columnsList}
@@ -233,7 +238,8 @@ export default function ModelConfirmSearch({
             variant='contained'
             color='primary'
             sx={{ borderRadius: 2, width: 120 }}
-            onClick={handleConfirm}>
+            onClick={handleConfirm}
+            disabled={!periodData.startDate || !periodData.endDate}>
             ยืนยัน
           </Button>
         </DialogActions>
