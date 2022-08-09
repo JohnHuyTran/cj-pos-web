@@ -328,7 +328,6 @@ function CloseSaleShiftSearch() {
         open={openModalCloseSale}
         onClose={() => setOpenModalCloseSale(false)}
         noOfShiftKey={noOfShiftKey}
-        docNo={docNo}
       />
       <ModalDetailCash
         isOpen={openModalCashDetail}

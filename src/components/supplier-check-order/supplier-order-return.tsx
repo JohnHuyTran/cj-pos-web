@@ -60,7 +60,7 @@ import { FileType } from '../../models/supplier-check-order-model';
 import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
 import { formatFileNam } from '../../utils/enum/supplier-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
-import { numberWithCommas } from '../../utils/utils';
+import { numberWithCommas, stringNullOrEmpty } from '../../utils/utils';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
@@ -745,6 +745,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
                   className={classes.MbtnApprove}
                   sx={{ width: 200 }}
                   onClick={handleDeletePN}
+                  disabled={stringNullOrEmpty(pnNo)}
                 >
                   ยกเลิก
                 </Button>
