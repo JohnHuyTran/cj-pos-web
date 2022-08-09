@@ -9,6 +9,7 @@ import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { STProductDetail } from '../../../models/sale-limit-time';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { StockActionStatus } from '../../../utils/enum/common-enum';
+import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
 
 const _ = require('lodash');
 interface Props {
@@ -96,14 +97,20 @@ export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactE
         };
 
         const handleDeleteItem = () => {
-          let newList = payloadAddTypeProduct.filter((r: any) => r.barcode !== params.row.barcode);
-          let listCodeProductByType = newList.map((el1: any) => el1.productTypeCode);
-          let listAdd = newList.filter((item: any) => {
-            if (item.selectedType === 1 && !listCodeProductByType.includes(item.productTypeCode)) {
-              return false;
-            } else return true;
-          });
-          dispatch(updateAddTypeAndProductState(listAdd));
+          let newList = payloadAddTypeProduct.filter((r: any) => r.skuCode !== params.row.skuCode);
+          let newListProducts = newList.filter((r: any) => r.selectedType == 2);
+          if (newListProducts.length > 0) {
+            let listCodeProductByType = newList.map((el1: any) => el1.productTypeCode);
+            let listAdd = newList.filter((item: any) => {
+              if (item.selectedType === 1 && !listCodeProductByType.includes(item.productTypeCode)) {
+                return false;
+              } else return true;
+            });
+            dispatch(updateAddTypeAndProductState(listAdd));
+          } else {
+            dispatch(setCheckEdit(!!(status == StockActionStatus.DRAFT)));
+            dispatch(updateAddTypeAndProductState([]));
+          }
           setOpenModalDelete(false);
           setShowSnackBar(true);
         };
