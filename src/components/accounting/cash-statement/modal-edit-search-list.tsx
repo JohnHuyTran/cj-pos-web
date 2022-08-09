@@ -18,8 +18,6 @@ import AlertError from '../../commons/ui/alert-error';
 import LoadingModal from '../../commons/ui/loading-modal';
 
 const initialStateValues: any = {
-  minDate: new Date(),
-  maxDate: new Date(),
   date: new Date(),
   cashOver: 0,
   cashShort: 0,
@@ -44,6 +42,7 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
   const [openLoadingModal, setOpenLoadingModal] = useState(false);
 
   const today = new Date();
+  const maxDate = moment(new Date()).add(6, 'days');
   const payEdit = payloadEdit.salesDate;
   const payEditDate = moment(payEdit, 'DD/MM/YYYY').subtract(543, 'year').format('MM/DD/YYYY');
   const d = new Date(payEditDate);
@@ -119,22 +118,16 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
     setIsValidateCash(true);
 
     if (Number(d.getDate()) <= Number(today.getDate())) {
-      const maxDate = moment(new Date()).add(6, 'days');
       setValues({
         ...values,
         date: new Date(),
-        minDate: new Date(),
-        maxDate: maxDate,
         cashOver: payloadEdit ? payloadEdit.cashOver : '0',
         cashShort: payloadEdit ? payloadEdit.cashShort : '0',
       });
     } else {
-      const maxDate = moment(d).add(6, 'days');
       setValues({
         ...values,
         date: d,
-        minDate: d,
-        maxDate: maxDate,
         cashOver: payloadEdit ? payloadEdit.cashOver : '0',
         cashShort: payloadEdit ? payloadEdit.cashShort : '0',
       });
@@ -157,8 +150,8 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
                 onClickDate={handleDatePicker}
                 value={values.date}
                 type={'TO'}
-                minDateTo={values.minDate}
-                maxDate={values.maxDate}
+                minDateTo={today}
+                maxDate={maxDate}
               />
             </Grid>
             <Grid item xs={5} textAlign="right" sx={{ mt: 1 }}>
