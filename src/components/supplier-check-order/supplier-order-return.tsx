@@ -593,10 +593,21 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
   };
   const onCloseModalDelPN = async (value: boolean) => {
     if (value) {
-      await deletePN(pnNo);
+      await deletePN(pnNo)
+        .then((_value) => {
+          dispatch(featchOrderListSupAsync(payloadSearch));
+          dispatch(uploadFileState([]));
+          setTimeout(() => {
+            setOpenDelPNModal(false);
+            setOpen(false);
+            onClickClose();
+          }, 500);
+        })
+        .catch((error: ApiError) => {
+          setOpenAlert(true);
+          setTextError(error.message);
+        });
     }
-
-    setOpenDelPNModal(false);
   };
 
   return (
