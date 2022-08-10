@@ -80,7 +80,7 @@ export default function SelectExcludeBranch(props: Props): ReactElement {
   const provincesTemporary = !!branchList ? branchList.map((item: any) => item.province) : [];
   const provinceList = getUnique(provincesTemporary, 'code');
 
-  const totalBranches = branchList.length ? branchList.length : 0;
+  const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
   const payloadBranches = useAppSelector((state) => state.searchBranchProvince.excludeSelectBranch);
   const [listBranchSelect, setListBranchSelect] = React.useState<Object[] | any>([]);
   const [listExcludeBranchSelect, setListExcludeBranchSelect] = React.useState<Object[] | any>([]);
