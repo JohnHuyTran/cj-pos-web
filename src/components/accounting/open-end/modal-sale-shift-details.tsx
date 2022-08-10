@@ -127,8 +127,35 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     });
   }
   
-  const calculate = (amount: any) => {
-    +amount.replace(/,/g, '')
+  const number = (value: any) => {
+    // function comvert number
+    return (+(''+value).replaceAll(',', ''))
+  }
+
+  const calculate = () => {
+    // รายการเงินสดรับภายนอก (รวม) bussiness logic
+    const totalExIncomeAmountCal = (
+      externalIncomeList.reduce(( total, num ) => (total.amount + num.amount))
+    )
+    
+    //ยอดรวมเงินสดร้านค้า bussiness logic
+    const { cashAmount, diffAmount } = data.income
+    const totalCashAmountCal = (
+      number(cashAmount) + number(totalExIncomeAmountCal) + number(diffAmount)
+    )
+    
+    // ยอดเงินที่ต้องนำฝาก business logic
+    const { cashOverShortAmount, cdmAmount, totalPayAmount } = summarizeCashDeposite
+    const depositeAmountCal = (
+      number(totalCashAmountCal) + number(cashOverShortAmount) + (number(cdmAmount) - number(totalPayAmount))
+    )
+
+    setExternalIncome({...externalIncome, totalExIncomeAmount: totalExIncomeAmountCal})
+    setSummarizeCashDeposite({
+      ...summarizeCashDeposite,
+      totalCashAmount: ''+totalCashAmountCal,
+      depositeAmount: ''+depositeAmountCal
+    })
   }
 
   const handleExternalIncomeList = (value: any, code: number) => {
@@ -136,8 +163,8 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       const newState = prevState.map(obj => {
         if (obj.code === code) {
           if (Object.keys(value)[0] === 'amount') {
-            calculate(value.amount)
-            return {...obj, amount: value.amount};
+            // calculate(value.amount)
+            return {...obj, amount: number(value.amount)};
           }
           if (Object.keys(value)[0] === 'noItem') {
             if (value.noItem) { // ถ้า checked amount = 0
@@ -161,16 +188,25 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
 
   useEffect(() => {
     if (data) {
+      const externaleIncome = data.externalIncome
       setSummarizeCashDeposite({
         ...initialSearchState.summarizeCashDeposite,
         ...data.summarizeCashDeposite,
         comment: data.comment
       })
       setExternalIncome({...initialSearchState.externalIncome, ...data.externalIncome})
-      setExternalIncomeList([...initialSearchState.externalIncomeList, ...data.externalIncome.items])
       setCashPayment({...initialSearchState.cashPayment, ...data.cashPayment})
+      if (externaleIncome?.items && externaleIncome?.items.length > 0) {
+        setExternalIncomeList([...initialSearchState.externalIncomeList, ...data.externalIncome.items])
+      }
     }
   }, [data])
+  
+  useEffect(() => {
+    if(data && externalIncomeList.length > 0) {
+      calculate()
+    }
+  }, [externalIncomeList])
 
   return (
     <Fragment>
@@ -329,22 +365,20 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     onChange={(value) => setExternalIncome({...externalIncome, totalExIncomeAmount: value})} />
                   { externalIncomeList.length > 0 && (
                     externalIncomeList.map((item: any, index: number) => (
-                      <Fragment>
-                        <InputNumberLayout id={'boonterm'} name={'boonterm'} key={index}
-                            title={item.name}
-                            disabled={externalIncomeList[index]['noItem']}
-                            value={externalIncomeList[index]['amount']}
-                            onChange={(value) => handleExternalIncomeList(
-                              { amount: value }, item.code)
-                            }
-                          >
+                      <Fragment key={item.code}>
+                        <InputNumberLayout id={item.name} name={item.name}
+                          title={item.name}
+                          disabled={externalIncomeList[index]['noItem']}
+                          value={externalIncomeList[index]['amount']}
+                          onChange={(value) => handleExternalIncomeList(
+                            { amount: value }, item.code
+                          )}>
                           <FormControlLabel
                             control={
-                              <Checkbox name={item.name}
+                              <Checkbox id={item.name} name={item.name}
                                 checked={externalIncomeList[index]['noItem']}
                                 onChange={(e) => handleExternalIncomeList(
-                                  { noItem: e.target.checked },
-                                  item.code
+                                  { noItem: e.target.checked }, item.code
                                 )}
                               />
                             }
@@ -489,7 +523,11 @@ const Details = (props: DetailsProps) => {
       </Grid>
       <Grid container item md={4} sm={12} xs={12}>
         <Grid item xs={4}><b>วันที่ยอดขาย :</b></Grid>
-        <Grid item xs={8}>{detailsData.shiftDate || '-'}</Grid>
+        <Grid item xs={8}>{ detailsData.shiftDate
+            ? new Date(detailsData.shiftDate).toLocaleDateString("th-TH")
+            : '-' 
+          }
+        </Grid>
       </Grid>
       <Grid container item md={8} sm={12} xs={12}>
         <Grid item xs={3}><b>แนบเอกสาร Settlement :</b></Grid>
@@ -514,7 +552,7 @@ const Details = (props: DetailsProps) => {
       </Grid>
       <Grid container item md={4} sm={12} xs={12}>
         <Grid item xs={4}><b>การBypass :</b></Grid>
-        <Grid item xs={8}>{t(`statusByPass.${detailsData.bypass}`|| '-')}</Grid>
+        <Grid item xs={8}>{detailsData.bypass ? t(`statusByPass.${detailsData.bypass}`) : '-'}</Grid>
       </Grid>
     </Grid>
   )

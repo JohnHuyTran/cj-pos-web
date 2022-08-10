@@ -289,7 +289,7 @@ const viewOpenEndRs = {
     summarizeCashDeposite: {
       dailyIncomeAmount: 33850.5,
       cashOverShortAmount: 50,
-      totalCashAmount: 0,
+      totalCashAmount: 350,
       cdmAmount: 25,
       totalPayAmount: 0,
       depositeAmount: 100515,
