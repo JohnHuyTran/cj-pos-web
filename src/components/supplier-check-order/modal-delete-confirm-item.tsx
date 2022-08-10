@@ -8,12 +8,11 @@ import Typography from '@mui/material/Typography';
 
 interface Props {
   open: boolean;
-  itemMsg?: any;
-  textMsg?: string;
+  itemMsg?: string;
   onClose: (confirm: boolean) => void;
 }
 
-export default function ModelDelConfirm({ open, onClose, itemMsg, textMsg }: Props): ReactElement {
+export default function ModelDelConfirm({ open, onClose, itemMsg }: Props): ReactElement {
   const handleDeleteItem = async () => {
     return onClose(true);
   };
@@ -33,11 +32,11 @@ export default function ModelDelConfirm({ open, onClose, itemMsg, textMsg }: Pro
       <DialogContent>
         <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
           <Typography variant="h6" align="center" sx={{ marginBottom: 1 }}>
-            ยืนยันการลบ
+            ยืนยันการยกเลิกใบคืนสินค้า
           </Typography>
           {itemMsg && (
             <Typography variant="body1" align="left">
-              {textMsg} <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
+              เลขที่ใบเอกสาร PN <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
               <label style={{ color: '#36C690' }}>
                 <b>{itemMsg}</b>
                 {/* <br />
@@ -61,11 +60,11 @@ export default function ModelDelConfirm({ open, onClose, itemMsg, textMsg }: Pro
         <Button
           id="btnConfirm"
           variant="contained"
-          color="error"
+          color="primary"
           sx={{ borderRadius: 2, width: 90 }}
           onClick={handleDeleteItem}
         >
-          ลบ
+          ยืนยัน
         </Button>
       </DialogActions>
     </Dialog>
