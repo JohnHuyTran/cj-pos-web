@@ -30,6 +30,7 @@ import {
   cancelAuditPlan,
   confirmAuditPlan,
   countingAuditPlan,
+  importAP,
   saveDraftAuditPlan,
   updateAuditPlan,
 } from '../../../services/audit-plan';
@@ -39,7 +40,6 @@ import { clearDataFilter, getAuditPlanDetail } from '../../../store/slices/audit
 import { setCheckEdit } from '../../../store/slices/sale-limit-time-slice';
 import DocumentList from './modal-documents-list';
 import { env } from '../../../adapters/environmentConfigs';
-import { importST } from '../../../services/sale-limit-time';
 import ModalValidateImport from '../../sale-limit-time/modal-validate-import';
 import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
 import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
@@ -428,7 +428,7 @@ export default function ModalCreateAuditPlan({
       if (e.target.files[0]) {
         const formData = new FormData();
         formData.append('barcode', e.target.files[0]);
-        const rs = await importST(formData);
+        const rs = await importAP(formData);
         if (!!rs.data) {
           if (rs.code == 20000) {
             let newList = rs.data.appliedProducts.map((item: any) => {

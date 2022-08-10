@@ -416,6 +416,9 @@ export const environment = {
       cancel: {
         url: '/stock/audit-planning/cancel/{id}',
       },
+      upload: {
+        url: '/stock/audit-planning/upload',
+      },
     },
     stockCount: {
       search: {
@@ -441,13 +444,13 @@ export const environment = {
       detail: {
         url: '/stock/stock-adjust',
       },
-      calculate:{
+      calculate: {
         skuTab: {
           url: '/stock/stock-adjust/skus',
         },
         barcodeTab: {
           url: '/stock/stock-adjust/barcodes',
-        }
+        },
       },
       statsSku: {
         url: '/stock/stock-adjust/stats/{id}',
@@ -458,7 +461,7 @@ export const environment = {
       cancel: {
         url: '/stock/stock-adjust/{id}',
       },
-    } 
+    },
   },
   master: {
     branch: {
