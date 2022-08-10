@@ -281,7 +281,7 @@ const viewOpenEndRs = {
   data: {
     branchCode: 'B005',
     branchName: 'สำนักงานใหญ่สีลม Operation',
-    docNo: 'mock-003',
+    docNo: 'OE22080101-012',
     shiftDate: '2022-07-20T17:00:00Z',
     noOfSaleBill: 5,
     bypass: 'NONE',
@@ -370,6 +370,12 @@ const viewOpenEndRs = {
           name: 'Center Topping',
           amount: 350,
           noItem: false,
+        },
+        {
+          code: '02',
+          name: 'บุญเติม',
+          amount: 0,
+          noItem: true,
         },
       ],
     },

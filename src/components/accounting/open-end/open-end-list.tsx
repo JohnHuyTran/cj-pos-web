@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import moment from 'moment';
 import { DataGrid, GridCellParams, GridColDef, GridRowData } from '@mui/x-data-grid';
 import NumberFormat from 'react-number-format';
@@ -19,6 +19,9 @@ import {
   savePayloadSearch,
 } from '../../../store/slices/accounting/open-end/open-end-search-slice';
 
+// components
+import ModalSaleShiftDetails from 'components/accounting/open-end/modal-sale-shift-details'
+
 function OpenEndList() {
   const { t } = useTranslation(['openEnd', 'common']);
   const classes = useStyles();
@@ -29,7 +32,7 @@ function OpenEndList() {
   const cuurentPage = useAppSelector((state) => state.searchOpenEndSlice.openEndSearchList.page);
   const limit = useAppSelector((state) => state.searchOpenEndSlice.openEndSearchList.perPage);
   const [pageSize, setPageSize] = useState(limit.toString());
-  const [openLoadingModal, setOpenLoadingModal] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const columns: GridColDef[] = [
@@ -307,26 +310,31 @@ function OpenEndList() {
   };
 
   return (
-    <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        disableColumnMenu
-        autoHeight={rows.length >= 10 ? false : true}
-        scrollbarSize={10}
-        pagination
-        page={cuurentPage - 1}
-        pageSize={parseInt(pageSize)}
-        rowsPerPageOptions={[10, 20, 50, 100]}
-        rowCount={items.total}
-        paginationMode="server"
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        onCellClick={currentlySelected}
-        loading={loading}
-        rowHeight={65}
-      />
-    </div>
+    <Fragment>
+      <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          disableColumnMenu
+          autoHeight={rows.length >= 10 ? false : true}
+          scrollbarSize={10}
+          pagination
+          page={cuurentPage - 1}
+          pageSize={parseInt(pageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          rowCount={items.total}
+          paginationMode="server"
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          onCellClick={currentlySelected}
+          loading={loading}
+          rowHeight={65}
+        />
+      </div>
+      { openModal &&
+        <ModalSaleShiftDetails open={openModal} onClose={() => setOpenModal(false)}/>
+      }
+    </Fragment>
   );
 }
 

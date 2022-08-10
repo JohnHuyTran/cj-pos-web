@@ -27,6 +27,7 @@ interface fileDisplayList {
 
 interface Props {
   files: FileType[];
+  title?: string;
   docNo?: string | null | undefined | '';
   docType?: string | null | undefined | '';
   isStatus: boolean;
@@ -41,6 +42,7 @@ interface Props {
 
 function AccordionUploadFile({
   files,
+  title = 'แนบไฟล์',
   docNo,
   docType,
   isStatus,
@@ -262,7 +264,7 @@ function AccordionUploadFile({
             className={classes.MbtnBrowse}
             disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
           >
-            แนบไฟล์
+            {title}
           </Button>
         </label>
 
