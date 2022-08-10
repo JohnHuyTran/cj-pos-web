@@ -64,7 +64,7 @@ import { numberWithCommas, stringNullOrEmpty } from '../../utils/utils';
 import { uploadFileState } from '../../store/slices/upload-file-slice';
 import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
 import AccordionUploadFile from '../commons/ui/accordion-upload-file';
-import ModelDelConfirm from '../commons/ui/modal-delete-confirm-item';
+import ModelDelConfirm from './modal-delete-confirm-item';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
@@ -860,7 +860,7 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
         fileName={formatFileNam(pnNo, pnStatus)}
         btnPrintName="พิมพ์เอกสาร"
       />
-      <ModelDelConfirm open={openDelPNModal} onClose={onCloseModalDelPN} />
+      <ModelDelConfirm open={openDelPNModal} onClose={onCloseModalDelPN} itemMsg={pnNo} />
       <LoadingModal open={openLoadingModal} />
     </div>
   );
