@@ -48,6 +48,15 @@ export async function cancelAuditPlan(id: string) {
   }
 }
 
+export async function importAP(payload: any) {
+  try {
+    const response = await post(`${env.backEnd.url}${environment.checkStock.auditPlan.upload.url}`, payload);
+    return response;
+  } catch (error) {
+    return error;
+  }
+}
+
 export const getPathConfirmAP = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.checkStock.auditPlan.confirm.url}`, { id: id });
 };
