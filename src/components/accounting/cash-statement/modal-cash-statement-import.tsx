@@ -15,12 +15,18 @@ interface Props {
   open: boolean;
   onClickClose: () => void;
   onConfirm: (files: any) => void;
+  errorUploadFile: boolean;
 }
 interface loadingModalState {
   open: boolean;
 }
 
-export default function ModalCashStatementImport({ open, onClickClose, onConfirm }: Props): ReactElement {
+export default function ModalCashStatementImport({
+  open,
+  onClickClose,
+  onConfirm,
+  errorUploadFile,
+}: Props): ReactElement {
   const classes = useStyles();
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
 
@@ -44,7 +50,6 @@ export default function ModalCashStatementImport({ open, onClickClose, onConfirm
     setOpenLoadingModal(false);
   };
 
-  const [errorUploadFile, setErrorUploadFile] = React.useState(false);
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
   const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
   const [validationFile, setValidationFile] = React.useState(false);

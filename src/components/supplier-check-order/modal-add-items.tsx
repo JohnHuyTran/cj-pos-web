@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import React, { ReactElement, useMemo } from 'react';
+import React, { ReactElement, useEffect, useMemo, useRef } from 'react';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { ItemInfo } from '../../models/modal-add-item-model';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -29,6 +29,7 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import LoadingModal from '../commons/ui/loading-modal';
+import _ from 'lodash';
 
 interface Props {
   open: boolean;
@@ -122,7 +123,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const { apiRef, columns } = useApiRef();
   const classes = useStyles();
   const dispatch = useAppDispatch();
-
+  const searchDebouceRef = useRef<any>();
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   // const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [values, setValues] = React.useState<string[]>([]);
@@ -146,8 +147,9 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     setNewAddItemListArray([]);
   };
 
-  const itemsList = useAppSelector((state) => state.searchItemListBySupplier.itemList);
-  let options: any = itemsList.data && itemsList.data.length > 0 ? itemsList.data : [];
+  const _itemsList = useAppSelector((state) => state.searchItemListBySupplier.itemList);
+  const [itemsList, setItemList] = React.useState(_itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : []);
+  let options: any = itemsList && itemsList.length > 0 ? itemsList : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode,
   });
@@ -168,12 +170,15 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
+        id='tbxSearch'
         {...params}
         placeholder='บาร์โค้ด/รายละเอียดสินค้า'
         className={classes.MtextField}
         variant='outlined'
         size='small'
         fullWidth
+        onMouseDown={handleOnMouseDown}
+        onChange={handleOnMouseDown}
       />
     );
   };
@@ -216,6 +221,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
         setNewAddItemListArray(itemsList);
       }
       clearInput();
+      // setItemList(_itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : []);
     } else {
       clearData();
     }
@@ -291,13 +297,38 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   };
 
   const onInputChange = async (event: any, value: string, reason: string) => {
-    if (event && event.keyCode && event.keyCode === 13) {
-      return false;
-    }
+    searchDebouceRef.current?.cancel();
+    searchDebouceRef.current = _.debounce(async () => {
+      if (event && event.keyCode && event.keyCode === 13) {
+        return false;
+      }
+      if (reason == 'reset') {
+        clearInput();
+      }
+      const keyword = value.trim();
+      const _itemList = itemsList && itemsList.length > 0 ? itemsList : [];
+      const _option: any = _itemList.filter((r: any) => r.barcode === keyword);
+      if (value && _option.length > 0) {
+        const item: any = {
+          barcode: _option[0].barcode,
+          barcodeName: _option[0].barcodeName,
+          freshLifeBuyPrice: _option[0].freshLifeBuyPrice,
+          qty: 1,
+          skuCode: _option[0].skuCode,
+          unitCode: _option[0].unitCode,
+          unitName: _option[0].unitName,
+          unitPrice: _option[0].unitPrice,
+          unitPriceText: _option[0].unitPriceText,
+        };
+        setItemList([]);
+        handleChangeItem(null, item, 'selectOption');
+      }
+    }, 200);
+    searchDebouceRef.current();
+  };
 
-    if (reason == 'reset') {
-      clearInput();
-    }
+  const handleOnMouseDown = () => {
+    setItemList(_itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : []);
   };
 
   return (
@@ -322,6 +353,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                 getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
                 isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
                 renderInput={autocompleteRenderInput}
+                noOptionsText=''
               />
             </Box>
 
@@ -336,7 +368,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
                     top: 8,
                     color: (theme: any) => theme.palette.grey[400],
                   }}>
-                  <CancelOutlinedIcon fontSize='large' stroke={'white'} stroke-width={1} />
+                  <CancelOutlinedIcon fontSize='large' stroke={'white'} strokeWidth={1} />
                 </IconButton>
               ) : null}
             </Box>
@@ -356,7 +388,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
               </div>
             </Box>
           )}
-          {newAddItemListArray.length == 0 && itemsList.code === 204 && (
+          {newAddItemListArray.length == 0 && _itemsList.code === 204 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }} color='#CBD4DB'>
               <h4>ไม่พบสินค้า</h4>
             </Box>

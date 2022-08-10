@@ -31,8 +31,6 @@ interface Props {
 function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
   const classes = useStyles();
 
-  const date = new Date();
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [values, setValues] = useState(initialStateValues);
   const [isValidateCash, setIsValidateCash] = useState(true);
   const [msgError, setMsgError] = useState('');
@@ -43,8 +41,14 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
   const [textError, setTextError] = useState('');
   const [openLoadingModal, setOpenLoadingModal] = useState(false);
 
+  const today = new Date();
+  const maxDate = moment(new Date()).add(6, 'days');
+  const payEdit = payloadEdit.salesDate;
+  const payEditDate = moment(payEdit, 'DD/MM/YYYY').subtract(543, 'year').format('MM/DD/YYYY');
+  const d = new Date(payEditDate);
+
   const handleDatePicker = (value: any) => {
-    setStartDate(value);
+    setValues({ ...values, date: value });
   };
 
   const handleChange = (event: any) => {
@@ -74,7 +78,7 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
 
       const payloadSave: any = {
         id: payloadEdit.id,
-        cashDate: moment(startDate).startOf('day').toISOString(),
+        salesDate: moment(values.date).startOf('day').toISOString(),
         cashOver: Number(values.cashOver),
         cashShort: Number(values.cashShort),
       };
@@ -110,14 +114,24 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
   };
 
   useEffect(() => {
-    setValues({
-      date: new Date(),
-      cashOver: payloadEdit ? payloadEdit.cashOver : '0',
-      cashShort: payloadEdit ? payloadEdit.cashShort : '0',
-    });
-    setStartDate(new Date());
     setMsgError('');
     setIsValidateCash(true);
+
+    if (Number(d.getDate()) <= Number(today.getDate())) {
+      setValues({
+        ...values,
+        date: new Date(),
+        cashOver: payloadEdit ? payloadEdit.cashOver : '0',
+        cashShort: payloadEdit ? payloadEdit.cashShort : '0',
+      });
+    } else {
+      setValues({
+        ...values,
+        date: d,
+        cashOver: payloadEdit ? payloadEdit.cashOver : '0',
+        cashShort: payloadEdit ? payloadEdit.cashShort : '0',
+      });
+    }
   }, [open]);
 
   return (
@@ -134,10 +148,10 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
             <Grid item xs={5} textAlign="left">
               <DatePickerAllComponent
                 onClickDate={handleDatePicker}
-                value={startDate}
+                value={values.date}
                 type={'TO'}
-                minDateTo={new Date()}
-                maxDate={date.setDate(date.getDate() + 6)}
+                minDateTo={today}
+                maxDate={maxDate}
               />
             </Grid>
             <Grid item xs={5} textAlign="right" sx={{ mt: 1 }}>

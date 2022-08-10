@@ -93,9 +93,14 @@ function TextBoxSearchProduct({ onSelectItem, isClear, disable, onChange, onKeyD
         try {
           const rs = await searchProductItem(keyword);
           if (rs) {
-            setItemList(rs.data);
-            setLoading(false);
+            if (rs.data.length === 1) {
+              handleChangeItem('', rs.data[0], '');
+              setItemList([]);
+            } else {
+              setItemList(rs.data);
+            }
           }
+          setLoading(false);
         } catch (error) {
           setLoading(false);
         }
