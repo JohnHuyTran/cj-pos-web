@@ -607,6 +607,8 @@ function SupplierOrderReturn({ isOpen, onClickClose }: Props) {
           setOpenAlert(true);
           setTextError(error.message);
         });
+    } else {
+      setOpenDelPNModal(false);
     }
   };
 
