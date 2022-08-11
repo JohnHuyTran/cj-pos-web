@@ -11,6 +11,11 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import CloseSaleShiftSearch from 'components/accounting/close-saleshift/close-saleshift-search';
 import CloseSaleShiftSearchList from 'components/accounting/close-saleshift/close-saleshift-list';
+import {
+  mockStoreSearchCloseSaleShift,
+  mockStoreSearchCloseSaleShiftMoreTenRecords,
+  mockStoreSearchCloseSaleShiftNoData,
+} from 'tests/mockdata-store/mock-store-accounting';
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 let wrapper;
@@ -34,54 +39,77 @@ jest.mock('react-i18next', () => ({
 }));
 beforeEach(() => {
   store = mockStore(initialState);
-  wrapper = render(
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CloseSaleShiftSearchList />
-      </ThemeProvider>
-    </Provider>
-  );
 });
 
 describe('component modal close sale', () => {
   // console.debug('debug:', inputField);
-  it('find button ตกลง', () => {
-    const button = screen.getByTestId(/testid-btnSubmit/).closest('button');
-    expect(button).toBeInTheDocument();
-    expect(button).toBeDisabled();
-  });
-
-  it('find text', () => {
-    expect(screen.getByText('กรุณาสแกน Barcode เพื่อเพิ่มรหัสปิดรอบ')).toBeInTheDocument();
-    // expect(screen.getByText(`จำนวนรหัสปิดรอบ: 8`)).toBeInTheDocument();
-  });
 
   it('find item in data grid', () => {
-    expect(screen.getByRole('grid')).toBeInTheDocument();
-  });
-
-  it('on click button บันทึก ', async () => {
-    const input = screen.getByTestId('testid-tbx-shiftKey').querySelector('input') as HTMLInputElement;
-    await fireEvent.change(input, { target: { value: '186A00' } });
-    await fireEvent.keyPress(input, { key: 'Enter', code: 13 });
-
-    fireEvent.click(screen.getByTestId(/testid-btnSubmit/));
-
-    await new Promise((r) => setTimeout(r, 4000));
-    expect(screen.getByText('กรุณารอสักครู่')).toBeInTheDocument();
-  });
-
-  it('on close modal', () => {
-    fireEvent.click(screen.getByTestId('testid-title-btnClose'));
-    expect(handleOnClose).toHaveBeenCalledTimes(1);
-  });
-
-  it('payload in null', async () => {
+    store = mockStore(mockStoreSearchCloseSaleShift);
     const container: any = render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}></ThemeProvider>
+        <ThemeProvider theme={theme}>
+          <CloseSaleShiftSearchList />
+        </ThemeProvider>
       </Provider>
     );
-    expect(container.getByRole('grid')).toBeInTheDocument();
+
+    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')[1]).toContainHTML('20220811T03-001');
   });
+
+  it('find item in data grid > 10 record', () => {
+    store = mockStore(mockStoreSearchCloseSaleShiftMoreTenRecords);
+    const container: any = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <CloseSaleShiftSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')[1]).toContainHTML('20220811T03-001');
+  });
+
+  it('on select shiftCode 20220801T05-021 , to dispaly popup', async () => {
+    store = mockStore(mockStoreSearchCloseSaleShift);
+    const container: any = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <CloseSaleShiftSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
+    const row = container.getByText('20220801T05-021');
+    row.focus();
+    fireEvent.keyDown(row, { key: 'Enter' });
+    fireEvent.click(row);
+    await new Promise((r) => setTimeout(r, 1000));
+    expect(container.getByText('บันทึกรหัสปิดรอบ')).toBeInTheDocument();
+  });
+  // it('on click button บันทึก ', async () => {
+  //   const input = screen.getByTestId('testid-tbx-shiftKey').querySelector('input') as HTMLInputElement;
+  //   await fireEvent.change(input, { target: { value: '186A00' } });
+  //   await fireEvent.keyPress(input, { key: 'Enter', code: 13 });
+
+  //   fireEvent.click(screen.getByTestId(/testid-btnSubmit/));
+
+  //   await new Promise((r) => setTimeout(r, 4000));
+  //   expect(screen.getByText('กรุณารอสักครู่')).toBeInTheDocument();
+  // });
+
+  // it('on close modal', () => {
+  //   fireEvent.click(screen.getByTestId('testid-title-btnClose'));
+  //   expect(handleOnClose).toHaveBeenCalledTimes(1);
+  // });
+
+  // it('payload in null', async () => {
+  //   const container: any = render(
+  //     <Provider store={store}>
+  //       <ThemeProvider theme={theme}></ThemeProvider>
+  //     </Provider>
+  //   );
+  //   expect(container.getByRole('grid')).toBeInTheDocument();
+  // });
 });
