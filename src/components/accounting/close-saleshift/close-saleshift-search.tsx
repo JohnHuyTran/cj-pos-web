@@ -84,7 +84,6 @@ function CloseSaleShiftSearch() {
   const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState('');
   const [disableBtnSearch, setDisableBtnSearch] = React.useState(true);
   const [disableBtnManage, setDisableBtnManage] = React.useState(true);
-  const [openModalCashDetail, setOpenModalCashDetail] = React.useState(false);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -179,10 +178,7 @@ function CloseSaleShiftSearch() {
     handleOpenLoading('open', false);
   };
   const handleOnBypass = () => {};
-  const handleOnupdate = async () => {
-    // await dispatch(featchOpenEndDeatilAsync('OE22080101-012'));
-    setOpenModalCashDetail(true);
-  };
+  const handleOnupdate = async () => {};
   const handleChange = (event: any) => {
     const value = event.target.value;
     setValues({ ...values, [event.target.name]: value });
@@ -258,6 +254,7 @@ function CloseSaleShiftSearch() {
         <Grid container spacing={2} mt={4} mb={2}>
           <Grid item xs={5}>
             <Button
+              data-testid='testid-btnImport'
               id='btnImport'
               variant='contained'
               color='primary'
@@ -269,7 +266,8 @@ function CloseSaleShiftSearch() {
               อัพเดท
             </Button>
             <Button
-              id='btnImport'
+              data-testid='testid-btnBypass'
+              id='btnBypass'
               variant='contained'
               color='primary'
               onClick={handleOnBypass}
@@ -282,6 +280,7 @@ function CloseSaleShiftSearch() {
           </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
+              data-testid='testid-btnCreateStockTransferModal'
               id='btnCreateStockTransferModal'
               variant='contained'
               onClick={handleOpenCloseSale}
@@ -292,6 +291,7 @@ function CloseSaleShiftSearch() {
               ปิดรอบยอดการขาย
             </Button>
             <Button
+              data-testid='testid-btnClear'
               id='btnClear'
               variant='contained'
               onClick={onClickClearBtn}
@@ -301,6 +301,7 @@ function CloseSaleShiftSearch() {
               เคลียร์
             </Button>
             <Button
+              data-testid='testid-btnSearch'
               id='btnSearch'
               variant='contained'
               color='primary'
@@ -328,12 +329,6 @@ function CloseSaleShiftSearch() {
         open={openModalCloseSale}
         onClose={() => setOpenModalCloseSale(false)}
         noOfShiftKey={noOfShiftKey}
-      />
-      <ModalDetailCash
-        isOpen={openModalCashDetail}
-        onClose={function (): void {
-          setOpenModalCashDetail(false);
-        }}
       />
     </>
   );
