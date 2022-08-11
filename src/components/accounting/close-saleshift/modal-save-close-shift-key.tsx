@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { updateConfirmShiftCloses } from 'services/accounting';
 import store, { useAppDispatch, useAppSelector } from '../../../store/store';
 import { featchCloseSaleShiptListAsync } from 'store/slices/accounting/close-saleshift-slice';
+import LoadingModal from 'components/commons/ui/loading-modal';
 interface ModalSaveCloseShiftKeyProps {
   open: boolean;
   payload: any;
@@ -43,10 +44,17 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
   const [barcode, setBarcode] = useState('');
   const [errorCode, setErrorCode] = useState('');
   const [isOpenLoading, setIsOpenLoading] = useState(false);
+  const [openLoadingModal, setOpenLoadingModal] = useState<{ open: boolean }>({
+    open: false,
+  });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   const handleSave = async () => {
     if (barcode) {
-      setIsOpenLoading(true);
+      // setIsOpenLoading(true);
+      handleOpenLoading('open', true);
       try {
         const res = await updateConfirmShiftCloses(payload?.shiftCode, { shiftKey: barcode });
 
@@ -56,7 +64,8 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
       } finally {
         const payloadSearch = store.getState().closeSaleShiftSlice.payloadSearch;
         await dispatch(featchCloseSaleShiptListAsync(payloadSearch));
-        setIsOpenLoading(false);
+        // setIsOpenLoading(false);
+        handleOpenLoading('open', false);
       }
     }
   };
@@ -72,7 +81,12 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
       <Dialog id='ModalSaveCloseShiftKey' open={open} fullWidth={true} maxWidth='md'>
         <Box id='Card' sx={{ m: '10px 10px 20px' }}>
           <DialogContent id='CloseButton' sx={{ textAlign: 'right', padding: 0 }}>
-            <IconButton ria-label='close' onClick={handleClose} disabled={isOpenLoading} sx={{ color: '#bdbdbd' }}>
+            <IconButton
+              ria-label='close'
+              onClick={handleClose}
+              disabled={isOpenLoading}
+              sx={{ color: '#bdbdbd' }}
+              data-testid='testid-title-btnClose'>
               <HighlightOff fontSize='large' />
             </IconButton>
           </DialogContent>
@@ -85,6 +99,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
                 กรุณาสแกน Barcode เพื่อเพิ่มรหัสปิดรอบ
               </Typography>
               <TextField
+                data-testid='testid-tbx-shiftKey'
                 name='accountNameTh'
                 size='small'
                 error={!!errorCode}
@@ -102,6 +117,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
               )}
             </Box>
             <LoadingButton
+              data-testid='testid-btnSubmit'
               id='btnSave'
               variant='contained'
               color='primary'
@@ -119,6 +135,7 @@ export default function ModalSaveCloseShiftKey(props: ModalSaveCloseShiftKeyProp
           </DialogActions>
         </Box>
       </Dialog>
+      <LoadingModal open={openLoadingModal.open} />
     </Fragment>
   );
 }
