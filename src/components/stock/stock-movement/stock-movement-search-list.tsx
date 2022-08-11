@@ -71,7 +71,7 @@ function StockMovementSearchList() {
   const [docType, setDocType] = React.useState<string>('');
 
   const handleModelAction = (params: GridRenderCellParams) => {
-    const barcodes: any = params.getValue(params.id, 'barcodes');
+    const barcodes: any = params.row.barcodes;
 
     const handleOpenModalTransaction = () => {
       setMovementTransaction(barcodes);
@@ -148,14 +148,12 @@ function StockMovementSearchList() {
             ? String(params.getValue(params.id, 'docRefNo'))
             : '';
         const docType: string =
-          params.getValue(params.id, 'docType') && params.getValue(params.id, 'docType') !== undefined
-            ? String(params.getValue(params.id, 'docType'))
-            : '';
+          params.row.docType && params.row.docType !== undefined ? String(params.row.docType) : '';
         const movementTypeCode: string =
-          params.getValue(params.id, 'movementTypeCode') && params.getValue(params.id, 'movementTypeCode') !== undefined
-            ? String(params.getValue(params.id, 'movementTypeCode'))
+          params.row.movementTypeCode && params.row.movementTypeCode !== undefined
+            ? String(params.row.movementTypeCode)
             : '';
-        if (params.getValue(params.id, 'movementAction') === true && docNo) {
+        if (params.row.movementAction === true && docNo) {
           return (
             <Typography
               color='secondary'
@@ -514,6 +512,7 @@ function StockMovementSearchList() {
             onCellClick={currentlySelected}
             loading={loading}
             rowHeight={65}
+            columnBuffer={10}
           />
         </div>
       </Box>
