@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, Grid, TextField, Typography } from '@mui/material';
 import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
-import { CashPayment, Income, Item } from 'models/branch-accounting-model';
-import React from 'react';
+import { Income, Item } from 'models/branch-accounting-model';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import NumberFormat from 'react-number-format';
 import { useAppDispatch, useAppSelector } from 'store/store';
@@ -14,14 +14,12 @@ interface Props {
 
 function ModalDetailCash({ isOpen, onClose }: Props) {
   const classes = useStyles();
-  const _ = require('lodash');
-  const dispatch = useAppDispatch();
-  const { t } = useTranslation(['expense', 'common']);
   const viewOpenEndResponse = useAppSelector((state) => state.viewOpenEndSlice.viewOpenEnd);
   const data: any = viewOpenEndResponse.data ? viewOpenEndResponse.data : null;
   const incomes: Income = data ? data.income : null;
+  
   return (
-    <React.Fragment>
+    <Fragment>
       <Dialog open={isOpen} maxWidth='lg' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClose}></BootstrapDialogTitle>
         <DialogContent>
@@ -43,31 +41,30 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                   </Grid>
                 )}
 
-                {incomes &&
+                { incomes &&
                   incomes.paymentTypeItems.length > 0 &&
-                  incomes.paymentTypeItems.map((element: Item, index: number) => {
-                    return (
-                      <>
-                        <Grid item xs={1}>
-                          <Typography></Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography>{element.name}</Typography>
-                        </Grid>
-                        <Grid item xs={5} justifyContent='flex-end'>
-                          <NumberFormat
-                            value={String(element.amount)}
-                            thousandSeparator={true}
-                            decimalScale={2}
-                            className={classes.MtextFieldNumber}
-                            disabled={true}
-                            customInput={TextField}
-                            fixedDecimalScale
-                          />
-                        </Grid>
-                      </>
-                    );
-                  })}
+                  incomes.paymentTypeItems.map((element: Item, index: number) => (
+                  <Fragment key={index}>
+                    <Grid item xs={1}>
+                      <Typography></Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography>{element.name}</Typography>
+                    </Grid>
+                    <Grid item xs={5} justifyContent='flex-end'>
+                      <NumberFormat
+                        value={String(element.amount)}
+                        thousandSeparator={true}
+                        decimalScale={2}
+                        className={classes.MtextFieldNumber}
+                        disabled={true}
+                        customInput={TextField}
+                        fixedDecimalScale
+                      />
+                    </Grid>
+                  </Fragment>
+                  ))
+                }
               </Grid>
             </Grid>
 
@@ -89,31 +86,30 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
                         <Typography sx={{ fontWeight: 'bold' }}>รายรับตามประเภท</Typography>
                       </Grid>
                     )}
-                    {incomes &&
+                    { incomes &&
                       incomes.typeItems.length > 0 &&
-                      incomes.typeItems.map((element: Item, index: number) => {
-                        return (
-                          <>
-                            <Grid item xs={1}>
-                              <Typography></Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Typography>{element.name}</Typography>
-                            </Grid>
-                            <Grid item xs={5}>
-                              <NumberFormat
-                                value={String(element.amount)}
-                                thousandSeparator={true}
-                                decimalScale={2}
-                                className={classes.MtextFieldNumber}
-                                disabled={true}
-                                customInput={TextField}
-                                fixedDecimalScale
-                              />
-                            </Grid>
-                          </>
-                        );
-                      })}
+                      incomes.typeItems.map((element: Item, index: number) => (
+                      <Fragment key={index}>
+                        <Grid item xs={1}>
+                          <Typography></Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography>{element.name}</Typography>
+                        </Grid>
+                        <Grid item xs={5}>
+                          <NumberFormat
+                            value={String(element.amount)}
+                            thousandSeparator={true}
+                            decimalScale={2}
+                            className={classes.MtextFieldNumber}
+                            disabled={true}
+                            customInput={TextField}
+                            fixedDecimalScale
+                          />
+                        </Grid>
+                      </Fragment>
+                      ))
+                    }
                   </Grid>
                 </Grid>
                 <Grid item>
@@ -287,7 +283,7 @@ function ModalDetailCash({ isOpen, onClose }: Props) {
           </Grid>
         </DialogContent>
       </Dialog>
-    </React.Fragment>
+    </Fragment>
   );
 }
 

@@ -32,11 +32,10 @@ import ModalDetailCash from 'components/accounting/open-end/modal-detail-cash';
 import useScrollTop from 'hooks/useScrollTop'
 
 // API call
-import { featchOpenEndDeatilAsync } from 'store/slices/accounting/open-end/open-end-slice';
+import { saveOpenEnd, submitApproveOpenEnd } from 'services/accounting';
 
 interface ModalSaleShiftDetailsProps {
   open: boolean;
-  payload?: any;
   onClose: () => void;
 }
 
@@ -54,12 +53,13 @@ interface InputNumberLayoutProps {
 }
 
 interface DetailsProps {
-  detailsData: any
+  detailsData: any,
+  isDisabledUploadFile: boolean
 }
 
 export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps): ReactElement {
   // Props
-  const { open, payload, onClose } = props
+  const { open, onClose } = props
 
   // Custom style
   const classes = useStyles();
@@ -68,23 +68,19 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     borderTop: '2px solid #EAEBEB',
     paddingTop: '15px'
   }
-
-  useEffect(() => {
-    dispatch(featchOpenEndDeatilAsync('0E22060412-20'));
-  }, [])
   
   // Set valiable
   const dispatch = useAppDispatch();
   const viewOpenEndResponse = useAppSelector((state) => state.viewOpenEndSlice.viewOpenEnd);
   const data: any = viewOpenEndResponse.data || null;
-  // const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
-  const state = {
+  const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
+  const initialDetailsState = {
     docNo: data?.docNo,
     branchName: data?.branchName,
     shiftDate: data?.shiftDate,
     bypass: data?.bypass
   }
-  const initialSearchState = {
+  const initialFormInputState = {
     summarizeCashDeposite: {
       dailyIncomeAmount: '',
       cashOverShortAmount: '',
@@ -111,11 +107,12 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
 
   // Set state data
   const CardContent = useRef<HTMLElement>(null);
-  const [summarizeCashDeposite, setSummarizeCashDeposite] = useState(initialSearchState.summarizeCashDeposite)
-  const [externalIncome, setExternalIncome] = useState(initialSearchState.externalIncome)
-  const [externalIncomeList, setExternalIncomeList] = useState<any[]>(initialSearchState.externalIncomeList)
-  const [cashPayment, setCashPayment] = useState(initialSearchState.cashPayment)
-  const [isOpenLoading, setIsOpenLoading] = useState(false);
+  const [summarizeCashDeposite, setSummarizeCashDeposite] = useState(initialFormInputState.summarizeCashDeposite)
+  const [externalIncome, setExternalIncome] = useState(initialFormInputState.externalIncome)
+  const [externalIncomeList, setExternalIncomeList] = useState<any[]>(initialFormInputState.externalIncomeList)
+  const [cashPayment, setCashPayment] = useState(initialFormInputState.cashPayment)
+  const [isSaveOpenLoading, setIsSaveOpenLoading] = useState(false);
+  const [isSubmitOpenLoading, setIsSubmitOpenLoading] = useState(false);
   const [openModalCashDetail, setOpenModalCashDetail] = useState(false);
   const [scrollTop, scrollProps] = useScrollTop();
 
@@ -179,10 +176,43 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     })
   }
 
+  const handleSave = async () => {
+    const payload = {
+      docNo: data?.docNo,
+      settlementFiles: data?.settlementFiles,
+      items: externalIncomeList
+    }
+    setIsSaveOpenLoading(true)
+    try {
+      const res = await saveOpenEnd(payload, fileUploadList);
+      // handleClose();
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsSaveOpenLoading(false);
+    }
+  }
+
+  const handleApprove = async () => {
+    const payload = {
+      settlementFiles: data?.settlementFiles,
+      items: externalIncomeList
+    }
+    setIsSubmitOpenLoading(true)
+    try {
+      const res = await submitApproveOpenEnd(data?.docNo, payload, fileUploadList);
+      handleClose();
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsSubmitOpenLoading(false);
+    }
+  }
+
   const handleClose = () => {
-    setSummarizeCashDeposite(initialSearchState.summarizeCashDeposite)
-    setExternalIncome(initialSearchState.externalIncome)
-    setCashPayment(initialSearchState.cashPayment)
+    setSummarizeCashDeposite(initialFormInputState.summarizeCashDeposite)
+    setExternalIncome(initialFormInputState.externalIncome)
+    setCashPayment(initialFormInputState.cashPayment)
     onClose()
   }
 
@@ -190,14 +220,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     if (data) {
       const externaleIncome = data.externalIncome
       setSummarizeCashDeposite({
-        ...initialSearchState.summarizeCashDeposite,
+        ...initialFormInputState.summarizeCashDeposite,
         ...data.summarizeCashDeposite,
         comment: data.comment
       })
-      setExternalIncome({...initialSearchState.externalIncome, ...data.externalIncome})
-      setCashPayment({...initialSearchState.cashPayment, ...data.cashPayment})
+      setExternalIncome({...initialFormInputState.externalIncome, ...data.externalIncome})
+      setCashPayment({...initialFormInputState.cashPayment, ...data.cashPayment})
       if (externaleIncome?.items && externaleIncome?.items.length > 0) {
-        setExternalIncomeList([...initialSearchState.externalIncomeList, ...data.externalIncome.items])
+        setExternalIncomeList([...initialFormInputState.externalIncomeList, ...data.externalIncome.items])
       }
     }
   }, [data])
@@ -215,7 +245,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
           <CardHeader
             onClose={handleClose}
             scrollTop={scrollTop}
-            isLoading={isOpenLoading}
+            isLoading={isSaveOpenLoading || isSubmitOpenLoading}
             steps={['บันทึก', 'ขออนุมัติ', 'อนุมัติ']}
             actionStep={0}
           >
@@ -227,21 +257,24 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
           >
             <Box ref={CardContent} sx={{ display: 'flex', flexDirection: 'column', padding: '20px 24px' }}>
               <Box id='DetailsSection'>
-                <Details detailsData={state} />
+                <Details
+                  detailsData={initialDetailsState}
+                  isDisabledUploadFile={isSaveOpenLoading || isSubmitOpenLoading}
+                />
                 <DialogActions sx={{ justifyContent: 'right', marginTop: '10px' }}>
                   <LoadingButton
                     id='btnSave'
                     variant='contained'
                     color='warning'
                     startIcon={<Save />}
-                    loading={isOpenLoading}
+                    loading={isSaveOpenLoading}
                     loadingIndicator={
                       <Typography component='span' sx={{ fontSize: '11px' }}>
                         กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                       </Typography>
                     }
                     sx={{ borderRadius: 2, height: 40, width: 110}}
-                    onClick={(e) => {console.log(e)}}>
+                    onClick={handleSave}>
                     บันทึก
                   </LoadingButton>
                   <LoadingButton
@@ -249,14 +282,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     variant='contained'
                     color='primary'
                     startIcon={<CheckCircleOutline />}
-                    loading={isOpenLoading}
+                    loading={isSubmitOpenLoading}
                     loadingIndicator={
                       <Typography component='span' sx={{ fontSize: '11px' }}>
                         กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                       </Typography>
                     }
                     sx={{ borderRadius: 2, height: 40, width: 110}}
-                    onClick={(e) => {console.log(e)}}>
+                    onClick={handleApprove}>
                     ขออนุมัติ
                   </LoadingButton>
                 </DialogActions>
@@ -278,12 +311,6 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                       id='BtnDetails'
                       variant='contained'
                       color='secondary'
-                      loading={isOpenLoading}
-                      loadingIndicator={
-                        <Typography component='span' sx={{ fontSize: '11px' }}>
-                          กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
-                        </Typography>
-                      }
                       sx={{ borderRadius: 2, width: 110}}
                       onClick={() => setOpenModalCashDetail(true)}>
                       ดูรายละเอียด
@@ -368,7 +395,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                       <Fragment key={item.code}>
                         <InputNumberLayout id={item.name} name={item.name}
                           title={item.name}
-                          disabled={externalIncomeList[index]['noItem']}
+                          disabled={externalIncomeList[index]['noItem'] || (isSaveOpenLoading || isSubmitOpenLoading)}
                           value={externalIncomeList[index]['amount']}
                           onChange={(value) => handleExternalIncomeList(
                             { amount: value }, item.code
@@ -377,6 +404,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                             control={
                               <Checkbox id={item.name} name={item.name}
                                 checked={externalIncomeList[index]['noItem']}
+                                disabled={isSaveOpenLoading || isSubmitOpenLoading}
                                 onChange={(e) => handleExternalIncomeList(
                                   { noItem: e.target.checked }, item.code
                                 )}
@@ -494,21 +522,18 @@ const InputNumberLayout = (props: InputNumberLayoutProps) => {
 }
 
 const Details = (props: DetailsProps) => {
-  const { detailsData } = props
+  const { detailsData, isDisabledUploadFile } = props
+  
   // Set data upload
-  const [attachFileOlds, setAttachFileOlds] = useState([]);
+  const [attachFiles, setAttachFiles] = useState([]);
   const [uploadFileFlag, setUploadFileFlag] = useState(false);
   const { t } = useTranslation(['openEnd']);
 
   // handle function
-  const handleOnChangeUploadFile = (status: boolean) => {
-    setUploadFileFlag(status);
-    // setAttachFileError('');
-  };
-  const onDeleteAttachFileOld = (item: any) => {
-    let attachFileData = {...attachFileOlds}
+  const handleDeleteFile = (item: any) => {
+    let attachFileData = {...attachFiles}
     let attachFileDataFilter = attachFileData.filter((it: any) => it.fileKey !== item.fileKey);
-    setAttachFileOlds(attachFileDataFilter);
+    setAttachFiles(attachFileDataFilter);
   };
 
   return (
@@ -534,19 +559,14 @@ const Details = (props: DetailsProps) => {
         <Grid item xs={6}>
           <AccordionUploadFile
             title="แนบเอกสาร"
-            files={attachFileOlds}
+            files={attachFiles}
             docNo={'docNo'}
             docType='OE'
+            disabled={isDisabledUploadFile}
             isStatus={uploadFileFlag}
-            onChangeUploadFile={handleOnChangeUploadFile}
-            onDeleteAttachFile={onDeleteAttachFileOld}
-            // enabledControl={
-            //   TOStatus.DRAFT === status ||
-            //   (TOStatus.WAIT_FOR_APPROVAL === status && approvePermission) ||
-            //   TOStatus.APPROVED === status
-            // }
-            // warningMessage={attachFileError}
-            // deletePermission={TOStatus.DRAFT === status}
+            onChangeUploadFile={(status: boolean) => setUploadFileFlag(status)}
+            onDeleteAttachFile={handleDeleteFile}
+            enabledControl={true}
           />
         </Grid>
       </Grid>

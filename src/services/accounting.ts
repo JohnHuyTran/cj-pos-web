@@ -317,3 +317,48 @@ export async function downloadTemplateCS() {
     throw error;
   }
 }
+
+export async function saveOpenEnd(payload: any, files: File[]) {
+  const bodyFormData = new FormData();
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+  files.map((file: File) => {
+    return bodyFormData.append('file[]', file);
+  });
+
+  try {
+    const response = await put(
+      environment.branchAccounting.openEnd.save.url,
+      bodyFormData,
+      ContentType.MULTIPART
+    )
+    return response
+  } catch(error) {
+    throw error
+  }
+}
+
+export async function submitApproveOpenEnd(docNo: string, payload: any, files: File[]) {
+  const bodyFormData = new FormData();
+  bodyFormData.append('requestBody', JSON.stringify(payload));
+  files.map((file: File) => {
+    return bodyFormData.append('file[]', file);
+  });
+
+  const getPathSubmitApprove = (docNo: string, path: string) => {
+    return getPathUrl(`${path}`, { docNo: docNo });
+  };
+
+  try {
+    const response = await post(
+      getPathSubmitApprove(
+        docNo,
+        environment.branchAccounting.openEnd.submitApprove.url
+      ),
+      bodyFormData,
+      ContentType.MULTIPART
+    )
+    return response
+  } catch(error) {
+    throw error
+  }
+}
