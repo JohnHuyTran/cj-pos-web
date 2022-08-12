@@ -12,13 +12,13 @@ import LoadingModal from '../../commons/ui/loading-modal';
 import { getUserInfo } from '../../../store/sessionStore';
 
 interface Props {
-  viewMode?: boolean;
+  openLink?: boolean;
   handleUpdateAgain?: ()=> void;
   relatedDocuments: any;
   type: string;
 }
 
-const DocumentList = ({viewMode, handleUpdateAgain, relatedDocuments, type}:Props) => {
+const DocumentList = ({openLink, handleUpdateAgain, relatedDocuments, type}:Props) => {
   const dispatch = useAppDispatch();
   const [openListDocNo, setOpenListDocNo] = useState<boolean>(false);
   const [popupMsg, setPopupMsg] = React.useState<string>('');
@@ -30,7 +30,7 @@ const DocumentList = ({viewMode, handleUpdateAgain, relatedDocuments, type}:Prop
   };
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const currentlySelected = async (item: any) => {
-    if (viewMode) return;
+    if (openLink) return;
     setOpenLoadingModal(true);
     try {
       await dispatch(getStockCountDetail(item.id));
