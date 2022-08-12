@@ -31,6 +31,7 @@ import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-
 import AuditPlan from './pages/check-stock/audit-plan';
 import StockCount from "./pages/check-stock/stock-count";
 import StockAdjustment from "./pages/check-stock/stock-adjustment";
+import AuditHistory from './pages/check-stock/audit-history';
 
 const drawerWidth = 240;
 
@@ -112,6 +113,7 @@ export default function App2() {
           <Route path='/audit-plan' component={AuditPlan} />
           <Route path='/stock-count' component={StockCount} />
           <Route path='/stock-adjustment' component={StockAdjustment} />
+          <Route path='/audit-history' component={AuditHistory} />
         </Switch>
       </Main>
     </Box>

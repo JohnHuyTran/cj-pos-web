@@ -548,6 +548,21 @@ export default function Sidebar({}: Props): ReactElement {
                 <ListItemText primary='รายละเอียดตรวจนับสต๊อก (SA)' />
               </ListItemButton>
             </Link>
+            <Link
+              to='/audit-history'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+              }}
+              id='subMenuAuditHistory'>
+              <ListItemButton
+                key='AuditHistory'
+                selected={selectedIndex === 17}
+                onClick={() => handleListItemClick(18)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รายละเอียดตรวจนับสต๊อก' />
+              </ListItemButton>
+            </Link>
           </List>
         </Collapse>
       </List>

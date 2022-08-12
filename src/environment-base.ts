@@ -462,6 +462,11 @@ export const environment = {
         url: '/stock/stock-adjust/{id}',
       },
     },
+    auditHistory:{
+      search:{
+        url: '/stock/audit-history',
+      }
+    }
   },
   master: {
     branch: {
