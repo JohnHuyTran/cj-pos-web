@@ -524,7 +524,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
-          viewMode={true}
+          viewMode={false}
         />
       )}
 
