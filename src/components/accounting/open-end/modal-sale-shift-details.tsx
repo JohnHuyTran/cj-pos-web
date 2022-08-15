@@ -562,11 +562,10 @@ const Details = (props: DetailsProps) => {
             files={attachFiles}
             docNo={'docNo'}
             docType='OE'
-            disabled={isDisabledUploadFile}
             isStatus={uploadFileFlag}
             onChangeUploadFile={(status: boolean) => setUploadFileFlag(status)}
             onDeleteAttachFile={handleDeleteFile}
-            enabledControl={true}
+            enabledControl={!isDisabledUploadFile}
           />
         </Grid>
       </Grid>
