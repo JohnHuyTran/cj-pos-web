@@ -39,7 +39,6 @@ interface Props {
   deletePermission?: boolean;
   onShowOtherType?: (fileKey: string | undefined) => void;
   reMark?: string;
-  disabled?: boolean;
 }
 
 function AccordionUploadFile({
@@ -56,7 +55,6 @@ function AccordionUploadFile({
   deletePermission,
   onShowOtherType,
   reMark,
-  disabled
 }: Props): ReactElement {
   const classes = useStyles();
 
@@ -270,7 +268,7 @@ function AccordionUploadFile({
             variant="contained"
             component="span"
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl) || disabled}
+            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
           >
             {title}
           </Button>

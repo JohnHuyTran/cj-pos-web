@@ -114,7 +114,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const [isSaveOpenLoading, setIsSaveOpenLoading] = useState(false);
   const [isSubmitOpenLoading, setIsSubmitOpenLoading] = useState(false);
   const [openModalCashDetail, setOpenModalCashDetail] = useState(false);
-  const [scrollTop, scrollProps] = useScrollTop();
+  const [scrollDown, scrollProps] = useScrollTop();
 
   // handle function
   const goTopModal = () => {
@@ -244,7 +244,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
         <Box id='Card'>
           <CardHeader
             onClose={handleClose}
-            scrollTop={scrollTop}
+            scrollDown={scrollDown}
             isLoading={isSaveOpenLoading || isSubmitOpenLoading}
             steps={['บันทึก', 'ขออนุมัติ', 'อนุมัติ']}
             actionStep={0}
@@ -447,7 +447,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                 </Grid>
               </Box>
 
-              { !!scrollTop && (
+              { scrollDown && (
                 <DialogActions sx={{
                   display: 'grid',
                   position: 'absolute',
@@ -562,11 +562,10 @@ const Details = (props: DetailsProps) => {
             files={attachFiles}
             docNo={'docNo'}
             docType='OE'
-            disabled={isDisabledUploadFile}
             isStatus={uploadFileFlag}
             onChangeUploadFile={(status: boolean) => setUploadFileFlag(status)}
             onDeleteAttachFile={handleDeleteFile}
-            enabledControl={true}
+            enabledControl={!isDisabledUploadFile}
           />
         </Grid>
       </Grid>

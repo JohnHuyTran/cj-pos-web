@@ -10,7 +10,7 @@ import Steppers from 'components/steppers'
 
 interface CardHeaderProps {
   isLoading: boolean;
-  scrollTop?: any;
+  scrollDown?: any;
   steps?: any,
   actionStep?: number,
   children: ReactNode;
@@ -22,7 +22,7 @@ export default function CardHeader (props: CardHeaderProps) {
     onClose,
     children,
     isLoading,
-    scrollTop,
+    scrollDown,
     steps,
     actionStep = 0
   } = props
@@ -30,7 +30,7 @@ export default function CardHeader (props: CardHeaderProps) {
   return (
     <Box id='CardHeader'
     sx={{ 
-        boxShadow: scrollTop > 0 ? "0 0 10px rgba(0,0,0,0.4)" : "none" ,
+        boxShadow: scrollDown ? "0 0 10px rgba(0,0,0,0.4)" : "none" ,
         position: 'sticky',
         top: 0,
         background: 'white',
