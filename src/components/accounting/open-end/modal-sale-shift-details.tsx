@@ -114,6 +114,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const [isSaveOpenLoading, setIsSaveOpenLoading] = useState(false);
   const [isSubmitOpenLoading, setIsSubmitOpenLoading] = useState(false);
   const [openModalCashDetail, setOpenModalCashDetail] = useState(false);
+  const [isAmountNull, setIsAmountNull] = useState(false);
   const [scrollDown, scrollProps] = useScrollTop();
 
   // handle function
@@ -132,7 +133,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const calculate = () => {
     // รายการเงินสดรับภายนอก (รวม) bussiness logic
     const totalExIncomeAmountCal = (
-      externalIncomeList.reduce(( total, num ) => (total.amount + num.amount))
+      externalIncomeList.reduce(( total, num ) => (total + num.amount), 0)
     )
     
     //ยอดรวมเงินสดร้านค้า bussiness logic
@@ -147,6 +148,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       number(totalCashAmountCal) + number(cashOverShortAmount) + (number(cdmAmount) - number(totalPayAmount))
     )
 
+    // Set data after calculate
     setExternalIncome({...externalIncome, totalExIncomeAmount: totalExIncomeAmountCal})
     setSummarizeCashDeposite({
       ...summarizeCashDeposite,
@@ -218,16 +220,16 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
 
   useEffect(() => {
     if (data) {
-      const externaleIncome = data.externalIncome
+      const { externalIncome, summarizeCashDeposite, cashPayment, comment } = data
       setSummarizeCashDeposite({
         ...initialFormInputState.summarizeCashDeposite,
-        ...data.summarizeCashDeposite,
-        comment: data.comment
+        ...summarizeCashDeposite,
+        comment: comment
       })
-      setExternalIncome({...initialFormInputState.externalIncome, ...data.externalIncome})
-      setCashPayment({...initialFormInputState.cashPayment, ...data.cashPayment})
-      if (externaleIncome?.items && externaleIncome?.items.length > 0) {
-        setExternalIncomeList([...initialFormInputState.externalIncomeList, ...data.externalIncome.items])
+      setExternalIncome({...initialFormInputState.externalIncome, ...externalIncome})
+      setCashPayment({...initialFormInputState.cashPayment, ...cashPayment})
+      if (externalIncome?.items && externalIncome?.items.length > 0) {
+        setExternalIncomeList([...initialFormInputState.externalIncomeList, ...externalIncome.items])
       }
     }
   }, [data])
@@ -235,6 +237,9 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   useEffect(() => {
     if(data && externalIncomeList.length > 0) {
       calculate()
+      // check amount null
+      const isAmountNull = externalIncomeList.findIndex((e: any) => e.amount === null) >= 0
+      isAmountNull ? setIsAmountNull(true) : setIsAmountNull(false)
     }
   }, [externalIncomeList])
 
@@ -266,6 +271,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='warning'
+                    disabled={isAmountNull}
                     startIcon={<Save />}
                     loading={isSaveOpenLoading}
                     loadingIndicator={
@@ -281,6 +287,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='primary'
+                    disabled={isAmountNull}
                     startIcon={<CheckCircleOutline />}
                     loading={isSubmitOpenLoading}
                     loadingIndicator={

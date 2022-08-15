@@ -5,7 +5,7 @@ import {
   Step,
   StepLabel,
 } from '@mui/material';
-import { Check } from '@mui/icons-material'
+import { CheckCircle, Brightness1 } from '@mui/icons-material'
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
 
 interface SteppersProps {
@@ -14,13 +14,13 @@ interface SteppersProps {
 }
 
 interface QontoStepIconProps {
-  active: string,
+  active: boolean,
   completed: string ,
   className: string
 }
 
 interface QontoStepIconRootProps {
-  activeState?: any
+  activeState?: boolean
 }
 
 export default function Steppers(props: SteppersProps) {
@@ -41,13 +41,12 @@ export default function Steppers(props: SteppersProps) {
 
 const QontoStepIcon = (props: QontoStepIconProps) => {
   const { active, completed, className } = props;
-
   return (
-    <QontoStepIconRoot activeState={{ active }} className={className}>
+    <QontoStepIconRoot activeState={active} className={className}>
       {completed ? (
-        <Check className="QontoStepIcon-completedIcon" />
+        <CheckCircle className="QontoStepIcon-completedIcon" />
       ) : (
-        <div className="QontoStepIcon-circle" />
+        <Brightness1 className="QontoStepIcon-circle" />
       )}
     </QontoStepIconRoot>
   );
@@ -70,29 +69,27 @@ const QontoConnector = styled(StepConnector)(({ theme }) => ({
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
-    borderColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#EAEBEB',
+    borderColor: '#EAEBEB',
     borderTopWidth: 3,
     borderRadius: 1,
   },
 }));
 
-const QontoStepIconRoot = styled('div')<QontoStepIconRootProps>(({ theme, activeState }) => ({
-  color: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#EAEBEB',
+const QontoStepIconRoot = styled('div')<QontoStepIconRootProps>(({ activeState }) => ({
   display: 'flex',
   height: 22,
   alignItems: 'center',
-  ...(activeState.active && {
-    color: '#36c690',
-  }),
   '& .QontoStepIcon-completedIcon': {
-    color: '#36c690',
     zIndex: 1,
-    fontSize: 18,
+    fontSize: 30,
+    color: '#36c690',
   },
   '& .QontoStepIcon-circle': {
-    width: 25,
-    height: 25,
-    borderRadius: '50%',
-    backgroundColor: 'currentColor',
+    zIndex: 1,
+    fontSize: 30,
+    color: activeState ? '#36c690' : '#EAEBEB',
+    // ...(activeState.active && {
+    //   color: '#36c690',
+    // })
   },
 }));
