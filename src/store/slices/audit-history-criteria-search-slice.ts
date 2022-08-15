@@ -10,6 +10,7 @@ const initialState: State = {
     perPage: '10',
     page: '1',
     docNo: '',
+    skuName:'',
     branch: '',
     status: '',
     creationDateFrom: '',

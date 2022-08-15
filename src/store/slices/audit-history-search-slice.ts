@@ -32,6 +32,9 @@ export const getAuditHistorySearch = createAsyncThunk(
       if (!stringNullOrEmpty(payload.docNo)) {
         path = path + `&docNo=${payload.docNo}`;
       }
+      if(!stringNullOrEmpty(payload.skuName)){
+        path = path + `&skuName=${payload.skuName}`
+      }
       if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
         path = path + `&branch=${payload.branch}`;
       }

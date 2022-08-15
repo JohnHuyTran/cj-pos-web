@@ -2,6 +2,7 @@ export interface AuditHistorySearchRequest {
     perPage: string;
     page: string;
     docNo: string;
+    skuName: string;
     branch: string;
     status: string;
     creationDateFrom: string;

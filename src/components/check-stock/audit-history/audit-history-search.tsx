@@ -30,6 +30,7 @@ const _ = require('lodash');
 
 interface State {
   documentNumber: string;
+  skuName: string;
   branch: string;
   status: string;
   type: string;
@@ -84,6 +85,7 @@ const AuditHistorySearch = () => {
   
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
+    skuName: '',
     branch: groupBranch ? ownBranch : 'ALL',
     status: 'ALL',
     type: 'ALL',
@@ -150,6 +152,7 @@ const AuditHistorySearch = () => {
     setFlagSearch(false);
     setValues({
       documentNumber: '',
+      skuName: '',
       branch: groupBranch ? ownBranch : 'ALL',
       status: 'ALL',
       type: 'ALL',
@@ -161,6 +164,7 @@ const AuditHistorySearch = () => {
       perPage: (limit ? limit : 10).toString(),
       page: page,
       docNo: values.documentNumber,
+      skuName: values.skuName,
       branch: values.branch,
       status: values.status,
       creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
@@ -199,6 +203,7 @@ const AuditHistorySearch = () => {
       perPage: limits,
       page: page,
       docNo: values.documentNumber.trim(),
+      skuName: values.skuName,
       branch: values.branch,
       status: values.status,
       creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
