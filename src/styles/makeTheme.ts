@@ -52,12 +52,13 @@ const useStyles = makeStyles({
       fontSize: '14px',
       '& input': {
         textAlign: 'right !important',
+        '&.Mui-disabled': {
+          backgroundColor: '#EAEBEB',
+          color: '#263238',
+          '-webkit-text-fill-color': '#263238'
+        }
       }
-    },
-    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
-      color: '#263238 !important',
-      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
-    },
+    }
   },
   MtextFieldNumberError: {
     '& .MuiOutlinedInput-root': {

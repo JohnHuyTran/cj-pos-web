@@ -666,6 +666,12 @@ export const environment = {
       search: {
         url: 'accounting/open-end',
       },
+      save: {
+        url: 'accounting/open-end',
+      },
+      submitApprove: {
+        url: 'accounting/open-end/{docNo}',
+      },
       view: {
         url: 'accounting/open-end/{docNo}',
       },

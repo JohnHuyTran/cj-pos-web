@@ -27,6 +27,7 @@ interface fileDisplayList {
 
 interface Props {
   files: FileType[];
+  title?: string;
   docNo?: string | null | undefined | '';
   docType?: string | null | undefined | '';
   isStatus: boolean;
@@ -38,10 +39,12 @@ interface Props {
   deletePermission?: boolean;
   onShowOtherType?: (fileKey: string | undefined) => void;
   reMark?: string;
+  disabled?: boolean;
 }
 
 function AccordionUploadFile({
   files,
+  title = 'แนบไฟล์',
   docNo,
   docType,
   isStatus,
@@ -53,6 +56,7 @@ function AccordionUploadFile({
   deletePermission,
   onShowOtherType,
   reMark,
+  disabled
 }: Props): ReactElement {
   const classes = useStyles();
 
@@ -266,9 +270,9 @@ function AccordionUploadFile({
             variant="contained"
             component="span"
             className={classes.MbtnBrowse}
-            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl)}
+            disabled={newFileDisplayList.length === 5 || (!stringNullOrEmpty(enabledControl) && !enabledControl) || disabled}
           >
-            แนบไฟล์
+            {title}
           </Button>
         </label>
 
