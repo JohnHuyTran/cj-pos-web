@@ -35,6 +35,7 @@ import { cancelStockCount, confirmStockCount, getSCDetail } from "../../../servi
 import ModalConfirmSC from './modal-confirm-SC';
 import { getUserInfo } from '../../../store/sessionStore';
 import { getUserGroup, isChannelBranch, isGroupAuditParam, isGroupBranchParam } from '../../../utils/role-permission';
+import LoadingModal from '../../commons/ui/loading-modal';
 
 
 interface Props {
@@ -46,6 +47,7 @@ interface Props {
   onSearchMain?: () => void;
   userPermission?: any[];
   viewMode?: boolean;
+  openLink?: boolean;
 }
 
 interface loadingModalState {
@@ -63,6 +65,7 @@ export default function ModalCreateStockCount({
   onSearchMain,
   userPermission,
   viewMode,
+  openLink,
 }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -347,7 +350,7 @@ export default function ModalCreateStockCount({
   };
   const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
   const handleOpenAP = async () => {
-    if (viewMode) return;
+    if (!openLink) return;
     handleOpenLoading('open', true);
     try {
       await dispatch(getAuditPlanDetail(dataDetail.APId));
@@ -461,7 +464,7 @@ export default function ModalCreateStockCount({
                     display:
                       (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
                       !isGroupAuditParam(_group) ||
-                      dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH ||
+                      dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH || viewMode || 
                       !groupBranch
                         ? 'none'
                         : undefined,
@@ -480,7 +483,7 @@ export default function ModalCreateStockCount({
                 style={{
                   display:
                     (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
-                    !managePermission ||
+                    !managePermission || viewMode ||
                     !groupBranch || (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) 
                     || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
                       ? 'none'
@@ -498,7 +501,7 @@ export default function ModalCreateStockCount({
                 disabled={stringNullOrEmpty(status)}
                 style={{
                   display:
-                    !managePermission ||
+                    !managePermission || viewMode ||
                     !groupBranch ||
                     (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
                     (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
@@ -529,7 +532,7 @@ export default function ModalCreateStockCount({
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
-          viewMode={true}
+          viewMode
         />
       )}
       <ModelConfirm
@@ -552,6 +555,7 @@ export default function ModalCreateStockCount({
         textError={'ไม่สามารถดำเนินการได้\nเนื่องจากเอกสาร AP ถูกยกเลิก'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 }
