@@ -103,7 +103,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       flex: 0.4,
       minWidth: 80,
       renderCell: (params) => (
-        <Box component="div" sx={{ margin: '0 auto', fontSize: textSize }}>
+        <Box component='div' sx={{ margin: '0 auto', fontSize: textSize }}>
           {params.value}
         </Box>
       ),
@@ -117,7 +117,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       minWidth: 200,
       renderCell: (params) => (
         <HtmlTooltip title={params.value ? params.value : ''}>
-          <Typography component="div" sx={{ fontSize: textSize }} noWrap>
+          <Typography component='div' sx={{ fontSize: textSize }} noWrap>
             {params.value}
           </Typography>
         </HtmlTooltip>
@@ -131,7 +131,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       flex: 0.9,
       minWidth: 180,
       renderCell: (params) => (
-        <Box component="div" sx={{ fontSize: textSize }}>
+        <Box component='div' sx={{ fontSize: textSize }}>
           {params.value}
         </Box>
       ),
@@ -144,7 +144,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       flex: 0.7,
       minWidth: 140,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '1rem', fontSize: textSize }}>
+        <Box component='div' sx={{ marginLeft: '1rem', fontSize: textSize }}>
           {params.value}
         </Box>
       ),
@@ -157,7 +157,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       flex: 0.7,
       minWidth: 140,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '1rem', fontSize: textSize }}>
+        <Box component='div' sx={{ marginLeft: '1rem', fontSize: textSize }}>
           {params.value}
         </Box>
       ),
@@ -181,7 +181,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       minWidth: 200,
       renderCell: (params) => (
         <HtmlTooltip title={params.value ? params.value : ''}>
-          <Typography component="div" sx={{ fontSize: textSize }} noWrap>
+          <Typography component='div' sx={{ fontSize: textSize }} noWrap>
             {params.value}
           </Typography>
         </HtmlTooltip>
@@ -196,7 +196,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
       minWidth: 200,
       renderCell: (params) => (
         <HtmlTooltip title={params.value ? params.value : ''}>
-          <Typography component="div" sx={{ fontSize: textSize }} noWrap>
+          <Typography component='div' sx={{ fontSize: textSize }} noWrap>
             {params.value}
           </Typography>
         </HtmlTooltip>
@@ -229,7 +229,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
     let status = params.value ? params.value.toString() : '';
     switch (status) {
       case TOStatus.DRAFT:
-        statusDisplay = genRowStatusValue('บันทีก', {
+        statusDisplay = genRowStatusValue('บันทึก', {
           color: '#FBA600',
           backgroundColor: '#FFF0CA',
         });
@@ -312,11 +312,10 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
 
   return (
     <div>
-      <Box mt={2} bgcolor="background.paper">
+      <Box mt={2} bgcolor='background.paper'>
         <div
           className={classes.MdataGridPaginationTop}
-          style={{ height: lstTransferOut.length >= 10 ? '60vh' : 'auto' }}
-        >
+          style={{ height: lstTransferOut.length >= 10 ? '60vh' : 'auto' }}>
           <DataGrid
             rows={lstTransferOut}
             columns={columns}
@@ -330,7 +329,7 @@ const TORawMasterialList: React.FC<StateProps> = (props) => {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={toSearchResponse.total}
-            paginationMode="server"
+            paginationMode='server'
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}

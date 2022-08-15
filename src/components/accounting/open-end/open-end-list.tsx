@@ -20,7 +20,7 @@ import {
 } from '../../../store/slices/accounting/open-end/open-end-search-slice';
 
 // components
-import ModalSaleShiftDetails from 'components/accounting/open-end/modal-sale-shift-details'
+import ModalSaleShiftDetails from 'components/accounting/open-end/modal-sale-shift-details';
 
 function OpenEndList() {
   const { t } = useTranslation(['openEnd', 'common']);
@@ -43,7 +43,7 @@ function OpenEndList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component="div" sx={{ paddingLeft: '20px' }}>
+        <Box component='div' sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -64,7 +64,7 @@ function OpenEndList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => {
-        return <Link color="secondary">{params.value}</Link>;
+        return <Link color='secondary'>{params.value}</Link>;
       },
     },
     {
@@ -111,7 +111,7 @@ function OpenEndList() {
               },
             }}
             fixedDecimalScale
-            type="text"
+            type='text'
           />
         );
       },
@@ -142,7 +142,7 @@ function OpenEndList() {
               },
             }}
             fixedDecimalScale
-            type="text"
+            type='text'
           />
         );
       },
@@ -173,7 +173,7 @@ function OpenEndList() {
               },
             }}
             fixedDecimalScale
-            type="text"
+            type='text'
           />
         );
       },
@@ -191,7 +191,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -199,7 +199,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -219,7 +219,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`statusByPass.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#AEAEAE', backgroundColor: '#EEEEEE' }}
             />
           );
@@ -227,7 +227,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`statusByPass.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -235,7 +235,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`statusByPass.${params.value}`)}
-              size="small"
+              size='small'
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -273,6 +273,7 @@ function OpenEndList() {
   const currentlySelected = async (params: GridCellParams) => {
     const docNo = params.row.docNo;
     await dispatch(featchOpenEndDeatilAsync(docNo));
+    setOpenModal(true);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
@@ -323,7 +324,7 @@ function OpenEndList() {
           pageSize={parseInt(pageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
           rowCount={items.total}
-          paginationMode="server"
+          paginationMode='server'
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           onCellClick={currentlySelected}
@@ -331,9 +332,7 @@ function OpenEndList() {
           rowHeight={65}
         />
       </div>
-      { openModal &&
-        <ModalSaleShiftDetails open={openModal} onClose={() => setOpenModal(false)}/>
-      }
+      {openModal && <ModalSaleShiftDetails open={openModal} onClose={() => setOpenModal(false)} />}
     </Fragment>
   );
 }
