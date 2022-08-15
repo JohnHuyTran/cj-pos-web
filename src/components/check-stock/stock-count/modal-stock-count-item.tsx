@@ -158,7 +158,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           checked={Boolean(params.value)}
           disabled={
             (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
-            !managePermission ||
+            !managePermission || viewMode ||
             (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
             (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
           }
@@ -233,7 +233,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
               }}
               disabled={
                 (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
-                !managePermission ||
+                !managePermission || viewMode ||
                 (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
                 (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
               }
