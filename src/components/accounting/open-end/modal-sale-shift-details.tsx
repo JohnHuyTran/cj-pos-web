@@ -27,6 +27,7 @@ import { useAppDispatch, useAppSelector } from 'store/store';
 import CardHeader from 'components/card-header'
 import AccordionUploadFile from 'components/commons/ui/accordion-upload-file'
 import ModalDetailCash from 'components/accounting/open-end/modal-detail-cash';
+import SnackbarStatus from 'components/commons/ui/snackbar-status';
 
 // Hooks function
 import useScrollTop from 'hooks/useScrollTop'
@@ -111,9 +112,12 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const [externalIncome, setExternalIncome] = useState(initialFormInputState.externalIncome)
   const [externalIncomeList, setExternalIncomeList] = useState<any[]>(initialFormInputState.externalIncomeList)
   const [cashPayment, setCashPayment] = useState(initialFormInputState.cashPayment)
+  const [contentMsg, setContentMsg] = useState('')
   const [isSaveOpenLoading, setIsSaveOpenLoading] = useState(false);
   const [isSubmitOpenLoading, setIsSubmitOpenLoading] = useState(false);
   const [openModalCashDetail, setOpenModalCashDetail] = useState(false);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [isStatusSanckBar, setIsStatusSanckBar] = useState(false);
   const [isAmountNull, setIsAmountNull] = useState(false);
   const [scrollDown, scrollProps] = useScrollTop();
 
@@ -187,10 +191,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     setIsSaveOpenLoading(true)
     try {
       const res = await saveOpenEnd(payload, fileUploadList);
+      setIsStatusSanckBar(true);
+      setContentMsg(res?.message);
       // handleClose();
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      setIsStatusSanckBar(false);
+      setContentMsg(error.message);
     } finally {
+      setOpenSnackBar(true);
       setIsSaveOpenLoading(false);
     }
   }
@@ -203,10 +211,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     setIsSubmitOpenLoading(true)
     try {
       const res = await submitApproveOpenEnd(data?.docNo, payload, fileUploadList);
-      handleClose();
-    } catch (err) {
-      console.log(err)
+      setIsStatusSanckBar(true);
+      setContentMsg(res?.message);
+      // handleClose();
+    } catch (error) {
+      setIsStatusSanckBar(false);
+      setContentMsg(error.message);
     } finally {
+      setOpenSnackBar(true);
       setIsSubmitOpenLoading(false);
     }
   }
@@ -271,7 +283,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='warning'
-                    disabled={isAmountNull}
+                    disabled={isAmountNull || isSubmitOpenLoading}
                     startIcon={<Save />}
                     loading={isSaveOpenLoading}
                     loadingIndicator={
@@ -287,7 +299,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='primary'
-                    disabled={isAmountNull}
+                    disabled={isAmountNull || isSaveOpenLoading}
                     startIcon={<CheckCircleOutline />}
                     loading={isSubmitOpenLoading}
                     loadingIndicator={
@@ -478,6 +490,12 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
               { openModalCashDetail && (
                 <ModalDetailCash isOpen={openModalCashDetail} onClose={() => setOpenModalCashDetail(false)}/>
               )}
+              <SnackbarStatus
+                open={openSnackBar}
+                onClose={() => setOpenSnackBar(false)}
+                isSuccess={isStatusSanckBar}
+                contentMsg={contentMsg}
+              />
             </Box>
           </DialogContent>
         </Box>
