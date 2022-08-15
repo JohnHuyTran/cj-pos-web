@@ -27,6 +27,7 @@ import { useAppDispatch, useAppSelector } from 'store/store';
 import CardHeader from 'components/card-header'
 import AccordionUploadFile from 'components/commons/ui/accordion-upload-file'
 import ModalDetailCash from 'components/accounting/open-end/modal-detail-cash';
+import SnackbarStatus from 'components/commons/ui/snackbar-status';
 
 // Hooks function
 import useScrollTop from 'hooks/useScrollTop'
@@ -111,9 +112,13 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const [externalIncome, setExternalIncome] = useState(initialFormInputState.externalIncome)
   const [externalIncomeList, setExternalIncomeList] = useState<any[]>(initialFormInputState.externalIncomeList)
   const [cashPayment, setCashPayment] = useState(initialFormInputState.cashPayment)
+  const [contentMsg, setContentMsg] = useState('')
   const [isSaveOpenLoading, setIsSaveOpenLoading] = useState(false);
   const [isSubmitOpenLoading, setIsSubmitOpenLoading] = useState(false);
   const [openModalCashDetail, setOpenModalCashDetail] = useState(false);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [isStatusSanckBar, setIsStatusSanckBar] = useState(false);
+  const [isAmountNull, setIsAmountNull] = useState(false);
   const [scrollDown, scrollProps] = useScrollTop();
 
   // handle function
@@ -132,7 +137,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const calculate = () => {
     // รายการเงินสดรับภายนอก (รวม) bussiness logic
     const totalExIncomeAmountCal = (
-      externalIncomeList.reduce(( total, num ) => (total.amount + num.amount))
+      externalIncomeList.reduce(( total, num ) => (total + num.amount), 0)
     )
     
     //ยอดรวมเงินสดร้านค้า bussiness logic
@@ -147,6 +152,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       number(totalCashAmountCal) + number(cashOverShortAmount) + (number(cdmAmount) - number(totalPayAmount))
     )
 
+    // Set data after calculate
     setExternalIncome({...externalIncome, totalExIncomeAmount: totalExIncomeAmountCal})
     setSummarizeCashDeposite({
       ...summarizeCashDeposite,
@@ -185,10 +191,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     setIsSaveOpenLoading(true)
     try {
       const res = await saveOpenEnd(payload, fileUploadList);
+      setIsStatusSanckBar(true);
+      setContentMsg(res?.message);
       // handleClose();
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      setIsStatusSanckBar(false);
+      setContentMsg(error.message);
     } finally {
+      setOpenSnackBar(true);
       setIsSaveOpenLoading(false);
     }
   }
@@ -201,10 +211,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     setIsSubmitOpenLoading(true)
     try {
       const res = await submitApproveOpenEnd(data?.docNo, payload, fileUploadList);
-      handleClose();
-    } catch (err) {
-      console.log(err)
+      setIsStatusSanckBar(true);
+      setContentMsg(res?.message);
+      // handleClose();
+    } catch (error) {
+      setIsStatusSanckBar(false);
+      setContentMsg(error.message);
     } finally {
+      setOpenSnackBar(true);
       setIsSubmitOpenLoading(false);
     }
   }
@@ -218,16 +232,16 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
 
   useEffect(() => {
     if (data) {
-      const externaleIncome = data.externalIncome
+      const { externalIncome, summarizeCashDeposite, cashPayment, comment } = data
       setSummarizeCashDeposite({
         ...initialFormInputState.summarizeCashDeposite,
-        ...data.summarizeCashDeposite,
-        comment: data.comment
+        ...summarizeCashDeposite,
+        comment: comment
       })
-      setExternalIncome({...initialFormInputState.externalIncome, ...data.externalIncome})
-      setCashPayment({...initialFormInputState.cashPayment, ...data.cashPayment})
-      if (externaleIncome?.items && externaleIncome?.items.length > 0) {
-        setExternalIncomeList([...initialFormInputState.externalIncomeList, ...data.externalIncome.items])
+      setExternalIncome({...initialFormInputState.externalIncome, ...externalIncome})
+      setCashPayment({...initialFormInputState.cashPayment, ...cashPayment})
+      if (externalIncome?.items && externalIncome?.items.length > 0) {
+        setExternalIncomeList([...initialFormInputState.externalIncomeList, ...externalIncome.items])
       }
     }
   }, [data])
@@ -235,6 +249,9 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   useEffect(() => {
     if(data && externalIncomeList.length > 0) {
       calculate()
+      // check amount null
+      const isAmountNull = externalIncomeList.findIndex((e: any) => e.amount === null) >= 0
+      isAmountNull ? setIsAmountNull(true) : setIsAmountNull(false)
     }
   }, [externalIncomeList])
 
@@ -266,6 +283,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='warning'
+                    disabled={isAmountNull || isSubmitOpenLoading}
                     startIcon={<Save />}
                     loading={isSaveOpenLoading}
                     loadingIndicator={
@@ -281,6 +299,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                     id='btnSave'
                     variant='contained'
                     color='primary'
+                    disabled={isAmountNull || isSaveOpenLoading}
                     startIcon={<CheckCircleOutline />}
                     loading={isSubmitOpenLoading}
                     loadingIndicator={
@@ -471,6 +490,12 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
               { openModalCashDetail && (
                 <ModalDetailCash isOpen={openModalCashDetail} onClose={() => setOpenModalCashDetail(false)}/>
               )}
+              <SnackbarStatus
+                open={openSnackBar}
+                onClose={() => setOpenSnackBar(false)}
+                isSuccess={isStatusSanckBar}
+                contentMsg={contentMsg}
+              />
             </Box>
           </DialogContent>
         </Box>

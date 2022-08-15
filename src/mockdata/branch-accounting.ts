@@ -374,6 +374,12 @@ const viewOpenEndRs = {
         {
           code: '02',
           name: 'บุญเติม',
+          amount: null,
+          noItem: false,
+        },
+        {
+          code: '01',
+          name: 'AJ เติมสบาย',
           amount: 0,
           noItem: true,
         },
