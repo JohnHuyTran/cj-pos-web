@@ -4,7 +4,11 @@ import { Store, AnyAction } from '@reduxjs/toolkit';
 import { ThemeProvider } from '@mui/material';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
-import { mockDataStockMovement, mockDataStockMovementMoreThen10 } from '../../../mockdata-store/mock-store-stock';
+import {
+  mockDataStockMovement,
+  mockDataStockMovementBAO,
+  mockDataStockMovementMoreThen10,
+} from '../../../mockdata-store/mock-store-stock';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import StockMovementSearchList from '../../../../components/stock/stock-movement/stock-movement-search-list';
@@ -81,111 +85,128 @@ describe('component stock-movement-search-list', () => {
     });
   });
 
-  // it('show transaction detail in LD', async () => {
-  //   store = mockStore(mockDataStockMovementMoreThen10);
-  //   const container = render(
-  //     <Provider store={store}>
-  //       <ThemeProvider theme={theme}>
-  //         <StockMovementSearchList />
-  //       </ThemeProvider>
-  //     </Provider>
-  //   );
+  it('show transaction detail in LD', async () => {
+    store = mockStore(mockDataStockMovementMoreThen10);
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockMovementSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
 
-  //   const row = container.getByText('LD20220530000003');
-  //   row.focus();
-  //   act(() => {
-  //     fireEvent.keyDown(row, { key: 'Enter' });
-  //     fireEvent.click(row);
-  //   });
-  // });
+    const row = container.getByText('LD20220530000003');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+  });
 
-  // it('show transaction detail in PN', async () => {
-  //   store = mockStore(mockDataStockMovementMoreThen10);
-  //   const container = render(
-  //     <Provider store={store}>
-  //       <ThemeProvider theme={theme}>
-  //         <StockMovementSearchList />
-  //       </ThemeProvider>
-  //     </Provider>
-  //   );
+  it('show transaction detail in PN', async () => {
+    store = mockStore(mockDataStockMovementMoreThen10);
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockMovementSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
 
-  //   const row = container.getByText('LD20220530000005');
-  //   row.focus();
-  //   act(() => {
-  //     fireEvent.keyDown(row, { key: 'Enter' });
-  //     fireEvent.click(row);
-  //   });
-  // });
+    const row = container.getByText('LD20220530000005');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+  });
 
-  // it('show transaction detail in PO', async () => {
-  //   store = mockStore(mockDataStockMovementMoreThen10);
-  //   const container = render(
-  //     <Provider store={store}>
-  //       <ThemeProvider theme={theme}>
-  //         <StockMovementSearchList />
-  //       </ThemeProvider>
-  //     </Provider>
-  //   );
+  it('show transaction detail in PO', async () => {
+    store = mockStore(mockDataStockMovementMoreThen10);
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockMovementSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
 
-  //   const row = container.getByText('LD20220530000006');
-  //   row.focus();
-  //   act(() => {
-  //     fireEvent.keyDown(row, { key: 'Enter' });
-  //     fireEvent.click(row);
-  //   });
-  // });
+    const row = container.getByText('LD20220530000006');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+  });
 
-  // it('show transaction detail in ADJ_TRNS_IN_LD', async () => {
-  //   store = mockStore(mockDataStockMovementMoreThen10);
-  //   const container = render(
-  //     <Provider store={store}>
-  //       <ThemeProvider theme={theme}>
-  //         <StockMovementSearchList />
-  //       </ThemeProvider>
-  //     </Provider>
-  //   );
+  it('show transaction detail in ADJ_TRNS_IN_LD', async () => {
+    store = mockStore(mockDataStockMovementBAO);
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockMovementSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
 
-  //   const row = container.getByText('LD20220530000007');
-  //   row.focus();
-  //   act(() => {
-  //     fireEvent.keyDown(row, { key: 'Enter' });
-  //     fireEvent.click(row);
-  //   });
-  // });
+    const row = container.getByText('LD22060101-000014');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+  });
 
-  // it('show transaction detail in TRANSFER_OUT', async () => {
-  //   store = mockStore(mockDataStockMovementMoreThen10);
-  //   const container = render(
-  //     <Provider store={store}>
-  //       <ThemeProvider theme={theme}>
-  //         <StockMovementSearchList />
-  //       </ThemeProvider>
-  //     </Provider>
-  //   );
+  it('show transaction detail in TRANSFER_OUT', async () => {
+    store = mockStore(mockDataStockMovementMoreThen10);
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockMovementSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
 
-  //   const row = container.getByText('LD20220609001001');
-  //   row.focus();
-  //   act(() => {
-  //     fireEvent.keyDown(row, { key: 'Enter' });
-  //     fireEvent.click(row);
-  //   });
-  // });
+    const row = container.getByText('LD20220609001001');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+  });
 
-  // it('show transaction detail in ADJ_TRNS_IN_SRC_BT', async () => {
-  //   store = mockStore(mockDataStockMovementMoreThen10);
-  //   const container = render(
-  //     <Provider store={store}>
-  //       <ThemeProvider theme={theme}>
-  //         <StockMovementSearchList />
-  //       </ThemeProvider>
-  //     </Provider>
-  //   );
+  it('show transaction detail in ADJ_TRNS_IN_SRC_BT', async () => {
+    store = mockStore(mockDataStockMovementMoreThen10);
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockMovementSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
 
-  //   const row = container.getByText('LD20220530000009');
-  //   row.focus();
-  //   act(() => {
-  //     fireEvent.keyDown(row, { key: 'Enter' });
-  //     fireEvent.click(row);
-  //   });
-  // });
+    const row = container.getByText('LD20220530000009');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+  });
+  it('show transaction detail in TRANSFER_OUT_BAO', async () => {
+    store = mockStore(mockDataStockMovementBAO);
+    const container = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <StockMovementSearchList />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    const row = container.getByText('BT22060101-000014');
+    row.focus();
+    act(() => {
+      fireEvent.keyDown(row, { key: 'Enter' });
+      fireEvent.click(row);
+    });
+  });
 });
