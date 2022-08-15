@@ -1,7 +1,13 @@
 import { useState } from 'react';
 
 export default function useScrollTop () {
-  const [scrollTop, setScrollTop] = useState(0);
-  const onScroll = (event: any) => setScrollTop(event.target.scrollTop);
-  return [scrollTop, { onScroll }];
+  const [scrollDown, setScrollDown] = useState<boolean>();
+  const onScroll = (event: any) => {
+    if (event.target.scrollTop > 0) {
+      setScrollDown(true)
+    } else {
+      setScrollDown(false)
+    }
+  }
+  return [scrollDown, { onScroll }];
 }
