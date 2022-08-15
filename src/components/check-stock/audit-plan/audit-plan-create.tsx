@@ -58,6 +58,7 @@ interface Props {
   userPermission?: any[];
   viewMode?: boolean;
   isRedirect?: boolean;
+  openLink?: boolean;
 }
 
 interface Values {
@@ -82,6 +83,7 @@ export default function ModalCreateAuditPlan({
   onReSearchMain,
   action,
   viewMode,
+  openLink,
 }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -621,7 +623,7 @@ export default function ModalCreateAuditPlan({
                     เอกสาร SC :
                   </Grid>
                   <Grid item xs={8}>
-                    <DocumentList viewMode={viewMode} handleUpdateAgain={handleUpdateAgainDetailAP} relatedDocuments={dataDetail.relatedScDocuments} type={'SC'}/>
+                    <DocumentList openLink={openLink} handleUpdateAgain={handleUpdateAgainDetailAP} relatedDocuments={dataDetail.relatedScDocuments} type={'SC'}/>
                   </Grid>
                 </>
               )}

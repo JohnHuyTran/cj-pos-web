@@ -94,13 +94,27 @@ export default function ModalCreateStockCount({
     setOpenModalCancel(false);
   };
 
-  const handleOpenModalConfirm = () => {
-    if (!validate()) {
-      setOpenModalError(true);
-      setAlertTextError('กรุณาระบุจำนวนนับ');
-      return;
-    } else {
-      setOpenModalConfirmConfirm(true);
+  const handleOpenModalConfirm = async () => {
+    try {
+      const resuilt = await getSCDetail(dataDetail.id);
+      if (resuilt) {
+        if (!validate()) {
+          setOpenModalError(true);
+          setAlertTextError('กรุณาระบุจำนวนนับ');
+          return;
+        } else {
+          setOpenModalConfirmConfirm(true);
+        }
+      } else {
+        setOpenModalErrorExit(true);
+      }
+    } catch (error) {
+      const er: any = error;
+      if (er.code == 50000) {
+        setOpenModalErrorExit(true);
+      } else {
+        setOpenModalError(true);
+      }
     }
   };
 

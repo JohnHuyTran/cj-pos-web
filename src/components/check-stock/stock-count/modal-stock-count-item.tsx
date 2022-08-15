@@ -117,14 +117,30 @@ export const ModalStockCountItem = (props: DataGridProps) => {
   };
 
   const onCheckCell =  (event: any, index: number,  skuCode: string) => {
+    let listIndex: number[] = [];
     setDtTable((preData: Array<StockCountDetail>) => {
       const data = [...preData];
-      let newList = data.map((item:any) => {
+      let newList = data.map((item:any, index:number) => {
+        if (item.skuCode == skuCode){
+          listIndex.push(index)
+        }
         return {
           ...item,
           checked: item.skuCode == skuCode ? !item.checked : item.checked
         }
-      })
+      }) 
+      dispatch(
+        updateErrorList(
+          errorList.map((item: any, idx: number) => {
+            return listIndex.includes(idx)
+              ? {
+                ...item,
+                errorQuantity: '',
+              }
+              : item;
+          })
+        )
+      );
       return newList;
     });
   };
