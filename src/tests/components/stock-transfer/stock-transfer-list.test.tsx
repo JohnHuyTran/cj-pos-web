@@ -63,9 +63,9 @@ describe('component stock-transfer-bt search', () => {
     fireEvent.click(row);
     await new Promise((r) => setTimeout(r, 1000));
     expect(renderer.getByText('ตรวจสอบรายการใบโอน')).toBeInTheDocument();
-    await new Promise((r) => setTimeout(r, 1000));
+    // await new Promise((r) => setTimeout(r, 1000));
     await fireEvent.click(renderer.getByTestId('testid-title-btnClose'));
-    await new Promise((r) => setTimeout(r, 1000));
+    // await new Promise((r) => setTimeout(r, 1000));
     expect(renderer.queryByText('ตรวจสอบรายการใบโอน')).toBeNull;
   });
 });
