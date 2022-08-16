@@ -108,8 +108,12 @@ export function isOwnBranch(branch: any): boolean {
   return env.branch.code === branch;
 }
 
-export const formatNumber = (value: any, decimalPoint: number = 0) => {
-  return ''+((+value).toFixed(decimalPoint)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export const formatNumber = (value: any, decimalPoint: number = 0, type: string = 'string') => {
+  if (type === 'string') {
+    return ''+((+value).toFixed(decimalPoint)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  } else if (type === 'number') {
+    return (+(''+value).replaceAll(',', ''))
+  }
 }
 
 // export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {

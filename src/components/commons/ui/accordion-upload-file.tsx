@@ -162,7 +162,8 @@ function AccordionUploadFile({
             }
           })
           .catch((error: ApiError) => {
-            console.log('error', error);
+            setErrorBrowseFile(true);
+            setMsgErrorBrowseFile(error.message)
           });
       }
     }
