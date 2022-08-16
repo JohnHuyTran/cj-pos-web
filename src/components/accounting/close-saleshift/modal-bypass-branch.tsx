@@ -30,9 +30,10 @@ function ModalByPassByBranch({ open, onClose }: Props) {
   const [showSnackBar, setShowSnackBar] = React.useState(false);
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
-
+  const [isDisableBypass, setIsDisableBypass] = React.useState(true);
   const onChange = (e: any) => {
     setQrcode(e.target.value);
+    setIsDisableBypass(false);
     setIsError(false);
     setErrorMessage('');
   };
@@ -40,7 +41,7 @@ function ModalByPassByBranch({ open, onClose }: Props) {
   const onSubmit = async () => {
     handleOpenLoading('open', true);
     if (stringNullOrEmpty(qrcode)) {
-      setErrorMessage('กรุณาสแกน QR Code');
+      setErrorMessage('ข้อมูล Bypass ไม่ถูกต้อง');
       setIsError(true);
     } else {
       const payload: any = {
@@ -71,6 +72,7 @@ function ModalByPassByBranch({ open, onClose }: Props) {
     setQrcode('');
     setIsError(false);
     setErrorMessage('');
+    setIsDisableBypass(true);
   }, [open]);
   return (
     <>
@@ -98,7 +100,7 @@ function ModalByPassByBranch({ open, onClose }: Props) {
               autoFocus={true}
               autoComplete='off'
               //   disabled={true}
-              onKeyPress={(e) => {}}
+              //   inputProps={{ readOnly: true }}
             />
             {errorMessage && (
               <Typography variant='body2' component='div' color='error' sx={{ textAlign: 'center' }}>
@@ -115,8 +117,9 @@ function ModalByPassByBranch({ open, onClose }: Props) {
             color='primary'
             onClick={onSubmit}
             sx={{ width: 110, ml: 2 }}
-            className={classes.MbtnSearch}>
-            ตกลง
+            className={classes.MbtnSearch}
+            disabled={isDisableBypass}>
+            บันทึกรหัส
           </Button>
         </DialogActions>
       </Dialog>
