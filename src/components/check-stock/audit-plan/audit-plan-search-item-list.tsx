@@ -68,6 +68,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           documentNumberAP: data.documentNumber,
           status: data.status,
           creationDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
+          countingDate: convertUtcToBkkDate(data.countingDate, DateFormat.DATE_FORMAT),
           product: data.product,
           createrName: data.createdBy,
           branch: `${data.branchCode}-${data.branchName}`,
@@ -141,7 +142,14 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       headerName: 'วันที่สร้างรายการ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
+    },
+    {
+      field: 'countingDate',
+      headerName: 'กำหนดตรวจนับ',
+      headerAlign: 'center',
+      sortable: false,
+      minWidth: 160,
     },
     {
       field: 'branch',
@@ -155,7 +163,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       headerName: 'ผู้สร้างรายการ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 180,
+      minWidth: 160,
     },
   ];
   const genRowStatus = (params: GridValueGetterParams) => {
@@ -271,6 +279,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           onSearchMain={props.onSearch}
+          openLink={true}
         />
       )}
 

@@ -16,9 +16,10 @@ interface Props {
   handleUpdateAgain?: ()=> void;
   relatedDocuments: any;
   type: string;
+  viewMode?: boolean;
 }
 
-const DocumentList = ({openLink, handleUpdateAgain, relatedDocuments, type}:Props) => {
+const DocumentList = ({openLink, handleUpdateAgain, relatedDocuments, type, viewMode}:Props) => {
   const dispatch = useAppDispatch();
   const [openListDocNo, setOpenListDocNo] = useState<boolean>(false);
   const [popupMsg, setPopupMsg] = React.useState<string>('');
@@ -30,7 +31,7 @@ const DocumentList = ({openLink, handleUpdateAgain, relatedDocuments, type}:Prop
   };
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
   const currentlySelected = async (item: any) => {
-    if (openLink) return;
+    if (!openLink) return;
     setOpenLoadingModal(true);
     try {
       await dispatch(getStockCountDetail(item.id));
@@ -105,7 +106,7 @@ const DocumentList = ({openLink, handleUpdateAgain, relatedDocuments, type}:Prop
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
-          viewMode={true}
+          viewMode={viewMode}
           userPermission={getUserInfo().acl['service.posback-stock'] != null && getUserInfo().acl['service.posback-stock'].length > 0
           ? getUserInfo().acl['service.posback-stock']
           : []}

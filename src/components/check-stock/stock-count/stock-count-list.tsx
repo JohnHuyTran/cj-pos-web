@@ -16,6 +16,7 @@ import { StockCount, StockCountSearchRequest, StockCountSearchResponse } from ".
 import { getStockCountDetail } from "../../../store/slices/stock-count-detail-slice";
 import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
 import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
+import LoadingModal from '../../commons/ui/loading-modal';
 
 const _ = require('lodash');
 
@@ -335,9 +336,11 @@ const StockCountList: React.FC<StateProps> = (props) => {
           setOpenPopup={setOpenPopup}
           onSearchMain={onSearchAgain}
           userPermission={userPermission}
+          openLink
         />
       )}
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 };
