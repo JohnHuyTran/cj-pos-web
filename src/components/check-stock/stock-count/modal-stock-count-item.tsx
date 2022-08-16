@@ -126,7 +126,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
         }
         return {
           ...item,
-          checked: item.skuCode == skuCode ? !item.checked : item.checked
+          checked: item.skuCode == skuCode ? !item.checked : item.checked,
+          quantity: !item.checked ? null : item.quantity
         }
       }) 
       dispatch(
@@ -235,7 +236,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
                 (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
                 !managePermission || viewMode ||
                 (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
-                (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+                (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT) ||
+                !!params.getValue(params.id, 'checked')
               }
             />
             {/* {condition && <div className="title">{errorList[index]?.errorQuantity}</div>} */}
