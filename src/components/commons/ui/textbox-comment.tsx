@@ -4,12 +4,12 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
 interface Props {
-  fieldName: any;
+  fieldName?: any;
   defaultValue: string;
   maxLength: number;
   maxWidth?: string | number;
   onChangeComment: (value: string) => void;
-  isDisable: boolean;
+  isDisable?: boolean;
   rowDisplay?: number;
   hypterText?: string;
   isError?: boolean;
