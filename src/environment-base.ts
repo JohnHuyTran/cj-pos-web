@@ -641,6 +641,9 @@ export const environment = {
       checkInfo: {
         url: 'sale/shift-closes/check-info',
       },
+      byPassByBranch: {
+        url: 'sale/shift-closes/bypass',
+      },
     },
     cashStatement: {
       search: {
