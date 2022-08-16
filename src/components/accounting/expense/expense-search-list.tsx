@@ -35,6 +35,7 @@ import { saveExpenseSearch } from '../../../store/slices/accounting/save-account
 import { getUserInfo, setInit } from '../../../store/sessionStore';
 import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
 import NumberFormat from 'react-number-format';
+import HtmlTooltip from 'components/commons/ui/html-tooltip';
 
 interface loadingModalState {
   open: boolean;
@@ -52,7 +53,7 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: '20px' }}>
         {params.value}
       </Box>
     ),
@@ -66,7 +67,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
+        <Typography variant="body2" sx={{ lineHeight: '120%' }}>
           {params.value}-{params.getValue(params.id, 'branchName') || ''}
         </Typography>
       </div>
@@ -117,15 +118,15 @@ const columns: GridColDef[] = [
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size='small'
+            size="small"
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
-      } else if (params.value === 'APPROVED') {
+      } else if (params.value === 'APPROVED' || params.value === 'CLOSED' || params.value === 'SAP_ERROR') {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
-            size='small'
+            size="small"
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
           />
         );
@@ -160,7 +161,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
@@ -193,7 +194,7 @@ const columns: GridColDef[] = [
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
@@ -237,6 +238,25 @@ const columns: GridColDef[] = [
       } else {
         return '';
       }
+    },
+  },
+  {
+    field: 'errorMsgSap',
+    headerName: 'หมายเหตุ',
+    minWidth: 160,
+    headerAlign: 'center',
+    align: 'center',
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => {
+      return (
+        <>
+          <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
+            <Typography variant="body2" sx={{ lineHeight: '120%', whiteSpace: 'nowrap' }} noWrap>
+              {params.value}
+            </Typography>
+          </HtmlTooltip>
+        </>
+      );
     },
   },
 ];
@@ -297,7 +317,7 @@ var calDiff = function (params: GridValueGetterParams) {
         }}
         prefix={diff > 0 ? '+' : ''}
         fixedDecimalScale
-        type='text'
+        type="text"
       />
     );
   }
@@ -337,6 +357,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
       sumApprovalAmount: data.sumApprovalAmount,
       expenseDate: convertUtcToBkkDate(data.expenseDate),
       approvedDate: convertUtcToBkkDate(data.approvedDate),
+      errorMsgSap: data.errorMsgSap,
     };
   });
 
@@ -438,7 +459,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
+      <Box mt={2} bgcolor="background.paper">
         <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
           <DataGrid
             rows={rows}
@@ -451,7 +472,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
