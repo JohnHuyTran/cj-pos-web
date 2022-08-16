@@ -43,7 +43,7 @@ import useScrollTop from 'hooks/useScrollTop'
 
 // API call
 import { saveOpenEnd, submitApproveOpenEnd } from 'services/accounting';
-// import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice'
+import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice'
 
 interface ModalSaleShiftDetailsProps {
   open: boolean;
@@ -87,6 +87,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   // Set valiable
   const dispatch = useAppDispatch();
   const viewOpenEndResponse = useAppSelector((state) => state.viewOpenEndSlice.viewOpenEnd);
+  const { payloadOpenEndSearch, openEndSearchList } = useAppSelector((state) => state.searchOpenEndSlice);
   const data: any = viewOpenEndResponse.data || null;
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const initialDetailsState = {
@@ -221,8 +222,8 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       const res = await saveOpenEnd(payload, fileUploadList);
       setContentMsg('บันทึกข้อมูล เรียบร้อยแล้ว');
       setIsStatusSanckBar(true);
-      setStepStatus(1)
-      // handleClose();
+      setStepStatus(1);
+      updateOpenEndData();
     } catch (error) {
       setContentMsg(error.message);
       setIsStatusSanckBar(false);
@@ -236,21 +237,22 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     // ขออนุมัติ
     const isUploadSettlements = (settlementFiles.length <= 0  && fileUploadList.length <= 0)
     if (isUploadSettlements) {
-      setTextError('กรุณาแนบเอกสาร Settlement')
-      setIsOpenAlert(true)
+      setTextError('กรุณาแนบเอกสาร Settlement');
+      setIsOpenAlert(true);
     } else {
       if (isConfirm) {
-        setIsOpenModalConfirmApproval(false)
+        setIsOpenModalConfirmApproval(false);
         const payload = {
           settlementFiles: settlementFiles,
           items: externalIncomeList
         }
-        setIsSubmitOpenLoading(true)
+        setIsSubmitOpenLoading(true);
         try {
           const res = await submitApproveOpenEnd(data?.docNo, payload, fileUploadList);
           setContentMsg('ขออนุมัติ เรียบร้อยแล้ว');
           setIsStatusSanckBar(true);
-          setStepStatus(2)
+          setStepStatus(2);
+          updateOpenEndData();
           handleClose();
         } catch (error) {
           setContentMsg(error.message);
@@ -260,7 +262,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
           setIsSubmitOpenLoading(false);
         }
       } else {
-        setIsOpenModalConfirmApproval(true)
+        setIsOpenModalConfirmApproval(true);
       }
     }
   }
@@ -275,18 +277,18 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
         setTimeout(() => {
           setContentMsg('ยืนยันการอนุมัติสำเร็จ');
           setIsStatusSanckBar(true);
-          setStepStatus(3)
-          setIsApprovedOpenLoading(false);
+          setStepStatus(3);
+          updateOpenEndData();
         }, 1000)
       } catch (error) {
         setContentMsg(error.message);
         setIsStatusSanckBar(false);
       } finally {
         setOpenSnackBar(true);
-        setIsSubmitOpenLoading(false);
+        setIsApprovedOpenLoading(false);
       }
     } else {
-      setIsOpenModalConfirmApproved(true)
+      setIsOpenModalConfirmApproved(true);
     }
   }
   
@@ -300,6 +302,18 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     setCashPayment(initialFormInputState.cashPayment)
     setSettlementFiles(initialFormInputState.settlementFiles)
     onClose()
+  }
+
+  const updateOpenEndData = async () => {
+    const searchOpenEndPayload = {
+      branchCode: payloadOpenEndSearch.branchCode,
+      status: payloadOpenEndSearch.status,
+      dateFrom: payloadOpenEndSearch.dateFrom,
+      dateTo: payloadOpenEndSearch.dateTo,
+      limit: ''+openEndSearchList.perPage,
+      page: '1',
+    }
+    await dispatch(featchSearchOpenEndAsync(searchOpenEndPayload));
   }
 
   useEffect(() => {
