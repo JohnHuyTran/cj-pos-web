@@ -29,6 +29,7 @@ import { ApiError } from '../../../models/api-error-model';
 import { ACTIONS } from 'utils/enum/permission-enum';
 import ModalDetailCash from '../open-end/modal-detail-cash';
 import { featchOpenEndDeatilAsync } from 'store/slices/accounting/open-end/open-end-slice';
+import ModalByPassByBranch from './modal-bypass-branch';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
@@ -84,6 +85,7 @@ function CloseSaleShiftSearch() {
   const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState('');
   const [disableBtnSearch, setDisableBtnSearch] = React.useState(true);
   const [disableBtnManage, setDisableBtnManage] = React.useState(true);
+  const [modalBypass, setModalByPass] = React.useState(false);
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -177,7 +179,9 @@ function CloseSaleShiftSearch() {
 
     handleOpenLoading('open', false);
   };
-  const handleOnBypass = () => {};
+  const handleOnBypass = () => {
+    setModalByPass(true);
+  };
   const handleOnupdate = async () => {};
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -273,7 +277,6 @@ function CloseSaleShiftSearch() {
               onClick={handleOnBypass}
               sx={{ ml: 2, minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnSearch}
-              disabled={true}
               startIcon={<ArrowBackIcon />}>
               Bypass
             </Button>
@@ -329,6 +332,12 @@ function CloseSaleShiftSearch() {
         open={openModalCloseSale}
         onClose={() => setOpenModalCloseSale(false)}
         noOfShiftKey={noOfShiftKey}
+      />
+      <ModalByPassByBranch
+        open={modalBypass}
+        onClose={() => {
+          setModalByPass(false);
+        }}
       />
     </>
   );
