@@ -340,6 +340,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
       setVat(purchaseDetail.amountText.vat);
       setVatRate(purchaseDetail.amountText.vatRate);
       setGrandTotalAmount(purchaseDetail.amountText.grandTotalAmount);
+      setRoundAmount(purchaseDetail.amountText.roundAmount);
     }
   }, [open, fileUploadList]);
 

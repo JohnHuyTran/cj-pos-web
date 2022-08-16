@@ -15,7 +15,7 @@ import {
   removeUserInfo,
 } from '../store/sessionStore';
 import { getDecodedAccessToken, objectNullOrEmpty, stringNullOrEmpty } from '../utils/utils';
-import { getUserGroup, isChannelBranch, isGroupBranch, isGroupBranchParam } from '../utils/role-permission';
+import { getUserGroup, isChannelBranch, isGroupAuditParam, isGroupBranch, isGroupBranchParam } from '../utils/role-permission';
 import { getErrorMessage, getErrorMessageHttp, POSException } from '../utils/exception/pos-exception';
 import { ERROR_CODE } from '../utils/enum/common-enum';
 
@@ -43,15 +43,14 @@ export function authentication(payload: loginForm): Promise<Response> {
         setAccessToken(response.data.access_token);
         setRefreshToken(response.data.refresh_token);
         setSessionId(response.data.session_state);
-        let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');
+        let userInfo = getDecodedAccessToken(response.data.access_token ? response.data.access_token : '');      
         const _group = getUserGroup(userInfo.groups);
-
         if (stringNullOrEmpty(_group)) {
           const err = new POSException(401, ERROR_CODE.NOT_AUTHORIZE, 'ผู้ใช้งานไม่สิทธิ์');
           throw err;
         }
 
-        if (isChannelBranch() && !isGroupBranchParam(_group)) {
+        if (isChannelBranch() && !isGroupBranchParam(_group) && !isGroupAuditParam(_group)) {
           const err = new POSException(401, 'invalid_channel_hq', 'กรุณาใช้งาน channel Head Quarter', {
             userLogin: payload.userId,
           });

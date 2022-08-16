@@ -44,12 +44,12 @@ import {
 import { updateCheckStock } from "../../store/slices/stock-balance-check-slice";
 import { checkStockBalance } from "../../services/common";
 import AttachFileAfter from "./attach-file-after";
-import StepperBarToDestroyDiscount from "./stepper-bar-to-destroy-discount";
 import ModalAddProductToDestroyDiscount from "./modal-add-product-to-destroy-discount";
 import { uploadFileAfterState } from "../../store/slices/to-destroy-discount-attach-after-slice";
 import ModalToDestroyDiscountItem from "./modal-to-destroy-discount-item";
 import { updateAddDestroyProductState } from "../../store/slices/add-to-destroy-product-slice";
 import StepperBar from "./stepper-bar";
+import ModalShowBeforeAfterFile from "../commons/ui/modal-show-before-after-file";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -113,6 +113,10 @@ export default function ModalCreateToDestroyDiscount({
   const [currentBranch, setCurrentBranch] = React.useState((branchList && branchList.length > 0 && getUserInfo().branch)
     ? (getUserInfo().branch + ' - ' + getBranchName(branchList, getUserInfo().branch)) : '');
   const [branchCodeCheckStock, setBranchCodeCheckStock] = React.useState(getUserInfo().branch ? getUserInfo().branch : '');
+  const [openShowFile, setOpenShowFile] = React.useState<boolean>(false);
+  const [lstAttachFileBeforeShow, setLstAttachFileBeforeShow] = React.useState<any>([]);
+  const [lstAttachFileAfterShow, setLstAttachFileAfterShow] = React.useState<any>([]);
+  const [currentFileOpenKey, setCurrentFileOpenKey] = React.useState<any>('');
 
   const handleOpenAddItems = () => {
     setOpenModelAddItems(true);
@@ -311,7 +315,7 @@ export default function ModalCreateToDestroyDiscount({
             item.errorNumberOfRequested = 'ระบุจำนวนการทำลายที่แท้จริง';
           } else if (preData.numberOfRequested > preData.numberOfDiscounted) {
             isValid = false;
-            item.errorNumberOfRequested = 'จำนวนทำลายจริงต้องไม่น้อยกว่าจำนวนขอส่วนลด';
+            item.errorNumberOfRequested = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
           }
         }
         if (!isValid) {
@@ -684,12 +688,20 @@ export default function ModalCreateToDestroyDiscount({
     return (dataDetail && moment(dataDetail.createdDate).isBefore(moment(new Date), 'day'));
   };
 
+  const onShowBeforeAfterFile = (fileKey: string | undefined) => {
+    let allBeforeFile: any[] = _.cloneDeep(attachFileBeforeOlds);
+    let allAfterFile: any[] = _.cloneDeep(attachFileAfterOlds);
+    setLstAttachFileBeforeShow(allBeforeFile);
+    setLstAttachFileAfterShow(allAfterFile);
+    setCurrentFileOpenKey(fileKey);
+    setOpenShowFile(true);
+  }
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCloseModalCreate}>
           <Typography sx={{ fontSize: '1em' }}>รายละเอียดเอกสารทำลาย (ส่วนลด)</Typography>
-          {/*<StepperBarToDestroyDiscount activeStep={status} setActiveStep={setStatus}/>*/}
           <StepperBar activeStep={status} setActiveStep={setStatus}/>
         </BootstrapDialogTitle>
         <DialogContent>
@@ -760,6 +772,7 @@ export default function ModalCreateToDestroyDiscount({
                   }
                   warningMessage={attachFileBeforeError}
                   deletePermission={TOStatus.DRAFT === status}
+                  onShowOtherType={(fileKey) => onShowBeforeAfterFile(fileKey)}
                 />
               </Grid>
             </Grid>
@@ -779,6 +792,7 @@ export default function ModalCreateToDestroyDiscount({
                   enabledControl={TOStatus.APPROVED === status && !approvePermission}
                   warningMessage={attachFileAfterError}
                   deletePermission={TOStatus.DRAFT === status}
+                  onShowOtherType={(fileKey) => onShowBeforeAfterFile(fileKey)}
                 />
               </Grid>
             </Grid>
@@ -886,6 +900,14 @@ export default function ModalCreateToDestroyDiscount({
           </Box>
         </DialogContent>
       </Dialog>
+
+      <ModalShowBeforeAfterFile
+        open={openShowFile}
+        onClose={() => setOpenShowFile(false)}
+        attachFileBefore={lstAttachFileBeforeShow}
+        attachFileAfter={lstAttachFileAfterShow}
+        currentFileOpenKey={currentFileOpenKey}
+      />
 
       <ModalAddProductToDestroyDiscount
         open={openModelAddItems}

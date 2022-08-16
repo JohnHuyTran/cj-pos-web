@@ -440,6 +440,34 @@ export const environment = {
         url: '/stock/stock-count/{id}',
       },
     },
+    stockAdjustment: {
+      search: {
+        url: '/stock/stock-adjust',
+      },
+      saveDraft: {
+        url: '/stock/stock-adjust',
+      },
+      detail: {
+        url: '/stock/stock-adjust',
+      },
+      calculate: {
+        skuTab: {
+          url: '/stock/stock-adjust/skus',
+        },
+        barcodeTab: {
+          url: '/stock/stock-adjust/barcodes',
+        },
+      },
+      statsSku: {
+        url: '/stock/stock-adjust/stats/{id}',
+      },
+      confirm: {
+        url: '/stock/stock-adjust/confirm',
+      },
+      cancel: {
+        url: '/stock/stock-adjust/{id}',
+      },
+    },
   },
   master: {
     branch: {
