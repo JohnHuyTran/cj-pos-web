@@ -365,3 +365,16 @@ export async function byPassByBranch(payload: any) {
   //   });
   return byPassByBranchMock();
 }
+
+export async function byPassBySupport(payload: any) {
+  // const response = await post(
+  //   environment.branchAccounting.closeSaleShift.byPassBySupport.url,
+  //   payload,
+  //   ContentType.JSON
+  // )
+  //   .then((result: any) => result)
+  //   .catch((error) => {
+  //     throw error;
+  //   });
+  return byPassByBranchMock();
+}
