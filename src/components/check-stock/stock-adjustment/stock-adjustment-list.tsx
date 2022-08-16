@@ -11,7 +11,11 @@ import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
 import { getUserInfo } from '../../../store/sessionStore';
 import { convertUtcToBkkDate } from "../../../utils/date-utill";
-import { StockAdjustment, StockAdjustmentSearchRequest, StockAdjustmentSearchResponse } from "../../../models/stock-adjustment-model";
+import {
+  StockAdjustment,
+  StockAdjustmentSearchRequest,
+  StockAdjustmentSearchResponse
+} from "../../../models/stock-adjustment-model";
 import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment-search-slice";
 import { saveSearchCriteriaSA } from "../../../store/slices/stock-adjustment-criteria-search-slice";
 import ModalCreateStockAdjustment from "./modal-create-stock-adjustment";
@@ -100,7 +104,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
       headerName: t('numberOrder'),
       headerAlign: 'center',
       sortable: false,
-      minWidth: 50,
+      flex: 0.6,
       renderCell: (params) => (
         <Box component="div" sx={{ margin: '0 auto' }}>
           {params.value}
@@ -112,48 +116,44 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
       headerName: 'เลขที่เอกสาร',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 180,
-      width: 220,
+      flex: 1.2,
     },
     {
-        field: 'createdDate',
-        headerName: 'วันที่สร้างรายการ',
-        headerAlign: 'center',
-        align: 'center',
-        sortable: false,
-        minWidth: 120,
-        width: 180,
-        renderCell: (params) => (
-          <Box component="div" sx={{ marginLeft: '0.2rem' }}>
-            {params.value}
-          </Box>
-        ),
+      field: 'createdDate',
+      headerName: 'วันที่สร้างรายการ',
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      flex: 1,
+      renderCell: (params) => (
+        <Box component="div" sx={{ marginLeft: '0.2rem' }}>
+          {params.value}
+        </Box>
+      ),
     },
     {
-        field: 'branch',
-        headerName: 'สาขาที่สร้างรายการ',
-        headerAlign: 'center',
-        sortable: false,
-        minWidth: 200,
-        width: 600,
-        renderCell: (params) => (
-          <Box component="div" sx={{ marginLeft: '0 auto' }}>
-            {params.value}
-          </Box>
-        ),
+      field: 'branch',
+      headerName: 'สาขาที่สร้างรายการ',
+      headerAlign: 'center',
+      sortable: false,
+      flex: 1.5,
+      renderCell: (params) => (
+        <Box component="div" sx={{ marginLeft: '0 auto' }}>
+          {params.value}
+        </Box>
+      ),
     },
     {
-        field: 'createdBy',
-        headerName: 'ผู้สร้างรายการ',
-        headerAlign: 'center',
-        sortable: false,
-        minWidth: 120,
-        width: 220,
-        renderCell: (params) => (
-          <Box component="div" sx={{ marginLeft: '1rem' }}>
-            {params.value}
-          </Box>
-        ),
+      field: 'createdBy',
+      headerName: 'ผู้สร้างรายการ',
+      headerAlign: 'center',
+      sortable: false,
+      flex: 1.2,
+      renderCell: (params) => (
+        <Box component="div" sx={{ marginLeft: '1rem' }}>
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: 'status',
@@ -161,11 +161,10 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      minWidth: 100,
-      width: 150,
+      flex: 1.2,
       renderCell: (params) => genRowStatus(params),
     },
-    
+
   ];
 
   const genRowStatus = (params: GridValueGetterParams) => {
@@ -257,8 +256,8 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
         await dispatch(getAuditPlanDetail(params.row.APId));
         await dispatch(getStockAdjustmentDetail(params.row.id));
         if (stockAdjustDetail) {
-            setOpenDetail(true);
-            await dispatch(updateRefresh(true));
+          setOpenDetail(true);
+          await dispatch(updateRefresh(true));
         }
       } catch (error) {
         console.log(error);
@@ -307,7 +306,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
           onSearchMain={onSearchAgain}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
     </div>
   );
 };
