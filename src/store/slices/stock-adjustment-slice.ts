@@ -2,60 +2,57 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import moment from 'moment';
 
 type ItemsState = {
-  createDraft: any;
   dataDetail: any;
   errorList: any;
   checkStock: any;
   checkEdit: boolean;
 };
 const initialState: ItemsState = {
-  createDraft: {
-    products: [],
-  },
   dataDetail: {
     id: '',
     documentNumber: '',
     status: '',
     createdDate: moment(new Date()).toISOString(),
     createdBy: '',
-    branch: '',
-    storeType: '',
-    countingTime: '',
+    branchCode: '',
+    branchName: '',
+    APId: '',
     APDocumentNumber: '',
-    stockCounter: 0,
-    APId: ''
+    relatedSCs: [],
+    recheckSkus: [],
+    notCountableSkus: [],
+    skuDifferenceEqual: 0,
+    skuDifferenceNegative: 0,
+    skuDifferencePositive: 0,
+    stockCounter: '',
   },
   errorList: [],
   checkStock: [],
   checkEdit: false,
 };
 
-const stockCountSlice = createSlice({
-  name: 'stockCountSlice',
+const stockAdjustmentSlice = createSlice({
+  name: 'stockAdjustmentSlice',
   initialState,
   reducers: {
-    save: (state, action: PayloadAction<any>) => {
-      state.createDraft = action.payload;
-    },
-    updateDataDetail: (state, action: any) => {
+    updateDataDetail: (state, action: PayloadAction<any>) => {
       state.dataDetail = action.payload;
     },
-    updateErrorList: (state, action: any) => {
+    updateErrorList: (state, action: PayloadAction<any>) => {
       state.errorList = action.payload;
     },
-    updateCheckStock: (state, action: any) => {
+    updateCheckStock: (state, action: PayloadAction<any>) => {
       state.checkStock = action.payload;
     },
-    updateCheckEdit: (state, action: any) => {
+    updateCheckEdit: (state, action: PayloadAction<any>) => {
       state.checkEdit = action.payload;
     },
   },
 });
 export const {
-  save,
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
   updateCheckEdit
-} = stockCountSlice.actions;
-export default stockCountSlice.reducer;
+} = stockAdjustmentSlice.actions;
+export default stockAdjustmentSlice.reducer;

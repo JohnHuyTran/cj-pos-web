@@ -824,7 +824,7 @@ export default function ModalCreateBarcodeDiscount({
   };
 
   const onShowPrintedHistory = async (sequence: any) => {
-    if (printHistoryRows && printHistoryRows.length > 0 && printInDetail) {
+    if (printHistoryRows && printHistoryRows.length > 0) {
       let lstProductPrintHistory = [];
       let printHistory = _.cloneDeep(printHistoryRows).find((it: any) => it.sequence === sequence);
       if (printHistory.listOfProduct && printHistory.listOfProduct.length) {

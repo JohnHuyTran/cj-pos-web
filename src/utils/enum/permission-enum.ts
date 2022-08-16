@@ -43,6 +43,9 @@ export enum ACTIONS {
   STOCK_SC_MANAGE = 'stock.sc.manage',
   STOCK_SC_VIEW = 'stock.sc.view',
 
+  STOCK_SA_MANAGE = 'stock.sa.manage',
+  STOCK_SA_VIEW = 'stock.sa.view',
+
   AUTHORITY_CHECK = 'authority.check',
   ORDER_RO_DRAFT = 'order.ro.draft',
   ORDER_RO_APPROVE = 'order.ro.approve',

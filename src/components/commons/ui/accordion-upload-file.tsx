@@ -37,6 +37,7 @@ interface Props {
   enabledControl?: boolean;
   warningMessage?: string;
   deletePermission?: boolean;
+  onShowOtherType?: (fileKey: string | undefined) => void;
   reMark?: string;
 }
 
@@ -52,6 +53,7 @@ function AccordionUploadFile({
   enabledControl,
   warningMessage,
   deletePermission,
+  onShowOtherType,
   reMark,
 }: Props): ReactElement {
   const classes = useStyles();
@@ -142,23 +144,27 @@ function AccordionUploadFile({
   };
 
   function getHuaweiFileUrl(item: fileDisplayList) {
-    const keys = item.fileKey ? item.fileKey : '';
-    const branchCode = item.branchCode ? item.branchCode : '';
-    const name = item.fileName ? item.fileName : '';
+    if (onShowOtherType) {
+      onShowOtherType(stringNullOrEmpty(item.fileKey) ? '' : item.fileKey);
+    } else {
+      const keys = item.fileKey ? item.fileKey : '';
+      const branchCode = item.branchCode ? item.branchCode : '';
+      const name = item.fileName ? item.fileName : '';
 
-    if (item.status === 'old') {
-      getFileUrlHuawei(keys, branchCode)
-        .then((resp) => {
-          if (resp && resp.data) {
-            setFileUrl(resp.data);
-            setIsImage(item.mimeType === 'image/jpeg');
-            setNewFilename(name);
-            setDisplayFile(true);
-          }
-        })
-        .catch((error: ApiError) => {
-          console.log('error', error);
-        });
+      if (item.status === 'old') {
+        getFileUrlHuawei(keys, branchCode)
+          .then((resp) => {
+            if (resp && resp.data) {
+              setFileUrl(resp.data);
+              setIsImage(item.mimeType === 'image/jpeg');
+              setNewFilename(name);
+              setDisplayFile(true);
+            }
+          })
+          .catch((error: ApiError) => {
+            console.log('error', error);
+          });
+      }
     }
   }
   let newFileDisplayList: any = [];

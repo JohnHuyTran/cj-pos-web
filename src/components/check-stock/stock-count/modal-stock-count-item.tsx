@@ -14,9 +14,11 @@ import {
   updateErrorList,
 } from '../../../store/slices/stock-count-slice';
 import { handleNumberBeforeUse, stringNullOrEmpty } from '../../../utils/utils';
-import { Action, TOStatus } from '../../../utils/enum/common-enum';
+import { Action, StockActionStatus, STOCK_COUNTER_TYPE, TOStatus } from '../../../utils/enum/common-enum';
 import { ACTIONS } from "../../../utils/enum/permission-enum";
 import { StockCountDetail } from '../../../models/stock-count-model';
+import { getUserInfo } from '../../../store/sessionStore';
+import { getUserGroup, isGroupAuditParam, isGroupBranchParam } from '../../../utils/role-permission';
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -41,6 +43,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
   const [dtTable, setDtTable] = React.useState<Array<StockCountDetail>>([]);
   const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
+  const userGroups = getUserInfo().groups ? getUserInfo().groups : [];
+  const _group = getUserGroup(userGroups);
   
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
@@ -54,9 +58,15 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           unit: item.unitName,
           unitCode: item.unitCode || '',
           barFactor: item.baseUnit || 0,
-          quantity: stringNullOrEmpty(item.qty) ? null : item.qty,
+          quantity:
+            stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.CONFIRM
+              ? 0
+              : stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.DRAFT
+              ? null
+              : item.qty,
           errorQty: '',
-          skuCode: item.skuCode
+          skuCode: item.skuCode,
+          skuName: item.skuName
         };
       });
       setDtTable(rows);
@@ -74,7 +84,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           unitName: item.unit,
           productName: item.barcodeName,
           sku: item.skuCode,
-          canNotCount: item.checked
+          canNotCount: item.checked,
+          skuName: item.skuName
         };
       });
       dispatch(save({ ...payloadStockCount, products: products }));
@@ -129,7 +140,12 @@ export const ModalStockCountItem = (props: DataGridProps) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission || viewMode}
+          disabled={
+            (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
+            !managePermission ||
+            (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
+            (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+          }
           onClick={(e) => onCheckCell(e, params.row.index, params.row.skuCode)}
         />
       ),
@@ -199,7 +215,12 @@ export const ModalStockCountItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeQuantity(e, params.row.index, index, params.row.barcode);
               }}
-              disabled={(!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) || !managePermission}
+              disabled={
+                (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
+                !managePermission ||
+                (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
+                (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+              }
             />
             {/* {condition && <div className="title">{errorList[index]?.errorQuantity}</div>} */}
           </div>

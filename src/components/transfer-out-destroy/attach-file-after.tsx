@@ -35,6 +35,7 @@ interface Props {
   enabledControl?: boolean;
   warningMessage?: string;
   deletePermission?: boolean;
+  onShowOtherType?: (fileKey: string | undefined) => void;
   reMark?: string;
 }
 
@@ -49,6 +50,7 @@ function AttachFileAfter({
   enabledControl,
   warningMessage,
   deletePermission,
+  onShowOtherType,
   reMark,
 }: Props): ReactElement {
   const classes = useStyles();
@@ -139,25 +141,30 @@ function AttachFileAfter({
   };
 
   function getHuaweiFileUrl(item: fileDisplayList) {
-    const keys = item.fileKey ? item.fileKey : '';
-    const name = item.fileName ? item.fileName : '';
-    const branchCode = item.branchCode ? item.branchCode : '';
+    if (onShowOtherType) {
+      onShowOtherType(stringNullOrEmpty(item.fileKey) ? '' : item.fileKey);
+    } else {
+      const keys = item.fileKey ? item.fileKey : '';
+      const name = item.fileName ? item.fileName : '';
+      const branchCode = item.branchCode ? item.branchCode : '';
 
-    if (item.status === 'old') {
-      getFileUrlHuawei(keys, branchCode)
-        .then((resp) => {
-          if (resp && resp.data) {
-            setFileUrl(resp.data);
-            setIsImage(item.mimeType === 'image/jpeg');
-            setNewFilename(name);
-            setDisplayFile(true);
-          }
-        })
-        .catch((error: ApiError) => {
-          console.log('error', error);
-        });
+      if (item.status === 'old') {
+        getFileUrlHuawei(keys, branchCode)
+          .then((resp) => {
+            if (resp && resp.data) {
+              setFileUrl(resp.data);
+              setIsImage(item.mimeType === 'image/jpeg');
+              setNewFilename(name);
+              setDisplayFile(true);
+            }
+          })
+          .catch((error: ApiError) => {
+            console.log('error', error);
+          });
+      }
     }
   }
+
   let newFileDisplayList: any = [];
 
   useEffect(() => {
@@ -284,7 +291,7 @@ function AttachFileAfter({
           <Typography sx={{ fontSize: '14px', color: '#676767' }}>
             เอกสารแนบ จำนวน {newFileDisplayList.length}/5
           </Typography>
-          {accordionFile ? <KeyboardArrowUp color="primary" /> : <KeyboardArrowDown color="primary" />}
+          {accordionFile ? <KeyboardArrowUp color="primary"/> : <KeyboardArrowDown color="primary"/>}
         </Box>
 
         <Box sx={{ display: accordionFile ? 'visible' : 'none' }}>
@@ -330,7 +337,7 @@ function AttachFileAfter({
                   onClick={() => handleDeleteAttachFile(item)}
                   size="small"
                 >
-                  <CloseIcon fontSize="small" color="error" />
+                  <CloseIcon fontSize="small" color="error"/>
                 </IconButton>
               </Box>
             ))}
@@ -353,7 +360,7 @@ function AttachFileAfter({
         isImage={isImage}
       />
 
-      <ModalAlert open={errorBrowseFile} onClose={closeDialogConfirm} errormsg={msgErrorBrowseFile} />
+      <ModalAlert open={errorBrowseFile} onClose={closeDialogConfirm} errormsg={msgErrorBrowseFile}/>
     </>
   );
 }

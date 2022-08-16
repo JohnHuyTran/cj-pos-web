@@ -13,13 +13,14 @@ import { getUserInfo } from '../../../store/sessionStore';
 
 interface Props {
   viewMode?: boolean;
+  handleUpdateAgain?: ()=> void;
+  relatedDocuments: any;
+  type: string;
 }
 
-const DocumentList = ({viewMode}:Props) => {
+const DocumentList = ({viewMode, handleUpdateAgain, relatedDocuments, type}:Props) => {
   const dispatch = useAppDispatch();
   const [openListDocNo, setOpenListDocNo] = useState<boolean>(false);
-  const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
-  const relatedDocuments = dataDetail.relatedDocuments;
   const [popupMsg, setPopupMsg] = React.useState<string>('');
   const [openDetail, setOpenDetail] = React.useState(false);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
@@ -40,6 +41,19 @@ const DocumentList = ({viewMode}:Props) => {
       console.log(error);
     }
     setOpenLoadingModal(false);
+  };
+
+  const genValueDisplay = (item:any) => {
+    let valueDisplay = '';
+    switch (type) {
+      case 'SC':
+        valueDisplay = `${item.documentNumber} ครั้งที่ ${item.countingTime}`;
+        break;
+      case 'SA':
+        valueDisplay = item.documentNumber;
+        break;
+    }
+    return valueDisplay;
   };
 
   return (
@@ -65,7 +79,7 @@ const DocumentList = ({viewMode}:Props) => {
           {openListDocNo &&
             relatedDocuments &&
             relatedDocuments.length > 0 &&
-            relatedDocuments.map((item, index) => (
+            relatedDocuments.map((item:any, index:any) => (
               <Box
                 key={`item-${index + 1}-${item}`}
                 component="a"
@@ -78,7 +92,7 @@ const DocumentList = ({viewMode}:Props) => {
                   color="secondary"
                   sx={{ textDecoration: 'underline', fontSize: '14px', whiteSpace: 'normal', cursor: 'pointer' }}
                   noWrap>
-                  {item.documentNumber} ครั้งที่ {item.countingTime}
+                  {genValueDisplay(item)}
                 </Typography>
               </Box>
             ))}
@@ -95,6 +109,7 @@ const DocumentList = ({viewMode}:Props) => {
           userPermission={getUserInfo().acl['service.posback-stock'] != null && getUserInfo().acl['service.posback-stock'].length > 0
           ? getUserInfo().acl['service.posback-stock']
           : []}
+          onSearchMain={handleUpdateAgain}
         />
       )}
       <LoadingModal open={openLoadingModal} />

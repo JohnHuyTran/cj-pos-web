@@ -103,7 +103,7 @@ export default function Sidebar({}: Props): ReactElement {
   );
   const [openSettingsMenu, setOpenSettingsMenu] = useState(selectedByPath('reserves'));
   const [openCheckStockMenu, setOpenCheckStockMenu] = useState(
-    selectedByPath('audit-plan') || selectedByPath('stock-count')
+    selectedByPath('audit-plan') || selectedByPath('stock-count') || selectedByPath('stock-adjustment')
   );
 
   const navState = useAppSelector((state) => state.navigator.state);
@@ -558,6 +558,21 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuStockCount'>
               <ListItemButton key='StockCount' selected={selectedByPath('stock-count')} sx={{ pl: 7 }}>
                 <ListItemText primary='ตรวจนับสต๊อก (SC)' />
+              </ListItemButton>
+            </Link>
+            <Link
+              to='/stock-adjustment'
+              style={{
+                textDecoration: 'none',
+                color: '#676767',
+              }}
+              id='subMenuStockAdjustment'>
+              <ListItemButton
+                key='StockAdjustment'
+                selected={selectedByPath('stock-adjustment')}
+                // onClick={() => handleListItemClick(17)}
+                sx={{ pl: 7 }}>
+                <ListItemText primary='รายละเอียดตรวจนับสต๊อก (SA)' />
               </ListItemButton>
             </Link>
           </List>
