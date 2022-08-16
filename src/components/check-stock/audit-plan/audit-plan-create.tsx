@@ -44,7 +44,7 @@ import ModalValidateImport from '../../sale-limit-time/modal-validate-import';
 import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
 import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
 import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
-import { clearCalculate } from "../../../store/slices/stock-adjust-calculate-slice";
+import { clearCalculate, updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 import LoadingModal from '../../commons/ui/loading-modal';
 
 interface Props {
@@ -57,8 +57,8 @@ interface Props {
   onReSearchMain?: (branch: string) => void;
   userPermission?: any[];
   viewMode?: boolean;
-  isRedirect?: boolean;
   openLink?: boolean;
+  notClearWhenClose?: boolean;
 }
 
 interface Values {
@@ -84,6 +84,7 @@ export default function ModalCreateAuditPlan({
   action,
   viewMode,
   openLink,
+  notClearWhenClose,
 }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -148,7 +149,7 @@ export default function ModalCreateAuditPlan({
     userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
       ? userInfo.acl['service.posback-stock'].includes(ACTIONS.STOCK_SA_MANAGE)
       : false;
-  const isBranchPermission = !!(env.branch.channel === 'branch');
+  const isBranchPermission = (env.branch.channel === 'branch');
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
@@ -287,7 +288,9 @@ export default function ModalCreateAuditPlan({
 
   const handleClose = async () => {
     dispatch(updateAddTypeAndProductState([]));
-    dispatch(clearDataFilter());
+    if (!notClearWhenClose) {
+      dispatch(clearDataFilter());
+    }
     setOpen(false);
     onClickClose();
   };
@@ -507,6 +510,7 @@ export default function ModalCreateAuditPlan({
       await dispatch(getStockAdjustmentDetail(dataDetail.relatedSaDocuments[0].id));
       if (stockAdjustDetail) {
         setOpenSADetail(true);
+        await dispatch(updateRefresh(true));
       }
     } catch (error) {
       console.log(error);
@@ -862,6 +866,7 @@ export default function ModalCreateAuditPlan({
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
+          onSearchMain={handleUpdateAgainDetailAP}
         />
       )}
 
@@ -874,6 +879,7 @@ export default function ModalCreateAuditPlan({
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
+          onSearchMain={handleUpdateAgainDetailAP}
         />
       )}
 

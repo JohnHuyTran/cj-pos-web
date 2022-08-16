@@ -14,6 +14,7 @@ import Button from "@mui/material/Button";
 import { BootstrapDialogTitle } from "../../commons/ui/dialog-title";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import { convertUtcToBkkDate } from "../../../utils/date-utill";
+import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 
 export interface DataGridProps {
   open: boolean;
@@ -227,6 +228,7 @@ export const ModalAddStockCount = (props: DataGridProps) => {
     if (lstSelected && lstSelected.length > 0) {
       for (const it of lstSelected) {
         selectedSCs.push({
+          id: it.id,
           documentNumber: it.documentNumber,
           countingTime: it.countingTime
         });
@@ -242,7 +244,7 @@ export const ModalAddStockCount = (props: DataGridProps) => {
           <Typography sx={{ fontSize: '1em' }}><b>เลือกรายการเอกสาร SC :</b></Typography>
         </BootstrapDialogTitle>
         <DialogContent>
-          <div style={{ width: '100%', height: dataTable.length >= 10 ? '60vh' : 'auto' }}
+          <div style={{ width: '100%', height: dataTable.length >= 5 ? '35vh' : 'auto' }}
                className={classes.MdataGridDetail}>
             <DataGrid
               rows={dataTable}
@@ -253,7 +255,7 @@ export const ModalAddStockCount = (props: DataGridProps) => {
               rowsPerPageOptions={[10, 20, 50, 100]}
               pagination
               disableColumnMenu
-              autoHeight={dataTable.length < 10}
+              autoHeight={dataTable.length < 5}
               scrollbarSize={10}
               rowHeight={45}
               components={{

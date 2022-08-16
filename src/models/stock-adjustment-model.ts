@@ -85,6 +85,7 @@ export interface BarcodeCalculate {
   difference: number;
   tempStock: number;
   unitName: string;
+  unitPrice: number;
 }
 
 export interface SASkuCalculateResponse {
@@ -110,7 +111,7 @@ export interface SkuCalculate {
   difference: number;
   tempStock: number;
   unitName: string;
-  adjustedPrice: number;
+  unitPrice: number;
   remark: string,
 }
 

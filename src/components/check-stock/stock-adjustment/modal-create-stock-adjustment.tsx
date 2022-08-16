@@ -45,6 +45,8 @@ import { ACTIONS } from "../../../utils/enum/permission-enum";
 import ModelConfirmStockAdjust from "./modal-confirm-stock-adjust";
 import { clearCalculate, updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 import { saveDraftAuditPlan } from "../../../services/audit-plan";
+import DocumentList from "../audit-plan/modal-documents-list";
+import LoadingModal from "../../commons/ui/loading-modal";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -96,6 +98,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const [relatedSCs, setRelatedSCs] = useState<any[]>([]);
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SA_MANAGE) : false);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   const handleOpenCancel = () => {
     setOpenModalCancel(true);
@@ -217,6 +223,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   }, [stockAdjustDetail]);
 
   const handleCreateDraft = async (relatedSCsParam: any, withoutNotice: boolean) => {
+    handleOpenLoading('open', true);
     setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     try {
       const payload = {
@@ -249,6 +256,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     } catch (error) {
       setOpenModalError(true);
     }
+    handleOpenLoading('open', false);
   };
 
   const handleConfirm = async () => {
@@ -325,11 +333,8 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   ];
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
   const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
+
   const handleOpenAP = async () => {
     if (viewMode) return;
     handleOpenLoading('open', true);
@@ -434,6 +439,16 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                 </Link>
               </Grid>
             </Grid>
+            {dataDetail && dataDetail.relatedSCs && dataDetail.relatedSCs && (
+              <Grid item container xs={4} pr={4}>
+                <Grid item xs={4}>
+                  เอกสาร SC :
+                </Grid>
+                <Grid item xs={8}>
+                  <DocumentList openLink={false} relatedDocuments={dataDetail.relatedSCs} type={'SC'}/>
+                </Grid>
+              </Grid>
+            )}
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
@@ -449,8 +464,9 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
                       || !managePermission || viewMode) ? 'none' : undefined
                   }}
-                  onClick={() => {
-                    setOpenAddSC(true)
+                  onClick={async () => {
+                    await dispatch(getAuditPlanDetail(dataDetail.APId));
+                    setOpenAddSC(true);
                   }}
                   sx={{ width: 140, height: '36.5px' }}
                 >
@@ -525,6 +541,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
           viewMode={true}
+          notClearWhenClose={true}
         />
       )}
 
@@ -567,6 +584,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         }}
       />
       <SnackbarStatus open={openSnackBar} onClose={handleCloseSnackBar} isSuccess={true} contentMsg={textSnackBar}/>
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 }
