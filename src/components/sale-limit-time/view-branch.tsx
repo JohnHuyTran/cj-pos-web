@@ -144,8 +144,6 @@ export default function ViewBranch({ values }: Props) {
                               size="small"
                               disabled={true}
                               className={classes.MSearchBranch}
-                              getOptionLabel={(option) => option.name}
-                              value={province}
                               fullWidth
                             />
                           </Box>
