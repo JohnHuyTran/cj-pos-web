@@ -404,6 +404,13 @@ const responsSuccess = {
   message: 'success',
 };
 
+const responsFail = {
+  timestamp: '2022-08-02T04:10:31.965+0000',
+  ref: '62e8a3b7f3948986e2d51bdc',
+  code: 40001,
+  message: 'error',
+};
+
 export function featchViewOpenEndRsMockup() {
   return new Promise((resolve, reject) => {
     resolve(viewOpenEndRs);
@@ -412,6 +419,7 @@ export function featchViewOpenEndRsMockup() {
 
 export function byPassByBranchMock() {
   return new Promise((resolve, reject) => {
-    resolve(responsSuccess);
+    // resolve(responsSuccess);
+    reject(responsFail);
   });
 }

@@ -155,7 +155,15 @@ function ModalBypassBySupport({ shiftCode, open, onClose }: Props) {
         contentMsg={contentMsg}
         durationTime={1000}
       />
-      <AlertError open={openAlert} onClose={onClose} textError={textError} payload={null} />
+      <AlertError
+        open={openAlert}
+        onClose={() => {
+          onClose();
+          setOpenAlert(false);
+        }}
+        textError={textError}
+        payload={null}
+      />
     </>
   );
 }
