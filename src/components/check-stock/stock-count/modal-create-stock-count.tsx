@@ -376,6 +376,7 @@ export default function ModalCreateStockCount({
           unitPrice: item.price || 0,
           skuCode: item.sku,
           canNotCount: sameItem.canNotCount,
+          skuName: item.skuName,
           qty: (!sameItem.quantity && !sameItem.canNotCount) ? 0 : sameItem.quantity,
         };
       });

@@ -45,7 +45,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
   const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
   const userGroups = getUserInfo().groups ? getUserInfo().groups : [];
   const _group = getUserGroup(userGroups);
-  
+
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
@@ -59,7 +59,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           unitCode: item.unitCode || '',
           barFactor: item.baseUnit || 0,
           quantity:
-            stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.CONFIRM
+            stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.CONFIRM && !item.canNotCount
               ? 0
               : stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.DRAFT
               ? null
@@ -98,7 +98,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
     let currentValue = handleNumberBeforeUse(event.target.value);
     setDtTable((preData: Array<StockCountDetail>) => {
       const data = [...preData];
-      data[index - 1].quantity = currentValue; 
+      data[index - 1].quantity = currentValue;
       return data;
     });
     dispatch(
@@ -126,9 +126,10 @@ export const ModalStockCountItem = (props: DataGridProps) => {
         }
         return {
           ...item,
-          checked: item.skuCode == skuCode ? !item.checked : item.checked
+          checked: item.skuCode == skuCode ? !item.checked : item.checked,
+          quantity: item.skuCode == skuCode && !item.checked ? null : item.quantity
         }
-      }) 
+      })
       dispatch(
         updateErrorList(
           errorList.map((item: any, idx: number) => {
@@ -235,7 +236,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
                 (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
                 !managePermission || viewMode ||
                 (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
-                (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+                (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT) ||
+                !!params.getValue(params.id, 'checked')
               }
             />
             {/* {condition && <div className="title">{errorList[index]?.errorQuantity}</div>} */}
