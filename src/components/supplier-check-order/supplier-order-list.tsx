@@ -124,7 +124,7 @@ export default function SupplierOrderList() {
     {
       field: 'piNo',
       headerName: 'เลขที่เอกสาร PI',
-      minWidth: 160,
+      minWidth: 163,
       // flex: 1,
       headerAlign: 'center',
       sortable: false,
