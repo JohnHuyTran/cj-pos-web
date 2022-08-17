@@ -9,7 +9,9 @@
     "WAITTING_APPROVAL3": "รออนุมัติ3",
     "APPROVED": "อนุมัติ",
     "CORRECT": "ถูกต้อง",
-    "PENDDING_REVIEW": "รอตรวจสอบ"
+    "PENDDING_REVIEW": "รอตรวจสอบ",
+    "CLOSED": "ปิดงาน",
+    "SAP_ERROR": "ส่งSAPไม่สำเร็จ"
   },
   "type": {
     "COFFEE": "ค่าใช้จ่ายร้านกาแฟ",
