@@ -122,12 +122,20 @@ const columns: GridColDef[] = [
             sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
           />
         );
-      } else if (params.value === 'APPROVED' || params.value === 'CLOSED' || params.value === 'SAP_ERROR') {
+      } else if (params.value === 'APPROVED' || params.value === 'SAP_ERROR') {
         return (
           <Chip
             label={params.getValue(params.id, 'statusText')}
             size="small"
             sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+          />
+        );
+      } else if (params.value === 'CLOSED') {
+        return (
+          <Chip
+            label={params.getValue(params.id, 'statusText')}
+            size="small"
+            sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
           />
         );
       }
