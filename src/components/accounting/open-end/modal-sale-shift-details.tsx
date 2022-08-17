@@ -23,17 +23,29 @@ import {
 } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from 'store/store';
 
+// Util and global functions
+import { formatFileStockTransfer } from 'utils/utils'
+const number = (value: any) => {
+  // function comvert number
+  return (+(''+value).replaceAll(',', ''))
+}
+
 // Components
 import CardHeader from 'components/card-header'
 import AccordionUploadFile from 'components/commons/ui/accordion-upload-file'
 import ModalDetailCash from 'components/accounting/open-end/modal-detail-cash';
+import AlertError from 'components/commons/ui/alert-error';
+import ModalShowFile from 'components/commons/ui/modal-show-file';
 import SnackbarStatus from 'components/commons/ui/snackbar-status';
+import ModalConfirmApproval from './confirm/modal-confirm-approval'
+import ModalConfirmApproved from './confirm/modal-confirm-approved'
 
 // Hooks function
 import useScrollTop from 'hooks/useScrollTop'
 
 // API call
 import { saveOpenEnd, submitApproveOpenEnd } from 'services/accounting';
+import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice'
 
 interface ModalSaleShiftDetailsProps {
   open: boolean;
@@ -49,13 +61,17 @@ interface InputNumberLayoutProps {
   decimal?: number,
   children?: ReactNode,
   disabled?: boolean,
+  native?: boolean,
   validate?: boolean,
   onChange: (value: any) => void
 }
 
 interface DetailsProps {
   detailsData: any,
-  isDisabledUploadFile: boolean
+  settlementFiles: any,
+  paymentTypeItems: any,
+  isDisabledUploadFile: boolean,
+  setSettlementFiles: (value: any) => void
 }
 
 export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps): ReactElement {
@@ -73,6 +89,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   // Set valiable
   const dispatch = useAppDispatch();
   const viewOpenEndResponse = useAppSelector((state) => state.viewOpenEndSlice.viewOpenEnd);
+  const { payloadOpenEndSearch, openEndSearchList } = useAppSelector((state) => state.searchOpenEndSlice);
   const data: any = viewOpenEndResponse.data || null;
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
   const initialDetailsState = {
@@ -103,7 +120,19 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       yakultAmount: '',
       coffeeExpenseAmount: '',
       frontExpenseAmount: ''
-    }
+    },
+    settlementFiles: []
+  }
+  let initailStepStatus = 0
+  switch (data?.status) {
+    case 'DRAFT': initailStepStatus = 1
+      break;
+    case 'REQUEST_APPROVE': initailStepStatus = 2
+      break;
+    case 'APPROVED': initailStepStatus = 3
+      break;
+    default: 0
+      break;
   }
 
   // Set state data
@@ -112,10 +141,18 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   const [externalIncome, setExternalIncome] = useState(initialFormInputState.externalIncome)
   const [externalIncomeList, setExternalIncomeList] = useState<any[]>(initialFormInputState.externalIncomeList)
   const [cashPayment, setCashPayment] = useState(initialFormInputState.cashPayment)
+  const [settlementFiles, setSettlementFiles] = useState<any[]>(initialFormInputState.settlementFiles)
+  const [textError, setTextError] = useState('')
   const [contentMsg, setContentMsg] = useState('')
+  const [stepStatus, setStepStatus] = useState(initailStepStatus);
   const [isSaveOpenLoading, setIsSaveOpenLoading] = useState(false);
   const [isSubmitOpenLoading, setIsSubmitOpenLoading] = useState(false);
+  const [isApprovedOpenLoading, setIsApprovedOpenLoading] = useState(false);
   const [openModalCashDetail, setOpenModalCashDetail] = useState(false);
+  const [isOpenModalConfirmApproval, setIsOpenModalConfirmApproval] = useState(false);
+  const [isOpenModalConfirmApproved, setIsOpenModalConfirmApproved] = useState(false);
+  const [isOpenModelPrintDoc, setIsOpenModelPrintDoc] = useState(false);
+  const [isOpenAlert, setIsOpenAlert] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [isStatusSanckBar, setIsStatusSanckBar] = useState(false);
   const [isAmountNull, setIsAmountNull] = useState(false);
@@ -127,11 +164,6 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       block: 'start',
       behavior: 'smooth',
     });
-  }
-  
-  const number = (value: any) => {
-    // function comvert number
-    return (+(''+value).replaceAll(',', ''))
   }
 
   const calculate = () => {
@@ -166,7 +198,6 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       const newState = prevState.map(obj => {
         if (obj.code === code) {
           if (Object.keys(value)[0] === 'amount') {
-            // calculate(value.amount)
             return {...obj, amount: number(value.amount)};
           }
           if (Object.keys(value)[0] === 'noItem') {
@@ -183,43 +214,87 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
   }
 
   const handleSave = async () => {
+    // บันทึก
     const payload = {
       docNo: data?.docNo,
-      settlementFiles: data?.settlementFiles,
+      settlementFiles: settlementFiles,
       items: externalIncomeList
     }
     setIsSaveOpenLoading(true)
     try {
       const res = await saveOpenEnd(payload, fileUploadList);
+      setContentMsg('บันทึกข้อมูล เรียบร้อยแล้ว');
       setIsStatusSanckBar(true);
-      setContentMsg(res?.message);
-      // handleClose();
+      setStepStatus(1);
+      updateOpenEndData();
     } catch (error) {
-      setIsStatusSanckBar(false);
       setContentMsg(error.message);
+      setIsStatusSanckBar(false);
     } finally {
       setOpenSnackBar(true);
       setIsSaveOpenLoading(false);
     }
   }
 
-  const handleApprove = async () => {
-    const payload = {
-      settlementFiles: data?.settlementFiles,
-      items: externalIncomeList
+  const handleApproval = async (isConfirm: boolean) => {
+    // ขออนุมัติ
+    const isSettlementReq = (data?.income?.paymentTypeItems?.filter((e: any) => {
+      return e.isSettlementFile && e.amount > 0
+    }).length > 0)
+    const isUploadSettlements = (settlementFiles.length <= 0  && fileUploadList.length <= 0 && isSettlementReq)
+    if (isUploadSettlements) {
+      setTextError('กรุณาแนบเอกสาร Settlement');
+      setIsOpenAlert(true);
+    } else {
+      if (isConfirm) {
+        setIsOpenModalConfirmApproval(false);
+        const payload = {
+          settlementFiles: settlementFiles,
+          items: externalIncomeList
+        }
+        setIsSubmitOpenLoading(true);
+        try {
+          const res = await submitApproveOpenEnd(data?.docNo, payload, fileUploadList);
+          setContentMsg('ขออนุมัติ เรียบร้อยแล้ว');
+          setIsStatusSanckBar(true);
+          setStepStatus(2);
+          updateOpenEndData();
+          handleClose();
+        } catch (error) {
+          setContentMsg(error.message);
+          setIsStatusSanckBar(false);
+        } finally {
+          setOpenSnackBar(true);
+          setIsSubmitOpenLoading(false);
+        }
+      } else {
+        setIsOpenModalConfirmApproval(true);
+      }
     }
-    setIsSubmitOpenLoading(true)
-    try {
-      const res = await submitApproveOpenEnd(data?.docNo, payload, fileUploadList);
-      setIsStatusSanckBar(true);
-      setContentMsg(res?.message);
-      // handleClose();
-    } catch (error) {
-      setIsStatusSanckBar(false);
-      setContentMsg(error.message);
-    } finally {
-      setOpenSnackBar(true);
-      setIsSubmitOpenLoading(false);
+  }
+
+  const handleApproved = (isConfirm: boolean, payload: any) => {
+    // อนุมัติ
+    if (isConfirm) {
+      setIsOpenModalConfirmApproved(false)
+      setIsApprovedOpenLoading(true);
+      try {
+        console.log('handleApproved', payload);
+        setTimeout(() => {
+          setContentMsg('ยืนยันการอนุมัติสำเร็จ');
+          setIsStatusSanckBar(true);
+          setStepStatus(3);
+          updateOpenEndData();
+        }, 1000)
+      } catch (error) {
+        setContentMsg(error.message);
+        setIsStatusSanckBar(false);
+      } finally {
+        setOpenSnackBar(true);
+        setIsApprovedOpenLoading(false);
+      }
+    } else {
+      setIsOpenModalConfirmApproved(true);
     }
   }
 
@@ -227,12 +302,25 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     setSummarizeCashDeposite(initialFormInputState.summarizeCashDeposite)
     setExternalIncome(initialFormInputState.externalIncome)
     setCashPayment(initialFormInputState.cashPayment)
+    setSettlementFiles(initialFormInputState.settlementFiles)
     onClose()
+  }
+
+  const updateOpenEndData = async () => {
+    const searchOpenEndPayload = {
+      branchCode: payloadOpenEndSearch.branchCode,
+      status: payloadOpenEndSearch.status,
+      dateFrom: payloadOpenEndSearch.dateFrom,
+      dateTo: payloadOpenEndSearch.dateTo,
+      limit: ''+openEndSearchList.perPage,
+      page: '1',
+    }
+    await dispatch(featchSearchOpenEndAsync(searchOpenEndPayload));
   }
 
   useEffect(() => {
     if (data) {
-      const { externalIncome, summarizeCashDeposite, cashPayment, comment } = data
+      const { externalIncome, summarizeCashDeposite, cashPayment, settlementFiles, comment } = data
       setSummarizeCashDeposite({
         ...initialFormInputState.summarizeCashDeposite,
         ...summarizeCashDeposite,
@@ -240,6 +328,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       })
       setExternalIncome({...initialFormInputState.externalIncome, ...externalIncome})
       setCashPayment({...initialFormInputState.cashPayment, ...cashPayment})
+      settlementFiles && setSettlementFiles([...initialFormInputState.settlementFiles, ...settlementFiles])
       if (externalIncome?.items && externalIncome?.items.length > 0) {
         setExternalIncomeList([...initialFormInputState.externalIncomeList, ...externalIncome.items])
       }
@@ -250,7 +339,9 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     if(data && externalIncomeList.length > 0) {
       calculate()
       // check amount null
-      const isAmountNull = externalIncomeList.findIndex((e: any) => e.amount === null) >= 0
+      const isAmountNull = externalIncomeList.findIndex((e: any) => 
+       (e.amount === null || e.amount === 0) && !e.noItem
+      ) >= 0
       isAmountNull ? setIsAmountNull(true) : setIsAmountNull(false)
     }
   }, [externalIncomeList])
@@ -264,7 +355,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
             scrollDown={scrollDown}
             isLoading={isSaveOpenLoading || isSubmitOpenLoading}
             steps={['บันทึก', 'ขออนุมัติ', 'อนุมัติ']}
-            actionStep={0}
+            actionStep={stepStatus}
           >
             <b>รายละเอียดปิดรอบการขาย</b>
           </CardHeader>
@@ -275,42 +366,81 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
             <Box ref={CardContent} sx={{ display: 'flex', flexDirection: 'column', padding: '20px 24px' }}>
               <Box id='DetailsSection'>
                 <Details
-                  detailsData={initialDetailsState}
+                  detailsData={{...initialDetailsState, stepStatus: stepStatus}}
+                  paymentTypeItems={data?.income?.paymentTypeItems}
+                  settlementFiles={settlementFiles}
+                  setSettlementFiles={(value: any) => setSettlementFiles([...value])}
                   isDisabledUploadFile={isSaveOpenLoading || isSubmitOpenLoading}
                 />
-                <DialogActions sx={{ justifyContent: 'right', marginTop: '10px' }}>
-                  <LoadingButton
-                    id='btnSave'
-                    variant='contained'
-                    color='warning'
-                    disabled={isAmountNull || isSubmitOpenLoading}
-                    startIcon={<Save />}
-                    loading={isSaveOpenLoading}
-                    loadingIndicator={
-                      <Typography component='span' sx={{ fontSize: '11px' }}>
-                        กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
-                      </Typography>
-                    }
-                    sx={{ borderRadius: 2, height: 40, width: 110}}
-                    onClick={handleSave}>
-                    บันทึก
-                  </LoadingButton>
-                  <LoadingButton
-                    id='btnSave'
-                    variant='contained'
-                    color='primary'
-                    disabled={isAmountNull || isSaveOpenLoading}
-                    startIcon={<CheckCircleOutline />}
-                    loading={isSubmitOpenLoading}
-                    loadingIndicator={
-                      <Typography component='span' sx={{ fontSize: '11px' }}>
-                        กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
-                      </Typography>
-                    }
-                    sx={{ borderRadius: 2, height: 40, width: 110}}
-                    onClick={handleApprove}>
-                    ขออนุมัติ
-                  </LoadingButton>
+                <DialogActions sx={{ justifyContent: (stepStatus < 3) ? 'right' : 'left', marginTop: '10px' }}>
+                  {(stepStatus < 2) && (
+                    <Fragment>
+                      <LoadingButton
+                        id='btnSave'
+                        variant='contained'
+                        color='warning'
+                        disabled={isAmountNull || isSubmitOpenLoading}
+                        startIcon={<Save />}
+                        loading={isSaveOpenLoading}
+                        loadingIndicator={
+                          <Typography component='span' sx={{ fontSize: '11px' }}>
+                            กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
+                          </Typography>
+                        }
+                        sx={{ borderRadius: 2, height: 40, width: 110}}
+                        onClick={handleSave}>
+                        บันทึก
+                      </LoadingButton>
+                      <LoadingButton
+                        id='btnApprove'
+                        variant='contained'
+                        color='primary'
+                        disabled={isAmountNull || isSaveOpenLoading}
+                        startIcon={<CheckCircleOutline />}
+                        loading={isSubmitOpenLoading}
+                        loadingIndicator={
+                          <Typography component='span' sx={{ fontSize: '11px' }}>
+                            กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
+                          </Typography>
+                        }
+                        sx={{ borderRadius: 2, height: 40, width: 110}}
+                        onClick={() => handleApproval(false)}>
+                        ขออนุมัติ
+                      </LoadingButton>
+                    </Fragment>
+                  )}
+                  {(stepStatus === 2) && (
+                    <Fragment>
+                      <LoadingButton
+                        id='btnApproved'
+                        variant='contained'
+                        color='primary'
+                        disabled={isAmountNull}
+                        startIcon={<CheckCircleOutline />}
+                        loading={isApprovedOpenLoading}
+                        loadingIndicator={
+                          <Typography component='span' sx={{ fontSize: '11px' }}>
+                            กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
+                          </Typography>
+                        }
+                        sx={{ borderRadius: 2, height: 40, width: 110}}
+                        onClick={() => handleApproved(false, '')}>
+                        อนุมัติ
+                      </LoadingButton>
+                    </Fragment>
+                  )}
+                  {(stepStatus === 3) && (
+                    <Fragment>
+                      <LoadingButton
+                        id='btnPayInPrint'
+                        variant='contained'
+                        color='primary'
+                        sx={{ borderRadius: 2, height: 40, width: 125, mt: 7}}
+                        onClick={() => setIsOpenModelPrintDoc(true)}>
+                        พิมพ์ใบ Pay-IN
+                      </LoadingButton>
+                    </Fragment>
+                  )}
                 </DialogActions>
               </Box>
 
@@ -412,9 +542,12 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                   { externalIncomeList.length > 0 && (
                     externalIncomeList.map((item: any, index: number) => (
                       <Fragment key={item.code}>
-                        <InputNumberLayout id={item.name} name={item.name}
+                        <InputNumberLayout id={item.name} name={item.name} native={false}
                           title={item.name}
-                          disabled={externalIncomeList[index]['noItem'] || (isSaveOpenLoading || isSubmitOpenLoading)}
+                          validate={externalIncomeList[index]['amount'] === null || externalIncomeList[index]['amount'] === 0}
+                          disabled={externalIncomeList[index]['noItem'] || stepStatus === 3 ||
+                            (isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading)
+                          }
                           value={externalIncomeList[index]['amount']}
                           onChange={(value) => handleExternalIncomeList(
                             { amount: value }, item.code
@@ -423,7 +556,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                             control={
                               <Checkbox id={item.name} name={item.name}
                                 checked={externalIncomeList[index]['noItem']}
-                                disabled={isSaveOpenLoading || isSubmitOpenLoading}
+                                disabled={stepStatus === 3 || (isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading)}
                                 onChange={(e) => handleExternalIncomeList(
                                   { noItem: e.target.checked }, item.code
                                 )}
@@ -490,6 +623,31 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
               { openModalCashDetail && (
                 <ModalDetailCash isOpen={openModalCashDetail} onClose={() => setOpenModalCashDetail(false)}/>
               )}
+              {isOpenModalConfirmApproval && (
+                <ModalConfirmApproval open={isOpenModalConfirmApproval} docNo={data.docNo}
+                  onClose={() => setIsOpenModalConfirmApproval(false)}
+                  onConfirm={(isConfirm: boolean) => handleApproval(isConfirm)}
+                />
+              )}
+              {isOpenModalConfirmApproved && (
+                <ModalConfirmApproved open={isOpenModalConfirmApproved} data={summarizeCashDeposite}
+                  onClose={() => setIsOpenModalConfirmApproved(false)}
+                  onConfirm={(isConfirm: boolean, payload: any) => handleApproved(isConfirm, payload)}
+                />
+              )}
+              <ModalShowFile
+                open={isOpenModelPrintDoc}
+                onClose={() => setIsOpenModelPrintDoc(false)}
+                // url={pathReport}
+                url={''}
+                statusFile={1}
+                sdImageFile={''}
+                fileName={formatFileStockTransfer('55-sd-86', 'สำเร็จ', 'ปิดสิ้นวัน')}
+                // fileName={formatFileStockTransfer(btNo, btStatus, suffixDocType)}
+                btnPrintName='พิมพ์เอกสาร'
+                landscape={false}
+              />
+              <AlertError open={isOpenAlert} onClose={() => setIsOpenAlert(false)} textError={textError} />
               <SnackbarStatus
                 open={openSnackBar}
                 onClose={() => setOpenSnackBar(false)}
@@ -506,14 +664,14 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
 
 const InputNumberLayout = (props: InputNumberLayoutProps) => {
   const classes = useStyles();
-  const { title, id, name, value, onChange, children, validate, color, disabled = false, decimal = 2 } = props
+  const { title, id, name, value, onChange, children, validate, color, disabled = false, decimal = 2, native } = props
   return (
     <Grid container item xs={12} sx={{alignItems: 'center'}}>
       <Grid item xs={3} sx={{textAlign: 'right'}}>
         {title}
-        { validate && (
+        {/* { validate && (
           <Typography component='span' color='red'> * </Typography>
-        )}
+        )} */}
         <Typography component='span'> : </Typography>
       </Grid>
       <Grid item xs='auto' sx={{pl: '40px'}}>
@@ -521,12 +679,13 @@ const InputNumberLayout = (props: InputNumberLayoutProps) => {
           id={id}
           name={name}
           value={''+value}
-          onChange={(e: any) => onChange(e.target.value)}
+          onChange={(e: any) => onChange(number(e.target.value))}
           decimalScale={decimal}
           className={classes.MtextFieldNumber}
           disabled={disabled}
           customInput={TextField}
           fixedDecimalScale
+          allowNegative={native}
           autoComplete='off'
           thousandSeparator={true}
           sx={{
@@ -534,6 +693,9 @@ const InputNumberLayout = (props: InputNumberLayoutProps) => {
               '& input': {
                 background: color || 'white',
                 borderRadius: '3px'
+              },
+              '& fieldset': {
+                borderColor: validate ? 'red' : '#0000003b'
               }
             },
           }}
@@ -547,8 +709,11 @@ const InputNumberLayout = (props: InputNumberLayoutProps) => {
 }
 
 const Details = (props: DetailsProps) => {
-  const { detailsData, isDisabledUploadFile } = props
-  
+  const { detailsData, settlementFiles, paymentTypeItems, isDisabledUploadFile, setSettlementFiles } = props
+  const isEnableSettlement = (paymentTypeItems?.filter((e: any) => {
+    return e.isSettlementFile && e.amount > 0
+  }).length > 0)
+
   // Set data upload
   const [attachFiles, setAttachFiles] = useState([]);
   const [uploadFileFlag, setUploadFileFlag] = useState(false);
@@ -556,10 +721,16 @@ const Details = (props: DetailsProps) => {
 
   // handle function
   const handleDeleteFile = (item: any) => {
-    let attachFileData = {...attachFiles}
-    let attachFileDataFilter = attachFileData.filter((it: any) => it.fileKey !== item.fileKey);
+    let attachFileData = [...attachFiles]
+    let attachFileDataFilter = attachFileData.filter((file: any) => file.fileKey !== item.fileKey)
     setAttachFiles(attachFileDataFilter);
+    setSettlementFiles(attachFileDataFilter)
   };
+
+  useEffect(() => {
+     // Preview Settlement files
+     setAttachFiles(settlementFiles);
+  }, [settlementFiles])
 
   return (
     <Grid container rowSpacing={3} columnSpacing={7}>
@@ -590,7 +761,7 @@ const Details = (props: DetailsProps) => {
             isStatus={uploadFileFlag}
             onChangeUploadFile={(status: boolean) => setUploadFileFlag(status)}
             onDeleteAttachFile={handleDeleteFile}
-            enabledControl={!isDisabledUploadFile}
+            enabledControl={!isDisabledUploadFile && isEnableSettlement && detailsData.stepStatus < 2}
           />
         </Grid>
       </Grid>

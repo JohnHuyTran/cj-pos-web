@@ -285,7 +285,20 @@ const viewOpenEndRs = {
     shiftDate: '2022-07-20T17:00:00Z',
     noOfSaleBill: 5,
     bypass: 'NONE',
-    settlementFiles: null,
+    settlementFiles: [
+      {
+        "fileKey": "OpenEnd/OE2208M04C-003-01.pdf",
+        "fileName": "BT22020002-000009-Box.pdf",
+        "mimeType": "application/pdf",
+        "branchCode": "M04C"
+      },
+      {
+        "fileKey": "OpenEnd/OE2208M04C-003-02.pdf",
+        "fileName": "BT22020002-000010-Box.pdf",
+        "mimeType": "application/pdf",
+        "branchCode": "M04C"
+      }
+    ],
     summarizeCashDeposite: {
       dailyIncomeAmount: 33850.5,
       cashOverShortAmount: 50,
