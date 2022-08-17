@@ -297,10 +297,6 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       setIsOpenModalConfirmApproved(true);
     }
   }
-  
-  const handlePayInPrint = () => {
-    // พิมพ์ใบ Pay-IN
-  }
 
   const handleClose = () => {
     setSummarizeCashDeposite(initialFormInputState.summarizeCashDeposite)
@@ -370,7 +366,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
             <Box ref={CardContent} sx={{ display: 'flex', flexDirection: 'column', padding: '20px 24px' }}>
               <Box id='DetailsSection'>
                 <Details
-                  detailsData={initialDetailsState}
+                  detailsData={{...initialDetailsState, stepStatus: stepStatus}}
                   paymentTypeItems={data?.income?.paymentTypeItems}
                   settlementFiles={settlementFiles}
                   setSettlementFiles={(value: any) => setSettlementFiles([...value])}
@@ -440,7 +436,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                         variant='contained'
                         color='primary'
                         sx={{ borderRadius: 2, height: 40, width: 125, mt: 7}}
-                        onClick={handlePayInPrint}>
+                        onClick={() => setIsOpenModelPrintDoc(true)}>
                         พิมพ์ใบ Pay-IN
                       </LoadingButton>
                     </Fragment>
@@ -549,7 +545,9 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                         <InputNumberLayout id={item.name} name={item.name} native={false}
                           title={item.name}
                           validate={externalIncomeList[index]['amount'] === null || externalIncomeList[index]['amount'] === 0}
-                          disabled={externalIncomeList[index]['noItem'] || (isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading)}
+                          disabled={externalIncomeList[index]['noItem'] || stepStatus === 3 ||
+                            (isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading)
+                          }
                           value={externalIncomeList[index]['amount']}
                           onChange={(value) => handleExternalIncomeList(
                             { amount: value }, item.code
@@ -558,7 +556,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                             control={
                               <Checkbox id={item.name} name={item.name}
                                 checked={externalIncomeList[index]['noItem']}
-                                disabled={isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading}
+                                disabled={stepStatus === 3 || (isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading)}
                                 onChange={(e) => handleExternalIncomeList(
                                   { noItem: e.target.checked }, item.code
                                 )}
@@ -763,7 +761,7 @@ const Details = (props: DetailsProps) => {
             isStatus={uploadFileFlag}
             onChangeUploadFile={(status: boolean) => setUploadFileFlag(status)}
             onDeleteAttachFile={handleDeleteFile}
-            enabledControl={!isDisabledUploadFile && isEnableSettlement}
+            enabledControl={!isDisabledUploadFile && isEnableSettlement && detailsData.stepStatus < 2}
           />
         </Grid>
       </Grid>
