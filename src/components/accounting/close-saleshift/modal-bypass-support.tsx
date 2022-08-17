@@ -20,6 +20,7 @@ import { featchCloseSaleShiptListAsync } from 'store/slices/accounting/close-sal
 import store, { useAppDispatch } from 'store/store';
 import SnackbarStatus from 'components/commons/ui/snackbar-status';
 import TextBoxComment from 'components/commons/ui/textbox-comment';
+import AlertError from 'components/commons/ui/alert-error';
 
 interface Props {
   shiftCode: string;
@@ -42,6 +43,10 @@ function ModalBypassBySupport({ shiftCode, open, onClose }: Props) {
   const [contentMsg, setContentMsg] = React.useState('');
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const [isDisableBypass, setIsDisableBypass] = React.useState(true);
+
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [textError, setTextError] = React.useState('');
+
   const handleChangeComment = (value: any) => {
     setComment(value);
     if (!stringNullOrEmpty(value)) {
@@ -72,8 +77,8 @@ function ModalBypassBySupport({ shiftCode, open, onClose }: Props) {
           }, 500);
         })
         .catch((error: ApiError) => {
-          setIsError(true);
-          setErrorMessage(error.message);
+          setOpenAlert(true);
+          setTextError(error.message);
         })
         .finally(async () => {
           const payloadSearch = store.getState().closeSaleShiftSlice.payloadSearch;
@@ -150,6 +155,7 @@ function ModalBypassBySupport({ shiftCode, open, onClose }: Props) {
         contentMsg={contentMsg}
         durationTime={1000}
       />
+      <AlertError open={openAlert} onClose={onClose} textError={textError} payload={null} />
     </>
   );
 }
