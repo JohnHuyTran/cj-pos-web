@@ -250,6 +250,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         if (!withoutNotice) {
           handleRefresh();
         }
+        if (onSearchMain) onSearchMain();
       } else {
         setOpenModalError(true);
       }
@@ -280,6 +281,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             branchName: dataDetail.branchName,
             countingDate: moment(new Date()).endOf('day').toISOString(true),
             stockCounter: dataDetailAP.stockCounter,
+            recounting: true,
             product: dataDetail.recheckSkus,
           };
           saveDraftAuditPlan(body);
@@ -445,7 +447,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   เอกสาร SC :
                 </Grid>
                 <Grid item xs={8}>
-                  <DocumentList openLink={false} relatedDocuments={dataDetail.relatedSCs} type={'SC'}/>
+                  <DocumentList openLink={true} viewMode={true} relatedDocuments={dataDetail.relatedSCs} type={'SC'}/>
                 </Grid>
               </Grid>
             )}
