@@ -16,6 +16,7 @@ import { AuditPlan, AuditPlanSearchRequest, AuditPlanSearchResponse } from '../.
 import { auditPlanGetSearch } from '../../../store/slices/audit-plan-search-slice';
 import { getAuditPlanDetail } from '../../../store/slices/audit-plan-detail-slice';
 import ModalCreateAuditPlan from './audit-plan-create';
+import LoadingModal from "../../commons/ui/loading-modal";
 
 const _ = require('lodash');
 
@@ -284,6 +285,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       )}
 
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 };

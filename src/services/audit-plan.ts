@@ -1,4 +1,4 @@
-import { post } from '../adapters/posback-adapter';
+import { post, get } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import { env } from '../adapters/environmentConfigs';
 import { Payload, PayloadCounting } from '../models/audit-plan';
@@ -56,6 +56,16 @@ export async function importAP(payload: any) {
     return error;
   }
 }
+
+export async function getProductByDocNoSA(payload: any) {
+  try {
+    const response = await get(`${env.backEnd.url}${environment.checkStock.stockAdjustment.getSkuCode.url}?documentNumbers=${payload}`);
+    return response;
+  } catch (error) {
+    return error;
+  }
+}
+
 
 export const getPathConfirmAP = (id: string) => {
   return getPathUrl(`${env.backEnd.url}${environment.checkStock.auditPlan.confirm.url}`, { id: id });

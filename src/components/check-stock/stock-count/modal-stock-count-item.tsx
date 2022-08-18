@@ -160,8 +160,10 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           disabled={
             (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
             !managePermission || viewMode ||
-            (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
-            (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+            (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !dataDetail.recounting)
+            || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
+            || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
+            || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting)
           }
           onClick={(e) => onCheckCell(e, params.row.index, params.row.skuCode)}
         />
@@ -235,8 +237,10 @@ export const ModalStockCountItem = (props: DataGridProps) => {
               disabled={
                 (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
                 !managePermission || viewMode ||
-                (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
-                (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT) ||
+                (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !dataDetail.recounting)
+                || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
+                || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
+                || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting) ||
                 !!params.getValue(params.id, 'checked')
               }
             />

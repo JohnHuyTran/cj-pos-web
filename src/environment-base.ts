@@ -438,6 +438,12 @@ export const environment = {
       search: {
         url: '/stock/stock-adjust',
       },
+      tempStockSearch: {
+        url: '/stock/stock-adjust/has-temp-stock'
+      },
+      getSkuCode: {
+        url: '/stock/stock-adjust/get-sku'
+      },
       saveDraft: {
         url: '/stock/stock-adjust',
       },

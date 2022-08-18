@@ -27,6 +27,8 @@ const initialState: State = {
       relatedScDocuments: [],
       relatedSaDocuments: [],
       stockCounter: 0,
+      recounting: true,
+      recountingBy: 2,
     },
   },
   error: '',
@@ -35,26 +37,7 @@ const initialState: State = {
 export const getAuditPlanDetail = createAsyncThunk('getAuditPlanDetail', async (id: string) => {
   try {
     const apiRootPath = `${environment.checkStock.auditPlan.detail.url}/${id}`;
-    let response: AuditPlanDetailResponse = {
-      ref: '',
-      code: 0,
-      message: '',
-      data: {
-        id: '',
-        branchCode: '',
-        branchName: '',
-        createdBy: '',
-        createdByGroup: '',
-        documentNumber: '',
-        status: '',
-        createdDate: '',
-        countingDate: '',
-        product: [],
-        relatedScDocuments: [],
-        relatedSaDocuments: [],
-        stockCounter: 0,
-      },
-    };
+    let response: AuditPlanDetailResponse;
     response = await get(apiRootPath).then();
     return response;
   } catch (error) {

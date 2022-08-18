@@ -10,6 +10,17 @@ export interface StockAdjustmentSearchRequest {
   type?: string | undefined;
 }
 
+export interface StockAdjustHasTempStockSearchRequest {
+  perPage: string;
+  page: string;
+  docNo: string;
+  branch: string;
+  creationDateFrom: string;
+  creationDateTo: string;
+  clearSearch?: boolean;
+  type?: string | undefined;
+}
+
 export interface StockAdjustmentSearchResponse {
   ref: string;
   code: number;
