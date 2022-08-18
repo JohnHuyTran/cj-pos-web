@@ -257,29 +257,26 @@ function CloseSaleShiftSearchList() {
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
-    // if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
-    //   handleOpenLoading('open', true);
-    //   const payload: CloseSaleShiftInfo = {
-    //     branchCode: params.row.branchCode,
-    //     shiftCode: params.row.shiftCode,
-    //     shiftKey: params.row.shiftKey,
-    //     shiftDate: params.row.shiftDate,
-    //     shiftAmount: params.row.shiftAmount,
-    //     billAmount: params.row.billAmount,
-    //     confirmAmount: params.row.confirmAmount,
-    //     noOfSaleBill: params.row.noOfSaleBill,
-    //     noOfReturnBill: params.row.noOfReturnBill,
-    //     status: '',
-    //     posCode: params.row.posCode,
-    //     posUser: params.row.posUser,
-    //   };
-    //   setPayloadCloseShiftKey(payload);
-    //   handleOpenLoading('open', false);
-    //   setOpenPopupCloseShiftKey(true);
-    // } else if (isGroupSupport()) {
-    setOpenModalBypassBySupport(true);
-    setShiftCodeSelect(params.row.shiftCode);
-    // }
+    if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
+      handleOpenLoading('open', true);
+      const payload: CloseSaleShiftInfo = {
+        branchCode: params.row.branchCode,
+        shiftCode: params.row.shiftCode,
+        shiftKey: params.row.shiftKey,
+        shiftDate: params.row.shiftDate,
+        shiftAmount: params.row.shiftAmount,
+        billAmount: params.row.billAmount,
+        confirmAmount: params.row.confirmAmount,
+        noOfSaleBill: params.row.noOfSaleBill,
+        noOfReturnBill: params.row.noOfReturnBill,
+        status: '',
+        posCode: params.row.posCode,
+        posUser: params.row.posUser,
+      };
+      setPayloadCloseShiftKey(payload);
+      handleOpenLoading('open', false);
+      setOpenPopupCloseShiftKey(true);
+    }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
     return {
