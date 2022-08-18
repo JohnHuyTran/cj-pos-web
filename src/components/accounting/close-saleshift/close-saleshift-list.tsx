@@ -4,7 +4,7 @@ import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import NumberFormat from 'react-number-format';
-import { isGroupBranch } from 'utils/role-permission';
+import { isGroupBranch, isGroupSupport } from 'utils/role-permission';
 import { stringNullOrEmpty } from 'utils/utils';
 import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
 import {
@@ -16,6 +16,7 @@ import { useStyles } from '../../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
 import { STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
+import ModalBypassBySupport from './modal-bypass-support';
 import ModalSaveCloseShiftKey from './modal-save-close-shift-key';
 
 function CloseSaleShiftSearchList() {
@@ -35,7 +36,9 @@ function CloseSaleShiftSearchList() {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
+  const [shiftCodeSelect, setShiftCodeSelect] = React.useState('');
   const [openPopupCloseShiftKey, setOpenPopupCloseShiftKey] = React.useState(false);
+  const [openModalBypassBySupport, setOpenModalBypassBySupport] = React.useState(false);
   const [payloadCloseShiftKey, setPayloadCloseShiftKey] = React.useState<CloseSaleShiftInfo>();
   const columns: GridColDef[] = [
     {
@@ -254,26 +257,29 @@ function CloseSaleShiftSearchList() {
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
-    if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
-      handleOpenLoading('open', true);
-      const payload: CloseSaleShiftInfo = {
-        branchCode: params.row.branchCode,
-        shiftCode: params.row.shiftCode,
-        shiftKey: params.row.shiftKey,
-        shiftDate: params.row.shiftDate,
-        shiftAmount: params.row.shiftAmount,
-        billAmount: params.row.billAmount,
-        confirmAmount: params.row.confirmAmount,
-        noOfSaleBill: params.row.noOfSaleBill,
-        noOfReturnBill: params.row.noOfReturnBill,
-        status: '',
-        posCode: params.row.posCode,
-        posUser: params.row.posUser,
-      };
-      setPayloadCloseShiftKey(payload);
-      handleOpenLoading('open', false);
-      setOpenPopupCloseShiftKey(true);
-    }
+    // if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
+    //   handleOpenLoading('open', true);
+    //   const payload: CloseSaleShiftInfo = {
+    //     branchCode: params.row.branchCode,
+    //     shiftCode: params.row.shiftCode,
+    //     shiftKey: params.row.shiftKey,
+    //     shiftDate: params.row.shiftDate,
+    //     shiftAmount: params.row.shiftAmount,
+    //     billAmount: params.row.billAmount,
+    //     confirmAmount: params.row.confirmAmount,
+    //     noOfSaleBill: params.row.noOfSaleBill,
+    //     noOfReturnBill: params.row.noOfReturnBill,
+    //     status: '',
+    //     posCode: params.row.posCode,
+    //     posUser: params.row.posUser,
+    //   };
+    //   setPayloadCloseShiftKey(payload);
+    //   handleOpenLoading('open', false);
+    //   setOpenPopupCloseShiftKey(true);
+    // } else if (isGroupSupport()) {
+    setOpenModalBypassBySupport(true);
+    setShiftCodeSelect(params.row.shiftCode);
+    // }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
     return {
@@ -318,6 +324,13 @@ function CloseSaleShiftSearchList() {
         open={openPopupCloseShiftKey}
         payload={payloadCloseShiftKey}
         onClose={() => setOpenPopupCloseShiftKey(false)}
+      />
+      <ModalBypassBySupport
+        shiftCode={shiftCodeSelect}
+        open={openModalBypassBySupport}
+        onClose={() => {
+          setOpenModalBypassBySupport(false);
+        }}
       />
     </div>
   );
