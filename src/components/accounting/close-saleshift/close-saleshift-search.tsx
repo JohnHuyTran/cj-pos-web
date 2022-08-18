@@ -117,8 +117,10 @@ function CloseSaleShiftSearch() {
 
   const onClickSearch = async () => {
     handleOpenLoading('open', true);
-    setDisableCloseShiftKey(true);
-    checkSaleShipInfo();
+    if (groupBranch) {
+      setDisableCloseShiftKey(true);
+      checkSaleShipInfo();
+    }
     if (startDate !== null) {
       let limits: number;
       if (limit === 0 || limit === undefined) {
@@ -136,8 +138,11 @@ function CloseSaleShiftSearch() {
 
       await dispatch(featchCloseSaleShiptListAsync(payload));
       await dispatch(savePayloadSearch(payload));
+      const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
       const _noOfShiftKey = store.getState().closeSaleShiftSlice.closeSaleShift.total;
-      setNoOfShiftKey(_noOfShiftKey.toString());
+      if (datas && datas.length > 0) {
+        setNoOfShiftKey(_noOfShiftKey.toString());
+      }
 
       setFlagSearch(true);
     } else {
