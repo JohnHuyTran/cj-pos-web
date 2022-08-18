@@ -32,6 +32,7 @@ import { updateAddTypeAndProductState } from "../../../store/slices/add-type-pro
 import { getProductByDocNoSA } from "../../../services/audit-plan";
 import AlertError from '../../commons/ui/alert-error';
 import { getStockAdjustHasTempStockSearch } from "../../../store/slices/stock-adjust-has-temp-stock-search";
+import { clearDataFilter } from  '../../../store/slices/stock-adjust-has-temp-stock-search'
 
 export interface Props {
   open: boolean;
@@ -138,8 +139,10 @@ export const ModalAddProductFromSA = (props: Props) => {
     })
     setDataTable([])
     setCheckAll(false)
+    dispatch(clearDataFilter())
   };
   const onSearch = async () => {
+    setCheckAll(false)
     if (!validateSearch()) {
       return;
     }
@@ -159,6 +162,7 @@ export const ModalAddProductFromSA = (props: Props) => {
   };
 
   const handlePageChange = async (newPage: number) => {
+    if (saSearchResponse.total < 10) return;
     setCheckAll(false);
     setOpenLoadingModal(true);
     let page: string = (newPage + 1).toString();
@@ -351,7 +355,7 @@ export const ModalAddProductFromSA = (props: Props) => {
             </Box>
           </Box>
           <div
-            style={{ width: '100%', height: 'auto' }}
+            style={{ width: '100%', height: dataTable.length == 0 ? 231 :  'auto' }}
             className={classes.MdataGridDetail}>
             <DataGrid
               rows={dataTable}
@@ -361,10 +365,9 @@ export const ModalAddProductFromSA = (props: Props) => {
               pagination
               page={currentPage - 1}
               disableColumnMenu
-              autoHeight
+              autoHeight={!!dataTable.length}
               onPageChange={handlePageChange}
               rowCount={saSearchResponse.total}
-              scrollbarSize={10}
               paginationMode="server"
               rowHeight={45}
               components={{
