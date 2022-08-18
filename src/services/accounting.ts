@@ -13,6 +13,7 @@ import {
 import { ContentType } from '../utils/enum/common-enum';
 import { getPathUrl } from './base-service';
 import { env } from '../adapters/environmentConfigs';
+import { byPassByBranchMock } from 'mockdata/branch-accounting';
 
 export async function expenseSave(payload: ExpenseSaveRequest, files: File[]) {
   const bodyFormData = new FormData();
@@ -326,14 +327,10 @@ export async function saveOpenEnd(payload: any, files: File[]) {
   });
 
   try {
-    const response = await put(
-      environment.branchAccounting.openEnd.save.url,
-      bodyFormData,
-      ContentType.MULTIPART
-    )
-    return response
-  } catch(error) {
-    throw error
+    const response = await put(environment.branchAccounting.openEnd.save.url, bodyFormData, ContentType.MULTIPART);
+    return response;
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -350,15 +347,38 @@ export async function submitApproveOpenEnd(docNo: string, payload: any, files: F
 
   try {
     const response = await post(
-      getPathSubmitApprove(
-        docNo,
-        environment.branchAccounting.openEnd.submitApprove.url
-      ),
+      getPathSubmitApprove(docNo, environment.branchAccounting.openEnd.submitApprove.url),
       bodyFormData,
       ContentType.MULTIPART
-    )
-    return response
-  } catch(error) {
-    throw error
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function byPassByBranch(payload: any) {
+  try {
+    const response = await post(
+      environment.branchAccounting.closeSaleShift.byPassByBranch.url,
+      payload,
+      ContentType.JSON
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function byPassBySupport(payload: any) {
+  try {
+    const response = await post(
+      environment.branchAccounting.closeSaleShift.byPassBySupport.url,
+      payload,
+      ContentType.JSON
+    );
+    return response;
+  } catch (error) {
+    throw error;
   }
 }
