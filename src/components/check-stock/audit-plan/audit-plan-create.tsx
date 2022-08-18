@@ -504,7 +504,8 @@ export default function ModalCreateAuditPlan({
     dispatch(getAuditPlanDetail(dataDetail.id));
   };
   const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
-  const handleOpenAP = async () => {
+  const handleOpenSADetail = async () => {
+    if (viewMode) return;
     setOpenLoadingModal(true);
     try {
       await dispatch(getStockAdjustmentDetail(dataDetail.relatedSaDocuments[0].id));
@@ -640,7 +641,7 @@ export default function ModalCreateAuditPlan({
                     เอกสาร SA :
                   </Grid>
                   <Grid item xs={8}>
-                  <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenAP}>
+                  <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenSADetail}>
                   {dataDetail.relatedSaDocuments[0].documentNumber}
                 </Link>
                   </Grid>
