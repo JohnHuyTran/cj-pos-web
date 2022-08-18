@@ -7,7 +7,7 @@ import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import UpdateIcon from '@mui/icons-material/Update';
 import { getUserInfo } from '../../../store/sessionStore';
-import { getBranchName } from '../../../utils/utils';
+import { getBranchName, stringNullOrEmpty } from '../../../utils/utils';
 import { env } from '../../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
@@ -78,6 +78,7 @@ function CloseSaleShiftSearch() {
   const [textError, setTextError] = React.useState('');
 
   const [disableCloseShiftKey, setDisableCloseShiftKey] = React.useState(true);
+  const [disableBtnBypass, setDisableBtnBypass] = React.useState(true);
   const [openModalCloseSale, setOpenModalCloseSale] = React.useState(false);
   const [docNo, setDocNo] = React.useState('');
   const [noOfShiftKey, setNoOfShiftKey] = React.useState('');
@@ -98,9 +99,26 @@ function CloseSaleShiftSearch() {
       setValues({ ...values, branchFrom: '' });
     }
   };
+
+  const checkSaleShipInfo = async () => {
+    await shiftCloseCheckInfo({ shiftDate: moment(startDate).endOf('day').toISOString() })
+      .then(async (value) => {
+        if (value.data) {
+          setDisableCloseShiftKey(!value.data.canProceedEnd);
+          if (stringNullOrEmpty(value.data.openEndDocNo)) {
+            setDisableBtnBypass(false);
+          } else {
+            setDisableBtnBypass(true);
+          }
+        }
+      })
+      .catch((error: ApiError) => {});
+  };
+
   const onClickSearch = async () => {
     handleOpenLoading('open', true);
-
+    setDisableCloseShiftKey(true);
+    checkSaleShipInfo();
     if (startDate !== null) {
       let limits: number;
       if (limit === 0 || limit === undefined) {
@@ -118,20 +136,8 @@ function CloseSaleShiftSearch() {
 
       await dispatch(featchCloseSaleShiptListAsync(payload));
       await dispatch(savePayloadSearch(payload));
-      const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
       const _noOfShiftKey = store.getState().closeSaleShiftSlice.closeSaleShift.total;
-      if (datas && datas.length > 0) {
-        setNoOfShiftKey(_noOfShiftKey.toString());
-        await shiftCloseCheckInfo(payload)
-          .then(async (value) => {
-            if (value.data) {
-              setDisableCloseShiftKey(!value.data.canProceedEnd);
-            }
-          })
-          .catch((error: ApiError) => {});
-      } else {
-        setDisableCloseShiftKey(true);
-      }
+      setNoOfShiftKey(_noOfShiftKey.toString());
 
       setFlagSearch(true);
     } else {
@@ -198,6 +204,23 @@ function CloseSaleShiftSearch() {
     setDisableBtnManage(isAllowActionPermission(ACTIONS.SALE_SHIFT_MANAGE));
     setDisableBtnSearch(isAllowActionPermission(ACTIONS.SALE_SHIFT_VIEW));
   }, []);
+
+  React.useEffect(() => {
+    if (groupBranch) {
+      const payload: CloseSaleShiftRequest = {
+        shiftDate: moment(startDate).endOf('day').toISOString(),
+        branchCode: branchFromCode,
+        status: values.status,
+        page: page,
+        limit: 10,
+      };
+
+      dispatch(featchCloseSaleShiptListAsync(payload));
+      dispatch(savePayloadSearch(payload));
+      checkSaleShipInfo();
+      setFlagSearch(true);
+    }
+  }, [open]);
 
   return (
     <>
@@ -277,7 +300,8 @@ function CloseSaleShiftSearch() {
               onClick={handleOnBypass}
               sx={{ ml: 2, minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnSearch}
-              startIcon={<ArrowBackIcon />}>
+              startIcon={<ArrowBackIcon />}
+              disabled={disableBtnBypass}>
               Bypass
             </Button>
           </Grid>
@@ -337,6 +361,9 @@ function CloseSaleShiftSearch() {
         open={modalBypass}
         onClose={() => {
           setModalByPass(false);
+        }}
+        onCallBack={() => {
+          setFlagSearch(true);
         }}
       />
     </>

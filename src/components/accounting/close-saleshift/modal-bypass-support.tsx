@@ -11,9 +11,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
-import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import { stringNullOrEmpty } from 'utils/utils';
-import { byPassByBranch } from 'services/accounting';
+import { byPassBySupport } from 'services/accounting';
 import { ApiError } from 'models/api-error-model';
 import LoadingModal from 'components/commons/ui/loading-modal';
 import { featchCloseSaleShiptListAsync } from 'store/slices/accounting/close-saleshift-slice';
@@ -67,7 +66,7 @@ function ModalBypassBySupport({ shiftCode, open, onClose }: Props) {
       const payload: any = {
         comment: comment,
       };
-      await byPassByBranch(payload)
+      await byPassBySupport(payload)
         .then(async (value) => {
           setShowSnackBar(true);
           setSnackbarIsStatus(true);

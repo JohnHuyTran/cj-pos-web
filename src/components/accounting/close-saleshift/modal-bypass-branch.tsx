@@ -13,9 +13,10 @@ import SnackbarStatus from 'components/commons/ui/snackbar-status';
 interface Props {
   open: boolean;
   onClose: () => void;
+  onCallBack: () => void;
 }
 
-function ModalByPassByBranch({ open, onClose }: Props) {
+function ModalByPassByBranch({ open, onClose, onCallBack }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [qrcode, setQrcode] = React.useState('');
@@ -45,7 +46,7 @@ function ModalByPassByBranch({ open, onClose }: Props) {
       setIsError(true);
     } else {
       const payload: any = {
-        qrCode: qrcode,
+        payload: qrcode,
       };
       await byPassByBranch(payload)
         .then(async (value) => {
@@ -54,6 +55,7 @@ function ModalByPassByBranch({ open, onClose }: Props) {
           setContentMsg('ส่งคำร้องขอ เรียบร้อยแล้ว');
           setTimeout(() => {
             onClose();
+            onCallBack();
           }, 500);
         })
         .catch((error: ApiError) => {

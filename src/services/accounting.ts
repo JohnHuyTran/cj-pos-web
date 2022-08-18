@@ -358,23 +358,27 @@ export async function submitApproveOpenEnd(docNo: string, payload: any, files: F
 }
 
 export async function byPassByBranch(payload: any) {
-  // const response = await post(environment.branchAccounting.closeSaleShift.byPassByBranch.url, payload, ContentType.JSON)
-  //   .then((result: any) => result)
-  //   .catch((error) => {
-  //     throw error;
-  //   });
-  return byPassByBranchMock();
+  try {
+    const response = await post(
+      environment.branchAccounting.closeSaleShift.byPassByBranch.url,
+      payload,
+      ContentType.JSON
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export async function byPassBySupport(payload: any) {
-  // const response = await post(
-  //   environment.branchAccounting.closeSaleShift.byPassBySupport.url,
-  //   payload,
-  //   ContentType.JSON
-  // )
-  //   .then((result: any) => result)
-  //   .catch((error) => {
-  //     throw error;
-  //   });
-  return byPassByBranchMock();
+  try {
+    const response = await post(
+      environment.branchAccounting.closeSaleShift.byPassBySupport.url,
+      payload,
+      ContentType.JSON
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
 }
