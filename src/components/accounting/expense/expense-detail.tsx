@@ -74,7 +74,7 @@ import { uploadFileState } from '../../../store/slices/upload-file-slice';
 interface Props {
   isOpen: boolean;
   onClickClose: () => void;
-  type: string;
+  type?: string;
   edit: boolean;
   periodProps?: ExpensePeriod;
 }
@@ -1093,7 +1093,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             }
       );
       setEditAction(edit);
-      setExpenseType(type);
+      setExpenseType(type ? type : '');
       setExpenseTypeName(
         type === EXPENSE_TYPE.COFFEE
           ? 'รายละเอียดเอกสารค่าใช้จ่ายร้านกาแฟ'
