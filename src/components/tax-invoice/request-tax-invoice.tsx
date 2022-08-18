@@ -38,7 +38,7 @@ function RequestTaxInvoice({ isOpen, onChangeTaxNo, onClose, onRequest }: Props)
     <React.Fragment>
       <Dialog open={open} maxWidth='sm' fullWidth={true}>
         <BootstrapDialogTitle id='customized-dialog-title' onClose={onClose}>
-          <Typography sx={{ fontWeight: 'bold' }}>ขอออกใบกำกับภาษีจากสำนักงานใหญ่</Typography>
+          <Typography sx={{ fontWeight: 'bold' }}>ค้นหาใบเสร็จจาก สนง.ใหญ่</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container rowSpacing={1} columnSpacing={{ xs: 4 }}>
@@ -72,7 +72,7 @@ function RequestTaxInvoice({ isOpen, onChangeTaxNo, onClose, onRequest }: Props)
                 className={classes.MbtnPrint}
                 fullWidth={true}
                 color='info'>
-                ร้องขอ
+                ค้นหา
               </Button>
             </Grid>
           </Grid>
