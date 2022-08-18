@@ -356,7 +356,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      hide: !auditPermission,
+      hide: !auditPermission || viewMode,
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
@@ -592,7 +592,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
-      hide: !auditPermission,
+      hide: !auditPermission || viewMode,
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
