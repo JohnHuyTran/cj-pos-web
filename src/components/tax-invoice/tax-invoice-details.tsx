@@ -886,12 +886,12 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 id='btnCreateStockTransferModal'
                 variant='contained'
                 onClick={handleSubmit(onSave)}
-                sx={{ width: 220 }}
+                sx={{ width: 150 }}
                 className={classes.MbtnClear}
                 startIcon={<ContentPaste />}
                 color='primary'
                 disabled={disabledBtnPreview}>
-                Preview ใบเสร็จ / ใบกำกับ
+                พิมพ์
               </Button>
             </Grid>
             <Grid item xs={10} sx={{ textAlign: 'end' }}>
