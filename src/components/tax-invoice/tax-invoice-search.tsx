@@ -223,20 +223,20 @@ export default function TaxInvoiceSearch() {
       </Box>
       <Box mb={3}>
         <Grid container spacing={2} mt={4} mb={2}>
-          <Grid item xs={4}>
+          <Grid item xs={3} sx={{ textAlign: 'start' }}>
             {' '}
             <Button
               id='btnSearch'
               variant='contained'
               onClick={onClickRequestBtn}
-              sx={{ maxWidth: '250', ml: 1, display: `${hideRequesthBtn ? 'none' : ''}` }}
               className={classes.MbtnClear}
+              sx={{ display: `${hideRequesthBtn ? 'none' : ''}` }}
               fullWidth={true}
               color='cancelColor'>
               ค้นหาใบเสร็จเกิน 3 เดือนจาก สนง.ใหญ่
             </Button>
           </Grid>
-          <Grid item xs={8} sx={{ textAlign: 'end' }}>
+          <Grid item xs={9} sx={{ textAlign: 'end' }}>
             {' '}
             <Button
               id='btnClear'
