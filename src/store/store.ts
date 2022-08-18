@@ -90,6 +90,7 @@ import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branc
 import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-reasons-slice';
 import auditPlanDetailSlice from './slices/audit-plan-detail-slice';
 import auditPlanSearchSlice from './slices/audit-plan-search-slice';
+import stockAdjustHasTempStockSearchSlice from './slices/stock-adjust-has-temp-stock-search'
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -182,6 +183,7 @@ const store = configureStore({
     verifyReasonsRejectListSlice: verifyReasonsRejectListSlice,
     auditPlanDetailSlice: auditPlanDetailSlice,
     auditPlanSearchSlice: auditPlanSearchSlice,
+    stockAdjustHasTempStockSearchSlice: stockAdjustHasTempStockSearchSlice,
   },
 });
 

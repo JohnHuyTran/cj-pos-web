@@ -51,6 +51,8 @@ export interface AuditPlan {
   createdDate: string;
   countingDate: string;
   stockCounter: number;
+  recountingBy?: number;
+  recounting?: boolean;
   product: AuditPlanProductDetail[];
   relatedScDocuments: relatedScDocuments[];
   relatedSaDocuments: relatedSaDocuments[];
