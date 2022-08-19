@@ -14,7 +14,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
-import { STATUS } from '../../../utils/enum/accounting-enum';
+import { CLOSE_SALE_SHIFT_ENUM, STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
 import ModalBypassBySupport from './modal-bypass-support';
 import ModalSaveCloseShiftKey from './modal-save-close-shift-key';
@@ -258,6 +258,7 @@ function CloseSaleShiftSearchList() {
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
+    const byPassStatus = '';
     if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
       handleOpenLoading('open', true);
       const payload: CloseSaleShiftInfo = {
@@ -277,11 +278,12 @@ function CloseSaleShiftSearchList() {
       setPayloadCloseShiftKey(payload);
       handleOpenLoading('open', false);
       setOpenPopupCloseShiftKey(true);
-    } else {
-      setShiftCodeSelect(params.row.shiftCode);
-      setBranchCodeSelect(params.row.branchCode);
-      setOpenModalBypassBySupport(true);
     }
+    // else if (isGroupSupport() && status === CLOSE_SALE_SHIFT_ENUM.CORRECT && byPassStatus) {
+    //   setShiftCodeSelect(params.row.shiftCode);
+    //   setBranchCodeSelect(params.row.branchCode);
+    //   setOpenModalBypassBySupport(true);
+    // }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
     return {
