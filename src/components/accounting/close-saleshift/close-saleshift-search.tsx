@@ -369,6 +369,7 @@ function CloseSaleShiftSearch() {
         }}
         onCallBack={() => {
           setFlagSearch(true);
+          checkSaleShipInfo();
         }}
       />
     </>
