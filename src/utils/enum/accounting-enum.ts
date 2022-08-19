@@ -96,12 +96,12 @@ export const getExpenseStatus = (key: string) => expenseStatusList.find((item) =
 // return stockTransferStatus.filter((item) => item.type === type || item.type === 'ALL');
 export enum CLOSE_SALE_SHIFT_ENUM {
   DRAFT = 'DRAFT',
-  PENDDING_REVIEW = 'PENDDING_REVIEW',
+  PENDING_REVIEW = 'PENDING_REVIEW',
   CORRECT = 'CORRECT',
 }
 export const closeSaleShift = [
   { key: CLOSE_SALE_SHIFT_ENUM.DRAFT, text: 'บันทึก' },
-  { key: CLOSE_SALE_SHIFT_ENUM.PENDDING_REVIEW, text: 'รอตรวจสอบ' },
+  { key: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW, text: 'รอตรวจสอบ' },
   { key: CLOSE_SALE_SHIFT_ENUM.CORRECT, text: 'ถูกต้อง' },
 ];
 

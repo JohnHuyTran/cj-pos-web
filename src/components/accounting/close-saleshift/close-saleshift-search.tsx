@@ -157,7 +157,7 @@ function CloseSaleShiftSearch() {
     if (!isGroupBranch()) {
       setStartDate(null);
       setBranchFromCode('');
-      setValues({ status: CLOSE_SALE_SHIFT_ENUM.PENDDING_REVIEW, branchFrom: '' });
+      setValues({ status: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW, branchFrom: '' });
     } else {
       setValues({ ...values, status: 'ALL' });
     }
@@ -204,7 +204,7 @@ function CloseSaleShiftSearch() {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchFrom: ownBranch });
     } else {
-      setValues({ ...values, status: CLOSE_SALE_SHIFT_ENUM.PENDDING_REVIEW });
+      setValues({ ...values, status: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW });
     }
     setDisableBtnManage(isAllowActionPermission(ACTIONS.SALE_SHIFT_MANAGE));
     setDisableBtnSearch(isAllowActionPermission(ACTIONS.SALE_SHIFT_VIEW));
