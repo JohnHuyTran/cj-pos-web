@@ -20,13 +20,15 @@ import store, { useAppDispatch } from 'store/store';
 import SnackbarStatus from 'components/commons/ui/snackbar-status';
 import TextBoxComment from 'components/commons/ui/textbox-comment';
 import AlertError from 'components/commons/ui/alert-error';
+import { BypassPayload } from 'models/branch-accounting-model';
 
 interface Props {
   shiftCode: string;
+  branchCode: string;
   open: boolean;
   onClose: () => void;
 }
-function ModalBypassBySupport({ shiftCode, open, onClose }: Props) {
+function ModalBypassBySupport({ shiftCode, branchCode, open, onClose }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [comment, setComment] = React.useState('');
@@ -63,8 +65,10 @@ function ModalBypassBySupport({ shiftCode, open, onClose }: Props) {
       setErrorMessage('กรุณากรอกหมายเหตุ');
       setIsError(true);
     } else {
-      const payload: any = {
-        comment: comment,
+      const payload: BypassPayload = {
+        shiftCode: shiftCode,
+        branchCode: branchCode,
+        remark: comment,
       };
       await byPassBySupport(payload)
         .then(async (value) => {

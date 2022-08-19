@@ -505,3 +505,10 @@ export interface CashPayment {
   coffeeExpenseAmount: number;
   frontExpenseAmount: number;
 }
+
+export interface BypassPayload {
+  branchCode?: string;
+  shiftCode?: string;
+  remark?: string;
+  payload?: string;
+}

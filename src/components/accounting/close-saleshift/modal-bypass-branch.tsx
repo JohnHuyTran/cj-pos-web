@@ -9,6 +9,7 @@ import LoadingModal from 'components/commons/ui/loading-modal';
 import { featchCloseSaleShiptListAsync } from 'store/slices/accounting/close-saleshift-slice';
 import store, { useAppDispatch } from 'store/store';
 import SnackbarStatus from 'components/commons/ui/snackbar-status';
+import { BypassPayload } from 'models/branch-accounting-model';
 
 interface Props {
   open: boolean;
@@ -45,7 +46,7 @@ function ModalByPassByBranch({ open, onClose, onCallBack }: Props) {
       setErrorMessage('ข้อมูล Bypass ไม่ถูกต้อง');
       setIsError(true);
     } else {
-      const payload: any = {
+      const payload: BypassPayload = {
         payload: qrcode,
       };
       await byPassByBranch(payload)
