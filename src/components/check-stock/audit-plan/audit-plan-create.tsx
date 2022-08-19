@@ -321,8 +321,8 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleClose = async () => {
-    dispatch(updateAddTypeAndProductState([]));
     if (!notClearWhenClose) {
+      dispatch(updateAddTypeAndProductState([]));
       dispatch(clearDataFilter());
     }
     setOpen(false);

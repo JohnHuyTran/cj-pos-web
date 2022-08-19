@@ -247,9 +247,9 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     let isDisplay = false;
     if (STOCK_COUNTER_TYPE.BRANCH === stockCounter) {
       if (auditPermission) {
-        isDisplay = isGroupBranchParam(_group);
-      } else {
         isDisplay = false;
+      } else {
+        isDisplay = isGroupBranchParam(_group);
       }
     } else if (STOCK_COUNTER_TYPE.AUDIT === stockCounter) {
       isDisplay = auditPermission;
