@@ -37,6 +37,7 @@ function CloseSaleShiftSearchList() {
   };
 
   const [shiftCodeSelect, setShiftCodeSelect] = React.useState('');
+  const [branchCodeSelect, setBranchCodeSelect] = React.useState('');
   const [openPopupCloseShiftKey, setOpenPopupCloseShiftKey] = React.useState(false);
   const [openModalBypassBySupport, setOpenModalBypassBySupport] = React.useState(false);
   const [payloadCloseShiftKey, setPayloadCloseShiftKey] = React.useState<CloseSaleShiftInfo>();
@@ -276,6 +277,10 @@ function CloseSaleShiftSearchList() {
       setPayloadCloseShiftKey(payload);
       handleOpenLoading('open', false);
       setOpenPopupCloseShiftKey(true);
+    } else {
+      setShiftCodeSelect(params.row.shiftCode);
+      setBranchCodeSelect(params.row.branchCode);
+      setOpenModalBypassBySupport(true);
     }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
@@ -293,6 +298,7 @@ function CloseSaleShiftSearchList() {
       noOfSaleBill: item.noOfSaleBill,
       noOfReturnBill: item.noOfReturnBill,
       shiftDate: `${convertUtcToBkkDate(item.shiftDate)} ${moment(item.shiftDate).format('HH:mm ')}`,
+      branchCode: item.branchCode,
     };
   });
   return (
@@ -328,6 +334,7 @@ function CloseSaleShiftSearchList() {
         onClose={() => {
           setOpenModalBypassBySupport(false);
         }}
+        branchCode={branchCodeSelect}
       />
     </div>
   );

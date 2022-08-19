@@ -645,7 +645,7 @@ export const environment = {
         url: 'sale/shift-closes/bypass',
       },
       byPassBySupport: {
-        url: 'sale/shift-closes/bypass',
+        url: 'sale/shift-closes/bypass/confirm',
       },
     },
     cashStatement: {
