@@ -360,7 +360,10 @@ function CloseSaleShiftSearch() {
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
       <ModalCloseSale
         open={openModalCloseSale}
-        onClose={() => setOpenModalCloseSale(false)}
+        onClose={async () => {
+          setOpenModalCloseSale(false);
+          await checkSaleShipInfo();
+        }}
         noOfShiftKey={noOfShiftKey}
       />
       <ModalByPassByBranch

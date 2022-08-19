@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, Grid, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
 import React from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
@@ -16,9 +16,9 @@ function ModalCloseSale({ open, onClose, noOfShiftKey }: Props) {
   return (
     <>
       <Dialog open={open} maxWidth='sm' fullWidth={true} key='modal-add-expense'>
-        <BootstrapDialogTitle id='dialog-title' onClose={onClose}>
+        <DialogTitle>
           <Typography sx={{ fontSize: 20, fontWeight: 400 }}>ปิดรหัสการขายสำเร็จ</Typography>
-        </BootstrapDialogTitle>
+        </DialogTitle>
         <DialogContent sx={{ justifyContent: 'center' }}>
           <Box>
             <Grid container data-testid='testid-label-noOfShiftKey'>
