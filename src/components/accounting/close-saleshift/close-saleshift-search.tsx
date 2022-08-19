@@ -105,6 +105,7 @@ function CloseSaleShiftSearch() {
       .then(async (value) => {
         if (value.data) {
           setDisableCloseShiftKey(!value.data.canProceedEnd);
+          setNoOfShiftKey(value.data.noOfShifts);
           if (stringNullOrEmpty(value.data.openEndDocNo)) {
             setDisableBtnBypass(false);
           } else {
