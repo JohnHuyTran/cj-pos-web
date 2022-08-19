@@ -54,6 +54,7 @@ export interface AuditPlan {
   recountingBy?: number;
   recounting?: boolean;
   product: AuditPlanProductDetail[];
+  appliedProduct: any;
   relatedScDocuments: relatedScDocuments[];
   relatedSaDocuments: relatedSaDocuments[];
 }
