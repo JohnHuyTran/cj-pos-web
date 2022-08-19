@@ -21,7 +21,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import IconButton from '@mui/material/IconButton';
 import { useStyles } from '../../styles/makeTheme';
 
-import { saveOrderShipments, getPathReportSD, approveOrderShipmentsOC } from '../../services/order-shipment';
+import {
+  saveOrderShipments,
+  getPathReportSD,
+  approveOrderShipmentsOC,
+  rejectOrderShipmentsOC,
+} from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import ConfirmExitModel from './confirm-model';
 import {
@@ -71,6 +76,8 @@ import _ from 'lodash';
 import { isErrorCode } from '../../utils/exception/pos-exception';
 import { ToteItem } from '../../models/tote-model';
 import moment from 'moment';
+import TextBoxComentList from 'components/commons/ui/texbox-commentList';
+import ModalReject from './modal-reject';
 
 interface loadingModalState {
   open: boolean;
@@ -719,6 +726,36 @@ export default function CheckOrderDetail({
     const fileKeyDel = item.fileKey;
   };
 
+  const [openReject, setOpenReject] = React.useState(false);
+
+  const handleRejectBtn = () => {
+    setOpenReject(true);
+  };
+
+  const onCallBackReject = async (comment: string) => {
+    handleOpenLoading('open', true);
+    setOpenReject(false);
+    const payload: any = {
+      comment: comment,
+      sdNo: sdNo,
+    };
+    await rejectOrderShipmentsOC(payload)
+      .then((value) => {
+        setShowSnackBar(true);
+        setContentMsg('ส่งคำขอ เรียบร้อยแล้ว');
+        setSnackbarStatus(true);
+        updateShipmentOrder();
+        updateAddItemsState({});
+      })
+      .catch((error: ApiError) => {
+        setOpenFailAlert(true);
+        setTextFail(error.message);
+      })
+      .finally(() => {
+        handleOpenLoading('open', false);
+      });
+  };
+
   return (
     <div>
       <Dialog open={open} maxWidth='xl' fullWidth={true}>
@@ -954,7 +991,7 @@ export default function CheckOrderDetail({
                       variant='contained'
                       color='error'
                       className={classes.MbtnApprove}
-                      onClick={handleApproveOCBtn}
+                      onClick={handleRejectBtn}
                       startIcon={<HighlightOffIcon />}
                       style={{ width: 200 }}>
                       ไม่อนุมัติ
@@ -975,37 +1012,7 @@ export default function CheckOrderDetail({
             )}
           </Box>
           <Box sx={{ mt: 2 }}>
-            <Typography variant='body2' sx={{ mb: '5px' }}>
-              หมายเหตุไม่อนุมัติ
-            </Typography>
-            <Card
-              variant='outlined'
-              style={{
-                width: '500px',
-                height: '150px',
-                paddingLeft: '10px',
-                paddingRight: '10px',
-                paddingTop: '10px',
-                paddingBottom: '10px',
-                overflow: 'scroll',
-              }}>
-              {/* {expenseData &&
-                    expenseData.comments &&
-                    expenseData.comments.length > 0 &&
-                    expenseData.comments.map((e: Comment) => {
-                      return (
-                        <> */}
-              <Typography variant='body2'>
-                <span style={{ fontWeight: 'bold' }}>user : </span>
-                <span style={{ color: '#AEAEAE' }}>
-                  stataus : {convertUtcToBkkDate('2022-08-04T04:15:34.903+0000')} {moment(new Date()).format('HH:mm ')}
-                </span>
-              </Typography>
-              <Typography variant='body2'> comment</Typography>
-              {/* </>
-                      );
-                    })} */}
-            </Card>
+            <TextBoxComentList filedLabel={'หมายเหตุไม่อนุมัติ:'} payload={[]} />
           </Box>
         </DialogContent>
       </Dialog>
@@ -1081,6 +1088,14 @@ export default function CheckOrderDetail({
           skuTypes: [2],
           isSellable: true,
         }}></ModalAddItems>
+      <ModalReject
+        docNo={'LD123'}
+        open={openReject}
+        onClose={() => {
+          setOpenReject(false);
+        }}
+        onCallBack={onCallBackReject}
+      />
     </div>
   );
 }
