@@ -29,12 +29,7 @@ import {
 } from '../../services/order-shipment';
 import ConfirmOrderShipment from './check-order-confirm-model';
 import ConfirmExitModel from './confirm-model';
-import {
-  ShipmentDeliveryStatusCodeEnum,
-  getShipmentTypeText,
-  getShipmentStatusText,
-  formatFileNam,
-} from '../../utils/enum/check-order-enum';
+import { ShipmentDeliveryStatusCodeEnum, getShipmentTypeText, formatFileName } from '../../utils/enum/check-order-enum';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import {
   SaveDraftSDRequest,
@@ -78,6 +73,7 @@ import { ToteItem } from '../../models/tote-model';
 import moment from 'moment';
 import TextBoxComentList from 'components/commons/ui/texbox-commentList';
 import ModalReject from './modal-reject';
+import { useTranslation } from 'react-i18next';
 
 interface loadingModalState {
   open: boolean;
@@ -151,6 +147,7 @@ export default function CheckOrderDetail({
   onClickClose,
 }: CheckOrderDetailProps) {
   const classes = useStyles();
+  const { t } = useTranslation(['orderReceive', 'common']);
   const sdRef = useAppSelector((state) => state.checkOrderSDList.orderList);
   const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
   const dispatch = useAppDispatch();
@@ -219,7 +216,7 @@ export default function CheckOrderDetail({
       );
 
       // setOpen(defaultOpen);
-      setShipmentStatusText(getShipmentStatusText(orderDetail.sdStatus));
+      setShipmentStatusText(t(`status.${orderDetail.sdStatus}`));
       setShipmentTypeText(getShipmentTypeText(orderDetail.sdType));
       if (orderDetail.receivedDate) setShipmentDateFormat(convertUtcToBkkDate(orderDetail.receivedDate));
       if (orderDetail.docRefRemark !== '') {
@@ -791,7 +788,7 @@ export default function CheckOrderDetail({
               </Grid>
               <Grid item lg={4}>
                 {/* <Typography variant="body2">{shipmentStatusText}</Typography> */}
-                <Typography variant='body2'>{getShipmentStatusText(orderDetail.sdStatus)}</Typography>
+                <Typography variant='body2'>{t(`status.${orderDetail.sdStatus}`)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -1068,7 +1065,7 @@ export default function CheckOrderDetail({
         fileName={
           orderDetail.sdImageFilename
             ? orderDetail.sdImageFilename
-            : formatFileNam(orderDetail.sdNo, orderDetail.sdStatus)
+            : formatFileName(orderDetail.sdNo, t(`status.${orderDetail.sdStatus}`))
         }
         btnPrintName='พิมพ์ใบผลต่าง'
       />

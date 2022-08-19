@@ -5,14 +5,11 @@ import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import { useStyles } from '../../styles/makeTheme';
-import {
-  ShipmentDeliveryStatusCodeEnum,
-  getShipmentTypeText,
-  getShipmentStatusText,
-} from '../../utils/enum/check-order-enum';
+import { getShipmentTypeText, ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import { CheckOrderSDDetailProps, Entry } from '../../models/order-model';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import { HighlightOff } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 const columns: GridColDef[] = [
   {
@@ -134,7 +131,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 export default function CheckOrderDetail({ defaultOpen, onClickClose }: CheckOrderSDDetailProps) {
   const classes = useStyles();
-
+  const { t } = useTranslation(['orderReceive', 'common']);
   const res = useAppSelector((state) => state.checkOrderSDList.orderList);
   const [open, setOpen] = React.useState(defaultOpen);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
@@ -146,7 +143,8 @@ export default function CheckOrderDetail({ defaultOpen, onClickClose }: CheckOrd
 
   useEffect(() => {
     setOpen(defaultOpen);
-    setShipmentStatusText(getShipmentStatusText(SD.sdStatus));
+
+    setShipmentStatusText(t(`status.${SD.sdStatus}`));
     setShipmentTypeText(getShipmentTypeText(SD.sdType));
     setShipmentDateFormat(convertUtcToBkkDate(SD.shipmentDate));
   }, [open, openModelConfirm]);

@@ -1,20 +1,17 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/store';
-import { DataGrid, GridColDef, GridCellParams, GridRowId } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-//import OrderProductList from './order-product-list';
 import { ShipmentResponse, ShipmentInfo, ShipmentRequest } from '../../models/order-model';
-import { getSdType, getSdStatus } from '../../utils/utils';
 import CheckOrderDetail from './check-order-detail';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { getShipmentStatusText, getShipmentTypeText } from '../../utils/enum/check-order-enum';
+import { getShipmentTypeText } from '../../utils/enum/check-order-enum';
 import { useStyles } from '../../styles/makeTheme';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
 import { saveSearchCriteria } from '../../store/slices/save-search-order';
-import checkOrderDetailSlice, { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
+import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
 import LoadingModal from '../commons/ui/loading-modal';
-import { ApiError } from '../../models/api-error-model';
 import { Chip, Typography } from '@mui/material';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
