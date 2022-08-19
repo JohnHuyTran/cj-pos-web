@@ -2,6 +2,7 @@ import { get, getFile, post, put } from '../adapters/posback-adapter';
 import { environment } from '../environment-base';
 import {
   AccountAccountExpenses,
+  BypassPayload,
   CashStatementEditRequest,
   CloseSaleShiftRequest,
   ExpenseApprove3All,
@@ -357,7 +358,7 @@ export async function submitApproveOpenEnd(docNo: string, payload: any, files: F
   }
 }
 
-export async function byPassByBranch(payload: any) {
+export async function byPassByBranch(payload: BypassPayload) {
   try {
     const response = await post(
       environment.branchAccounting.closeSaleShift.byPassByBranch.url,
@@ -370,7 +371,7 @@ export async function byPassByBranch(payload: any) {
   }
 }
 
-export async function byPassBySupport(payload: any) {
+export async function byPassBySupport(payload: BypassPayload) {
   try {
     const response = await post(
       environment.branchAccounting.closeSaleShift.byPassBySupport.url,

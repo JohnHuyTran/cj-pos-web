@@ -14,7 +14,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { useStyles } from '../../../styles/makeTheme';
 import { convertUtcToBkkDate } from '../../../utils/date-utill';
-import { STATUS } from '../../../utils/enum/accounting-enum';
+import { CLOSE_SALE_SHIFT_ENUM, STATUS } from '../../../utils/enum/accounting-enum';
 import LoadingModal from '../../commons/ui/loading-modal';
 import ModalBypassBySupport from './modal-bypass-support';
 import ModalSaveCloseShiftKey from './modal-save-close-shift-key';
@@ -37,6 +37,7 @@ function CloseSaleShiftSearchList() {
   };
 
   const [shiftCodeSelect, setShiftCodeSelect] = React.useState('');
+  const [branchCodeSelect, setBranchCodeSelect] = React.useState('');
   const [openPopupCloseShiftKey, setOpenPopupCloseShiftKey] = React.useState(false);
   const [openModalBypassBySupport, setOpenModalBypassBySupport] = React.useState(false);
   const [payloadCloseShiftKey, setPayloadCloseShiftKey] = React.useState<CloseSaleShiftInfo>();
@@ -257,6 +258,7 @@ function CloseSaleShiftSearchList() {
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
+    const byPassStatus = '';
     if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
       handleOpenLoading('open', true);
       const payload: CloseSaleShiftInfo = {
@@ -277,6 +279,11 @@ function CloseSaleShiftSearchList() {
       handleOpenLoading('open', false);
       setOpenPopupCloseShiftKey(true);
     }
+    // else if (isGroupSupport() && status === CLOSE_SALE_SHIFT_ENUM.CORRECT && byPassStatus) {
+    //   setShiftCodeSelect(params.row.shiftCode);
+    //   setBranchCodeSelect(params.row.branchCode);
+    //   setOpenModalBypassBySupport(true);
+    // }
   };
   let rows: any = items.data.map((item: CloseSaleShiftInfo, index: number) => {
     return {
@@ -293,6 +300,7 @@ function CloseSaleShiftSearchList() {
       noOfSaleBill: item.noOfSaleBill,
       noOfReturnBill: item.noOfReturnBill,
       shiftDate: `${convertUtcToBkkDate(item.shiftDate)} ${moment(item.shiftDate).format('HH:mm ')}`,
+      branchCode: item.branchCode,
     };
   });
   return (
@@ -328,6 +336,7 @@ function CloseSaleShiftSearchList() {
         onClose={() => {
           setOpenModalBypassBySupport(false);
         }}
+        branchCode={branchCodeSelect}
       />
     </div>
   );
