@@ -70,7 +70,6 @@ interface Values {
   createDate: Date | null | any;
   stockCounter: number;
   recountingBy: number;
-  recounting: boolean;
 }
 
 const _ = require('lodash');
@@ -129,8 +128,8 @@ export default function ModalCreateAuditPlan({
     createDate: new Date(),
     stockCounter: isGroupAuditParam(_group) ? 0 : STOCK_COUNTER_TYPE.BRANCH,
     recountingBy: 0,
-    recounting: false,
   });
+  const [recounting, setRecounting] = React.useState<boolean>(false)
   const [errorBranch, setErrorBranch] = React.useState<boolean>(false);
   const [reSave, setReSave] = React.useState(false);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
@@ -181,9 +180,9 @@ export default function ModalCreateAuditPlan({
         createDate: dataDetail.createdDate,
         countingDate: dataDetail.countingDate ? dataDetail.countingDate : null,
         stockCounter: dataDetail.stockCounter ? dataDetail.stockCounter : 0,
-        recounting: dataDetail.recounting ? dataDetail.recounting : false,
         recountingBy: dataDetail.recountingBy ? dataDetail.recountingBy : 0
       });
+      setRecounting(dataDetail.recounting ? dataDetail.recounting : false,)
       const products = dataDetail.product
         ? dataDetail.product.map((item: any) => {
             return {
@@ -200,12 +199,7 @@ export default function ModalCreateAuditPlan({
   }, [dataDetail]);
 
   useEffect(() => {
-    if (payloadAddTypeProduct.filter((el: any) => el.productFromSA).length > 0) {
-      setValues({
-        ...values,
-        recounting: true
-      })
-    }
+    setRecounting(!!payloadAddTypeProduct.filter((el: any) => el.productFromSA).length)
   },[payloadAddTypeProduct])
 
   useEffect(() => {
@@ -244,7 +238,7 @@ export default function ModalCreateAuditPlan({
           sku: item.skuCode,
         };
       });
-      const auditPlanning = values.recounting ?  {
+      const auditPlanning = recounting ?  {
           id: values.id,
           product: products,
           documentNumber: values.documentNumber,
@@ -357,13 +351,13 @@ export default function ModalCreateAuditPlan({
           sku: item.skuCode,
         };
       });
-      const body = values.recounting ? {
+      const body = recounting ? {
           branchCode: values.branch,
           branchName: getBranchName(branchList, values.branch),
           countingDate: moment(values.countingDate).endOf('day').toISOString(true),
           stockCounter: values.stockCounter,
           recountingBy: values.recountingBy,
-          recounting: values.recounting,
+          recounting: recounting,
           product: products,
         } :
         {
@@ -518,7 +512,7 @@ export default function ModalCreateAuditPlan({
     ) {
       return 'none';
     } else {
-      if(values.recounting){
+      if(recounting){
         if (
           (values.recountingBy == STOCK_COUNTER_TYPE.BRANCH && !isGroupAuditParam(_group)) ||
           (values.recountingBy == STOCK_COUNTER_TYPE.AUDIT && isGroupAuditParam(_group))
@@ -706,7 +700,7 @@ export default function ModalCreateAuditPlan({
                 </Box>
               </Grid>
             </Grid>
-            {values.recounting &&
+            {recounting &&
                 <Grid item container xs={4} mb={5} pl={2}>
                     <Grid item xs={3}>
                         ผผู้ทวน :
@@ -745,7 +739,7 @@ export default function ModalCreateAuditPlan({
                     </Grid>
                 </Grid>
             }
-            <Grid item container xs={4} mb={5} pl={values.recounting ? 0 : 2}>
+            <Grid item container xs={4} mb={5} pl={recounting ? 0 : 2}>
               {steps.indexOf(status) > 1 && dataDetail.relatedScDocuments && (
                 <>
                   <Grid item xs={3}>
@@ -845,8 +839,8 @@ export default function ModalCreateAuditPlan({
                                 sx={{ fontSize:'14px', color: '#446EF2' }}
                                 key={option}
                                 disabled={
-                                  index == 0 && payloadAddTypeProduct.length && values.recounting ||
-                                  index == 1 && payloadAddTypeProduct.length && !values.recounting
+                                  index == 0 && payloadAddTypeProduct.length && recounting ||
+                                  index == 1 && payloadAddTypeProduct.length && !recounting
                                 }
                                 selected={index === selectedIndex}
                                 onClick={() => handleMenuItemClick(index)}>
@@ -925,7 +919,7 @@ export default function ModalCreateAuditPlan({
                     values.branch == '' ||
                     values.stockCounter == 0 ||
                     (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])) ||
-                    (values.recounting && values.recountingBy == 0)
+                    (recounting && values.recountingBy == 0)
                   }
                   style={{
                     display:
@@ -947,7 +941,7 @@ export default function ModalCreateAuditPlan({
                     (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
                     !managePermission ||
                     (steps.indexOf(status) > 1 && !isBranchPermission) ||
-                    (values.recounting && values.recountingBy == 0) ||
+                    (recounting && values.recountingBy == 0) ||
                     values.branch == '' ||
                     values.countingDate == null ||
                     disableCounting
@@ -1020,7 +1014,7 @@ export default function ModalCreateAuditPlan({
           {!!urlModalValidate ? (
             <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
               <a href={urlModalValidate} target="_blank">
-                ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้{' '}
+                บางรายการไม่สามารถ import file ได้{' '}
               </a>
             </Typography>
           ) : (
@@ -1033,7 +1027,7 @@ export default function ModalCreateAuditPlan({
             onClick={() => {
               setOpenModalValidate(false);
             }}>
-            ปิด
+            ตกลง
           </Button>
         </Box>
       </ModalValidateImport>
