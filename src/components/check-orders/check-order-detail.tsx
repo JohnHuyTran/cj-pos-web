@@ -206,7 +206,10 @@ export default function CheckOrderDetail({
     setStatusOC(oc);
     setIsAllowExportBtn(isAllowActionPermission(ACTIONS.ORDER_SD_EXPORT));
     if (orderDetail) {
-      setShowSaveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT);
+      setShowSaveBtn(
+        orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ||
+          orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_SENDTOEDIT
+      );
       setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
       setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
       setShowCloseJobBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB);
@@ -406,7 +409,11 @@ export default function CheckOrderDetail({
               id: index,
               deliveryOrderNo: item.deliveryOrderNo,
               isTote: item.isTote ? item.isTote : false,
-              sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+              sdStatus:
+                orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ||
+                orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_SENDTOEDIT
+                  ? false
+                  : true,
               skuCode: item.skuCode,
               barcode: item.barcode,
               productName: item.productName,
