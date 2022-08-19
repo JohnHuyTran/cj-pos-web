@@ -82,11 +82,11 @@ function CloseSaleShiftSearchList() {
       align: 'center',
       renderCell: (params) => {
         const _status = params.getValue(params.id, 'status');
-        if (_status === 'DRAFT') {
+        if (_status === CLOSE_SALE_SHIFT_ENUM.DRAFT) {
           return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
-        } else if (_status === 'CORRECT') {
+        } else if (_status === CLOSE_SALE_SHIFT_ENUM.CORRECT) {
           return <Chip label={params.value} size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
-        } else if (_status === 'PENDDING_REVIEW') {
+        } else if (_status === CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW) {
           return <Chip label={params.value} size='small' sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
         }
       },
@@ -113,7 +113,7 @@ function CloseSaleShiftSearchList() {
               fixedDecimalScale
               thousandSeparator={true}
               decimalScale={2}
-              style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
+              style={{ color: isDiff && _status === CLOSE_SALE_SHIFT_ENUM.DRAFT ? '#F54949' : '#000' }}
             />
           );
         } else {
@@ -144,7 +144,7 @@ function CloseSaleShiftSearchList() {
               fixedDecimalScale
               thousandSeparator={true}
               decimalScale={2}
-              style={{ color: isDiff && _status === 'DRAFT' ? '#F54949' : '#000' }}
+              style={{ color: isDiff && _status === CLOSE_SALE_SHIFT_ENUM.DRAFT ? '#F54949' : '#000' }}
             />
           );
         } else {
