@@ -211,7 +211,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             value={i.value}
                             onChange={(event: any) => handleChangeNew(event.target.value, i.key)}
                             decimalScale={2}
-                            className={classes.MtextFieldNumber}
+                            className={classes.MtextFieldNumberNotStyleDisable}
                             disabled={!master?.isActive}
                             customInput={TextField}
                             fixedDecimalScale
@@ -248,7 +248,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                     value={String(sumOther)}
                     // onChange={handleOnChange}
                     decimalScale={2}
-                    className={classes.MtextFieldNumber}
+                    className={classes.MtextFieldNumberNotStyleDisable}
                     disabled={true}
                     customInput={TextField}
                     fixedDecimalScale
@@ -288,7 +288,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             value={i.value}
                             onChange={(event: any) => handleChangeNewOnOtherExpense(event.target.value, i.key)}
                             decimalScale={2}
-                            className={classes.MtextFieldNumber}
+                            className={classes.MtextFieldNumberNotStyleDisable}
                             disabled={!master?.isActive}
                             customInput={TextField}
                             fixedDecimalScale

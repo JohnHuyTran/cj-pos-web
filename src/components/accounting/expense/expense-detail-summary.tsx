@@ -82,7 +82,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
                 value={String(params.value)}
                 thousandSeparator={true}
                 decimalScale={2}
-                className={classes.MtextFieldNumber}
+                className={classes.MtextFieldNumberNotStyleDisable}
                 disabled={true}
                 customInput={TextField}
                 sx={{
@@ -123,7 +123,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
                 value={String(params.value)}
                 thousandSeparator={true}
                 decimalScale={2}
-                className={classes.MtextFieldNumber}
+                className={classes.MtextFieldNumberNotStyleDisable}
                 disabled={true}
                 customInput={TextField}
                 sx={{
