@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
-import { Action, StockActionStatus, TOStatus } from '../../../utils/enum/common-enum';
+import { Action, StockActionStatus } from '../../../utils/enum/common-enum';
 import { KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
 import { getUserInfo } from "../../../store/sessionStore";
 import { BarcodeCalculate, SACalculateRequest, SkuCalculate } from "../../../models/stock-adjustment-model";
@@ -122,11 +122,13 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           unitName: item.unitName,
           unitPrice: item.unitPrice,
           saleCounting: item.saleCounting,
-          stockMovement: item.stockMovement,
+          stockMovement: (item.stockMovementBack ? item.stockMovementBack: 0)
+            + (item.stockMovementFront ? item.stockMovementFront : 0),
           storeFrontCount: item.storeFrontCount,
           storeBackCount: item.storeBackCount,
-          totalCount: (item.storeFrontCount + item.storeBackCount),
-          availableStock: item.availableStock,
+          totalCount: (item.storeFrontCount ? item.storeFrontCount : 0)
+            + (item.storeBackCount ? item.storeBackCount : 0),
+          availableStock: (item.backStock ? item.backStock : 0) + (item.frontStock ? item.frontStock: 0),
           difference: item.difference,
           tempStock: item.tempStock,
           remark: objectNullOrEmpty(skuRecheckFilter) ? '' : skuRecheckFilter.remark,
@@ -156,11 +158,13 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           unitName: item.unitName,
           unitPrice: item.unitPrice,
           saleCounting: item.saleCounting,
-          stockMovement: item.stockMovement,
+          stockMovement: (item.stockMovementBack ? item.stockMovementBack: 0)
+            + (item.stockMovementFront ? item.stockMovementFront : 0),
           storeFrontCount: item.storeFrontCount,
           storeBackCount: item.storeBackCount,
-          totalCount: (item.storeFrontCount + item.storeBackCount),
-          availableStock: item.availableStock,
+          totalCount: (item.storeFrontCount ? item.storeFrontCount : 0)
+            + (item.storeBackCount ? item.storeBackCount : 0),
+          availableStock: (item.backStock ? item.backStock : 0) + (item.frontStock ? item.frontStock: 0),
           difference: item.difference,
           tempStock: item.tempStock,
         };
