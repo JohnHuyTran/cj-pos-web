@@ -225,7 +225,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'APPROVED') {
+      if (status === 'APPROVED' || status === 'CLOSED' || status === 'SAP_ERROR') {
         return params.value;
       } else {
         return '';
@@ -241,7 +241,7 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => {
       const status = params.getValue(params.id, 'status');
-      if (status === 'APPROVED') {
+      if (status === 'APPROVED' || status === 'CLOSED' || status === 'SAP_ERROR') {
         return params.value;
       } else {
         return '';
@@ -292,7 +292,9 @@ function useApiRef() {
 var calDiff = function (params: GridValueGetterParams) {
   if (
     params.getValue(params.id, 'status') === 'APPROVED' ||
-    params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3'
+    params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3' ||
+    params.getValue(params.id, 'status') === 'CLOSED' ||
+    params.getValue(params.id, 'status') === 'SAP_ERROR'
   ) {
     const diff =
       Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
