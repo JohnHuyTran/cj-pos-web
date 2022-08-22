@@ -20,8 +20,9 @@ import {
 import TextBoxComment from 'components/commons/ui/textbox-comment';
 
 // Util and global functions
-const number = (value: any) => ((+(''+value).replaceAll(',', '')))
-
+const number = (value: any) => ( (+(''+value).replaceAll(',', '')) )
+// const numRoundUp= (value: any) => ( (~~((value + 99) / 100) * 100) )
+const numRoundDown= (value: any) => ( (~~(value / 100) * 100) )
 interface ModalConfirmApprovedProps {
   open: boolean;
   data: any;
@@ -35,6 +36,7 @@ interface InputNumberLayoutProps {
   name?: string,
   color?: string,
   value: string | number,
+  validateMsg?: string,
   decimal?: number,
   disabled?: boolean,
   native?: boolean,
@@ -52,9 +54,9 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
 
    // Initial sate
   const initialSearchState = {
-    depositeAmount: number(data.depositeAmount),
+    suggestedDepositAmount: number(data.depositeAmount),
     depositType: 'PAY_IN',
-    moneyDeposit: 0,
+    amount: 0,
     comment: ''
   };
 
@@ -62,15 +64,21 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
   const [isError, setIsError] = useState(false)
   // Handle function
   const handleConfirm = () => {
-    const { depositeAmount, moneyDeposit, comment } = approvedForm
-    const isCommentValidate = ((depositeAmount === moneyDeposit) || comment) ? true : false;
+    const { suggestedDepositAmount, depositType, amount, comment } = approvedForm
+    const isCommentValidate = ((suggestedDepositAmount === amount) || comment) ? false : true;
+    let isCDM_AmountChecked = true
+    if (depositType === 'CDM') {
+      // check round == amount = amount checked pass.
+      isCDM_AmountChecked = (numRoundDown(amount) === amount) ? true : false;
+    }
+
     setIsError(true)
-    if (isCommentValidate) {
+    if (!isCommentValidate && isCDM_AmountChecked) {
       setIsError(false)
       onConfirm(true, {
         ...approvedForm,
-        depositeAmount: depositeAmount,
-        moneyDeposit: moneyDeposit
+        suggestedDepositAmount: suggestedDepositAmount,
+        amount: amount
       });
     }
   }
@@ -80,8 +88,15 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
   }
 
   useEffect(() => {
-    if (approvedForm.depositType === 'PAY_IN') {
-      setApprovedForm({...approvedForm, moneyDeposit: approvedForm.depositeAmount})
+    switch (approvedForm.depositType) {
+      case 'PAY_IN': 
+        setApprovedForm({...approvedForm, amount: approvedForm.suggestedDepositAmount})
+        break;
+      case 'CDM': 
+        setApprovedForm({...approvedForm, amount: numRoundDown(approvedForm.suggestedDepositAmount)})
+        break;
+      default: null
+        break;
     }
   }, [approvedForm.depositType])
 
@@ -102,10 +117,10 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
           </DialogContentText>
           <Box id='Description'>
             <Grid container rowSpacing={1} columnSpacing={7} mt={'10px'}>
-              <InputNumberLayout id={'DepositeAmount'} name={'depositeAmount'} color='#BEEDC2'
+              <InputNumberLayout id={'SuggestedDepositAmount'} name={'suggestedDepositAmount'} color='#BEEDC2'
                 title='ยอดเงินที่ต้องนำฝาก' disabled
-                value={approvedForm.depositeAmount}
-                onChange={(value) => setApprovedForm({...approvedForm, depositeAmount: value})} />
+                value={approvedForm.suggestedDepositAmount}
+                onChange={(value) => setApprovedForm({...approvedForm, suggestedDepositAmount: value})} />
               <Grid container item xs={12} sx={{alignItems: 'center'}}>
                 <Grid item xs={5} sx={{textAlign: 'right'}}>
                     นำฝาก
@@ -117,7 +132,6 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
                       id="Type"
                       name="type"
                       value={approvedForm.depositType}
-                      // disabled={isOpenLoading}
                       onChange={(e) => setApprovedForm({...approvedForm, depositType: e.target.value})}
                       inputProps={{ 'aria-label': 'Without label' }}
                     >
@@ -130,12 +144,16 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
                   </FormControl>
                 </Grid>
               </Grid>
-              <InputNumberLayout id={'MoneyDeposit'} name={'moneyDeposit'} native={false}
-                title='เงินที่จะนำฝาก'
-                value={approvedForm.moneyDeposit}
-                onChange={(value) => setApprovedForm({...approvedForm, moneyDeposit: value})} />
-              <Grid container item xs={12} sx={{alignItems: 'center'}}>
-                <Grid item xs={5} sx={{textAlign: 'right', mt:'-25px'}}>
+              <InputNumberLayout id={'Amount'} name={'amount'} native={false}
+                title='เงินที่จะนำฝาก' validate={
+                  approvedForm.depositType === 'CDM' && (isError &&
+                  numRoundDown(approvedForm.amount) !== approvedForm.amount)
+                }
+                validateMsg={'จำนวนเงิน ต้องเป็นหน่วยร้อยบาท'}
+                value={approvedForm.amount}
+                onChange={(value) => setApprovedForm({...approvedForm, amount: value})} />
+              <Grid container item xs={12}>
+                <Grid item xs={5} sx={{textAlign: 'right', mt:'25px'}}>
                     หมายเหตุ
                   <Typography component='span' sx={{ ml:1 ,mr: 2 }}>:</Typography>
                 </Grid>
@@ -145,13 +163,15 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
                   isDisable={false}
                   maxLength={100}
                   maxWidth='100%'
-                  isError={!approvedForm.comment && (isError && (approvedForm.depositeAmount !== approvedForm.moneyDeposit))}
+                  isError={
+                    !approvedForm.comment && (isError && (approvedForm.suggestedDepositAmount !== approvedForm.amount))
+                  }
                   onChangeComment={(value) => {
                     setApprovedForm({...approvedForm, comment: value});
                   }}
                   rowDisplay={2}
                 />
-                {(!approvedForm.comment && (isError && (approvedForm.depositeAmount !== approvedForm.moneyDeposit))) && (
+                {(!approvedForm.comment && (isError && (approvedForm.suggestedDepositAmount !== approvedForm.amount))) && (
                   <Typography component='label' variant='caption' sx={{ color: '#F54949' }}>
                     กรุณาระบุหมายเหตุ เนื่องจาก<br />ยอดเงินที่ต้องนำฝาก ไม่เท่ากับ เงินที่จะนำฝาก
                   </Typography>
@@ -186,10 +206,10 @@ export default function ModalConfirmApproved(props: ModalConfirmApprovedProps): 
 
 const InputNumberLayout = (props: InputNumberLayoutProps) => {
   const classes = useStyles();
-  const { title, id, name, value, onChange, validate, color, disabled = false, decimal = 2, native } = props
+  const { title, id, name, value, onChange, validate, validateMsg, color, disabled = false, decimal = 2, native } = props
   return (
-    <Grid container item xs={12} sx={{alignItems: 'center'}}>
-      <Grid item xs={5} sx={{textAlign: 'right'}}>
+    <Grid container item xs={12}>
+      <Grid item xs={5} sx={{textAlign: 'right', height: 'fit-content', mt: '5px'}}>
         {title}
         <Typography component='span' sx={{ ml:1 ,mr: 2 }}>:</Typography>
       </Grid>
@@ -220,6 +240,13 @@ const InputNumberLayout = (props: InputNumberLayoutProps) => {
             },
           }}
           />
+        { (validate && validateMsg) &&
+          <Grid item xs={12}>
+            <Typography component='label' variant='caption' sx={{ color: '#F54949' }}>
+              {validateMsg}
+            </Typography>
+          </Grid>
+        }
       </Grid>
     </Grid>
   )
