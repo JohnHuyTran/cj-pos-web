@@ -44,7 +44,7 @@ import ModalConfirmApproved from './confirm/modal-confirm-approved'
 import useScrollTop from 'hooks/useScrollTop'
 
 // API call
-import { saveOpenEnd, submitApproveOpenEnd } from 'services/accounting';
+import { saveOpenEnd, submitApproveOpenEnd, approvedOpenEnd } from 'services/accounting';
 import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice'
 
 interface ModalSaleShiftDetailsProps {
@@ -273,19 +273,21 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     }
   }
 
-  const handleApproved = (isConfirm: boolean, payload: any) => {
+  const handleApproved = async (isConfirm: boolean, approvedForm: any) => {
     // อนุมัติ
     if (isConfirm) {
       setIsOpenModalConfirmApproved(false)
+      const payload = {
+        items: externalIncomeList,
+        ...approvedForm
+      }
       setIsApprovedOpenLoading(true);
       try {
-        console.log('handleApproved', payload);
-        setTimeout(() => {
-          setContentMsg('ยืนยันการอนุมัติสำเร็จ');
+        const res = await approvedOpenEnd(data?.docNo, payload);
+        setContentMsg('ยืนยันการอนุมัติสำเร็จ');
           setIsStatusSanckBar(true);
           setStepStatus(3);
           updateOpenEndData();
-        }, 1000)
       } catch (error) {
         setContentMsg(error.message);
         setIsStatusSanckBar(false);
@@ -632,7 +634,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
               {isOpenModalConfirmApproved && (
                 <ModalConfirmApproved open={isOpenModalConfirmApproved} data={summarizeCashDeposite}
                   onClose={() => setIsOpenModalConfirmApproved(false)}
-                  onConfirm={(isConfirm: boolean, payload: any) => handleApproved(isConfirm, payload)}
+                  onConfirm={(isConfirm: boolean, approvedForm: any) => handleApproved(isConfirm, approvedForm)}
                 />
               )}
               <ModalShowFile
