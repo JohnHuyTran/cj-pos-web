@@ -9,6 +9,7 @@ import {
   savePayloadSearchLocation,
 } from '../../store/slices/stock/stock-balance-location-search-slice';
 import { SearchOff } from '@mui/icons-material';
+import { numberWithCommas } from 'utils/utils';
 
 function StockBalanceLocation() {
   const classes = useStyles();
@@ -118,10 +119,10 @@ function StockBalanceLocation() {
     if (Number(value) < 0)
       return (
         <Typography variant='body2' sx={{ color: '#F54949' }}>
-          {value}
+          {numberWithCommas(value)}
         </Typography>
       );
-    return value;
+    return numberWithCommas(value);
   };
 
   const concatName = (value: positionInfo[]) => {
