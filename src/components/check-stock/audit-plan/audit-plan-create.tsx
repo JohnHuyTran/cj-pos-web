@@ -192,6 +192,7 @@ export default function ModalCreateAuditPlan({
               productTypeCode: item.categoryTypeCode,
               productFromSA: dataDetail.recounting ? dataDetail.recounting : false,
               selectedType: 2,
+              skuName: item.skuName,
               productByType: dataDetail.appliedProduct.appliedCategories
                 .some((el1:any) => el1.code == item.categoryTypeCode),
             };
