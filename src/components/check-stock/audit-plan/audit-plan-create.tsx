@@ -163,7 +163,6 @@ export default function ModalCreateAuditPlan({
   const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
   const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
   const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
-
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
@@ -182,18 +181,43 @@ export default function ModalCreateAuditPlan({
         stockCounter: dataDetail.stockCounter ? dataDetail.stockCounter : 0,
         recountingBy: dataDetail.recountingBy ? dataDetail.recountingBy : 0
       });
-      setRecounting(dataDetail.recounting ? dataDetail.recounting : false,)
-      const products = dataDetail.product
-        ? dataDetail.product.map((item: any) => {
+      setRecounting(dataDetail.recounting ? dataDetail.recounting : false)
+      if (dataDetail.appliedProduct.appliedProducts && dataDetail.appliedProduct.appliedCategories) {
+        let listProducts = dataDetail.appliedProduct.appliedProducts.map((item: any) => {
             return {
-              skuName: item.name,
-              skuCode: item.sku,
-              selectedType: 2,
+              barcode: item.barcode ? item.barcode : '',
+              skuCode: item.skuCode,
+              unitName: item.unitName,
+              barcodeName: item.name,
+              productTypeCode: item.categoryTypeCode,
               productFromSA: dataDetail.recounting ? dataDetail.recounting : false,
+              selectedType: 2,
+              skuName: item.skuName,
+              productByType: dataDetail.appliedProduct.appliedCategories
+                .some((el1:any) => el1.code == item.categoryTypeCode),
             };
-          })
-        : [];
-      dispatch(updateAddTypeAndProductState(products));
+          });
+        let listCategories = dataDetail.appliedProduct.appliedCategories.map((item: any) => {
+            return {
+              productTypeCode: item.code,
+              productTypeName: item.name,
+              selectedType: 1,
+            };
+          });
+        dispatch(updateAddTypeAndProductState(listProducts.concat(listCategories)));
+      } else {
+        const products = dataDetail.product
+          ? dataDetail.product.map((item: any) => {
+              return {
+                skuName: item.name,
+                skuCode: item.sku,
+                selectedType: 2,
+                productFromSA: dataDetail.recounting ? dataDetail.recounting : false,
+              };
+            })
+          : [];
+        dispatch(updateAddTypeAndProductState(products));
+      }
       dispatch(setCheckEdit(false));
     }
   }, [dataDetail]);
@@ -293,7 +317,7 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleOpenCancel = async () => {
-    const rs = await dispatch(getAuditPlanDetail('62fda5f45885b0125d14171f'));
+    const rs = await dispatch(getAuditPlanDetail(values.id));
     const payload:any = rs.payload;
     if (payload && payload.data){
       if (payload.data.relatedScDocuments || payload.data.relatedSaDocuments) {
@@ -351,22 +375,52 @@ export default function ModalCreateAuditPlan({
           sku: item.skuCode,
         };
       });
-      const body = recounting ? {
-          branchCode: values.branch,
-          branchName: getBranchName(branchList, values.branch),
-          countingDate: moment(values.countingDate).endOf('day').toISOString(true),
-          stockCounter: values.stockCounter,
-          recountingBy: values.recountingBy,
-          recounting: recounting,
-          product: products,
-        } :
-        {
-          branchCode: values.branch,
-          branchName: getBranchName(branchList, values.branch),
-          countingDate: moment(values.countingDate).endOf('day').toISOString(true),
-          stockCounter: values.stockCounter,
-          product: products,
-        };
+      let listAppliedCategories = payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 1)
+        .filter((item: any) =>
+          payloadAddTypeProduct
+            .filter((el1: any) => el1.selectedType === 2 && el1.productByType)
+            .some((el2: any) => el2.productTypeCode == item.productTypeCode)
+        );
+      const appliedProduct = {
+        appliedProducts: payloadAddTypeProduct
+          .filter((el: any) => el.selectedType === 2)
+          .map((item: any) => {
+            return {
+              name: item.barcodeName,
+              skuCode: item.skuCode,
+              barcode: item.barcode,
+              unitName: item.unitName,
+              skuName: item.skuName,
+              categoryTypeCode: item.productTypeCode,
+            };
+          }),
+        appliedCategories: listAppliedCategories.map((item: any) => {
+          return {
+            name: item.productTypeName,
+            code: item.productTypeCode,
+          };
+        }),
+      };
+      const body = recounting
+        ? {
+            branchCode: values.branch,
+            branchName: getBranchName(branchList, values.branch),
+            countingDate: moment(values.countingDate).endOf('day').toISOString(true),
+            stockCounter: values.stockCounter,
+            recountingBy: values.recountingBy,
+            recounting: recounting,
+            product: products,
+            appliedProduct: appliedProduct,
+          }
+        : {
+            branchCode: values.branch,
+            branchName: getBranchName(branchList, values.branch),
+            countingDate: moment(values.countingDate).endOf('day').toISOString(true),
+            stockCounter: values.stockCounter,
+            product: products,
+            appliedProduct: appliedProduct,
+          };
       if (!!values.id) {
         const rs = await updateAuditPlan(values.id, body);
         if (rs.code == 20000) {
@@ -1073,7 +1127,7 @@ export default function ModalCreateAuditPlan({
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
         title="เพิ่มรายการสินค้า"
-        showSearch={false}
+        showSearch={true}
         textBtn="เพิ่มสินค้า"
         requestBody={{
           isControlStock: true,

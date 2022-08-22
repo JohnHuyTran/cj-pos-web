@@ -584,6 +584,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           userPermission={userPermission}
           viewMode={true}
           notClearWhenClose={true}
+          openLink
         />
       )}
 

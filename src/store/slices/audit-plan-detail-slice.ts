@@ -24,6 +24,7 @@ const initialState: State = {
       createdDate: '',
       countingDate: '',
       product: [],
+      appliedProduct: {},
       relatedScDocuments: [],
       relatedSaDocuments: [],
       stockCounter: 0,
