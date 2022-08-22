@@ -97,6 +97,10 @@ export interface BarcodeCalculate {
   tempStock: number;
   unitName: string;
   unitPrice: number;
+  stockMovementBack: number;
+  stockMovementFront: number;
+  backStock: number;
+  frontStock: number;
 }
 
 export interface SASkuCalculateResponse {
@@ -123,6 +127,10 @@ export interface SkuCalculate {
   tempStock: number;
   unitName: string;
   unitPrice: number;
-  remark: string,
+  remark: string;
+  stockMovementBack: number;
+  stockMovementFront: number;
+  backStock: number;
+  frontStock: number;
 }
 
