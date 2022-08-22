@@ -24,7 +24,7 @@ import {
 import { useAppDispatch, useAppSelector } from 'store/store';
 
 // Util and global functions
-import { formatFileStockTransfer } from 'utils/utils'
+// import { formatFileStockTransfer } from 'utils/utils'
 const number = (value: any) => {
   // function comvert number
   return (+(''+value).replaceAll(',', ''))
@@ -44,7 +44,7 @@ import ModalConfirmApproved from './confirm/modal-confirm-approved'
 import useScrollTop from 'hooks/useScrollTop'
 
 // API call
-import { saveOpenEnd, submitApproveOpenEnd, approvedOpenEnd } from 'services/accounting';
+import { saveOpenEnd, submitApproveOpenEnd, approvedOpenEnd, getPathReportPayIn } from 'services/accounting';
 import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice'
 
 interface ModalSaleShiftDetailsProps {
@@ -631,24 +631,24 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                   onConfirm={(isConfirm: boolean) => handleApproval(isConfirm)}
                 />
               )}
-              {isOpenModalConfirmApproved && (
+              { isOpenModalConfirmApproved && (
                 <ModalConfirmApproved open={isOpenModalConfirmApproved} data={summarizeCashDeposite}
                   onClose={() => setIsOpenModalConfirmApproved(false)}
                   onConfirm={(isConfirm: boolean, approvedForm: any) => handleApproved(isConfirm, approvedForm)}
                 />
               )}
-              <ModalShowFile
-                open={isOpenModelPrintDoc}
-                onClose={() => setIsOpenModelPrintDoc(false)}
-                // url={pathReport}
-                url={''}
-                statusFile={1}
-                sdImageFile={''}
-                fileName={formatFileStockTransfer('55-sd-86', 'สำเร็จ', 'ปิดสิ้นวัน')}
-                // fileName={formatFileStockTransfer(btNo, btStatus, suffixDocType)}
-                btnPrintName='พิมพ์เอกสาร'
-                landscape={false}
-              />
+              { isOpenModelPrintDoc &&
+                <ModalShowFile
+                  open={isOpenModelPrintDoc}
+                  onClose={() => setIsOpenModelPrintDoc(false)}
+                  url={getPathReportPayIn(data?.docNo) || ''}
+                  statusFile={1}
+                  sdImageFile={''}
+                  fileName={`${data?.docNo}-${data?.status}.pdf`}
+                  btnPrintName='พิมพ์เอกสาร'
+                  landscape={false}
+                />
+              }
               <AlertError open={isOpenAlert} onClose={() => setIsOpenAlert(false)} textError={textError} />
               <SnackbarStatus
                 open={openSnackBar}
