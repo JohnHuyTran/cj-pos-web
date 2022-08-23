@@ -6,7 +6,7 @@ import {
   Checkbox,
   FormControlLabel, FormGroup,
   Tab,
-  Tabs,
+  Tabs, TextField,
   Typography,
 } from '@mui/material';
 import { useStyles } from '../../../styles/makeTheme';
@@ -20,8 +20,9 @@ import {
   updateRefresh, updateReload
 } from "../../../store/slices/stock-adjust-calculate-slice";
 import LoadingModal from "../../commons/ui/loading-modal";
-import { numberWithCommas, stringNullOrEmpty } from "../../../utils/utils";
-import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
+import { addTwoDecimalPlaces, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from "../../../utils/utils";
+import { updateCheckEdit, updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
+import HtmlTooltip from "../../commons/ui/html-tooltip";
 
 export interface DataGridProps {
   action: Action | Action.INSERT;
@@ -107,9 +108,10 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
     if (skuCalculateData && skuCalculateData.length > 0) {
       let rows: any = skuCalculateData.map((item: SkuCalculate, index: number) => {
         let checked = false;
+        let skuRecheckFilter: any = {};
         if (dataDetail.recheckSkus && dataDetail.recheckSkus.length) {
-          let skuRecheckFilter = dataDetail.recheckSkus.filter((it: any) => it.sku === item.sku);
-          checked = (skuRecheckFilter && skuRecheckFilter.length > 0);
+          skuRecheckFilter = dataDetail.recheckSkus.find((it: any) => it.sku === item.sku);
+          checked = !objectNullOrEmpty(skuRecheckFilter);
         }
         return {
           checked: checked,
@@ -117,17 +119,19 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           index: index + 1,
           skuName: item.skuName,
           sku: item.sku,
+          unitName: item.unitName,
+          unitPrice: item.unitPrice,
           saleCounting: item.saleCounting,
-          stockMovement: item.stockMovement,
+          stockMovement: (item.stockMovementBack ? item.stockMovementBack: 0)
+            + (item.stockMovementFront ? item.stockMovementFront : 0),
           storeFrontCount: item.storeFrontCount,
           storeBackCount: item.storeBackCount,
-          totalCount: (item.storeFrontCount + item.storeBackCount),
-          availableStock: item.availableStock,
+          totalCount: (item.storeFrontCount ? item.storeFrontCount : 0)
+            + (item.storeBackCount ? item.storeBackCount : 0),
+          availableStock: (item.backStock ? item.backStock : 0) + (item.frontStock ? item.frontStock: 0),
           difference: item.difference,
           tempStock: item.tempStock,
-          unitName: item.unitName,
-          adjustedPrice: 0,
-          remark: checked ? ('นับทวนใหม่จาก ' + dataDetail.documentNumber) : '',
+          remark: objectNullOrEmpty(skuRecheckFilter) ? '' : skuRecheckFilter.remark,
         };
       });
       setSkuTable(rows);
@@ -151,15 +155,18 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           barcode: item.barcode,
           productName: item.productName,
           sku: item.sku,
+          unitName: item.unitName,
+          unitPrice: item.unitPrice,
           saleCounting: item.saleCounting,
-          stockMovement: item.stockMovement,
+          stockMovement: (item.stockMovementBack ? item.stockMovementBack: 0)
+            + (item.stockMovementFront ? item.stockMovementFront : 0),
           storeFrontCount: item.storeFrontCount,
           storeBackCount: item.storeBackCount,
-          totalCount: (item.storeFrontCount + item.storeBackCount),
-          availableStock: item.availableStock,
+          totalCount: (item.storeFrontCount ? item.storeFrontCount : 0)
+            + (item.storeBackCount ? item.storeBackCount : 0),
+          availableStock: (item.backStock ? item.backStock : 0) + (item.frontStock ? item.frontStock: 0),
           difference: item.difference,
           tempStock: item.tempStock,
-          unitName: item.unitName,
         };
       });
       setBarcodeTable(rows2);
@@ -329,7 +336,8 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
         if (event.target.checked) {
           skuRechecks.push({
             name: item.skuName,
-            sku: item.sku
+            sku: item.sku,
+            remark: item.remark,
           });
         } else {
           skuRechecks = skuRechecks.filter((it: any) => it.sku !== item.sku);
@@ -352,6 +360,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      hide: !auditPermission || viewMode,
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
@@ -389,6 +398,24 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
           </Typography>
         </div>
       ),
+    },
+    {
+      field: 'unitName',
+      headerName: 'หน่วย',
+      flex: 0.6,
+      headerAlign: 'center',
+      disableColumnMenu: true,
+      sortable: false,
+    },
+    {
+      field: 'unitPrice',
+      headerName: 'ราคาขาย (บาท)',
+      flex: 1,
+      headerAlign: 'center',
+      align: 'right',
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (params) => numberWithCommas(addTwoDecimalPlaces(params.value)),
     },
     {
       field: 'saleCounting',
@@ -487,6 +514,16 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       renderCell: (params) => numberWithCommas(params.value),
     },
     {
+      field: 'tempStock',
+      headerName: 'บ้านพักสต๊อก',
+      flex: 1,
+      headerAlign: 'center',
+      align: 'right',
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (params) => numberWithCommas(params.value),
+    },
+    {
       field: 'difference',
       headerName: 'ส่วนต่างการนับ',
       flex: 1,
@@ -499,42 +536,57 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
         Number(params.value)),
     },
     {
-      field: 'tempStock',
-      headerName: 'บ้านพักสต๊อก',
-      flex: 1,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (params) => numberWithCommas(params.value),
-    },
-    {
-      field: 'unitName',
-      headerName: 'หน่วย',
-      flex: 0.6,
-      headerAlign: 'center',
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: 'adjustedPrice',
-      headerName: 'ราคาที่ปรับ',
-      flex: 1,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (params) => numberWithCommas(params.value),
-    },
-    {
       field: 'remark',
       headerName: 'หมายเหตุ',
-      flex: 1.3,
+      flex: 1.2,
       headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => {
+        return params.getValue(params.id, 'checked') ? (
+          <HtmlTooltip disableHoverListener={stringNullOrEmpty(params.value)}
+                       disableTouchListener={stringNullOrEmpty(params.value)}
+                       disableFocusListener={stringNullOrEmpty(params.value)}
+                       disableInteractive={stringNullOrEmpty(params.value)}
+                       title={<React.Fragment>{params.value}</React.Fragment>}>
+            <TextField
+              type="text"
+              sx={{ width: '100%' }}
+              inputProps={{ maxLength: 250 }}
+              className={classes.MtextField}
+              value={stringNullOrEmpty(params.value) ? '' : params.value}
+              onChange={(e) => {
+                handleChangeRemark(e, params.row.index);
+              }}
+              disabled={!auditPermission}
+            />
+          </HtmlTooltip>
+        ) : <></>
+      },
     },
   ];
+
+  const handleChangeRemark = (event: any, index: number) => {
+    setSkuTable((preData: any) => {
+      const data = [...preData];
+      data[index - 1].remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
+      let skuRechecks = _.cloneDeep(dataDetail.recheckSkus);
+      if (skuRechecks && skuRechecks.length > 0) {
+        let skuRecheckUpdated = skuRechecks.map((it: any) => {
+          if (it.sku === data[index - 1].sku) {
+            it.remark = stringNullOrEmpty(event.target.value) ? '' : event.target.value;
+          }
+          return it;
+        });
+        dispatch(updateDataDetail({
+          ...dataDetail,
+          recheckSkus: skuRecheckUpdated,
+        }));
+      }
+      return data;
+    });
+    dispatch(updateCheckEdit(true));
+  };
 
   const columnsBarcodeTable: GridColDef[] = [
     {
@@ -544,6 +596,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       headerAlign: 'center',
       align: 'center',
       sortable: false,
+      hide: !auditPermission || viewMode,
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
@@ -591,6 +644,24 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       ),
     },
     {
+      field: 'unitName',
+      headerName: 'หน่วย',
+      flex: 0.6,
+      headerAlign: 'center',
+      disableColumnMenu: true,
+      sortable: false,
+    },
+    {
+      field: 'unitPrice',
+      headerName: 'ราคาขาย (บาท)',
+      flex: 1,
+      headerAlign: 'center',
+      align: 'right',
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (params) => numberWithCommas(addTwoDecimalPlaces(params.value)),
+    },
+    {
       field: 'saleCounting',
       headerName: 'จำนวนขาย ระหว่างนับ',
       flex: 1,
@@ -687,18 +758,6 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       renderCell: (params) => numberWithCommas(params.value),
     },
     {
-      field: 'difference',
-      headerName: 'ส่วนต่างการนับ',
-      flex: 1,
-      headerAlign: 'center',
-      align: 'right',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (params) => genDifferenceCount(
-        params.getValue(params.id, 'checked') ? Boolean(params.getValue(params.id, 'checked')) : false,
-        Number(params.value)),
-    },
-    {
       field: 'tempStock',
       headerName: 'บ้านพักสต๊อก',
       flex: 1,
@@ -709,12 +768,16 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
       renderCell: (params) => numberWithCommas(params.value),
     },
     {
-      field: 'unitName',
-      headerName: 'หน่วย',
-      flex: 0.6,
+      field: 'difference',
+      headerName: 'ส่วนต่างการนับ',
+      flex: 1,
       headerAlign: 'center',
+      align: 'right',
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params) => genDifferenceCount(
+        params.getValue(params.id, 'checked') ? Boolean(params.getValue(params.id, 'checked')) : false,
+        Number(params.value)),
     },
   ];
 
@@ -812,7 +875,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
                 pagination
                 autoHeight={skuTable.length < 10}
                 scrollbarSize={10}
-                rowHeight={60}
+                rowHeight={70}
                 components={{
                   NoRowsOverlay: () => (
                     <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
@@ -870,7 +933,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
                 pagination
                 autoHeight={barcodeTable.length < 10}
                 scrollbarSize={10}
-                rowHeight={60}
+                rowHeight={70}
                 components={{
                   NoRowsOverlay: () => (
                     <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">

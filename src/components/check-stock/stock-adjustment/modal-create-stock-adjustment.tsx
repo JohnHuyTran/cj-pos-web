@@ -19,7 +19,7 @@ import {
 } from '../../../store/slices/stock-adjustment-slice';
 import AlertError from '../../commons/ui/alert-error';
 import { objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
-import { Action, StockActionStatus } from '../../../utils/enum/common-enum';
+import { Action, STOCK_COUNTER_TYPE, StockActionStatus } from '../../../utils/enum/common-enum';
 import ConfirmCloseModel from '../../commons/ui/confirm-exit-model';
 import ModelConfirm from "../../barcode-discount/modal-confirm";
 import { updateCheckStock } from "../../../store/slices/stock-balance-check-slice";
@@ -41,10 +41,14 @@ import SnackbarStatus from "../../commons/ui/snackbar-status";
 import IconButton from "@mui/material/IconButton";
 import { HighlightOff, Replay } from "@mui/icons-material";
 import DialogTitle from "@mui/material/DialogTitle";
-import { ACTIONS } from "../../../utils/enum/permission-enum";
+import { ACTIONS, KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
 import ModelConfirmStockAdjust from "./modal-confirm-stock-adjust";
 import { clearCalculate, updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 import { saveDraftAuditPlan } from "../../../services/audit-plan";
+import DocumentList from "../audit-plan/modal-documents-list";
+import LoadingModal from "../../commons/ui/loading-modal";
+import { getUserInfo } from "../../../store/sessionStore";
+import { getUserGroup, isGroupBranchParam } from "../../../utils/role-permission";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -96,6 +100,16 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const [relatedSCs, setRelatedSCs] = useState<any[]>([]);
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SA_MANAGE) : false);
+  const userInfo = getUserInfo();
+  const _group = getUserGroup(userInfo.groups);
+  const [auditPermission, setAuditPermission] = useState<boolean>((userInfo && userInfo.groups && userInfo.groups.length > 0)
+    ? userInfo.groups.includes(KEYCLOAK_GROUP_AUDIT) : false);
+  const [displayFollowRole, setDisplayFollowRole] = React.useState<boolean>(false);
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
+
+  const handleOpenLoading = (prop: any, event: boolean) => {
+    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
+  };
 
   const handleOpenCancel = () => {
     setOpenModalCancel(true);
@@ -216,7 +230,35 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
     }
   }, [stockAdjustDetail]);
 
+  useEffect(() => {
+    let stockCounter: number;
+    if (Action.INSERT === action) {
+      stockCounter = dataDetail.stockCounter;
+    } else if (Action.UPDATE === action) {
+      if (!objectNullOrEmpty(stockAdjustDetail)) {
+        stockCounter = stockAdjustDetail.stockCounter;
+      } else {
+        stockCounter = dataDetail.stockCounter;
+      }
+    } else {
+      stockCounter = dataDetail.stockCounter;
+    }
+    // handle display follow role
+    let isDisplay = false;
+    if (STOCK_COUNTER_TYPE.BRANCH === stockCounter) {
+      if (auditPermission) {
+        isDisplay = false;
+      } else {
+        isDisplay = isGroupBranchParam(_group);
+      }
+    } else if (STOCK_COUNTER_TYPE.AUDIT === stockCounter) {
+      isDisplay = auditPermission;
+    }
+    setDisplayFollowRole(isDisplay);
+  }, [open]);
+
   const handleCreateDraft = async (relatedSCsParam: any, withoutNotice: boolean) => {
+    handleOpenLoading('open', true);
     setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     try {
       const payload = {
@@ -236,6 +278,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             id: rs.data.id,
             documentNumber: rs.data.documentNumber,
             status: StockActionStatus.DRAFT,
+            notCountableSkus: rs.data.notCountableSkus ? rs.data.notCountableSkus: [],
             relatedSCs: rs.data.relatedSCs ? rs.data.relatedSCs : relatedSCs,
             recheckSkus: rs.data.recheckSkus ? rs.data.recheckSkus : [],
           })
@@ -243,12 +286,14 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         if (!withoutNotice) {
           handleRefresh();
         }
+        if (onSearchMain) onSearchMain();
       } else {
         setOpenModalError(true);
       }
     } catch (error) {
       setOpenModalError(true);
     }
+    handleOpenLoading('open', false);
   };
 
   const handleConfirm = async () => {
@@ -272,6 +317,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
             branchName: dataDetail.branchName,
             countingDate: moment(new Date()).endOf('day').toISOString(true),
             stockCounter: dataDetailAP.stockCounter,
+            recounting: true,
             product: dataDetail.recheckSkus,
           };
           saveDraftAuditPlan(body);
@@ -325,11 +371,8 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   ];
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
-  const handleOpenLoading = (prop: any, event: boolean) => {
-    setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
-  };
   const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
+
   const handleOpenAP = async () => {
     if (viewMode) return;
     handleOpenLoading('open', true);
@@ -434,6 +477,16 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                 </Link>
               </Grid>
             </Grid>
+            {dataDetail && dataDetail.relatedSCs && dataDetail.relatedSCs && (
+              <Grid item container xs={4} pr={4}>
+                <Grid item xs={4}>
+                  เอกสาร SC :
+                </Grid>
+                <Grid item xs={8}>
+                  <DocumentList openLink={true} viewMode={true} relatedDocuments={dataDetail.relatedSCs} type={'SC'}/>
+                </Grid>
+              </Grid>
+            )}
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
@@ -447,10 +500,11 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={!managePermission}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
                   }}
-                  onClick={() => {
-                    setOpenAddSC(true)
+                  onClick={async () => {
+                    await dispatch(getAuditPlanDetail(dataDetail.APId));
+                    setOpenAddSC(true);
                   }}
                   sx={{ width: 140, height: '36.5px' }}
                 >
@@ -469,7 +523,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={!(relatedSCs && relatedSCs.length > 0)}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
                   }}
                   onClick={() => handleCreateDraft(relatedSCs, false)}
                   className={classes.MbtnSearch}
@@ -484,7 +538,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={stringNullOrEmpty(status) || status != StockActionStatus.DRAFT}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
                   }}
                   startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirm}
@@ -498,7 +552,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={stringNullOrEmpty(status) || status != StockActionStatus.DRAFT}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
                   }}
                   startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}
@@ -508,7 +562,11 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
               </Box>
             </Box>
             <Box>
-              <ModalStockAdjustmentItem action={action} userPermission={userPermission} viewMode={viewMode}/>
+              <ModalStockAdjustmentItem
+                action={action}
+                userPermission={userPermission}
+                viewMode={viewMode || !displayFollowRole}
+              />
             </Box>
           </Box>
         </DialogContent>
@@ -525,6 +583,8 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
           viewMode={true}
+          notClearWhenClose={true}
+          openLink
         />
       )}
 
@@ -567,6 +627,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
         }}
       />
       <SnackbarStatus open={openSnackBar} onClose={handleCloseSnackBar} isSuccess={true} contentMsg={textSnackBar}/>
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 }

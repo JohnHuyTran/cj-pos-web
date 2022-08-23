@@ -428,7 +428,7 @@ export const ModalToDestroyDiscountItem = (props: DataGridProps) => {
           disableColumnMenu
           autoHeight={dtTable.length < 8}
           scrollbarSize={10}
-          rowHeight={70}
+          rowHeight={80}
           components={{
             NoRowsOverlay: () => (
               <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">

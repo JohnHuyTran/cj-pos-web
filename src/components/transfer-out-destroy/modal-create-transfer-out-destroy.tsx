@@ -833,7 +833,7 @@ export default function ModalCreateTransferOutDestroy({
               </Grid>
             </Grid>
             {/*line 3*/}
-            <Grid container item xs={4} mb={8} mt={-1}>
+            <Grid container item xs={4} mb={5} mt={-1}>
               <Grid item xs={4}>
                 รูปก่อนทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>
@@ -855,7 +855,7 @@ export default function ModalCreateTransferOutDestroy({
                 />
               </Grid>
             </Grid>
-            <Grid container item xs={4} mb={8} mt={-1} pl={5}>
+            <Grid container item xs={4} mb={5} mt={-1} pl={5}>
               <Grid item xs={4}>
                 รูปหลังทำลาย<b style={{ fontSize: '18px' }}> *</b> :
               </Grid>

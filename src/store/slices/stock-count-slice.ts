@@ -23,6 +23,8 @@ const initialState: ItemsState = {
     countingTime: '',
     APDocumentNumber: '',
     stockCounter: 0,
+    recounting: false,
+    recountingBy: 0,
     APId: ''
   },
   errorList: [],

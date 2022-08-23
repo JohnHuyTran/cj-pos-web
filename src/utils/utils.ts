@@ -101,7 +101,14 @@ export function handleNumberBeforeUse(value: any): number {
 }
 
 export const numberWithCommas = (num: any) => {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  let currentValue;
+  if (stringNullOrEmpty(num)) currentValue = 0;
+  else currentValue = num;
+  try {
+    return currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  } catch (e) {
+    return '0';
+  }
 };
 
 export function isOwnBranch(branch: any): boolean {

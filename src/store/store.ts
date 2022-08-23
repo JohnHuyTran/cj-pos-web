@@ -62,7 +62,7 @@ import stockAdjustmentSearchSlice from './slices/stock-adjustment-search-slice';
 import stockAdjustmentCriteriaSearchSlice from './slices/stock-adjustment-criteria-search-slice';
 import stockAdjustmentSlice from './slices/stock-adjustment-slice';
 import stockAdjustmentDetailSlice from './slices/stock-adjustment-detail-slice';
-import stockAdjustCalculateSlice  from './slices/stock-adjust-calculate-slice';
+import stockAdjustCalculateSlice from './slices/stock-adjust-calculate-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
@@ -104,6 +104,7 @@ import saveCashStatementSearchRequest from './slices/accounting/cash-statement/s
 import searchOpenEndSlice from './slices/accounting/open-end/open-end-search-slice';
 import viewOpenEndSlice from './slices/accounting/open-end/open-end-slice';
 
+import stockAdjustHasTempStockSearchSlice from './slices/stock-adjust-has-temp-stock-search';
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -209,6 +210,7 @@ const store = configureStore({
     saveCashStatementSearchRequest: saveCashStatementSearchRequest,
     searchOpenEndSlice: searchOpenEndSlice,
     viewOpenEndSlice: viewOpenEndSlice,
+    stockAdjustHasTempStockSearchSlice: stockAdjustHasTempStockSearchSlice,
   },
 });
 

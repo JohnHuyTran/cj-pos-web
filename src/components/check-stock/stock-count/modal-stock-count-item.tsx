@@ -45,7 +45,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
   const checkStocks = useAppSelector((state) => state.stockBalanceCheckSlice.checkStock);
   const userGroups = getUserInfo().groups ? getUserInfo().groups : [];
   const _group = getUserGroup(userGroups);
-  
+
   useEffect(() => {
     if (Object.keys(payloadAddItem).length !== 0) {
       let rows = payloadAddItem.map((item: any, index: number) => {
@@ -59,7 +59,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           unitCode: item.unitCode || '',
           barFactor: item.baseUnit || 0,
           quantity:
-            stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.CONFIRM
+            stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.CONFIRM && !item.canNotCount
               ? 0
               : stringNullOrEmpty(item.qty) && dataDetail.status == StockActionStatus.DRAFT
               ? null
@@ -98,7 +98,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
     let currentValue = handleNumberBeforeUse(event.target.value);
     setDtTable((preData: Array<StockCountDetail>) => {
       const data = [...preData];
-      data[index - 1].quantity = currentValue; 
+      data[index - 1].quantity = currentValue;
       return data;
     });
     dispatch(
@@ -117,14 +117,31 @@ export const ModalStockCountItem = (props: DataGridProps) => {
   };
 
   const onCheckCell =  (event: any, index: number,  skuCode: string) => {
+    let listIndex: number[] = [];
     setDtTable((preData: Array<StockCountDetail>) => {
       const data = [...preData];
-      let newList = data.map((item:any) => {
+      let newList = data.map((item:any, index:number) => {
+        if (item.skuCode == skuCode){
+          listIndex.push(index)
+        }
         return {
           ...item,
-          checked: item.skuCode == skuCode ? !item.checked : item.checked
+          checked: item.skuCode == skuCode ? !item.checked : item.checked,
+          quantity: item.skuCode == skuCode && !item.checked ? null : item.quantity
         }
       })
+      dispatch(
+        updateErrorList(
+          errorList.map((item: any, idx: number) => {
+            return listIndex.includes(idx)
+              ? {
+                ...item,
+                errorQuantity: '',
+              }
+              : item;
+          })
+        )
+      );
       return newList;
     });
   };
@@ -142,9 +159,11 @@ export const ModalStockCountItem = (props: DataGridProps) => {
           checked={Boolean(params.value)}
           disabled={
             (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
-            !managePermission ||
-            (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
-            (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+            !managePermission || viewMode ||
+            (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !dataDetail.recounting)
+            || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
+            || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
+            || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting)
           }
           onClick={(e) => onCheckCell(e, params.row.index, params.row.skuCode)}
         />
@@ -217,9 +236,12 @@ export const ModalStockCountItem = (props: DataGridProps) => {
               }}
               disabled={
                 (!stringNullOrEmpty(dataDetail.status) && dataDetail.status != TOStatus.DRAFT) ||
-                !managePermission ||
-                (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
-                (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+                !managePermission || viewMode ||
+                (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !dataDetail.recounting)
+                || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
+                || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
+                || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting) ||
+                !!params.getValue(params.id, 'checked')
               }
             />
             {/* {condition && <div className="title">{errorList[index]?.errorQuantity}</div>} */}
