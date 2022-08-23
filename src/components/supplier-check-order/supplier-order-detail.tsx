@@ -1099,7 +1099,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                       name='paramQuery'
                       size='small'
                       value={grandTotalAmount}
-                      className={classes.MtextFieldNumber}
+                      className={classes.MtextFieldNumberNotStyleDisable}
                       fullWidth
                       disabled
                       sx={{ background: '#E7FFE9' }}
@@ -1121,7 +1121,7 @@ function SupplierOrderDetail({ isOpen, onClickClose }: Props): ReactElement {
                         name='paramQuery'
                         size='small'
                         value={roundAmount}
-                        className={classes.MtextFieldNumber}
+                        className={classes.MtextFieldNumberNotStyleDisable}
                         fullWidth
                         disabled
                         sx={{ background: '#E7FFE9' }}

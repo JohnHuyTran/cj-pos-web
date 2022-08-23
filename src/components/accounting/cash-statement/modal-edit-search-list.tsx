@@ -136,16 +136,16 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
 
   return (
     <Fragment>
-      <Dialog open={open} maxWidth="sm" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={onClose}>
-          <Typography variant="h6">แก้ไขข้อมูล</Typography>
+      <Dialog open={open} maxWidth='sm' fullWidth={true}>
+        <BootstrapDialogTitle id='customized-dialog-title' onClose={onClose}>
+          <Typography variant='h6'>แก้ไขข้อมูล</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            <Grid item xs={5} textAlign="right">
-              <Typography variant="body1">วันที่ยอดขาย : </Typography>
+            <Grid item xs={5} textAlign='right'>
+              <Typography variant='body1'>วันที่ยอดขาย : </Typography>
             </Grid>
-            <Grid item xs={5} textAlign="left">
+            <Grid item xs={5} textAlign='left'>
               <DatePickerAllComponent
                 onClickDate={handleDatePicker}
                 value={values.date}
@@ -154,22 +154,22 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
                 maxDate={maxDate}
               />
             </Grid>
-            <Grid item xs={5} textAlign="right" sx={{ mt: 1 }}>
-              <Typography variant="body1">เงินขาด : </Typography>
+            <Grid item xs={5} textAlign='right' sx={{ mt: 1 }}>
+              <Typography variant='body1'>เงินขาด : </Typography>
             </Grid>
-            <Grid item xs={5} textAlign="left" sx={{ mt: 1 }}>
+            <Grid item xs={5} textAlign='left' sx={{ mt: 1 }}>
               <NumberFormat
-                name="cashShort"
+                name='cashShort'
                 value={String(values.cashShort)}
                 thousandSeparator={true}
                 decimalScale={2}
-                className={classes.MtextFieldNumber}
+                className={classes.MtextFieldNumberNotStyleDisable}
                 customInput={TextField}
                 onChange={handleChange}
                 fullWidth
                 fixedDecimalScale
                 allowNegative={false}
-                type="text"
+                type='text'
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
@@ -182,22 +182,22 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
                 }}
               />
             </Grid>
-            <Grid item xs={5} textAlign="right">
-              <Typography variant="body1">เงินเกิน : </Typography>
+            <Grid item xs={5} textAlign='right'>
+              <Typography variant='body1'>เงินเกิน : </Typography>
             </Grid>
-            <Grid item xs={5} textAlign="left">
+            <Grid item xs={5} textAlign='left'>
               <NumberFormat
-                name="cashOver"
+                name='cashOver'
                 value={String(values.cashOver)}
                 thousandSeparator={true}
                 decimalScale={2}
-                className={classes.MtextFieldNumber}
+                className={classes.MtextFieldNumberNotStyleDisable}
                 customInput={TextField}
                 onChange={handleChange}
                 fullWidth
                 fixedDecimalScale
                 allowNegative={false}
-                type="text"
+                type='text'
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
@@ -210,8 +210,8 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
                 }}
               />
             </Grid>
-            <Grid item xs={12} textAlign="center">
-              <Typography variant="body1" color="error">
+            <Grid item xs={12} textAlign='center'>
+              <Typography variant='body1' color='error'>
                 {msgError ? msgError : ''}
               </Typography>
             </Grid>
@@ -219,14 +219,13 @@ function ModalEditSearchList({ open, onClose, payloadEdit }: Props) {
 
           <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
             <Button
-              data-testid="testid-btnEdit"
-              id="btnEdit"
-              variant="contained"
-              color="primary"
-              size="large"
+              data-testid='testid-btnEdit'
+              id='btnEdit'
+              variant='contained'
+              color='primary'
+              size='large'
               className={classes.MbtnSearch}
-              onClick={handleSaveBtn}
-            >
+              onClick={handleSaveBtn}>
               บันทึก
             </Button>
           </DialogActions>

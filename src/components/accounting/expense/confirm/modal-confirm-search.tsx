@@ -141,7 +141,7 @@ export default function ModelConfirmSearch({
                   value={String(params.value)}
                   thousandSeparator={true}
                   decimalScale={2}
-                  className={classes.MtextFieldNumber}
+                  className={classes.MtextFieldNumberNotStyleDisable}
                   disabled={true}
                   customInput={TextField}
                   sx={{
@@ -179,7 +179,7 @@ export default function ModelConfirmSearch({
                 value={String(params.value)}
                 thousandSeparator={true}
                 decimalScale={2}
-                className={classes.MtextFieldNumber}
+                className={classes.MtextFieldNumberNotStyleDisable}
                 disabled={true}
                 customInput={TextField}
                 sx={{

@@ -1,4 +1,4 @@
-import { ReactNode, ReactElement, Fragment, useState, useEffect, useRef } from "react";
+import { ReactNode, ReactElement, Fragment, useState, useEffect, useRef } from 'react';
 import NumberFormat from 'react-number-format';
 import { useTranslation } from 'react-i18next';
 import { useStyles } from 'styles/makeTheme';
@@ -16,36 +16,32 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import {
-  ArrowForwardIos,
-  CheckCircleOutline,
-  Save
-} from '@mui/icons-material'
+import { ArrowForwardIos, CheckCircleOutline, Save } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from 'store/store';
 
 // Util and global functions
 // import { formatFileStockTransfer } from 'utils/utils'
 const number = (value: any) => {
   // function comvert number
-  return (+(''+value).replaceAll(',', ''))
-}
+  return +('' + value).replaceAll(',', '');
+};
 
 // Components
-import CardHeader from 'components/card-header'
-import AccordionUploadFile from 'components/commons/ui/accordion-upload-file'
+import CardHeader from 'components/card-header';
+import AccordionUploadFile from 'components/commons/ui/accordion-upload-file';
 import ModalDetailCash from 'components/accounting/open-end/modal-detail-cash';
 import AlertError from 'components/commons/ui/alert-error';
 import ModalShowFile from 'components/commons/ui/modal-show-file';
 import SnackbarStatus from 'components/commons/ui/snackbar-status';
-import ModalConfirmApproval from './confirm/modal-confirm-approval'
-import ModalConfirmApproved from './confirm/modal-confirm-approved'
+import ModalConfirmApproval from './confirm/modal-confirm-approval';
+import ModalConfirmApproved from './confirm/modal-confirm-approved';
 
 // Hooks function
-import useScrollTop from 'hooks/useScrollTop'
+import useScrollTop from 'hooks/useScrollTop';
 
 // API call
 import { saveOpenEnd, submitApproveOpenEnd, approvedOpenEnd, getPathReportPayIn } from 'services/accounting';
-import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice'
+import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice';
 
 interface ModalSaleShiftDetailsProps {
   open: boolean;
@@ -53,39 +49,39 @@ interface ModalSaleShiftDetailsProps {
 }
 
 interface InputNumberLayoutProps {
-  title: string,
-  id?: string,
-  name?: string,
-  color?: string,
-  value: string | number,
-  decimal?: number,
-  children?: ReactNode,
-  disabled?: boolean,
-  native?: boolean,
-  validate?: boolean,
-  onChange: (value: any) => void
+  title: string;
+  id?: string;
+  name?: string;
+  color?: string;
+  value: string | number;
+  decimal?: number;
+  children?: ReactNode;
+  disabled?: boolean;
+  native?: boolean;
+  validate?: boolean;
+  onChange: (value: any) => void;
 }
 
 interface DetailsProps {
-  detailsData: any,
-  settlementFiles: any,
-  paymentTypeItems: any,
-  isDisabledUploadFile: boolean,
-  setSettlementFiles: (value: any) => void
+  detailsData: any;
+  settlementFiles: any;
+  paymentTypeItems: any;
+  isDisabledUploadFile: boolean;
+  setSettlementFiles: (value: any) => void;
 }
 
 export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps): ReactElement {
   // Props
-  const { open, onClose } = props
+  const { open, onClose } = props;
 
   // Custom style
   const classes = useStyles();
-  const TopLine = { 
-    mt:'30px',
+  const TopLine = {
+    mt: '30px',
     borderTop: '2px solid #EAEBEB',
-    paddingTop: '15px'
-  }
-  
+    paddingTop: '15px',
+  };
+
   // Set valiable
   const dispatch = useAppDispatch();
   const viewOpenEndResponse = useAppSelector((state) => state.viewOpenEndSlice.viewOpenEnd);
@@ -96,8 +92,8 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     docNo: data?.docNo,
     branchName: data?.branchName,
     shiftDate: data?.shiftDate,
-    bypass: data?.bypass
-  }
+    bypass: data?.bypass,
+  };
   const initialFormInputState = {
     summarizeCashDeposite: {
       dailyIncomeAmount: '',
@@ -108,10 +104,10 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       depositeAmount: '',
       nextCDMAmount: '',
       diffDepositeAmount: '',
-      comment: ''
+      comment: '',
     },
     externalIncome: {
-      totalExIncomeAmount: ''
+      totalExIncomeAmount: '',
     },
     externalIncomeList: [],
     cashPayment: {
@@ -119,31 +115,35 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       iceAmount: '',
       yakultAmount: '',
       coffeeExpenseAmount: '',
-      frontExpenseAmount: ''
+      frontExpenseAmount: '',
     },
-    settlementFiles: []
-  }
-  let initailStepStatus = 0
+    settlementFiles: [],
+  };
+  let initailStepStatus = 0;
   switch (data?.status) {
-    case 'DRAFT': initailStepStatus = 1
+    case 'DRAFT':
+      initailStepStatus = 1;
       break;
-    case 'REQUEST_APPROVE': initailStepStatus = 2
+    case 'REQUEST_APPROVE':
+      initailStepStatus = 2;
       break;
-    case 'APPROVED': initailStepStatus = 3
+    case 'APPROVED':
+      initailStepStatus = 3;
       break;
-    default: 0
+    default:
+      0;
       break;
   }
 
   // Set state data
   const CardContent = useRef<HTMLElement>(null);
-  const [summarizeCashDeposite, setSummarizeCashDeposite] = useState(initialFormInputState.summarizeCashDeposite)
-  const [externalIncome, setExternalIncome] = useState(initialFormInputState.externalIncome)
-  const [externalIncomeList, setExternalIncomeList] = useState<any[]>(initialFormInputState.externalIncomeList)
-  const [cashPayment, setCashPayment] = useState(initialFormInputState.cashPayment)
-  const [settlementFiles, setSettlementFiles] = useState<any[]>(initialFormInputState.settlementFiles)
-  const [textError, setTextError] = useState('')
-  const [contentMsg, setContentMsg] = useState('')
+  const [summarizeCashDeposite, setSummarizeCashDeposite] = useState(initialFormInputState.summarizeCashDeposite);
+  const [externalIncome, setExternalIncome] = useState(initialFormInputState.externalIncome);
+  const [externalIncomeList, setExternalIncomeList] = useState<any[]>(initialFormInputState.externalIncomeList);
+  const [cashPayment, setCashPayment] = useState(initialFormInputState.cashPayment);
+  const [settlementFiles, setSettlementFiles] = useState<any[]>(initialFormInputState.settlementFiles);
+  const [textError, setTextError] = useState('');
+  const [contentMsg, setContentMsg] = useState('');
   const [stepStatus, setStepStatus] = useState(initailStepStatus);
   const [isSaveOpenLoading, setIsSaveOpenLoading] = useState(false);
   const [isSubmitOpenLoading, setIsSubmitOpenLoading] = useState(false);
@@ -164,63 +164,59 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       block: 'start',
       behavior: 'smooth',
     });
-  }
+  };
 
   const calculate = () => {
     // รายการเงินสดรับภายนอก (รวม) bussiness logic
-    const totalExIncomeAmountCal = (
-      externalIncomeList.reduce(( total, num ) => (total + num.amount), 0)
-    )
-    
+    const totalExIncomeAmountCal = externalIncomeList.reduce((total, num) => total + num.amount, 0);
+
     //ยอดรวมเงินสดร้านค้า bussiness logic
-    const { cashAmount, diffAmount } = data.income
-    const totalCashAmountCal = (
-      number(cashAmount) + number(totalExIncomeAmountCal) + number(diffAmount)
-    )
-    
+    const { cashAmount, diffAmount } = data.income;
+    const totalCashAmountCal = number(cashAmount) + number(totalExIncomeAmountCal) + number(diffAmount);
+
     // ยอดเงินที่ต้องนำฝาก business logic
-    const { cashOverShortAmount, cdmAmount, totalPayAmount } = summarizeCashDeposite
-    const depositeAmountCal = (
-      number(totalCashAmountCal) + number(cashOverShortAmount) + (number(cdmAmount) - number(totalPayAmount))
-    )
+    const { cashOverShortAmount, cdmAmount, totalPayAmount } = summarizeCashDeposite;
+    const depositeAmountCal =
+      number(totalCashAmountCal) + number(cashOverShortAmount) + (number(cdmAmount) - number(totalPayAmount));
 
     // Set data after calculate
-    setExternalIncome({...externalIncome, totalExIncomeAmount: totalExIncomeAmountCal})
+    setExternalIncome({ ...externalIncome, totalExIncomeAmount: totalExIncomeAmountCal });
     setSummarizeCashDeposite({
       ...summarizeCashDeposite,
-      totalCashAmount: ''+totalCashAmountCal,
-      depositeAmount: ''+depositeAmountCal
-    })
-  }
+      totalCashAmount: '' + totalCashAmountCal,
+      depositeAmount: '' + depositeAmountCal,
+    });
+  };
 
   const handleExternalIncomeList = (value: any, code: number) => {
-    setExternalIncomeList(prevState => {
-      const newState = prevState.map(obj => {
+    setExternalIncomeList((prevState) => {
+      const newState = prevState.map((obj) => {
         if (obj.code === code) {
           if (Object.keys(value)[0] === 'amount') {
-            return {...obj, amount: number(value.amount)};
+            return { ...obj, amount: number(value.amount) };
           }
           if (Object.keys(value)[0] === 'noItem') {
-            if (value.noItem) { // ถ้า checked amount = 0
-              return {...obj, amount: 0, noItem: value.noItem};
+            if (value.noItem) {
+              // ถ้า checked amount = 0
+              return { ...obj, amount: 0, noItem: value.noItem };
             }
-            return {...obj, noItem: value.noItem};
+            return { ...obj, noItem: value.noItem };
           }
         }
         return obj;
-      })
-      return newState
-    })
-  }
+      });
+      return newState;
+    });
+  };
 
   const handleSave = async () => {
     // บันทึก
     const payload = {
       docNo: data?.docNo,
       settlementFiles: settlementFiles,
-      items: externalIncomeList
-    }
-    setIsSaveOpenLoading(true)
+      items: externalIncomeList,
+    };
+    setIsSaveOpenLoading(true);
     try {
       const res = await saveOpenEnd(payload, fileUploadList);
       setContentMsg('บันทึกข้อมูล เรียบร้อยแล้ว');
@@ -234,14 +230,15 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       setOpenSnackBar(true);
       setIsSaveOpenLoading(false);
     }
-  }
+  };
 
   const handleApproval = async (isConfirm: boolean) => {
     // ขออนุมัติ
-    const isSettlementReq = (data?.income?.paymentTypeItems?.filter((e: any) => {
-      return e.isSettlementFile && e.amount > 0
-    }).length > 0)
-    const isUploadSettlements = (settlementFiles.length <= 0  && fileUploadList.length <= 0 && isSettlementReq)
+    const isSettlementReq =
+      data?.income?.paymentTypeItems?.filter((e: any) => {
+        return e.isSettlementFile && e.amount > 0;
+      }).length > 0;
+    const isUploadSettlements = settlementFiles.length <= 0 && fileUploadList.length <= 0 && isSettlementReq;
     if (isUploadSettlements) {
       setTextError('กรุณาแนบเอกสาร Settlement');
       setIsOpenAlert(true);
@@ -250,8 +247,8 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
         setIsOpenModalConfirmApproval(false);
         const payload = {
           settlementFiles: settlementFiles,
-          items: externalIncomeList
-        }
+          items: externalIncomeList,
+        };
         setIsSubmitOpenLoading(true);
         try {
           const res = await submitApproveOpenEnd(data?.docNo, payload, fileUploadList);
@@ -271,23 +268,23 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
         setIsOpenModalConfirmApproval(true);
       }
     }
-  }
+  };
 
   const handleApproved = async (isConfirm: boolean, approvedForm: any) => {
     // อนุมัติ
     if (isConfirm) {
-      setIsOpenModalConfirmApproved(false)
+      setIsOpenModalConfirmApproved(false);
       const payload = {
         items: externalIncomeList,
-        ...approvedForm
-      }
+        ...approvedForm,
+      };
       setIsApprovedOpenLoading(true);
       try {
         const res = await approvedOpenEnd(data?.docNo, payload);
         setContentMsg('ยืนยันการอนุมัติสำเร็จ');
-          setIsStatusSanckBar(true);
-          setStepStatus(3);
-          updateOpenEndData();
+        setIsStatusSanckBar(true);
+        setStepStatus(3);
+        updateOpenEndData();
       } catch (error) {
         setContentMsg(error.message);
         setIsStatusSanckBar(false);
@@ -298,15 +295,15 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     } else {
       setIsOpenModalConfirmApproved(true);
     }
-  }
+  };
 
   const handleClose = () => {
-    setSummarizeCashDeposite(initialFormInputState.summarizeCashDeposite)
-    setExternalIncome(initialFormInputState.externalIncome)
-    setCashPayment(initialFormInputState.cashPayment)
-    setSettlementFiles(initialFormInputState.settlementFiles)
-    onClose()
-  }
+    setSummarizeCashDeposite(initialFormInputState.summarizeCashDeposite);
+    setExternalIncome(initialFormInputState.externalIncome);
+    setCashPayment(initialFormInputState.cashPayment);
+    setSettlementFiles(initialFormInputState.settlementFiles);
+    onClose();
+  };
 
   const updateOpenEndData = async () => {
     const searchOpenEndPayload = {
@@ -314,39 +311,38 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
       status: payloadOpenEndSearch.status,
       dateFrom: payloadOpenEndSearch.dateFrom,
       dateTo: payloadOpenEndSearch.dateTo,
-      limit: ''+openEndSearchList.perPage,
+      limit: '' + openEndSearchList.perPage,
       page: '1',
-    }
+    };
     await dispatch(featchSearchOpenEndAsync(searchOpenEndPayload));
-  }
+  };
 
   useEffect(() => {
     if (data) {
-      const { externalIncome, summarizeCashDeposite, cashPayment, settlementFiles, comment } = data
+      const { externalIncome, summarizeCashDeposite, cashPayment, settlementFiles, comment } = data;
       setSummarizeCashDeposite({
         ...initialFormInputState.summarizeCashDeposite,
         ...summarizeCashDeposite,
-        comment: comment
-      })
-      setExternalIncome({...initialFormInputState.externalIncome, ...externalIncome})
-      setCashPayment({...initialFormInputState.cashPayment, ...cashPayment})
-      settlementFiles && setSettlementFiles([...initialFormInputState.settlementFiles, ...settlementFiles])
+        comment: comment,
+      });
+      setExternalIncome({ ...initialFormInputState.externalIncome, ...externalIncome });
+      setCashPayment({ ...initialFormInputState.cashPayment, ...cashPayment });
+      settlementFiles && setSettlementFiles([...initialFormInputState.settlementFiles, ...settlementFiles]);
       if (externalIncome?.items && externalIncome?.items.length > 0) {
-        setExternalIncomeList([...initialFormInputState.externalIncomeList, ...externalIncome.items])
+        setExternalIncomeList([...initialFormInputState.externalIncomeList, ...externalIncome.items]);
       }
     }
-  }, [data])
-  
+  }, [data]);
+
   useEffect(() => {
-    if(data && externalIncomeList.length > 0) {
-      calculate()
+    if (data && externalIncomeList.length > 0) {
+      calculate();
       // check amount null
-      const isAmountNull = externalIncomeList.findIndex((e: any) => 
-       (e.amount === null || e.amount === 0) && !e.noItem
-      ) >= 0
-      isAmountNull ? setIsAmountNull(true) : setIsAmountNull(false)
+      const isAmountNull =
+        externalIncomeList.findIndex((e: any) => (e.amount === null || e.amount === 0) && !e.noItem) >= 0;
+      isAmountNull ? setIsAmountNull(true) : setIsAmountNull(false);
     }
-  }, [externalIncomeList])
+  }, [externalIncomeList]);
 
   return (
     <Fragment>
@@ -357,25 +353,24 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
             scrollDown={scrollDown}
             isLoading={isSaveOpenLoading || isSubmitOpenLoading}
             steps={['บันทึก', 'ขออนุมัติ', 'อนุมัติ']}
-            actionStep={stepStatus}
-          >
+            actionStep={stepStatus}>
             <b>รายละเอียดปิดรอบการขาย</b>
           </CardHeader>
-          <DialogContent id='CardContent'
+          <DialogContent
+            id='CardContent'
             {...(typeof scrollProps === 'object' ? scrollProps : {})}
-            sx={{ maxHeight: 'calc(100vh - 230px)', padding: 0 }}
-          >
+            sx={{ maxHeight: 'calc(100vh - 230px)', padding: 0 }}>
             <Box ref={CardContent} sx={{ display: 'flex', flexDirection: 'column', padding: '20px 24px' }}>
               <Box id='DetailsSection'>
                 <Details
-                  detailsData={{...initialDetailsState, stepStatus: stepStatus}}
+                  detailsData={{ ...initialDetailsState, stepStatus: stepStatus }}
                   paymentTypeItems={data?.income?.paymentTypeItems}
                   settlementFiles={settlementFiles}
                   setSettlementFiles={(value: any) => setSettlementFiles([...value])}
                   isDisabledUploadFile={isSaveOpenLoading || isSubmitOpenLoading}
                 />
-                <DialogActions sx={{ justifyContent: (stepStatus < 3) ? 'right' : 'left', marginTop: '10px' }}>
-                  {(stepStatus < 2) && (
+                <DialogActions sx={{ justifyContent: stepStatus < 3 ? 'right' : 'left', marginTop: '10px' }}>
+                  {stepStatus < 2 && (
                     <Fragment>
                       <LoadingButton
                         id='btnSave'
@@ -389,7 +384,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                             กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                           </Typography>
                         }
-                        sx={{ borderRadius: 2, height: 40, width: 110}}
+                        sx={{ borderRadius: 2, height: 40, width: 110 }}
                         onClick={handleSave}>
                         บันทึก
                       </LoadingButton>
@@ -405,13 +400,13 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                             กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                           </Typography>
                         }
-                        sx={{ borderRadius: 2, height: 40, width: 110}}
+                        sx={{ borderRadius: 2, height: 40, width: 110 }}
                         onClick={() => handleApproval(false)}>
                         ขออนุมัติ
                       </LoadingButton>
                     </Fragment>
                   )}
-                  {(stepStatus === 2) && (
+                  {stepStatus === 2 && (
                     <Fragment>
                       <LoadingButton
                         id='btnApproved'
@@ -425,19 +420,19 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                             กรุณารอสักครู่ <CircularProgress color='inherit' size={15} />
                           </Typography>
                         }
-                        sx={{ borderRadius: 2, height: 40, width: 110}}
+                        sx={{ borderRadius: 2, height: 40, width: 110 }}
                         onClick={() => handleApproved(false, '')}>
                         อนุมัติ
                       </LoadingButton>
                     </Fragment>
                   )}
-                  {(stepStatus === 3) && (
+                  {stepStatus === 3 && (
                     <Fragment>
                       <LoadingButton
                         id='btnPayInPrint'
                         variant='contained'
                         color='primary'
-                        sx={{ borderRadius: 2, height: 40, width: 125, mt: 7}}
+                        sx={{ borderRadius: 2, height: 40, width: 125, mt: 7 }}
                         onClick={() => setIsOpenModelPrintDoc(true)}>
                         พิมพ์ใบ Pay-IN
                       </LoadingButton>
@@ -451,125 +446,165 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                   <b>สรุปยอดเงินที่ต้องนำฝาก</b>
                 </Typography>
                 <Grid container rowSpacing={1} columnSpacing={7} mt={'10px'}>
-                  <InputNumberLayout id={'DailyIncomeAmount'} name={'dailyIncomeAmount'}
+                  <InputNumberLayout
+                    id={'DailyIncomeAmount'}
+                    name={'dailyIncomeAmount'}
                     title='มูลค่ายอดประจำวัน'
                     disabled
                     value={summarizeCashDeposite.dailyIncomeAmount}
-                    onChange={(value) => setSummarizeCashDeposite(
-                      {...summarizeCashDeposite, dailyIncomeAmount: value}
-                    )}>
+                    onChange={(value) =>
+                      setSummarizeCashDeposite({ ...summarizeCashDeposite, dailyIncomeAmount: value })
+                    }>
                     <LoadingButton
                       id='BtnDetails'
                       variant='contained'
                       color='secondary'
-                      sx={{ borderRadius: 2, width: 110}}
+                      sx={{ borderRadius: 2, width: 110 }}
                       onClick={() => setOpenModalCashDetail(true)}>
                       ดูรายละเอียด
                     </LoadingButton>
                   </InputNumberLayout>
-                  <InputNumberLayout id={'CashOverShortAmount'} name={'cashOverShortAmount'}
-                    title='เงินฝากขาดเกินจากทางการเงิน' disabled
+                  <InputNumberLayout
+                    id={'CashOverShortAmount'}
+                    name={'cashOverShortAmount'}
+                    title='เงินฝากขาดเกินจากทางการเงิน'
+                    disabled
                     value={summarizeCashDeposite.cashOverShortAmount}
-                    onChange={(value) => setSummarizeCashDeposite({...summarizeCashDeposite, cashOverShortAmount: value})}>
-                  </InputNumberLayout>
-                  <InputNumberLayout id={'TotalCashAmount'} name={'totalCashAmount'}
-                    title='ยอดรวมเงินสดร้านค้า' disabled
+                    onChange={(value) =>
+                      setSummarizeCashDeposite({ ...summarizeCashDeposite, cashOverShortAmount: value })
+                    }></InputNumberLayout>
+                  <InputNumberLayout
+                    id={'TotalCashAmount'}
+                    name={'totalCashAmount'}
+                    title='ยอดรวมเงินสดร้านค้า'
+                    disabled
                     value={summarizeCashDeposite.totalCashAmount}
-                    onChange={(value) => setSummarizeCashDeposite({...summarizeCashDeposite, totalCashAmount: value})}>
-                    <Typography color='#AEAEAE'>
-                      (เงินสดรับ + เงินสดจากร้านค้าภายนอก)
-                    </Typography>
+                    onChange={(value) =>
+                      setSummarizeCashDeposite({ ...summarizeCashDeposite, totalCashAmount: value })
+                    }>
+                    <Typography color='#AEAEAE'>(เงินสดรับ + เงินสดจากร้านค้าภายนอก)</Typography>
                   </InputNumberLayout>
-                  <InputNumberLayout id={'CdmAmount'} name={'cdmAmount'}
-                    title='เงินสะสมรอฝากตู้ CDM' disabled
+                  <InputNumberLayout
+                    id={'CdmAmount'}
+                    name={'cdmAmount'}
+                    title='เงินสะสมรอฝากตู้ CDM'
+                    disabled
                     value={summarizeCashDeposite.cdmAmount}
-                    onChange={(value) => setSummarizeCashDeposite({...summarizeCashDeposite, cdmAmount: value})}>
-                    <Typography color='#AEAEAE'>
-                      (เงินสะสมจากวันก่อนหน้า)
-                    </Typography>
+                    onChange={(value) => setSummarizeCashDeposite({ ...summarizeCashDeposite, cdmAmount: value })}>
+                    <Typography color='#AEAEAE'>(เงินสะสมจากวันก่อนหน้า)</Typography>
                   </InputNumberLayout>
-                  <InputNumberLayout id={'SummarizeCashDepositeTotalPayAmount'}
+                  <InputNumberLayout
+                    id={'SummarizeCashDepositeTotalPayAmount'}
                     name={'summarizeCashDepositetotalPayAmount'}
-                    title='รวมเงินสดจ่าย' disabled
+                    title='รวมเงินสดจ่าย'
+                    disabled
                     value={summarizeCashDeposite.totalPayAmount}
-                    onChange={(value) => setSummarizeCashDeposite({...summarizeCashDeposite, totalPayAmount: value})}>
-                  </InputNumberLayout>
-                  <InputNumberLayout id={'DepositeAmount'} name={'depositeAmount'} color='#BEEDC2'
-                    title='ยอดเงินที่ต้องนำฝาก' disabled
+                    onChange={(value) =>
+                      setSummarizeCashDeposite({ ...summarizeCashDeposite, totalPayAmount: value })
+                    }></InputNumberLayout>
+                  <InputNumberLayout
+                    id={'DepositeAmount'}
+                    name={'depositeAmount'}
+                    color='#BEEDC2'
+                    title='ยอดเงินที่ต้องนำฝาก'
+                    disabled
                     value={summarizeCashDeposite.depositeAmount}
-                    onChange={(value) => setSummarizeCashDeposite({...summarizeCashDeposite, depositeAmount: value})}>
+                    onChange={(value) => setSummarizeCashDeposite({ ...summarizeCashDeposite, depositeAmount: value })}>
                     <Typography color='#AEAEAE'>
                       (ยอดรวมเงินสดร้านค้า + เงินฝากขาด + เงินสะสมรอฝากตู้ CDM - เงินสดจ่าย)
                     </Typography>
                   </InputNumberLayout>
-                  <InputNumberLayout id={'NextCDMAmount'} name={'nextCDMAmount'} color='#E7FFE9'
-                    title='เงินรอฝาก CDM วันถัดไป' disabled
+                  <InputNumberLayout
+                    id={'NextCDMAmount'}
+                    name={'nextCDMAmount'}
+                    color='#E7FFE9'
+                    title='เงินรอฝาก CDM วันถัดไป'
+                    disabled
                     value={summarizeCashDeposite.nextCDMAmount}
-                    onChange={(value) => setSummarizeCashDeposite({...summarizeCashDeposite, nextCDMAmount: value})}>
-                    <Typography color='#AEAEAE'>
-                      (สำหรับวันถัดไป)
-                    </Typography>
+                    onChange={(value) => setSummarizeCashDeposite({ ...summarizeCashDeposite, nextCDMAmount: value })}>
+                    <Typography color='#AEAEAE'>(สำหรับวันถัดไป)</Typography>
                   </InputNumberLayout>
-                  <InputNumberLayout id={'DiffDepositeAmount'} name={'diffDepositeAmount'}
-                    title='ส่วนต่างเงินฝาก' disabled
+                  <InputNumberLayout
+                    id={'DiffDepositeAmount'}
+                    name={'diffDepositeAmount'}
+                    title='ส่วนต่างเงินฝาก'
+                    disabled
                     value={summarizeCashDeposite.diffDepositeAmount}
-                    onChange={(value) => setSummarizeCashDeposite({...summarizeCashDeposite, diffDepositeAmount: value})}>
+                    onChange={(value) =>
+                      setSummarizeCashDeposite({ ...summarizeCashDeposite, diffDepositeAmount: value })
+                    }>
                     <Box sx={{ display: 'flex', alignItems: 'center', ml: '110px' }}>
-                      <Typography sx={{width: '100px'}} component='label'>หมายเหตุ : </Typography>
+                      <Typography sx={{ width: '100px' }} component='label'>
+                        หมายเหตุ :{' '}
+                      </Typography>
                       <TextField
-                        id="Comment"
-                        name="comment"
-                        size="small"
+                        id='Comment'
+                        name='comment'
+                        size='small'
                         disabled
                         value={summarizeCashDeposite.comment}
-                        onChange={(e) => setSummarizeCashDeposite({...summarizeCashDeposite, comment: e.target.value})}
+                        onChange={(e) =>
+                          setSummarizeCashDeposite({ ...summarizeCashDeposite, comment: e.target.value })
+                        }
                         className={classes.MtextField}
                         fullWidth
-                        sx={{ml: 4}}
+                        sx={{ ml: 4 }}
                       />
                     </Box>
                   </InputNumberLayout>
                 </Grid>
               </Box>
-              
+
               <Box id='ExternalIncomeSection' sx={TopLine}>
                 <Typography component='label' sx={{ fontSize: '18px' }}>
                   <b>รายการเงินสดรับภายนอก</b>
                 </Typography>
                 <Grid container rowSpacing={1} columnSpacing={7} mt={'10px'}>
-                  <InputNumberLayout id={'result'} name={'result'}
-                    title='รวม' disabled
+                  <InputNumberLayout
+                    id={'result'}
+                    name={'result'}
+                    title='รวม'
+                    disabled
                     value={externalIncome.totalExIncomeAmount}
-                    onChange={(value) => setExternalIncome({...externalIncome, totalExIncomeAmount: value})} />
-                  { externalIncomeList.length > 0 && (
+                    onChange={(value) => setExternalIncome({ ...externalIncome, totalExIncomeAmount: value })}
+                  />
+                  {externalIncomeList.length > 0 &&
                     externalIncomeList.map((item: any, index: number) => (
                       <Fragment key={item.code}>
-                        <InputNumberLayout id={item.name} name={item.name} native={false}
+                        <InputNumberLayout
+                          id={item.name}
+                          name={item.name}
+                          native={false}
                           title={item.name}
-                          validate={externalIncomeList[index]['amount'] === null || externalIncomeList[index]['amount'] === 0}
-                          disabled={externalIncomeList[index]['noItem'] || stepStatus === 3 ||
-                            (isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading)
+                          validate={
+                            externalIncomeList[index]['amount'] === null || externalIncomeList[index]['amount'] === 0
+                          }
+                          disabled={
+                            externalIncomeList[index]['noItem'] ||
+                            stepStatus === 3 ||
+                            isSaveOpenLoading ||
+                            isSubmitOpenLoading ||
+                            isApprovedOpenLoading
                           }
                           value={externalIncomeList[index]['amount']}
-                          onChange={(value) => handleExternalIncomeList(
-                            { amount: value }, item.code
-                          )}>
+                          onChange={(value) => handleExternalIncomeList({ amount: value }, item.code)}>
                           <FormControlLabel
                             control={
-                              <Checkbox id={item.name} name={item.name}
+                              <Checkbox
+                                id={item.name}
+                                name={item.name}
                                 checked={externalIncomeList[index]['noItem']}
-                                disabled={stepStatus === 3 || (isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading)}
-                                onChange={(e) => handleExternalIncomeList(
-                                  { noItem: e.target.checked }, item.code
-                                )}
+                                disabled={
+                                  stepStatus === 3 || isSaveOpenLoading || isSubmitOpenLoading || isApprovedOpenLoading
+                                }
+                                onChange={(e) => handleExternalIncomeList({ noItem: e.target.checked }, item.code)}
                               />
                             }
-                            label='ไม่มีรายการ' 
+                            label='ไม่มีรายการ'
                           />
                         </InputNumberLayout>
                       </Fragment>
-                    ))
-                  )}
+                    ))}
                 </Grid>
               </Box>
 
@@ -578,36 +613,58 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                   <b>รายการเงินสดจ่าย</b>
                 </Typography>
                 <Grid container rowSpacing={1} columnSpacing={7} mt={'10px'}>
-                  <InputNumberLayout id={'CashPaymentTotalPayAmount'} name={'cashPaymentTotalPayAmount'}
-                    title='รวม' disabled
+                  <InputNumberLayout
+                    id={'CashPaymentTotalPayAmount'}
+                    name={'cashPaymentTotalPayAmount'}
+                    title='รวม'
+                    disabled
                     value={cashPayment.totalPayAmount}
-                    onChange={(value) => setCashPayment({...cashPayment, totalPayAmount: value})} />
-                  <InputNumberLayout id={'IceAmount'} name={'iceAmount'}
-                    title='ค่าน้ำแข็ง' disabled
+                    onChange={(value) => setCashPayment({ ...cashPayment, totalPayAmount: value })}
+                  />
+                  <InputNumberLayout
+                    id={'IceAmount'}
+                    name={'iceAmount'}
+                    title='ค่าน้ำแข็ง'
+                    disabled
                     value={cashPayment.iceAmount}
-                    onChange={(value) => setCashPayment({...cashPayment, iceAmount: value})} />
-                  <InputNumberLayout id={'YakultAmount'} name={'yakultAmount'}
-                    title='ค่ายาคูลท์' disabled
+                    onChange={(value) => setCashPayment({ ...cashPayment, iceAmount: value })}
+                  />
+                  <InputNumberLayout
+                    id={'YakultAmount'}
+                    name={'yakultAmount'}
+                    title='ค่ายาคูลท์'
+                    disabled
                     value={cashPayment.yakultAmount}
-                    onChange={(value) => setCashPayment({...cashPayment, yakultAmount: value})} />
-                  <InputNumberLayout id={'CoffeeExpenseAmount'} name={'coffeeExpenseAmount'}
-                    title='เงินอนุมัติสำรองร้านกาแฟ' disabled
+                    onChange={(value) => setCashPayment({ ...cashPayment, yakultAmount: value })}
+                  />
+                  <InputNumberLayout
+                    id={'CoffeeExpenseAmount'}
+                    name={'coffeeExpenseAmount'}
+                    title='เงินอนุมัติสำรองร้านกาแฟ'
+                    disabled
                     value={cashPayment.coffeeExpenseAmount}
-                    onChange={(value) => setCashPayment({...cashPayment, coffeeExpenseAmount: value})} />
-                  <InputNumberLayout id={'FrontExpenseAmount'} name={'frontExpenseAmount'}
-                    title='เงินอนุมัติสำรองหน้าร้าน' disabled
+                    onChange={(value) => setCashPayment({ ...cashPayment, coffeeExpenseAmount: value })}
+                  />
+                  <InputNumberLayout
+                    id={'FrontExpenseAmount'}
+                    name={'frontExpenseAmount'}
+                    title='เงินอนุมัติสำรองหน้าร้าน'
+                    disabled
                     value={cashPayment.frontExpenseAmount}
-                    onChange={(value) => setCashPayment({...cashPayment, frontExpenseAmount: value})} />
+                    onChange={(value) => setCashPayment({ ...cashPayment, frontExpenseAmount: value })}
+                  />
                 </Grid>
               </Box>
 
-              { scrollDown && (
-                <DialogActions sx={{
-                  display: 'grid',
-                  position: 'absolute',
-                  right: '40px',
-                  bottom: '15px'}}>
-                  <IconButton sx={{width: 'fit-content', margin: 'auto'}} onClick={goTopModal}>
+              {scrollDown && (
+                <DialogActions
+                  sx={{
+                    display: 'grid',
+                    position: 'absolute',
+                    right: '40px',
+                    bottom: '15px',
+                  }}>
+                  <IconButton sx={{ width: 'fit-content', margin: 'auto' }} onClick={goTopModal}>
                     <ArrowForwardIos
                       sx={{
                         fontSize: '41px',
@@ -619,25 +676,31 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                       }}
                     />
                   </IconButton>
-                  <Typography fontSize="13px" onClick={goTopModal}>กลับขึ้นด้านบน</Typography>
+                  <Typography fontSize='13px' onClick={goTopModal}>
+                    กลับขึ้นด้านบน
+                  </Typography>
                 </DialogActions>
               )}
-              { openModalCashDetail && (
-                <ModalDetailCash isOpen={openModalCashDetail} onClose={() => setOpenModalCashDetail(false)}/>
+              {openModalCashDetail && (
+                <ModalDetailCash isOpen={openModalCashDetail} onClose={() => setOpenModalCashDetail(false)} />
               )}
               {isOpenModalConfirmApproval && (
-                <ModalConfirmApproval open={isOpenModalConfirmApproval} docNo={data.docNo}
+                <ModalConfirmApproval
+                  open={isOpenModalConfirmApproval}
+                  docNo={data.docNo}
                   onClose={() => setIsOpenModalConfirmApproval(false)}
                   onConfirm={(isConfirm: boolean) => handleApproval(isConfirm)}
                 />
               )}
-              { isOpenModalConfirmApproved && (
-                <ModalConfirmApproved open={isOpenModalConfirmApproved} data={summarizeCashDeposite}
+              {isOpenModalConfirmApproved && (
+                <ModalConfirmApproved
+                  open={isOpenModalConfirmApproved}
+                  data={summarizeCashDeposite}
                   onClose={() => setIsOpenModalConfirmApproved(false)}
                   onConfirm={(isConfirm: boolean, approvedForm: any) => handleApproved(isConfirm, approvedForm)}
                 />
               )}
-              { isOpenModelPrintDoc &&
+              {isOpenModelPrintDoc && (
                 <ModalShowFile
                   open={isOpenModelPrintDoc}
                   onClose={() => setIsOpenModelPrintDoc(false)}
@@ -648,7 +711,7 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                   btnPrintName='พิมพ์เอกสาร'
                   landscape={false}
                 />
-              }
+              )}
               <AlertError open={isOpenAlert} onClose={() => setIsOpenAlert(false)} textError={textError} />
               <SnackbarStatus
                 open={openSnackBar}
@@ -661,29 +724,29 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
         </Box>
       </Dialog>
     </Fragment>
-  )
+  );
 }
 
 const InputNumberLayout = (props: InputNumberLayoutProps) => {
   const classes = useStyles();
-  const { title, id, name, value, onChange, children, validate, color, disabled = false, decimal = 2, native } = props
+  const { title, id, name, value, onChange, children, validate, color, disabled = false, decimal = 2, native } = props;
   return (
-    <Grid container item xs={12} sx={{alignItems: 'center'}}>
-      <Grid item xs={3} sx={{textAlign: 'right'}}>
+    <Grid container item xs={12} sx={{ alignItems: 'center' }}>
+      <Grid item xs={3} sx={{ textAlign: 'right' }}>
         {title}
         {/* { validate && (
           <Typography component='span' color='red'> * </Typography>
         )} */}
         <Typography component='span'> : </Typography>
       </Grid>
-      <Grid item xs='auto' sx={{pl: '40px'}}>
+      <Grid item xs='auto' sx={{ pl: '40px' }}>
         <NumberFormat
           id={id}
           name={name}
-          value={''+value}
+          value={'' + value}
           onChange={(e: any) => onChange(number(e.target.value))}
           decimalScale={decimal}
-          className={classes.MtextFieldNumber}
+          className={classes.MtextFieldNumberNotStyleDisable}
           disabled={disabled}
           customInput={TextField}
           fixedDecimalScale
@@ -694,27 +757,26 @@ const InputNumberLayout = (props: InputNumberLayoutProps) => {
             '.MuiOutlinedInput-root': {
               '& input': {
                 background: color || 'white',
-                borderRadius: '3px'
+                borderRadius: '3px',
               },
               '& fieldset': {
-                borderColor: validate ? 'red' : '#0000003b'
-              }
+                borderColor: validate ? 'red' : '#0000003b',
+              },
             },
           }}
-          />
+        />
       </Grid>
-      <Grid ml={3}>
-        {children}
-      </Grid>
+      <Grid ml={3}>{children}</Grid>
     </Grid>
-  )
-}
+  );
+};
 
 const Details = (props: DetailsProps) => {
-  const { detailsData, settlementFiles, paymentTypeItems, isDisabledUploadFile, setSettlementFiles } = props
-  const isEnableSettlement = (paymentTypeItems?.filter((e: any) => {
-    return e.isSettlementFile && e.amount > 0
-  }).length > 0)
+  const { detailsData, settlementFiles, paymentTypeItems, isDisabledUploadFile, setSettlementFiles } = props;
+  const isEnableSettlement =
+    paymentTypeItems?.filter((e: any) => {
+      return e.isSettlementFile && e.amount > 0;
+    }).length > 0;
 
   // Set data upload
   const [attachFiles, setAttachFiles] = useState([]);
@@ -723,40 +785,50 @@ const Details = (props: DetailsProps) => {
 
   // handle function
   const handleDeleteFile = (item: any) => {
-    let attachFileData = [...attachFiles]
-    let attachFileDataFilter = attachFileData.filter((file: any) => file.fileKey !== item.fileKey)
+    let attachFileData = [...attachFiles];
+    let attachFileDataFilter = attachFileData.filter((file: any) => file.fileKey !== item.fileKey);
     setAttachFiles(attachFileDataFilter);
-    setSettlementFiles(attachFileDataFilter)
+    setSettlementFiles(attachFileDataFilter);
   };
 
   useEffect(() => {
-     // Preview Settlement files
-     setAttachFiles(settlementFiles);
-  }, [settlementFiles])
+    // Preview Settlement files
+    setAttachFiles(settlementFiles);
+  }, [settlementFiles]);
 
   return (
     <Grid container rowSpacing={3} columnSpacing={7}>
       <Grid container item md={4} sm={12} xs={12}>
-        <Grid item xs={4}><b>เลขที่เอกสาร :</b></Grid>
-        <Grid item xs={8}>{detailsData.docNo || '-'}</Grid>
+        <Grid item xs={4}>
+          <b>เลขที่เอกสาร :</b>
+        </Grid>
+        <Grid item xs={8}>
+          {detailsData.docNo || '-'}
+        </Grid>
       </Grid>
       <Grid container item md={4} sm={12} xs={12}>
-        <Grid item xs={4}><b>สาขา :</b></Grid>
-        <Grid item xs={8}>{detailsData.branchName || '-'}</Grid>
+        <Grid item xs={4}>
+          <b>สาขา :</b>
+        </Grid>
+        <Grid item xs={8}>
+          {detailsData.branchName || '-'}
+        </Grid>
       </Grid>
       <Grid container item md={4} sm={12} xs={12}>
-        <Grid item xs={4}><b>วันที่ยอดขาย :</b></Grid>
-        <Grid item xs={8}>{ detailsData.shiftDate
-            ? new Date(detailsData.shiftDate).toLocaleDateString("th-TH")
-            : '-' 
-          }
+        <Grid item xs={4}>
+          <b>วันที่ยอดขาย :</b>
+        </Grid>
+        <Grid item xs={8}>
+          {detailsData.shiftDate ? new Date(detailsData.shiftDate).toLocaleDateString('th-TH') : '-'}
         </Grid>
       </Grid>
       <Grid container item md={8} sm={12} xs={12}>
-        <Grid item xs={3}><b>แนบเอกสาร Settlement :</b></Grid>
+        <Grid item xs={3}>
+          <b>แนบเอกสาร Settlement :</b>
+        </Grid>
         <Grid item xs={6}>
           <AccordionUploadFile
-            title="แนบเอกสาร"
+            title='แนบเอกสาร'
             files={attachFiles}
             docNo={'docNo'}
             docType='OE'
@@ -768,9 +840,13 @@ const Details = (props: DetailsProps) => {
         </Grid>
       </Grid>
       <Grid container item md={4} sm={12} xs={12}>
-        <Grid item xs={4}><b>การBypass :</b></Grid>
-        <Grid item xs={8}>{detailsData.bypass ? t(`statusByPass.${detailsData.bypass}`) : '-'}</Grid>
+        <Grid item xs={4}>
+          <b>การBypass :</b>
+        </Grid>
+        <Grid item xs={8}>
+          {detailsData.bypass ? t(`statusByPass.${detailsData.bypass}`) : '-'}
+        </Grid>
       </Grid>
     </Grid>
-  )
-}
+  );
+};
