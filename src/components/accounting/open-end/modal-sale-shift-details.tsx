@@ -20,7 +20,7 @@ import { ArrowForwardIos, CheckCircleOutline, Save } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from 'store/store';
 
 // Util and global functions
-import { formatFileStockTransfer } from 'utils/utils';
+// import { formatFileStockTransfer } from 'utils/utils'
 const number = (value: any) => {
   // function comvert number
   return +('' + value).replaceAll(',', '');
@@ -40,7 +40,7 @@ import ModalConfirmApproved from './confirm/modal-confirm-approved';
 import useScrollTop from 'hooks/useScrollTop';
 
 // API call
-import { saveOpenEnd, submitApproveOpenEnd } from 'services/accounting';
+import { saveOpenEnd, submitApproveOpenEnd, approvedOpenEnd, getPathReportPayIn } from 'services/accounting';
 import { featchSearchOpenEndAsync } from 'store/slices/accounting/open-end/open-end-search-slice';
 
 interface ModalSaleShiftDetailsProps {
@@ -270,19 +270,21 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
     }
   };
 
-  const handleApproved = (isConfirm: boolean, payload: any) => {
+  const handleApproved = async (isConfirm: boolean, approvedForm: any) => {
     // อนุมัติ
     if (isConfirm) {
       setIsOpenModalConfirmApproved(false);
+      const payload = {
+        items: externalIncomeList,
+        ...approvedForm,
+      };
       setIsApprovedOpenLoading(true);
       try {
-        console.log('handleApproved', payload);
-        setTimeout(() => {
-          setContentMsg('ยืนยันการอนุมัติสำเร็จ');
-          setIsStatusSanckBar(true);
-          setStepStatus(3);
-          updateOpenEndData();
-        }, 1000);
+        const res = await approvedOpenEnd(data?.docNo, payload);
+        setContentMsg('ยืนยันการอนุมัติสำเร็จ');
+        setIsStatusSanckBar(true);
+        setStepStatus(3);
+        updateOpenEndData();
       } catch (error) {
         setContentMsg(error.message);
         setIsStatusSanckBar(false);
@@ -695,21 +697,21 @@ export default function ModalSaleShiftDetails(props: ModalSaleShiftDetailsProps)
                   open={isOpenModalConfirmApproved}
                   data={summarizeCashDeposite}
                   onClose={() => setIsOpenModalConfirmApproved(false)}
-                  onConfirm={(isConfirm: boolean, payload: any) => handleApproved(isConfirm, payload)}
+                  onConfirm={(isConfirm: boolean, approvedForm: any) => handleApproved(isConfirm, approvedForm)}
                 />
               )}
-              <ModalShowFile
-                open={isOpenModelPrintDoc}
-                onClose={() => setIsOpenModelPrintDoc(false)}
-                // url={pathReport}
-                url={''}
-                statusFile={1}
-                sdImageFile={''}
-                fileName={formatFileStockTransfer('55-sd-86', 'สำเร็จ', 'ปิดสิ้นวัน')}
-                // fileName={formatFileStockTransfer(btNo, btStatus, suffixDocType)}
-                btnPrintName='พิมพ์เอกสาร'
-                landscape={false}
-              />
+              {isOpenModelPrintDoc && (
+                <ModalShowFile
+                  open={isOpenModelPrintDoc}
+                  onClose={() => setIsOpenModelPrintDoc(false)}
+                  url={getPathReportPayIn(data?.docNo) || ''}
+                  statusFile={1}
+                  sdImageFile={''}
+                  fileName={`${data?.docNo}-${data?.status}.pdf`}
+                  btnPrintName='พิมพ์เอกสาร'
+                  landscape={false}
+                />
+              )}
               <AlertError open={isOpenAlert} onClose={() => setIsOpenAlert(false)} textError={textError} />
               <SnackbarStatus
                 open={openSnackBar}

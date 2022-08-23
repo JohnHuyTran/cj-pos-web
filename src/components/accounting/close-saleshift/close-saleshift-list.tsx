@@ -50,7 +50,7 @@ function CloseSaleShiftSearchList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -74,20 +74,17 @@ function CloseSaleShiftSearchList() {
     },
     {
       field: 'statusDisplay',
-
-      headerName: 'สถานะ',
+      headerName: 'สถานะรหัส',
       width: 100,
       headerAlign: 'center',
       sortable: false,
       align: 'center',
       renderCell: (params) => {
         const _status = params.getValue(params.id, 'status');
-        if (_status === CLOSE_SALE_SHIFT_ENUM.DRAFT) {
-          return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+        if (_status === CLOSE_SALE_SHIFT_ENUM.DRAFT || _status === CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW) {
+          return <Chip label={params.value} size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (_status === CLOSE_SALE_SHIFT_ENUM.CORRECT) {
-          return <Chip label={params.value} size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
-        } else if (_status === CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW) {
-          return <Chip label={params.value} size='small' sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
+          return <Chip label={params.value} size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
         }
       },
     },
@@ -221,6 +218,32 @@ function CloseSaleShiftSearchList() {
       sortable: false,
       headerAlign: 'center',
     },
+    {
+      field: 'bypassStatusDisplay',
+      headerName: 'การ Bypass',
+      width: 110,
+      headerAlign: 'center',
+      sortable: false,
+      align: 'center',
+      renderCell: (params) => {
+        const _status = params.getValue(params.id, 'bypassStatus');
+        if (_status === CLOSE_SALE_SHIFT_ENUM.NONE) {
+          return <Chip label={params.value} size="small" sx={{ color: '#AEAEAE', backgroundColor: '#EEEEEE' }} />;
+        } else if (_status === CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW) {
+          return <Chip label={params.value} size="small" sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+        } else if (_status === CLOSE_SALE_SHIFT_ENUM.REVIEWED) {
+          return <Chip label={params.value} size="small" sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+        }
+      },
+    },
+    {
+      field: 'bypassComment',
+      headerName: 'หมายเหตุ',
+      width: 150,
+      align: 'center',
+      sortable: false,
+      headerAlign: 'center',
+    },
   ];
 
   const handlePageChange = async (newPage: number) => {
@@ -301,6 +324,9 @@ function CloseSaleShiftSearchList() {
       noOfReturnBill: item.noOfReturnBill,
       shiftDate: `${convertUtcToBkkDate(item.shiftDate)} ${moment(item.shiftDate).format('HH:mm ')}`,
       branchCode: item.branchCode,
+      bypassStatus: item.bypass?.status,
+      bypassStatusDisplay: t(`status.${item.bypass?.status}`),
+      bypassComment: item.bypass?.remark,
     };
   });
   return (
@@ -316,7 +342,7 @@ function CloseSaleShiftSearchList() {
         pageSize={pageSize}
         rowsPerPageOptions={[10, 20, 50, 100]}
         rowCount={items.total}
-        paginationMode='server'
+        paginationMode="server"
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onCellClick={currentlySelected}

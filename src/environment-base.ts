@@ -678,6 +678,12 @@ export const environment = {
       submitApprove: {
         url: 'accounting/open-end/submit/{docNo}',
       },
+      approved: {
+        url: 'accounting/open-end/approve/{docNo}',
+      },
+      exportPayInFile: {
+        url: 'accounting/open-end/export/pay-in/{OENo}',
+      },
       view: {
         url: 'accounting/open-end/{docNo}',
       },
