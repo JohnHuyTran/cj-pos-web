@@ -221,7 +221,7 @@ function CloseSaleShiftSearchList() {
     {
       field: 'bypassStatusDisplay',
       headerName: 'การ Bypass',
-      width: 100,
+      width: 110,
       headerAlign: 'center',
       sortable: false,
       align: 'center',
