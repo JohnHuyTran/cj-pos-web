@@ -33,6 +33,7 @@ interface PropsValues {
 
 interface StateProps {
   onSearch: () => void;
+  reSearch: (branch:string) => void;
   values: PropsValues;
 }
 
@@ -279,6 +280,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
+          onReSearchMain={props.reSearch}
           onSearchMain={props.onSearch}
           openLink={true}
         />
