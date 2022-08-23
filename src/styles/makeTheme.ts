@@ -55,10 +55,19 @@ const useStyles = makeStyles({
         '&.Mui-disabled': {
           backgroundColor: '#EAEBEB',
           color: '#263238',
-          '-webkit-text-fill-color': '#263238'
-        }
-      }
-    }
+          '-webkit-text-fill-color': '#263238',
+        },
+      },
+    },
+  },
+  MtextFieldNumberNotStyleDisable: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      fontSize: '14px',
+      '& input': {
+        textAlign: 'right !important',
+      },
+    },
   },
   MtextFieldNumberError: {
     '& .MuiOutlinedInput-root': {

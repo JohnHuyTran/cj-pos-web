@@ -420,7 +420,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               value={String(defaul ? defaul[1] : '')}
                               onChange={handleChange}
                               decimalScale={2}
-                              className={classes.MtextFieldNumber}
+                              className={classes.MtextFieldNumberNotStyleDisable}
                               disabled={enableSaveBtn ? false : true}
                               customInput={TextField}
                               fixedDecimalScale
@@ -456,7 +456,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       value={String(sumOther)}
                       // onChange={handleOnChange}
                       decimalScale={2}
-                      className={classes.MtextFieldNumber}
+                      className={classes.MtextFieldNumberNotStyleDisable}
                       disabled={true}
                       customInput={TextField}
                       fixedDecimalScale
@@ -507,7 +507,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               value={String(defaul ? defaul[1] : '')}
                               onChange={handleOnChange}
                               decimalScale={2}
-                              className={classes.MtextFieldNumber}
+                              className={classes.MtextFieldNumberNotStyleDisable}
                               disabled={enableSaveBtn ? false : true}
                               customInput={TextField}
                               fixedDecimalScale
@@ -557,7 +557,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               value={i.value}
                               onChange={(event: any) => handleChangeNew(event.target.value, i.key)}
                               decimalScale={2}
-                              className={classes.MtextFieldNumber}
+                              className={classes.MtextFieldNumberNotStyleDisable}
                               disabled={master?.isActive && enableSaveBtn ? false : true}
                               customInput={TextField}
                               fixedDecimalScale
@@ -592,7 +592,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                       value={String(sumOther)}
                       // onChange={handleOnChange}
                       decimalScale={2}
-                      className={classes.MtextFieldNumber}
+                      className={classes.MtextFieldNumberNotStyleDisable}
                       disabled={true}
                       customInput={TextField}
                       fixedDecimalScale
@@ -641,7 +641,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
                               value={i.value}
                               onChange={(event: any) => handleChangeNewOnOtherExpense(event.target.value, i.key)}
                               decimalScale={2}
-                              className={classes.MtextFieldNumber}
+                              className={classes.MtextFieldNumberNotStyleDisable}
                               disabled={master?.isActive && enableSaveBtn ? false : true}
                               customInput={TextField}
                               fixedDecimalScale
