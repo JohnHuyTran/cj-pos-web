@@ -182,7 +182,7 @@ export default function ModalCreateAuditPlan({
         recountingBy: dataDetail.recountingBy ? dataDetail.recountingBy : 0
       });
       setRecounting(dataDetail.recounting ? dataDetail.recounting : false)
-      if (dataDetail.appliedProduct.appliedProducts && dataDetail.appliedProduct.appliedCategories) {
+      if (dataDetail.appliedProduct.appliedProducts && dataDetail.appliedProduct.appliedCategories && dataDetail.status == StockActionStatus.DRAFT) {
         let listProducts = dataDetail.appliedProduct.appliedProducts.map((item: any) => {
             return {
               barcode: item.barcode ? item.barcode : '',
@@ -255,7 +255,7 @@ export default function ModalCreateAuditPlan({
     try {
       const products = _.uniqBy(
         payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
-        'skuName'
+        'skuCode'
       ).map((item: any) => {
         return {
           name: item.skuName,
@@ -295,6 +295,7 @@ export default function ModalCreateAuditPlan({
         await dispatch(getAuditPlanDetail(values.id));
       } else {
         setOpenModalError(true);
+        setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
       }
     } catch (error) {}
   };
@@ -368,7 +369,7 @@ export default function ModalCreateAuditPlan({
     try {
       const products = _.uniqBy(
         payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
-        'skuName'
+        'skuCode'
       ).map((item: any) => {
         return {
           name: item.skuName,
@@ -482,11 +483,8 @@ export default function ModalCreateAuditPlan({
           dispatch(setCheckEdit(false));
           setOpenPopup(true);
           setPopupMsg('คุณได้ทำการสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
-          if (action == Action.INSERT) {
-            if (onReSearchMain) onReSearchMain(values.branch);
-          } else {
-            if (onSearchMain) onSearchMain();
-          }
+          if (onReSearchMain) onReSearchMain(values.branch);
+
           handleClose();
         }
       } catch (error) {}
@@ -501,12 +499,8 @@ export default function ModalCreateAuditPlan({
         if (rs.code === 20000) {
           setOpenPopup(true);
           setPopupMsg('คุณได้ยกเลิกสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
-          if (action == Action.INSERT && !!values.branch) {
-            if (onReSearchMain) onReSearchMain(values.branch);
-          } else {
-            if (onSearchMain) onSearchMain();
-          }
-
+          dispatch(setCheckEdit(false));
+          if (onReSearchMain) onReSearchMain(values.branch);
           handleClose();
         } else {
           setOpenModalError(true);
@@ -1153,7 +1147,7 @@ export default function ModalCreateAuditPlan({
         onConfirm={handleDeleteDraft}
         barCode={values.documentNumber}
         headerTitle={'ยืนยันยกเลิกสร้างแผนตรวจนับสต๊อก'}
-        documentField={'เลขที่เอกสารเบิก'}
+        documentField={'เลขที่เอกสาร'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
       <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />
