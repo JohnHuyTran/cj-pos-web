@@ -43,7 +43,7 @@ function OpenEndList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: '20px' }}>
           {params.value}
         </Box>
       ),
@@ -64,7 +64,7 @@ function OpenEndList() {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => {
-        return <Link color='secondary'>{params.value}</Link>;
+        return <Link color="secondary">{params.value}</Link>;
       },
     },
     {
@@ -111,7 +111,7 @@ function OpenEndList() {
               },
             }}
             fixedDecimalScale
-            type='text'
+            type="text"
           />
         );
       },
@@ -142,7 +142,7 @@ function OpenEndList() {
               },
             }}
             fixedDecimalScale
-            type='text'
+            type="text"
           />
         );
       },
@@ -173,7 +173,7 @@ function OpenEndList() {
               },
             }}
             fixedDecimalScale
-            type='text'
+            type="text"
           />
         );
       },
@@ -191,7 +191,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
+              size="small"
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -199,7 +199,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
+              size="small"
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -209,7 +209,7 @@ function OpenEndList() {
     {
       field: 'bypass',
       headerName: 'การ By pass',
-      minWidth: 100,
+      minWidth: 110,
       flex: 0.65,
       headerAlign: 'center',
       align: 'center',
@@ -219,7 +219,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`statusByPass.${params.value}`)}
-              size='small'
+              size="small"
               sx={{ color: '#AEAEAE', backgroundColor: '#EEEEEE' }}
             />
           );
@@ -227,7 +227,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`statusByPass.${params.value}`)}
-              size='small'
+              size="small"
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
@@ -235,7 +235,7 @@ function OpenEndList() {
           return (
             <Chip
               label={t(`statusByPass.${params.value}`)}
-              size='small'
+              size="small"
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
@@ -324,7 +324,7 @@ function OpenEndList() {
           pageSize={parseInt(pageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
           rowCount={items.total}
-          paginationMode='server'
+          paginationMode="server"
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           onCellClick={currentlySelected}
