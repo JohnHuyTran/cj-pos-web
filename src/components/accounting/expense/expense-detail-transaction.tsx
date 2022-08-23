@@ -93,7 +93,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
                 value={String(params.value)}
                 thousandSeparator={true}
                 decimalScale={2}
-                className={classes.MtextFieldNumber}
+                className={classes.MtextFieldNumberNotStyleDisable}
                 disabled={true}
                 customInput={TextField}
                 sx={{
@@ -122,7 +122,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
             <>
               <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
                 <TextField
-                  className={classes.MtextFieldNumber}
+                  className={classes.MtextFieldNumberNotStyleDisable}
                   name={`txb${i.expenseNo}`}
                   inputProps={{ style: { textAlignLast: 'left', color: '#000000' } }}
                   sx={{
@@ -174,7 +174,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
               value={String(params.value)}
               thousandSeparator={true}
               decimalScale={2}
-              className={classes.MtextFieldNumber}
+              className={classes.MtextFieldNumberNotStyleDisable}
               disabled={true}
               customInput={TextField}
               sx={{
@@ -235,7 +235,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
                 value={String(params.value)}
                 thousandSeparator={true}
                 decimalScale={2}
-                className={classes.MtextFieldNumber}
+                className={classes.MtextFieldNumberNotStyleDisable}
                 disabled={true}
                 customInput={TextField}
                 sx={{

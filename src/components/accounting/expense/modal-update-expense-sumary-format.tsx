@@ -14,6 +14,7 @@ import {
 } from '../../../utils/utils';
 import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
 import NumberFormat from 'react-number-format';
+import { setInit } from 'store/sessionStore';
 
 interface Props {
   open: boolean;
@@ -67,6 +68,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
     if (sum > 0) {
       await dispatch(addSummaryItem(data));
       await dispatch(haveUpdateData(true));
+      setInit('N');
       setTimeout(() => {
         onClose();
       }, 300);
@@ -211,7 +213,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             value={i.value}
                             onChange={(event: any) => handleChangeNew(event.target.value, i.key)}
                             decimalScale={2}
-                            className={classes.MtextFieldNumber}
+                            className={classes.MtextFieldNumberNotStyleDisable}
                             disabled={!master?.isActive}
                             customInput={TextField}
                             fixedDecimalScale
@@ -248,7 +250,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                     value={String(sumOther)}
                     // onChange={handleOnChange}
                     decimalScale={2}
-                    className={classes.MtextFieldNumber}
+                    className={classes.MtextFieldNumberNotStyleDisable}
                     disabled={true}
                     customInput={TextField}
                     fixedDecimalScale
@@ -288,7 +290,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             value={i.value}
                             onChange={(event: any) => handleChangeNewOnOtherExpense(event.target.value, i.key)}
                             decimalScale={2}
-                            className={classes.MtextFieldNumber}
+                            className={classes.MtextFieldNumberNotStyleDisable}
                             disabled={!master?.isActive}
                             customInput={TextField}
                             fixedDecimalScale
