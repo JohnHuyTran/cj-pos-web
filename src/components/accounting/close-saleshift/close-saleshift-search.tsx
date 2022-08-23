@@ -11,7 +11,7 @@ import { getBranchName, stringNullOrEmpty } from '../../../utils/utils';
 import { env } from '../../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../../models/branch-model';
 import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
-import { closeSaleShift, CLOSE_SALE_SHIFT_ENUM } from '../../../utils/enum/accounting-enum';
+import { closeSaleShift, CLOSE_SALE_SHIFT_ENUM, bypassStatusReq } from '../../../utils/enum/accounting-enum';
 import CloseSaleShiftSearchList from './close-saleshift-list';
 import LoadingModal from '../../commons/ui/loading-modal';
 import AlertError from '../../commons/ui/alert-error';
@@ -46,6 +46,7 @@ function CloseSaleShiftSearch() {
   const [values, setValues] = React.useState({
     status: 'ALL',
     branchFrom: '',
+    bypassStatus: 'ALL',
   });
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
@@ -133,6 +134,7 @@ function CloseSaleShiftSearch() {
         shiftDate: moment(startDate).endOf('day').toISOString(),
         branchCode: branchFromCode,
         status: values.status,
+        bypassStatus: values.bypassStatus,
         page: page,
         limit: limits,
       };
@@ -158,9 +160,14 @@ function CloseSaleShiftSearch() {
     if (!isGroupBranch()) {
       setStartDate(null);
       setBranchFromCode('');
-      setValues({ status: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW, branchFrom: '' });
+      setValues({
+        ...values,
+        status: CLOSE_SALE_SHIFT_ENUM.CORRECT,
+        branchFrom: '',
+        bypassStatus: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW,
+      });
     } else {
-      setValues({ ...values, status: 'ALL' });
+      setValues({ ...values, status: 'ALL', bypassStatus: 'ALL' });
     }
 
     setClearBranchDropDown(!clearBranchDropDown);
@@ -205,7 +212,11 @@ function CloseSaleShiftSearch() {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchFrom: ownBranch });
     } else {
-      setValues({ ...values, status: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW });
+      setValues({
+        ...values,
+        status: CLOSE_SALE_SHIFT_ENUM.CORRECT,
+        bypassStatus: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW,
+      });
     }
     setDisableBtnManage(isAllowActionPermission(ACTIONS.SALE_SHIFT_MANAGE));
     setDisableBtnSearch(isAllowActionPermission(ACTIONS.SALE_SHIFT_VIEW));
@@ -217,6 +228,7 @@ function CloseSaleShiftSearch() {
         shiftDate: moment(startDate).endOf('day').toISOString(),
         branchCode: branchFromCode,
         status: values.status,
+        bypassStatus: values.bypassStatus,
         page: page,
         limit: 10,
       };
@@ -233,7 +245,7 @@ function CloseSaleShiftSearch() {
       <Box>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               สาขา
             </Typography>
             <BranchListDropDown
@@ -246,17 +258,18 @@ function CloseSaleShiftSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
               สถานะรหัส
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='status'
-                name='status'
+                id="status"
+                name="status"
                 value={values.status}
                 onChange={handleChange}
                 disabled={true}
-                inputProps={{ 'aria-label': 'Without label' }}>
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -268,11 +281,36 @@ function CloseSaleShiftSearch() {
           </Grid>
 
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div'>
+            <Typography gutterBottom variant="subtitle1" component="div">
+              Bypass
+            </Typography>
+            <FormControl fullWidth className={classes.Mselect}>
+              <Select
+                id="bypassStatus"
+                name="bypassStatus"
+                value={values.bypassStatus}
+                onChange={handleChange}
+                disabled={groupBranch}
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
+                {groupBranch && (
+                  <MenuItem value={'ALL'} selected={true}>
+                    ทั้งหมด
+                  </MenuItem>
+                )}
+                {bypassStatusReq.map((item: any, index: number) => {
+                  return <MenuItem value={item.key}>{item.text}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={4}>
+            <Typography gutterBottom variant="subtitle1" component="div">
               วันที่ยอดขาย
             </Typography>
             <DatePickerAllComponent
-              type='TO'
+              type="TO"
               onClickDate={handleStartDatePicker}
               value={startDate}
               disabled={groupBranch ? true : false}
@@ -287,60 +325,65 @@ function CloseSaleShiftSearch() {
         <Grid container spacing={2} mt={4} mb={2}>
           <Grid item xs={5}>
             <Button
-              data-testid='testid-btnImport'
-              id='btnImport'
-              variant='contained'
-              color='primary'
+              data-testid="testid-btnImport"
+              id="btnImport"
+              variant="contained"
+              color="primary"
               startIcon={<UpdateIcon />}
               onClick={handleOnupdate}
               sx={{ minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               disabled={true}
-              className={classes.MbtnSearch}>
+              className={classes.MbtnSearch}
+            >
               อัพเดท
             </Button>
             <Button
-              data-testid='testid-btnBypass'
-              id='btnBypass'
-              variant='contained'
-              color='primary'
+              data-testid="testid-btnBypass"
+              id="btnBypass"
+              variant="contained"
+              color="primary"
               onClick={handleOnBypass}
               sx={{ ml: 2, minWidth: 100, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnSearch}
               startIcon={<ArrowBackIcon />}
-              disabled={disableBtnBypass}>
+              disabled={disableBtnBypass}
+            >
               Bypass
             </Button>
           </Grid>
           <Grid item xs={7} sx={{ textAlign: 'end' }}>
             <Button
-              data-testid='testid-btnCreateStockTransferModal'
-              id='btnCreateStockTransferModal'
-              variant='contained'
+              data-testid="testid-btnCreateStockTransferModal"
+              id="btnCreateStockTransferModal"
+              variant="contained"
               onClick={handleOpenCloseSale}
               sx={{ width: 150, display: disableBtnManage ? 'none' : '' }}
               className={classes.MbtnClear}
-              color='secondary'
-              disabled={disableCloseShiftKey}>
+              color="secondary"
+              disabled={disableCloseShiftKey}
+            >
               ปิดรอบยอดการขาย
             </Button>
             <Button
-              data-testid='testid-btnClear'
-              id='btnClear'
-              variant='contained'
+              data-testid="testid-btnClear"
+              id="btnClear"
+              variant="contained"
               onClick={onClickClearBtn}
               sx={{ width: 110, ml: 2 }}
               className={classes.MbtnClear}
-              color='cancelColor'>
+              color="cancelColor"
+            >
               เคลียร์
             </Button>
             <Button
-              data-testid='testid-btnSearch'
-              id='btnSearch'
-              variant='contained'
-              color='primary'
+              data-testid="testid-btnSearch"
+              id="btnSearch"
+              variant="contained"
+              color="primary"
               onClick={onClickSearch}
               sx={{ width: 110, ml: 2, display: disableBtnSearch ? 'none' : '' }}
-              className={classes.MbtnSearch}>
+              className={classes.MbtnSearch}
+            >
               ค้นหา
             </Button>
           </Grid>
@@ -348,10 +391,10 @@ function CloseSaleShiftSearch() {
       </Box>
       {flagSearch && items.data.length > 0 && <CloseSaleShiftSearchList />}
       {flagSearch && items.data.length === 0 && (
-        <Grid container xs={12} justifyContent='center'>
-          <Box color='#CBD4DB' justifyContent='center'>
+        <Grid container xs={12} justifyContent="center">
+          <Box color="#CBD4DB" justifyContent="center">
             <h2>
-              ไม่มีข้อมูล <SearchOff fontSize='large' />
+              ไม่มีข้อมูล <SearchOff fontSize="large" />
             </h2>
           </Box>
         </Grid>
