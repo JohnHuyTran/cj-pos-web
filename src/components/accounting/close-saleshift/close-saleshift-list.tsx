@@ -253,6 +253,7 @@ function CloseSaleShiftSearchList() {
       shiftDate: payloadSearch.shiftDate,
       branchCode: payloadSearch.branchCode,
       status: payloadSearch.status,
+      bypassStatus: payloadSearch.bypassStatus,
       page: page,
       limit: pageSize,
     };
@@ -269,6 +270,7 @@ function CloseSaleShiftSearchList() {
       shiftDate: payloadSearch.shiftDate,
       branchCode: payloadSearch.branchCode,
       status: payloadSearch.status,
+      bypassStatus: payloadSearch.bypassStatus,
       page: 1,
       limit: pageSize,
     };
