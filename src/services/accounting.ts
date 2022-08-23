@@ -375,6 +375,10 @@ export async function approvedOpenEnd(docNo: string, payload: any) {
   }
 }
 
+export const getPathReportPayIn = (docNo: string) => {
+  return getPathUrl(`${environment.branchAccounting.openEnd.exportPayInFile.url}`, { OENo: docNo })
+};
+
 export async function byPassByBranch(payload: BypassPayload) {
   try {
     const response = await post(
