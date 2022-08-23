@@ -259,6 +259,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
 
   const storeSummaryItem = async (_item: any) => {
     if (_item) {
+      let totalOtherWithDraw: number = 0;
       let infosWithDraw: any;
       let infosApprove: any;
       let totalWithDraw: number = 0;
@@ -276,6 +277,12 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
         };
         if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
           totalWithDraw += entrie?.withdrawAmount || 0;
+        }
+
+        const master = getMasterExpenInto(entrie.expenseNo);
+        const _isOtherExpense = master ? master.isOtherExpense : false;
+        if (_isOtherExpense) {
+          totalOtherWithDraw += entrie?.withdrawAmount || 0;
         }
       });
       const arr = Object.entries(_item);
@@ -310,7 +317,13 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
       const _totalDiff = totalApprove - totalWithDraw;
       const totalDiff = _totalDiff > 0 ? `+${_totalDiff}` : _totalDiff;
       rows = [
-        { ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw },
+        {
+          ...infosWithDraw,
+          id: 1,
+          description: 'ยอดเงินเบิก',
+          SUMOTHER: totalOtherWithDraw,
+          total: totalWithDraw,
+        },
         { ...infosApprove, id: 2, description: 'ยอดเงินอนุมัติ', infosApprove },
         { ...infoDiff, total: totalDiff, isShowDiff: true },
       ];
