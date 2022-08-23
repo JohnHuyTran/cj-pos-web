@@ -118,6 +118,11 @@ export const isGroupSupport = () => {
   return userInfo.group === PERMISSION_GROUP.IT_SUPPORT;
 };
 
+export const isGroupFinance = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.FINANCE;
+};
+
 export const isPreferredUsername = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.preferred_username;

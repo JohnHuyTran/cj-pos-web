@@ -12,7 +12,7 @@ import moment from 'moment';
 import { useStyles } from '../../../styles/makeTheme';
 
 //utils
-import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
+import { isAllowActionPermission, isGroupBranch, isGroupFinance } from '../../../utils/role-permission';
 import { getBranchName } from '../../../utils/utils';
 import { openEndStatus } from '../../../utils/enum/accounting-enum';
 
@@ -20,6 +20,7 @@ import { openEndStatus } from '../../../utils/enum/accounting-enum';
 import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
 import DatePickerAllComponent from '../../commons/ui/date-picker-all';
 import OpenEndList from './open-end-list';
+import AlertError from 'components/commons/ui/alert-error';
 
 //model
 import { BranchListOptionType } from 'models/branch-model';
@@ -32,7 +33,6 @@ import {
   savePayloadSearch,
   clearOpenEndSearchList,
 } from '../../../store/slices/accounting/open-end/open-end-search-slice';
-import AlertError from 'components/commons/ui/alert-error';
 
 function OpenEndSearch() {
   const { t } = useTranslation(['openEnd', 'common']);
@@ -66,6 +66,7 @@ function OpenEndSearch() {
   //config branch
   const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
+  const [groupFinance, setFroupFinanace] = React.useState(isGroupFinance);
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [ownBranch, setOwnBranch] = React.useState(
@@ -149,9 +150,9 @@ function OpenEndSearch() {
   const onClickClearBtn = () => {
     setOpenLoadingModal(true);
 
-    if (!isGroupBranch()) {
+    if (isGroupFinance()) {
       setBranchFromCode('');
-      setValues({ ...values, status: 'ALL', branchCode: '' });
+      setValues({ ...values, status: 'APPROVED', branchCode: '' });
     } else {
       setValues({ ...values, status: 'ALL' });
     }
@@ -170,6 +171,10 @@ function OpenEndSearch() {
     if (groupBranch) {
       setBranchFromCode(ownBranch);
       setValues({ ...values, branchCode: ownBranch });
+    }
+
+    if (groupFinance) {
+      setValues({ ...values, status: 'APPROVED' });
     }
   }, []);
 
@@ -227,6 +232,7 @@ function OpenEndSearch() {
                 value={values.status}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'Without label' }}
+                disabled={groupFinance}
               >
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
