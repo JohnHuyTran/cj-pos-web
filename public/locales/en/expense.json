@@ -11,7 +11,9 @@
     "CORRECT": "ถูกต้อง",
     "PENDING_REVIEW": "รอตรวจสอบ",
     "CLOSED": "ปิดงาน",
-    "SAP_ERROR": "ส่งSAPไม่สำเร็จ"
+    "SAP_ERROR": "ส่งSAPไม่สำเร็จ",
+    "NONE": "ไม่มี",
+    "REVIEWED": "ตรวจสอบแล้ว"
   },
   "type": {
     "COFFEE": "ค่าใช้จ่ายร้านกาแฟ",

@@ -50,6 +50,9 @@ export const featchCloseSaleShiptListAsync = createAsyncThunk(
       if (payload.branchCode != '') {
         path += `&branchCode=${payload.branchCode}`;
       }
+      if (payload.bypassStatus != 'ALL') {
+        path += `&bypassStatus=${payload.bypassStatus}`;
+      }
 
       return await get(path).then();
       // return featchCloseSaleShiftRsMockup();

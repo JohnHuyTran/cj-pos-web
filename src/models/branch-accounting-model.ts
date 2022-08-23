@@ -318,6 +318,7 @@ export interface CloseSaleShiftRequest {
   shiftDate?: string;
   branchCode?: string;
   status?: string;
+  bypassStatus?: string;
   page?: number;
   limit?: number;
 }
@@ -348,6 +349,12 @@ export interface CloseSaleShiftInfo {
   status: string;
   posCode: string;
   posUser: string;
+  bypass?: bypassInfo | null;
+}
+export interface bypassInfo {
+  status: string;
+  remark: string;
+  shiftAmount: number;
 }
 
 export interface ExternalIncomeItemInfo {

@@ -98,7 +98,10 @@ export enum CLOSE_SALE_SHIFT_ENUM {
   DRAFT = 'DRAFT',
   PENDING_REVIEW = 'PENDING_REVIEW',
   CORRECT = 'CORRECT',
+  NONE = 'NONE',
+  REVIEWED = 'REVIEWED',
 }
+
 export const closeSaleShift = [
   { key: CLOSE_SALE_SHIFT_ENUM.DRAFT, text: 'บันทึก' },
   { key: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW, text: 'รอตรวจสอบ' },
@@ -109,4 +112,9 @@ export const openEndStatus = [
   { key: 'DRAFT', text: 'บันทึก' },
   { key: 'REQUEST_APPROVE', text: 'ขออนุมัติ' },
   { key: 'APPROVED', text: 'อนุมัติ' },
+];
+
+export const bypassStatusReq = [
+  { key: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW, text: 'รอตรวจสอบ' },
+  { key: CLOSE_SALE_SHIFT_ENUM.REVIEWED, text: 'ตรวจสอบแล้ว' },
 ];
