@@ -416,7 +416,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
       entries.map((entrie: SumItemsItem, i: number) => {
         infosWithDraw = {
           ...infosWithDraw,
-          [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
+          [entrie.expenseNo]: Math.round(_.sumBy(_item, entrie.expenseNo) * 100) / 100,
         };
         const sum = _.sumBy(_item, entrie.expenseNo);
         if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
@@ -429,7 +429,15 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
           _otherSum += stringNullOrEmpty(sum) ? 0 : sum;
         }
       });
-      rows = [{ ...infosWithDraw, id: 1, description: 'ยอดเงินเบิก', total: totalWithDraw, SUMOTHER: _otherSum }];
+      rows = [
+        {
+          ...infosWithDraw,
+          id: 1,
+          description: 'ยอดเงินเบิก',
+          total: totalWithDraw,
+          SUMOTHER: Math.round(_otherSum * 100) / 100,
+        },
+      ];
       dispatch(updateSummaryRows(rows));
     } else {
       totalWithDraw = 0;

@@ -315,7 +315,6 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
       };
 
       const _totalDiff = Number(totalApprove) - Number(totalWithDraw);
-      console.log(`${Number(totalApprove)} - ${Number(totalWithDraw)} = ${_totalDiff}`);
       const totalDiff = _totalDiff > 0 ? `+${_totalDiff}` : _totalDiff;
       rows = [
         {
