@@ -208,7 +208,7 @@ export default function CheckOrderDetail({
     if (orderDetail) {
       setShowSaveBtn(
         orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ||
-          orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_SENDTOEDIT
+          orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_REJECT_APPROVAL_1
       );
       setStatusWaitApprove1(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1);
       setShowApproveBtn(orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE);
@@ -411,7 +411,7 @@ export default function CheckOrderDetail({
               isTote: item.isTote ? item.isTote : false,
               sdStatus:
                 orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ||
-                orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_SENDTOEDIT
+                orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_REJECT_APPROVAL_1
                   ? false
                   : true,
               skuCode: item.skuCode,

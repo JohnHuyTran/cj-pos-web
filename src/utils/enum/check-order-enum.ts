@@ -3,12 +3,12 @@ export enum ShipmentDeliveryStatusCodeEnum {
   STATUS_DRAFT = 'DRAFT',
   STATUS_CLOSEJOB = 'CLOSED',
   STATUS_WAITAPPROVEL_1 = 'WAIT_FOR_APPROVAL_1',
-  STATUS_SENDTOEDIT = 'SEND_TO_EDIT',
+  STATUS_REJECT_APPROVAL_1 = 'REJECT_APPROVAL_1',
 }
 
 export const shipmentStatus = [
   { key: ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT },
-  { key: ShipmentDeliveryStatusCodeEnum.STATUS_SENDTOEDIT },
+  { key: ShipmentDeliveryStatusCodeEnum.STATUS_REJECT_APPROVAL_1 },
   { key: ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1 },
   { key: ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE },
   { key: ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB },

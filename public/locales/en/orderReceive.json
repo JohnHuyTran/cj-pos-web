@@ -1,7 +1,7 @@
 {
   "status": {
     "DRAFT": "Draft",
-    "SEND_TO_EDIT": "Send to edit",
+    "REJECT_APPROVAL_1": "Send to edit",
     "WAIT_FOR_APPROVAL_1": "Wait for approve 1",
     "APPROVED": "Approved",
     "CLOSED": "Closed"

@@ -1,7 +1,7 @@
 {
   "status": {
     "DRAFT": "บันทึก",
-    "SEND_TO_EDIT": "ส่งกลับแก้ไข",
+    "REJECT_APPROVAL_1": "ส่งกลับแก้ไข",
     "WAIT_FOR_APPROVAL_1": "รออนุมัติ1",
     "APPROVED": "อนุมัติ",
     "CLOSED": "ปิดงาน"

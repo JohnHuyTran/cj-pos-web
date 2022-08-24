@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import { ShipmentResponse, ShipmentInfo, ShipmentRequest } from '../../models/order-model';
 import CheckOrderDetail from './check-order-detail';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { getShipmentTypeText } from '../../utils/enum/check-order-enum';
+import { getShipmentTypeText, ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import { useStyles } from '../../styles/makeTheme';
 import { featchOrderListAsync } from '../../store/slices/check-order-slice';
 import { saveSearchCriteria } from '../../store/slices/save-search-order';
@@ -16,7 +16,7 @@ import { Chip, Typography } from '@mui/material';
 import { updateAddItemsState } from '../../store/slices/add-items-slice';
 
 function OrderList() {
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation(['orderReceive', 'common']);
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
   const cuurentPages = useAppSelector((state) => state.checkOrderList.orderList.page);
@@ -113,7 +113,11 @@ function OrderList() {
       align: 'left',
       sortable: false,
       renderCell: (params) => {
-        if (params.value === 'DRAFT' || params.value === 'WAIT_FOR_APPROVAL_1') {
+        if (
+          params.value === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ||
+          params.value === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1 ||
+          params.value === ShipmentDeliveryStatusCodeEnum.STATUS_REJECT_APPROVAL_1
+        ) {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -121,7 +125,7 @@ function OrderList() {
               sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
             />
           );
-        } else if (params.value === 'APPROVED') {
+        } else if (params.value === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
           return (
             <Chip
               label={t(`status.${params.value}`)}
@@ -129,7 +133,7 @@ function OrderList() {
               sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
             />
           );
-        } else if (params.value === 'CLOSED') {
+        } else if (params.value === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
           return (
             <Chip
               label={t(`status.${params.value}`)}
