@@ -30,10 +30,12 @@ import { ACTIONS } from 'utils/enum/permission-enum';
 import ModalDetailCash from '../open-end/modal-detail-cash';
 import { featchOpenEndDeatilAsync } from 'store/slices/accounting/open-end/open-end-slice';
 import ModalByPassByBranch from './modal-bypass-branch';
+import { useTranslation } from 'react-i18next';
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(['expense', 'common']);
   const page = 1;
   const items = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift);
   const limit = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift.perPage);
@@ -274,7 +276,8 @@ function CloseSaleShiftSearch() {
                   ทั้งหมด
                 </MenuItem>
                 {closeSaleShift.map((item: any, index: number) => {
-                  return <MenuItem value={item.key}>{item.text}</MenuItem>;
+                  const text = t(`status.${item.key}`);
+                  return <MenuItem value={item.key}>{text}</MenuItem>;
                 })}
               </Select>
             </FormControl>

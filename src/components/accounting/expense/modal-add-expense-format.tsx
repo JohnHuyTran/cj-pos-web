@@ -112,8 +112,9 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
               .toString()
               .replace(/[^0-9.]/g, '')
               .replace(/,/g, '');
-            _data = parseFloat(_data);
-            data = { ...data, [e.key]: _data };
+
+            _data = Math.round(parseFloat(_data) * 100) / 100;
+            data = { ...data, [e.key]: Number(_data) };
           } else {
             data = { ...data, [e.key]: e.value };
           }
@@ -140,7 +141,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
 
         data = {
           ...data,
-          total: sum,
+          total: Math.round(sum * 100) / 100,
           SUMOTHER: _otherSum,
           otherDetail: _otherDetail.substring(0, _otherDetail.length - 1),
           isOverApprovalLimit1: _isOverApprovalLimit1,
@@ -175,6 +176,7 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
           const key = element[0];
           const _amount = (element[1] || 0).replace(/[^0-9.]/g, '').replace(/,/g, '');
           const amount = parseFloat(_amount);
+
           if (!isFilterFieldInExpense(element[0]) && master?.isOtherExpense) {
             _otherSum += amount;
             if (amount > 0) {
@@ -230,10 +232,10 @@ function ModalAddExpense({ open, onClose, periodProps, edit, payload, type }: Pr
   //     setOpenLoadingModal(false);
   //     onClose();
   //   }, 300);
-  // };
+  // };Math.round(parseFloat(obj[key] || 0) * 100) / 100
 
   function sum(obj: any) {
-    return Object.keys(obj).reduce((sum, key) => sum + parseFloat(obj[key] || 0), 0);
+    return Object.keys(obj).reduce((sum, key) => sum + Math.round(parseFloat(obj[key] || 0) * 100) / 100, 0);
   }
 
   const handleChange = (event: any) => {

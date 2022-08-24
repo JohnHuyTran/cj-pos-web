@@ -30,6 +30,7 @@ import { env } from '../../adapters/environmentConfigs';
 import { BranchListOptionType } from '../../models/branch-model';
 import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
 import { gridColumnsTotalWidthSelector } from '@mui/x-data-grid';
+import { useTranslation } from 'react-i18next';
 
 // moment.locale("en");
 moment.locale('th');
@@ -51,6 +52,7 @@ interface loadingModalState {
 function CheckOrderSearch() {
   const dispatch = useAppDispatch();
   const classes = useStyles();
+  const { t } = useTranslation(['orderReceive', 'common']);
   // const limit = "10";
   const page = '1';
   const items = useAppSelector((state) => state.checkOrderList);
@@ -250,10 +252,10 @@ function CheckOrderSearch() {
       orderListData = <OrderList />;
     } else {
       orderListData = (
-        <Grid item container xs={12} justifyContent="center">
-          <Box color="#CBD4DB">
+        <Grid item container xs={12} justifyContent='center'>
+          <Box color='#CBD4DB'>
             <h2>
-              ไม่มีข้อมูล <SearchOff fontSize="large" />
+              ไม่มีข้อมูล <SearchOff fontSize='large' />
             </h2>
           </Box>
         </Grid>
@@ -291,22 +293,22 @@ function CheckOrderSearch() {
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ค้นหาเอกสาร
             </Typography>
             <TextField
-              id="txtOrderShipment"
-              name="orderShipment"
-              size="small"
+              id='txtOrderShipment'
+              name='orderShipment'
+              size='small'
               value={values.orderShipment}
               onChange={handleChange}
               className={classes.MtextField}
               fullWidth
-              placeholder="เลขที่เอกสาร LD/BT/SD"
+              placeholder='เลขที่เอกสาร LD/BT/SD'
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาต้นทาง
             </Typography>
             <BranchListDropDown
@@ -316,7 +318,7 @@ function CheckOrderSearch() {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               สาขาปลายทาง
             </Typography>
             <BranchListDropDown
@@ -330,32 +332,31 @@ function CheckOrderSearch() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               วันที่รับสินค้า
             </Typography>
-            <Typography gutterBottom variant="subtitle1" component="div">
+            <Typography gutterBottom variant='subtitle1' component='div'>
               ตั้งแต่
             </Typography>
             <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               ถึง
             </Typography>
             <DatePickerComponent onClickDate={handleEndDatePicker} value={endDate} type={'TO'} minDateTo={startDate} />
           </Grid>
           <Grid item xs={4} container>
-            <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+            <Typography gutterBottom variant='subtitle1' component='div' sx={{ mt: 3.5 }}>
               สถานะ
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selOrderStatus"
-                name="orderStatus"
+                id='selOrderStatus'
+                name='orderStatus'
                 value={values.orderStatus}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 {/* {branchOC && (
                   <>
                     <MenuItem value={'ALL'}>
@@ -383,7 +384,7 @@ function CheckOrderSearch() {
                     value={status.key}
                     // selected={status.key === 'WAIT_FOR_APPROVE_1' ? true : false}
                   >
-                    {status.text}
+                    {t(`status.${status.key}`)}
                   </MenuItem>
                 ))}
               </Select>
@@ -391,17 +392,16 @@ function CheckOrderSearch() {
           </Grid>
 
           <Grid item xs={4} sx={{ pt: 30 }}>
-            <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
               ประเภท
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id="selOrderType"
-                name="orderType"
+                id='selOrderType'
+                name='orderType'
                 value={values.orderType}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
-              >
+                inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
                   ทั้งหมด
                 </MenuItem>
@@ -412,36 +412,33 @@ function CheckOrderSearch() {
             </FormControl>
           </Grid>
 
-          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent="flex-end" direction="row" alignItems="flex-end">
+          <Grid item container xs={12} sx={{ mt: 3 }} justifyContent='flex-end' direction='row' alignItems='flex-end'>
             <Button
-              id="btnCreateStockTransferModal"
-              variant="contained"
+              id='btnCreateStockTransferModal'
+              variant='contained'
               onClick={handleOpenOrderReceiveModal}
               sx={{ minWidth: '15%', display: `${!displayBtnOrderReceive ? 'none' : ''}` }}
               className={classes.MbtnClear}
               startIcon={<AddCircleOutlineOutlinedIcon />}
-              color="secondary"
-            >
+              color='secondary'>
               รับสินค้า
             </Button>
             <Button
-              id="btnClear"
-              variant="contained"
+              id='btnClear'
+              variant='contained'
               onClick={onClickClearBtn}
               sx={{ width: '13%', ml: 2 }}
               className={classes.MbtnClear}
-              color="cancelColor"
-            >
+              color='cancelColor'>
               เคลียร์
             </Button>
             <Button
-              id="btnSearch"
-              variant="contained"
-              color="primary"
+              id='btnSearch'
+              variant='contained'
+              color='primary'
               onClick={onClickValidateForm}
               sx={{ width: '13%', ml: 2 }}
-              className={classes.MbtnSearch}
-            >
+              className={classes.MbtnSearch}>
               ค้นหา
             </Button>
           </Grid>

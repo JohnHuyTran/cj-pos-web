@@ -25,6 +25,9 @@ export const environment = {
       approveOC: {
         url: '/order/stock-diff/{sdNo}/approve-oc',
       },
+      rejectOC: {
+        url: '/order/stock-diff/{sdNo}/reject-oc',
+      },
       closejob: {
         url: '/order/stock-diff/{sdNo}/close',
       },

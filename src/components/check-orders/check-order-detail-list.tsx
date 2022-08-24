@@ -42,8 +42,8 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant="body2">{params.value}</Typography>
-        <Typography variant="body2" color="textSecondary">
+        <Typography variant='body2'>{params.value}</Typography>
+        <Typography variant='body2' color='textSecondary'>
           {params.getValue(params.id, 'skuCode') || ''}
         </Typography>
       </div>
@@ -81,9 +81,9 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnQuantityActual"
-        type="number"
+        variant='outlined'
+        name='txnQuantityActual'
+        type='number'
         inputProps={{ style: { textAlign: 'right' } }}
         value={params.value}
         onChange={(e) => {
@@ -95,7 +95,7 @@ const columns: GridColDef[] = [
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -117,12 +117,12 @@ const columns: GridColDef[] = [
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant="outlined"
-        name="txnComment"
+        variant='outlined'
+        name='txnComment'
         value={params.value}
         onChange={(e) => params.api.updateRows([{ ...params.row, comment: e.target.value }])}
         disabled={isDisable(params) ? true : false}
-        autoComplete="off"
+        autoComplete='off'
       />
     ),
   },
@@ -233,7 +233,11 @@ function CheckOrderDetailList() {
         id: index,
         deliveryOrderNo: item.deliveryOrderNo,
         isTote: item.isTote ? item.isTote : false,
-        sdStatus: orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ? false : true,
+        sdStatus:
+          orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ||
+          orderDetail.sdStatus === ShipmentDeliveryStatusCodeEnum.STATUS_REJECT_APPROVAL_1
+            ? false
+            : true,
         skuCode: item.skuCode,
         barcode: item.barcode,
         productName: item.productName,
@@ -275,8 +279,7 @@ function CheckOrderDetailList() {
     <>
       <div
         style={{ width: '100%', height: rowsEntries.length >= 8 ? '70vh' : 'auto' }}
-        className={classes.MdataGridDetail}
-      >
+        className={classes.MdataGridDetail}>
         <DataGrid
           rows={rowsEntries}
           columns={columns}
