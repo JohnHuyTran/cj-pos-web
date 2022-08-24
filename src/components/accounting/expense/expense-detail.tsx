@@ -1285,7 +1285,10 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                       );
                     })}
                 </Card> */}
-                <TextBoxComentList filedLabel={'หมายเหตุ:'} payload={expenseData.comments} />
+                <TextBoxComentList
+                  filedLabel={'หมายเหตุ:'}
+                  payload={expenseData && expenseData.comments ? expenseData.comments : []}
+                />
               </Grid>
               <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction} data-testid='testid-btnTop'>
