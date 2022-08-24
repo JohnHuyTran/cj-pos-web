@@ -5,21 +5,37 @@ import { Store, AnyAction } from '@reduxjs/toolkit';
 import { initialState } from '../../../mockStore';
 import theme from '../../../../styles/theme';
 import { mockUserInfo } from '../../../mockData';
-import ModalCloseSale from '../../../../components/accounting/close-saleshift/modal-close-sale';
+
 import { ThemeProvider } from '@mui/material';
+import ModalByPassByBranch from 'components/accounting/close-saleshift/modal-bypass-branch';
 
 let wrapper;
 const mockStore = configureStore();
 let store: Store<any, AnyAction>;
 const handleOnClose = jest.fn();
+const handleOnCallBack = jest.fn();
 const noOfShiftKey = '8';
 sessionStorage.setItem('user_info', mockUserInfo);
+jest.mock('react-i18next', () => ({
+  useTranslation: () => {
+    return {
+      t: (str: string) => str,
+      i18n: {
+        changeLanguage: () => new Promise(() => {}),
+      },
+    };
+  },
+  initReactI18next: {
+    type: '3rdParty',
+    init: jest.fn(),
+  },
+}));
 beforeEach(() => {
   store = mockStore(initialState);
   wrapper = render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <ModalCloseSale open={true} onClose={handleOnClose} noOfShiftKey={noOfShiftKey} />
+        <ModalByPassByBranch open={true} onClose={handleOnClose} onCallBack={handleOnCallBack} />
       </ThemeProvider>
     </Provider>
   );

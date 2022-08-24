@@ -80,7 +80,7 @@ function CloseSaleShiftSearchList() {
       sortable: false,
       align: 'center',
       renderCell: (params) => {
-        const _status = params.getValue(params.id, 'status');
+        const _status = params.row.status;
         if (_status === CLOSE_SALE_SHIFT_ENUM.DRAFT || _status === CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW) {
           return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
         } else if (_status === CLOSE_SALE_SHIFT_ENUM.CORRECT) {
@@ -101,7 +101,7 @@ function CloseSaleShiftSearchList() {
           : 0;
         const shiftAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
         const isDiff = shiftAmount != billAmount;
-        const _status = params.getValue(params.id, 'status');
+        const _status = params.row.status;
         if (!stringNullOrEmpty(params.value)) {
           return (
             <NumberFormat
@@ -132,7 +132,7 @@ function CloseSaleShiftSearchList() {
           : 0;
         const billAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
         const isDiff = shiftAmount != billAmount;
-        const _status = params.getValue(params.id, 'status');
+        const _status = params.row.status;
         if (!stringNullOrEmpty(params.value)) {
           return (
             <NumberFormat
@@ -353,7 +353,7 @@ function CloseSaleShiftSearchList() {
         onCellClick={currentlySelected}
         loading={loading}
         rowHeight={65}
-        columnBuffer={11}
+        columnBuffer={13}
       />
       <LoadingModal open={openLoadingModal.open} />
       <ModalSaveCloseShiftKey
