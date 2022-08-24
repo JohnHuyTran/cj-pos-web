@@ -67,8 +67,7 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
-        minWidth: 70,
-        flex: 0.6,
+        flex: 1,
         headerAlign: 'center',
         align: 'right',
         sortable: false,
@@ -314,7 +313,9 @@ function ExpenseDetailSummary({ type, periodProps, edit }: Props) {
         id: 3,
         description: 'ผลต่าง',
       };
-      const _totalDiff = totalApprove - totalWithDraw;
+
+      const _totalDiff = Number(totalApprove) - Number(totalWithDraw);
+      console.log(`${Number(totalApprove)} - ${Number(totalWithDraw)} = ${_totalDiff}`);
       const totalDiff = _totalDiff > 0 ? `+${_totalDiff}` : _totalDiff;
       rows = [
         {
