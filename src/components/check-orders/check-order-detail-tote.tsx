@@ -16,11 +16,7 @@ import {
 } from '@mui/material';
 import { HighlightOff, Print, CheckCircleOutline } from '@mui/icons-material';
 import SaveIcon from '@mui/icons-material/Save';
-import {
-  getShipmentStatusText,
-  getShipmentTypeText,
-  ShipmentDeliveryStatusCodeEnum,
-} from '../../utils/enum/check-order-enum';
+import { getShipmentTypeText, ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
 import { convertUtcToBkkDate } from '../../utils/date-utill';
 import {
   DataGrid,
@@ -39,7 +35,7 @@ import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-sl
 import LoadingModal from '../commons/ui/loading-modal';
 import ModalShowFile from '../commons/ui/modal-show-file';
 import { getPathReportSD, saveOrderShipments } from '../../services/order-shipment';
-import { formatFileNam } from '../../utils/enum/check-order-enum';
+import { formatFileName } from '../../utils/enum/check-order-enum';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ModalAddItemsTote from '../commons/ui/modal-add-items-tote';
@@ -54,6 +50,7 @@ import Snackbar from '../commons/ui/snackbar-status';
 import ConfirmExitModel from './confirm-model';
 import { ToteItem } from '../../models/tote-model';
 import { isErrorCode } from '../../utils/exception/pos-exception';
+import { useTranslation } from 'react-i18next';
 
 export interface CheckOrderDetailToteProps {
   defaultOpen: boolean;
@@ -260,7 +257,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
   const classes = useStyles();
-
+  const { t } = useTranslation(['orderReceive', 'common']);
   const itemsTote = useAppSelector((state) => state.itemsToteSlice.state);
   const payloadSearchOrder = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
   const orderDetails = useAppSelector((state) => state.checkOrderToteSlice.orderDetail);
@@ -631,7 +628,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
                 <Typography variant='body2'>สถานะ:</Typography>
               </Grid>
               <Grid item lg={4}>
-                <Typography variant='body2'>{getShipmentStatusText(orderDetailTote.sdStatus)}</Typography>
+                <Typography variant='body2'>{t(`status.${orderDetailTote.sdStatus}`)}</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
@@ -814,7 +811,7 @@ function CheckOrderDetailTote({ defaultOpen, onClickClose }: CheckOrderDetailTot
         fileName={
           orderDetailTote.sdImageFilename
             ? orderDetailTote.sdImageFilename
-            : formatFileNam(orderDetailTote.sdNo, orderDetailTote.sdStatus)
+            : formatFileName(orderDetailTote.sdNo, t(`status.${orderDetailTote.sdStatus}`))
         }
         btnPrintName='พิมพ์ใบผลต่าง'
       />

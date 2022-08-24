@@ -70,6 +70,7 @@ import Steppers from './steppers';
 import { FileType } from '../../../models/common-model';
 import ConfirmModalExit from '../../commons/ui/confirm-exit-model';
 import { uploadFileState } from '../../../store/slices/upload-file-slice';
+import TextBoxComentList from 'components/commons/ui/texbox-commentList';
 
 interface Props {
   isOpen: boolean;
@@ -1249,38 +1250,12 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
             <ExpenseDetailSummary type={expenseType} periodProps={period} edit={editAction} />
           </Box>
           <Box mt={1}>
-            <Box>
+            {/* <Box>
               <Typography variant='body2'>หมายเหตุ:</Typography>
-            </Box>
+            </Box> */}
             <Grid container spacing={2} mb={2} justifyContent='space-between'>
-              <Grid
-                item
-                // xs={3}
-                // mb={1}
-                // mt={1}
-                // ml={2}
-                // pr={1}
-                // pb={1}
-                // sx={{ border: 1, borderColor: '#CBD4DB', borderRadius: '5px !important' }}
-              >
-                {/* {expenseData &&
-                  expenseData.comments &&
-                  expenseData.comments.length > 0 &&
-                  expenseData.comments.map((e: Comment) => {
-                    return (
-                      <>
-                        <Typography variant='body2'>
-                          <span style={{ fontWeight: 'bold' }}>{e.username} : </span>
-                          <span style={{ color: '#AEAEAE' }}>
-                            {e.statusDesc} {convertUtcToBkkDate(e.commentDate)}
-                          </span>
-                        </Typography>
-                        <Typography variant='body2'> {e.comment}</Typography>
-                      </>
-                    );
-                  })} */}
-
-                <Card
+              <Grid item>
+                {/* <Card
                   variant='outlined'
                   style={{
                     width: '500px',
@@ -1288,6 +1263,7 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                     paddingLeft: '10px',
                     paddingRight: '10px',
                     paddingTop: '10px',
+                    
                     paddingBottom: '10px',
                     overflow: 'scroll',
                   }}>
@@ -1308,7 +1284,8 @@ function ExpenseDetail({ isOpen, onClickClose, type, edit, periodProps }: Props)
                         </>
                       );
                     })}
-                </Card>
+                </Card> */}
+                <TextBoxComentList filedLabel={'หมายเหตุ:'} payload={expenseData.comments} />
               </Grid>
               <Grid item xs={2} textAlign='center'>
                 <IconButton onClick={topFunction} data-testid='testid-btnTop'>
