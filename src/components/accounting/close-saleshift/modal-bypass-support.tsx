@@ -105,7 +105,7 @@ function ModalBypassBySupport({ shiftCode, branchCode, open, onClose }: Props) {
         </DialogTitle>
         <DialogContent sx={{ justifyContent: 'center' }}>
           <Box>
-            <Typography variant='body2' sx={{ textAlign: 'center' }}>
+            <Typography variant='body2' sx={{ textAlign: 'center' }} data-testid='testid-label-shiftCode'>
               เลขรหัสรอบขาย: {shiftCode}
             </Typography>
           </Box>
@@ -132,6 +132,7 @@ function ModalBypassBySupport({ shiftCode, branchCode, open, onClose }: Props) {
         <DialogActions sx={{ justifyContent: 'center', mb: 3 }}>
           <Button
             id='btnCancel'
+            data-testid='testid-btnCancle'
             variant='contained'
             color='cancelColor'
             sx={{ borderRadius: 2, width: 80, mr: 2 }}
