@@ -35,6 +35,7 @@ import { cancelStockCount, confirmStockCount, getSCDetail } from "../../../servi
 import ModalConfirmSC from './modal-confirm-SC';
 import { getUserInfo } from '../../../store/sessionStore';
 import { getUserGroup, isChannelBranch, isGroupAuditParam, isGroupBranchParam } from '../../../utils/role-permission';
+import LoadingModal from '../../commons/ui/loading-modal';
 
 
 interface Props {
@@ -46,6 +47,7 @@ interface Props {
   onSearchMain?: () => void;
   userPermission?: any[];
   viewMode?: boolean;
+  openLink?: boolean;
 }
 
 interface loadingModalState {
@@ -63,6 +65,7 @@ export default function ModalCreateStockCount({
   onSearchMain,
   userPermission,
   viewMode,
+  openLink,
 }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -85,7 +88,6 @@ export default function ModalCreateStockCount({
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
     ? userPermission.includes(ACTIONS.STOCK_SC_MANAGE) : false);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
-
   const handleOpenCancel = () => {
     setOpenModalCancel(true);
   };
@@ -94,13 +96,27 @@ export default function ModalCreateStockCount({
     setOpenModalCancel(false);
   };
 
-  const handleOpenModalConfirm = () => {
-    if (!validate()) {
-      setOpenModalError(true);
-      setAlertTextError('กรุณาระบุจำนวนนับ');
-      return;
-    } else {
-      setOpenModalConfirmConfirm(true);
+  const handleOpenModalConfirm = async () => {
+    try {
+      const resuilt = await getSCDetail(dataDetail.id);
+      if (resuilt) {
+        if (!validate()) {
+          setOpenModalError(true);
+          setAlertTextError('กรุณาระบุจำนวนนับ');
+          return;
+        } else {
+          setOpenModalConfirmConfirm(true);
+        }
+      } else {
+        setOpenModalErrorExit(true);
+      }
+    } catch (error) {
+      const er: any = error;
+      if (er.code == 50000) {
+        setOpenModalErrorExit(true);
+      } else {
+        setOpenModalError(true);
+      }
     }
   };
 
@@ -137,6 +153,8 @@ export default function ModalCreateStockCount({
         countingTime: '',
         APDocumentNumber: '',
         stockCounter: 0,
+        recounting: false,
+        recountingBy: 0,
         APId: ''
       })
     );
@@ -175,7 +193,9 @@ export default function ModalCreateStockCount({
           APId: stockCountDetail.APId,
           storeType: stockCountDetail.storeType,
           branch: stockCountDetail.branchCode + ' - ' + stockCountDetail.branchName,
-          stockCounter: stockCountDetail.stockCounter
+          stockCounter: stockCountDetail.stockCounter,
+          recounting: !!stockCountDetail.recounting,
+          recountingBy: stockCountDetail.recountingBy ? stockCountDetail.recountingBy : 0,
         })
       );
       //set value for products
@@ -333,7 +353,7 @@ export default function ModalCreateStockCount({
   };
   const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
   const handleOpenAP = async () => {
-    if (viewMode) return;
+    if (!openLink) return;
     handleOpenLoading('open', true);
     try {
       await dispatch(getAuditPlanDetail(dataDetail.APId));
@@ -359,6 +379,7 @@ export default function ModalCreateStockCount({
           unitPrice: item.price || 0,
           skuCode: item.sku,
           canNotCount: sameItem.canNotCount,
+          skuName: item.skuName,
           qty: (!sameItem.quantity && !sameItem.canNotCount) ? 0 : sameItem.quantity,
         };
       });
@@ -436,24 +457,25 @@ export default function ModalCreateStockCount({
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
-                <Button
-                  id="btnAddZero"
-                  variant="contained"
-                  color="info"
-                  className={classes.MbtnSearch}
-                  onClick={handleOpenAddZero}
-                  sx={{ width: 172 }}
-                  style={{
-                    display:
-                      (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
-                      !isGroupAuditParam(_group) ||
-                      dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH ||
-                      !groupBranch
-                        ? 'none'
-                        : undefined,
-                  }}>
-                  คลิกใส่ 0 สินค้าที่ไม่พบ
-                </Button>
+              <Button
+                id="btnAddZero"
+                variant="contained"
+                color="info"
+                className={classes.MbtnSearch}
+                onClick={handleOpenAddZero}
+                sx={{ width: 172 }}
+                style={{
+                  display:
+                    (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
+                    !isGroupAuditParam(_group) ||
+                    dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH || viewMode ||
+                    (isGroupAuditParam(_group) && dataDetail.recounting && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH) ||
+                    !groupBranch
+                      ? 'none'
+                      : undefined,
+                }}>
+                คลิกใส่ 0 สินค้าที่ไม่พบ
+              </Button>
             
             <Box sx={{ marginLeft: 'auto' }}>
               <Button
@@ -466,9 +488,11 @@ export default function ModalCreateStockCount({
                 style={{
                   display:
                     (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
-                    !managePermission ||
-                    !groupBranch || (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) 
-                    || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+                    !managePermission || viewMode ||
+                    !groupBranch || (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !dataDetail.recounting)
+                    || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
+                    || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
+                    || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting)
                       ? 'none'
                       : undefined,
                 }}
@@ -484,10 +508,12 @@ export default function ModalCreateStockCount({
                 disabled={stringNullOrEmpty(status)}
                 style={{
                   display:
-                    !managePermission ||
+                    !managePermission || viewMode ||
                     !groupBranch ||
-                    (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH) ||
-                    (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT)
+                    (isGroupAuditParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !dataDetail.recounting)
+                    || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
+                    || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
+                    || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting)
                       ? 'none'
                       : undefined,
                 }}
@@ -515,7 +541,7 @@ export default function ModalCreateStockCount({
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
-          viewMode={true}
+          viewMode
         />
       )}
       <ModelConfirm
@@ -538,6 +564,7 @@ export default function ModalCreateStockCount({
         textError={'ไม่สามารถดำเนินการได้\nเนื่องจากเอกสาร AP ถูกยกเลิก'}
       />
       <ConfirmCloseModel open={openModalClose} onClose={() => setOpenModalClose(false)} onConfirm={handleClose}/>
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 }

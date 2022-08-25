@@ -28,11 +28,18 @@ import CreatePurchaseBranch from './pages/purchase-branch-request/create-purchas
 import { featchMasterStockMovementTypeListAsync } from './store/slices/master/stock-movement-type-slice';
 import ProductMaster from './pages/stock/product-master';
 import TORawMasterial from './pages/transfer-out-raw-masterial/transfer-out-raw-masterial';
+import Expense from './pages/accounting/expense';
+import Reserves from './pages/settings/reserves';
+import CashStatement from './pages/accounting/cash-statement';
+import { featchMasterExpenseListAsync } from './store/slices/master/expense-list-slice';
+import { featchExpenseDetailAsync } from './store/slices/accounting/accounting-slice';
 import AuditPlan from './pages/check-stock/audit-plan';
-import StockCount from "./pages/check-stock/stock-count";
-import StockAdjustment from "./pages/check-stock/stock-adjustment";
-import AuditHistory from './pages/check-stock/audit-history';
 
+import CloseSaleShift from './pages/accounting/close-saleshift';
+import StockCount from './pages/check-stock/stock-count';
+import StockAdjustment from './pages/check-stock/stock-adjustment';
+import AuditHistory from './pages/check-stock/audit-history';
+import OpenEnd from './pages/accounting/open-end';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -83,6 +90,7 @@ export default function App2() {
     dispatch(featchBranchListAsync());
     dispatch(featchAuthorizedBranchListAsync());
     dispatch(featchMasterStockMovementTypeListAsync());
+    dispatch(featchMasterExpenseListAsync());
   }
 
   return (
@@ -110,9 +118,14 @@ export default function App2() {
           <Route path='/stock-movement' component={StockMovement} />
           <Route path='/create-purchase-branch' component={CreatePurchaseBranch} />
           <Route path='/product-master' component={ProductMaster} />
+          <Route path='/expense' component={Expense} />
+          <Route path='/reserves' component={Reserves} />
           <Route path='/audit-plan' component={AuditPlan} />
           <Route path='/stock-count' component={StockCount} />
+          <Route path='/close-saleshift' component={CloseSaleShift} />
+          <Route path='/cash-statement' component={CashStatement} />
           <Route path='/stock-adjustment' component={StockAdjustment} />
+          <Route path='/open-end' component={OpenEnd} />
           <Route path='/audit-history' component={AuditHistory} />
         </Switch>
       </Main>

@@ -21,6 +21,9 @@ import {
   KEYCLOAK_GROUP_PI,
   KEYCLOAK_GROUP_PCM,
   KEYCLOAK_GROUP_DATA,
+  KEYCLOAK_GROUP_ACCOUNTING_MANAGER,
+  KEYCLOAK_IT_SUPPORT,
+  KEYCLOAK_GROUP_FINANCE,
 } from './enum/permission-enum';
 
 const _ = require('lodash');
@@ -55,6 +58,12 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.PCM;
   } else if (group === KEYCLOAK_GROUP_DATA) {
     return PERMISSION_GROUP.DATA;
+  } else if (group === KEYCLOAK_GROUP_ACCOUNTING_MANAGER) {
+    return PERMISSION_GROUP.ACCOUNT_MANAGER;
+  } else if (group === KEYCLOAK_IT_SUPPORT) {
+    return PERMISSION_GROUP.IT_SUPPORT;
+  } else if (group === KEYCLOAK_GROUP_FINANCE) {
+    return PERMISSION_GROUP.FINANCE;
   }
 
   return '';
@@ -92,6 +101,10 @@ export const isGroupBranch = () => {
   const userInfo: KeyCloakTokenInfo = getUserInfo();
   return userInfo.group === PERMISSION_GROUP.BRANCH;
 };
+export const isGroupOC = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.OC;
+};
 
 export const isGroupBranchParam = (group: string) => {
   return group === PERMISSION_GROUP.BRANCH;
@@ -99,6 +112,15 @@ export const isGroupBranchParam = (group: string) => {
 
 export const isGroupAuditParam = (group: string) => {
   return group === PERMISSION_GROUP.AUDIT;
+};
+export const isGroupSupport = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.IT_SUPPORT;
+};
+
+export const isGroupFinance = () => {
+  const userInfo: KeyCloakTokenInfo = getUserInfo();
+  return userInfo.group === PERMISSION_GROUP.FINANCE;
 };
 
 export const isPreferredUsername = () => {
@@ -120,7 +142,13 @@ const permission = {
   },
   oc: {
     menu: {
-      mainmenu: [MAINMENU.ORDER_RECEIVE, MAINMENU.STOCK_TRANSFER, MAINMENU.PRODUCT_INFO, MAINMENU.PURCHASE_BRANCH],
+      mainmenu: [
+        MAINMENU.ORDER_RECEIVE,
+        MAINMENU.STOCK_TRANSFER,
+        MAINMENU.PRODUCT_INFO,
+        MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
+      ],
       submenu: [
         SUBMENU.OR_ORDER_RECEIVE,
         SUBMENU.ST_REQUEST,
@@ -128,6 +156,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
@@ -156,6 +185,7 @@ const permission = {
         MAINMENU.TRANSFER_OUT,
         MAINMENU.PRODUCT_INFO,
         MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
       ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
@@ -172,6 +202,9 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
+        SUBMENU.EX_CLOSE_SALE_SHIFT,
+        SUBMENU.EX_OPEN_END,
       ],
     },
     action: [
@@ -193,11 +226,19 @@ const permission = {
       ACTIONS.STOCK_MOVEMENT_VIEW,
       ACTIONS.PURCHASE_BR_VIEW,
       ACTIONS.PURCHASE_BR_MANAGE,
+      ACTIONS.SALE_SHIFT_MANAGE,
+      ACTIONS.SALE_SHIFT_VIEW,
     ],
   },
   areaManager: {
     menu: {
-      mainmenu: [MAINMENU.SALE, MAINMENU.TRANSFER_OUT, MAINMENU.PRODUCT_INFO, MAINMENU.PURCHASE_BRANCH],
+      mainmenu: [
+        MAINMENU.SALE,
+        MAINMENU.TRANSFER_OUT,
+        MAINMENU.PRODUCT_INFO,
+        MAINMENU.PURCHASE_BRANCH,
+        MAINMENU.EXPENSE,
+      ],
       submenu: [
         SUBMENU.SALE_DISCOUNT,
         SUBMENU.SALE_SALE_LIMIT,
@@ -207,6 +248,7 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
         SUBMENU.PI_PRODUCT_MASTER,
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
+        SUBMENU.EX_EXPENSE,
       ],
     },
     action: [
@@ -254,10 +296,22 @@ const permission = {
   },
   accounting: {
     menu: {
-      mainmenu: [MAINMENU.SALE],
-      submenu: [SUBMENU.SALE_SALE_LIMIT],
+      mainmenu: [MAINMENU.SALE, MAINMENU.EXPENSE],
+      submenu: [SUBMENU.SALE_SALE_LIMIT, SUBMENU.EX_EXPENSE],
     },
-    action: [ACTIONS.CAMPAIGN_TO_VIEW],
+  },
+  accountManager: {
+    menu: {
+      mainmenu: [MAINMENU.EXPENSE, MAINMENU.APP_CONFIG],
+      submenu: [SUBMENU.EX_EXPENSE, SUBMENU.EX_CONFIG],
+    },
+    action: [
+      ACTIONS.ACCOUNTING_VIEW,
+      ACTIONS.ACCOUNTING_CONFIG_VIEW,
+      ACTIONS.ACCOUNTING_MANAGE,
+      ACTIONS.ACCOUNTING_APPROVE3,
+      ACTIONS.ACCOUNTING_REJECT3,
+    ],
   },
   operationProcess: {
     menu: {
@@ -284,5 +338,25 @@ const permission = {
       submenu: [SUBMENU.SALE_SALE_LIMIT],
     },
     action: [ACTIONS.CAMPAIGN_TO_VIEW],
+  },
+  itSupport: {
+    menu: {
+      mainmenu: [MAINMENU.EXPENSE],
+      submenu: [SUBMENU.EX_CLOSE_SALE_SHIFT],
+    },
+    action: [ACTIONS.SALE_SHIFT_VIEW],
+  },
+  finance: {
+    menu: {
+      mainmenu: [MAINMENU.EXPENSE],
+      submenu: [SUBMENU.CASH_STATEMENT, SUBMENU.EX_OPEN_END],
+    },
+    action: [
+      ACTIONS.ACCOUNTING_CS_IMPORT,
+      ACTIONS.ACCOUNTING_CS_APPROVE,
+      ACTIONS.ACCOUNTING_CS_EXPORT,
+      ACTIONS.ACCOUNTING_CS_MANAGE,
+      ACTIONS.ACCOUNTING_CS_VIEW,
+    ],
   },
 };

@@ -191,7 +191,7 @@ const AuditPlanSearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <AuditPlanItemList values={values} onSearch={onSearch} />;
+      dataTable = <AuditPlanItemList values={values} onSearch={onSearch} reSearch={onReSearch} />;
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent="center">

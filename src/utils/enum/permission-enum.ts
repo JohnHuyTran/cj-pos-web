@@ -63,6 +63,20 @@ export enum ACTIONS {
 
   SALE_TAX_INVOICE_VIEW = 'sale.tax.view',
   SALE_TAX_INVOICE_REQUEST = 'sale.tax.view',
+
+  ACCOUNTING_CONFIG_VIEW = 'account.config.view',
+  ACCOUNTING_VIEW = 'account.ex.view',
+  ACCOUNTING_MANAGE = 'account.config.manage',
+  ACCOUNTING_APPROVE3 = 'account.ex.approve3',
+  ACCOUNTING_REJECT3 = 'account.ex.reject3',
+
+  ACCOUNTING_CS_IMPORT = 'account.cs.import',
+  ACCOUNTING_CS_APPROVE = 'account.cs.approve',
+  ACCOUNTING_CS_EXPORT = 'account.cs.export',
+  ACCOUNTING_CS_MANAGE = 'account.cs.manage',
+  ACCOUNTING_CS_VIEW = 'account.cs.view',
+  SALE_SHIFT_VIEW = 'sale.shift.view',
+  SALE_SHIFT_MANAGE = 'sale.shift.manage',
 }
 
 export enum MAINMENU {
@@ -72,6 +86,8 @@ export enum MAINMENU {
   TRANSFER_OUT = 'transferOut',
   PRODUCT_INFO = 'productInfo',
   PURCHASE_BRANCH = 'purchaseBranch',
+  EXPENSE = 'expense',
+  APP_CONFIG = 'appConfig',
 }
 
 export enum SUBMENU {
@@ -89,6 +105,11 @@ export enum SUBMENU {
   PI_STOCK_MOVEMENT = 'productInfo.stockMovement',
   PI_PRODUCT_MASTER = 'productInfo.productMaster',
   PR_CREATE_PURCHASE_BRANCH = 'purchasebranch.createPurchaseBranch',
+  EX_EXPENSE = 'account.expense',
+  EX_CONFIG = 'account.config',
+  EX_CLOSE_SALE_SHIFT = 'account.closeSaleShift',
+  CASH_STATEMENT = 'cash.statement',
+  EX_OPEN_END = 'account.openEnd',
 }
 
 export enum PERMISSION_GROUP {
@@ -101,14 +122,17 @@ export enum PERMISSION_GROUP {
   DISTRICT_MANAGER = 'districtManager',
   SM = 'storeManagement',
   ACCOUNTING = 'accounting',
+  ACCOUNT_MANAGER = 'accountManager',
   PI = 'operationProcess',
   PCM = 'procurement',
   RTC = 'readyToClear',
   DATA = 'data',
+  IT_SUPPORT = 'itSupport',
+  FINANCE = 'finance',
 }
 
-export const KEYCLOAK_GROUP_DC01 = '/service.posback/dc01';
-export const KEYCLOAK_GROUP_DC02 = '/service.posback/dc02';
+export const KEYCLOAK_GROUP_DC01 = '/service.posback/D001';
+export const KEYCLOAK_GROUP_DC02 = '/service.posback/D002';
 export const KEYCLOAK_GROUP_SCM01 = '/service.posback/scm01';
 export const KEYCLOAK_GROUP_OC01 = '/service.posback/oc01';
 export const KEYCLOAK_GROUP_BRANCH_MANAGER01 = '/service.posback/branch-manager';
@@ -123,3 +147,6 @@ export const KEYCLOAK_GROUP_PI = '/service.posback/pi';
 export const KEYCLOAK_GROUP_PCM = '/service.posback/pcm';
 export const KEYCLOAK_GROUP_RTC = '/service.posback/rtc';
 export const KEYCLOAK_GROUP_DATA = '/service.posback/data';
+export const KEYCLOAK_GROUP_ACCOUNTING_MANAGER = '/service.posback/account-manager';
+export const KEYCLOAK_IT_SUPPORT = '/service.posback/it-support';
+export const KEYCLOAK_GROUP_FINANCE = '/service.posback/finance';

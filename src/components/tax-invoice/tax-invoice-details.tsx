@@ -79,6 +79,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
   const [disabledBtnPreview, setDisabledBtnPreview] = React.useState(true);
   const [disabledBtnClear, setDisabledBtnClear] = React.useState(false);
   const [disabledBtnSave, setDisabledBtnSave] = React.useState(false);
+  const [disabledBtnUpload, setDisabledBtnUpload] = React.useState(false);
 
   const [flagSave, setFlagSave] = React.useState(false);
   const [confirmModelExit, setConfirmModelExit] = React.useState(false);
@@ -468,8 +469,8 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
     setIsClearSubDistricts(false);
   };
 
-  const handleEditMode = () => {
-    if (editMode) {
+  const handleEditMode = (type: any) => {
+    if (editMode && type === 'edit') {
       setOpenLoadingModal(true);
       setTimeout(() => {
         setOpenLoadingModal(false);
@@ -479,6 +480,21 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
         setDisabledSelProvinces(false);
         setDisabledSelDistricts(false);
         setDisabledSelSubDistricts(false);
+
+        setDisabledBtnUpload(true);
+      }, 300);
+    } else {
+      setOpenLoadingModal(true);
+      setTimeout(() => {
+        setOpenLoadingModal(false);
+
+        setEditMode(true);
+        setDisabledBtnClear(true);
+        setDisabledSelProvinces(true);
+        setDisabledSelDistricts(true);
+        setDisabledSelSubDistricts(true);
+
+        setDisabledBtnUpload(true);
       }, 300);
     }
   };
@@ -529,11 +545,19 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
               <Button
                 id='btnCreateStockTransferModal'
                 variant='contained'
-                onClick={handleEditMode}
+                onClick={() => handleEditMode('print')}
                 className={classes.MbtnClear}
                 color='secondary'
-                // disabled={!editMode}
-                sx={{ width: 120, display: `${disabledBtnEdit ? 'none' : ''}` }}>
+                sx={{ width: 100, mr: 1, display: `${disabledBtnEdit ? 'none' : ''}` }}>
+                พิมพ์ซ้ำ
+              </Button>
+              <Button
+                id='btnCreateStockTransferModal'
+                variant='contained'
+                onClick={() => handleEditMode('edit')}
+                className={classes.MbtnClear}
+                color='secondary'
+                sx={{ width: 100, display: `${disabledBtnEdit ? 'none' : ''}` }}>
                 แก้ไขข้อมูล
               </Button>
             </Grid>
@@ -844,7 +868,7 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                     files={[]}
                     isStatus={uploadFileFlag}
                     onChangeUploadFile={handleOnChangeUploadFile}
-                    enabledControl={true}
+                    enabledControl={disabledBtnUpload}
                     reMark='แนบไฟล์ใบแทน / สำเนาบัตรประชาชน .pdf/.jpg ขนาดไม่เกิน 5 mb'
                   />
                 </Box>
@@ -862,12 +886,12 @@ function customerDetails({ isOpen, onClickClose, reloadRequestTaxInvoice }: Prop
                 id='btnCreateStockTransferModal'
                 variant='contained'
                 onClick={handleSubmit(onSave)}
-                sx={{ width: 220 }}
+                sx={{ width: 150 }}
                 className={classes.MbtnClear}
                 startIcon={<ContentPaste />}
                 color='primary'
                 disabled={disabledBtnPreview}>
-                Preview ใบเสร็จ / ใบกำกับ
+                พิมพ์
               </Button>
             </Grid>
             <Grid item xs={10} sx={{ textAlign: 'end' }}>

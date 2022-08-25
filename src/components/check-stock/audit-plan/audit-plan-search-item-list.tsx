@@ -16,6 +16,7 @@ import { AuditPlan, AuditPlanSearchRequest, AuditPlanSearchResponse } from '../.
 import { auditPlanGetSearch } from '../../../store/slices/audit-plan-search-slice';
 import { getAuditPlanDetail } from '../../../store/slices/audit-plan-detail-slice';
 import ModalCreateAuditPlan from './audit-plan-create';
+import LoadingModal from "../../commons/ui/loading-modal";
 
 const _ = require('lodash');
 
@@ -32,6 +33,7 @@ interface PropsValues {
 
 interface StateProps {
   onSearch: () => void;
+  reSearch: (branch:string) => void;
   values: PropsValues;
 }
 
@@ -68,6 +70,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           documentNumberAP: data.documentNumber,
           status: data.status,
           creationDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
+          countingDate: convertUtcToBkkDate(data.countingDate, DateFormat.DATE_FORMAT),
           product: data.product,
           createrName: data.createdBy,
           branch: `${data.branchCode}-${data.branchName}`,
@@ -141,7 +144,14 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       headerName: 'วันที่สร้างรายการ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 170,
+      minWidth: 160,
+    },
+    {
+      field: 'countingDate',
+      headerName: 'กำหนดตรวจนับ',
+      headerAlign: 'center',
+      sortable: false,
+      minWidth: 160,
     },
     {
       field: 'branch',
@@ -155,7 +165,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
       headerName: 'ผู้สร้างรายการ',
       headerAlign: 'center',
       sortable: false,
-      minWidth: 180,
+      minWidth: 160,
     },
   ];
   const genRowStatus = (params: GridValueGetterParams) => {
@@ -270,11 +280,14 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
           action={Action.UPDATE}
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
+          onReSearchMain={props.reSearch}
           onSearchMain={props.onSearch}
+          openLink={true}
         />
       )}
 
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <LoadingModal open={openLoadingModal.open}/>
     </div>
   );
 };

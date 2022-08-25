@@ -306,7 +306,7 @@ export default function ModalCreateToDestroyDiscount({
               item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนทำลายจริง';
+              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
             }
           }
         } else {
@@ -315,7 +315,7 @@ export default function ModalCreateToDestroyDiscount({
             item.errorNumberOfRequested = 'ระบุจำนวนการทำลายที่แท้จริง';
           } else if (preData.numberOfRequested > preData.numberOfDiscounted) {
             isValid = false;
-            item.errorNumberOfRequested = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
+            item.errorNumberOfRequested = 'จำนวนทำลายจริงต้องไม่น้อยกว่าจำนวนขอส่วนลด';
           }
         }
         if (!isValid) {

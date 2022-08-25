@@ -15,8 +15,11 @@ interface StateProps {
   value: any | Date | number | string;
   type?: string;
   minDateTo?: any | Date | number | string;
+  maxDate?: any | Date | number | string;
   disabled?: boolean;
-  error?:boolean;
+  isError?: boolean;
+  hyperText?: string;
+  error?: boolean;
   placeHolder?: string;
   disableMinDateMsg?: boolean;
 }
@@ -61,7 +64,10 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size='small' onClick={() => !props.disabled && handleDateChange(null)} data-testid='endDateIconClose'>
+            <IconButton
+              size='small'
+              onClick={() => !props.disabled && handleDateChange(null)}
+              data-testid='endDateIconClose'>
               <CloseIcon fontSize='small' />
             </IconButton>
           ),
@@ -71,9 +77,12 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
           position: 'start',
         }}
         minDate={props.minDateTo}
+        maxDate={props.maxDate ? props.maxDate : ''}
         placeholder={props.placeHolder ? props.placeHolder : 'กรุณาเลือกวันที่'}
         minDateMessage={props.disableMinDateMsg ? '' : 'วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน'}
         disabled={props.disabled ? props.disabled : false}
+        helperText={props.hyperText}
+        error={props.isError}
       />
     );
   } else {

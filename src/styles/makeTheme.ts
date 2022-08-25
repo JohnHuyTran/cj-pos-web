@@ -18,6 +18,24 @@ const useStyles = makeStyles({
       backgroundColor: '#EAEBEB',
     },
   },
+  MtextFieldAutoComplete: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      fontSize: '12px',
+      // padding: "2x 2px 2px 6px",
+    },
+    '& .MuiOutlinedInput-root input::placeholder': {
+      fontSize: '14px',
+    },
+    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
+      // opacity: 0,
+      color: '#263238 !important',
+      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+    },
+    '& .Mui-disabled': {
+      backgroundColor: '#EAEBEB',
+    },
+  },
   MtextFieldDetail: {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
@@ -32,11 +50,23 @@ const useStyles = makeStyles({
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px !important',
       fontSize: '14px',
-      textAlignLast: 'end !important',
+      '& input': {
+        textAlign: 'right !important',
+        '&.Mui-disabled': {
+          backgroundColor: '#EAEBEB',
+          color: '#263238',
+          '-webkit-text-fill-color': '#263238',
+        },
+      },
     },
-    '& .css-wufqwl-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled': {
-      color: '#263238 !important',
-      '-webkit-text-fill-color': 'rgb(0 0 0 / 100%)',
+  },
+  MtextFieldNumberNotStyleDisable: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '5px !important',
+      fontSize: '14px',
+      '& input': {
+        textAlign: 'right !important',
+      },
     },
   },
   MtextFieldNumberError: {
@@ -137,7 +167,13 @@ const useStyles = makeStyles({
   MdataGridDetail: {
     '& .MuiDataGrid-columnHeaderTitle': {
       color: '#36C690',
+      textAlign: 'center',
+      // overflow: 'unset !important',
+      textOverflow: 'clip !important',
+      whiteSpace: 'break-spaces !important',
+      lineHeight: 'initial',
       fontWeight: '600 !important',
+      wordWrap: 'break-word !important',
     },
     '& .MuiDataGrid-root': {
       color: '#263238',
@@ -148,9 +184,17 @@ const useStyles = makeStyles({
       '& .MuiDataGrid-main': {
         top: -16,
       },
+      '& .MuiDataGrid-columnsContainer': {
+        justifyContent: 'center',
+      },
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+      },
       '& .MuiDataGrid-cell': {
         cursor: 'pointer',
         display: 'flex',
+        padding: '5px',
+        overflowWrap: 'anywhere',
         alignItems: 'center',
         lineHeight: '120% !important',
         maxHeight: 'none !important',
@@ -186,21 +230,78 @@ const useStyles = makeStyles({
     },
   },
 
-  MdataGridPaginationTop: {
+  MdataGridNoPagination: {
     '& .MuiDataGrid-columnHeaderTitle': {
       color: '#36C690',
+      textAlign: 'center',
+      textOverflow: 'clip !important',
+      whiteSpace: 'break-spaces !important',
+      lineHeight: 'initial',
       fontWeight: '600 !important',
-      whiteSpace: 'unset !important',
-      // overflow: "unset !important",
     },
     '& .MuiDataGrid-root': {
       fontFamily: 'Kanit',
       borderRadius: '10px !important',
       display: 'flex !important',
       flexDirection: 'column-reverse',
+      '& .MuiDataGrid-columnsContainer': {
+        justifyContent: 'center',
+      },
       '& .MuiDataGrid-row': {
         maxHeight: 'none !important',
         '& .MuiDataGrid-cell': {
+          padding: '5px',
+          overflowWrap: 'anywhere',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          lineHeight: '120% !important',
+          maxHeight: 'none !important',
+          whiteSpace: 'unset !important',
+          overflow: 'unset !important',
+        },
+        '&:last-child': {
+          '& .MuiDataGrid-cell': {
+            borderBottom: 'none',
+          },
+          '&.Mui-selected': {
+            borderBottomLeftRadius: '8px',
+            borderBottomRightRadius: '8px',
+          },
+        },
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
+    },
+    '& .MuiCheckbox-colorPrimary.Mui-checked': {
+      color: '#36C690',
+    },
+  },
+
+  MdataGridPaginationTop: {
+    '& .MuiDataGrid-columnHeaderTitle': {
+      color: '#36C690',
+      textAlign: 'center',
+      textOverflow: 'clip !important',
+      whiteSpace: 'break-spaces !important',
+      lineHeight: 'initial',
+      fontWeight: '600 !important',
+    },
+    '& .MuiDataGrid-root': {
+      fontFamily: 'Kanit',
+      borderRadius: '10px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-columnsContainer': {
+        justifyContent: 'center',
+      },
+      '& .MuiDataGrid-row': {
+        maxHeight: 'none !important',
+        '& .MuiDataGrid-cell': {
+          // padding: '5px',
+          overflowWrap: 'anywhere',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -349,6 +450,49 @@ const useStyles = makeStyles({
       overflow: 'unset !important',
     },
   },
+  MdataGridConfirm: {
+    '& .MuiDataGrid-columnHeaderTitle': {
+      color: '#36C690',
+      fontWeight: '600 !important',
+    },
+    '& .MuiDataGrid-root': {
+      color: '#263238',
+      fontFamily: 'Kanit',
+      borderRadius: '20px !important',
+      display: 'flex !important',
+      flexDirection: 'column-reverse',
+      '& .MuiDataGrid-main': {
+        top: -16,
+      },
+      '& .MuiDataGrid-cell': {
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        lineHeight: '120% !important',
+        maxHeight: 'none !important',
+        whiteSpace: 'unset !important',
+        overflow: 'unset !important',
+      },
+      '& .MuiDataGrid-cell--textRight': {
+        justifyContent: 'flex-end',
+      },
+      '& .MuiDataGrid-cell--textLeft': {
+        justifyContent: 'flex-start',
+      },
+      '& .MuiDataGrid-cell:focus-within,& .MuiDataGrid-cell:focus,& .MuiDataGrid-columnHeader:focus-within,& .MuiDataGrid-columnHeader:focus':
+        {
+          outline: 'none',
+        },
+    },
+    '& .MuiDataGrid-footerContainer': {
+      color: '#AEAEAE',
+      '& MuiDataGrid-selectedRowCount': {
+        fontFamily: 'Kanit !important',
+      },
+      minHeight: '20px !important',
+    },
+  },
+
   Mautocomplete: {
     '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
       padding: '1.5px !important',
@@ -445,6 +589,13 @@ const useStyles = makeStyles({
   MbtnBrowse: {
     '&.MuiButton-root': {
       width: '125px',
+      borderRadius: '8px !important',
+      boxShadow: 'none !important',
+    },
+  },
+  MbtnBrowseSmall: {
+    '&.MuiButton-root': {
+      width: '75px',
       borderRadius: '8px !important',
       boxShadow: 'none !important',
     },
@@ -571,7 +722,7 @@ const useStyles = makeStyles({
   MSelected: {
     '& .MuiSelect-select': {
       textAlign: 'right !important',
-    }
+    },
   },
   MtextFieldNumberNoneArrow: {
     '& .MuiInput-input': {

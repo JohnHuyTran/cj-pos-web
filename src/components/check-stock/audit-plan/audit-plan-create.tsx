@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
-import { Button, Dialog, DialogContent, FormControl, Grid, Input, Link, MenuItem, Select, Typography } from '@mui/material';
+import { Button, ButtonGroup, ClickAwayListener, Dialog, DialogContent, Fade, FormControl, Grid, Grow, Input, Link, MenuItem, MenuList, Paper, Popper, Select, Typography } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -44,8 +44,9 @@ import ModalValidateImport from '../../sale-limit-time/modal-validate-import';
 import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
 import { updateDataDetail } from "../../../store/slices/stock-adjustment-slice";
 import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
-import { clearCalculate } from "../../../store/slices/stock-adjust-calculate-slice";
+import { clearCalculate, updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 import LoadingModal from '../../commons/ui/loading-modal';
+import ModalAddProductFromSA from './modal-add-product-from-SA';
 
 interface Props {
   action: Action | Action.INSERT;
@@ -57,7 +58,8 @@ interface Props {
   onReSearchMain?: (branch: string) => void;
   userPermission?: any[];
   viewMode?: boolean;
-  isRedirect?: boolean;
+  openLink?: boolean;
+  notClearWhenClose?: boolean;
 }
 
 interface Values {
@@ -67,6 +69,7 @@ interface Values {
   documentNumber: string;
   createDate: Date | null | any;
   stockCounter: number;
+  recountingBy: number;
 }
 
 const _ = require('lodash');
@@ -82,6 +85,8 @@ export default function ModalCreateAuditPlan({
   onReSearchMain,
   action,
   viewMode,
+  openLink,
+  notClearWhenClose,
 }: Props): ReactElement {
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -90,6 +95,7 @@ export default function ModalCreateAuditPlan({
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalConfirm, setOpenModalConfirm] = React.useState<boolean>(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
+  const [openModalAddItemFromSA, setOpenModalAddItemFromSA] = React.useState<boolean>(false);
   const [openPopupModal, setOpenPopupModal] = React.useState<boolean>(false);
   const [openModalError, setOpenModalError] = React.useState<boolean>(false);
   const [openModalClose, setOpenModalClose] = React.useState<boolean>(false);
@@ -121,7 +127,10 @@ export default function ModalCreateAuditPlan({
     documentNumber: '',
     createDate: new Date(),
     stockCounter: isGroupAuditParam(_group) ? 0 : STOCK_COUNTER_TYPE.BRANCH,
+    recountingBy: 0,
   });
+  const [recounting, setRecounting] = React.useState<boolean>(false)
+  const [errorBranch, setErrorBranch] = React.useState<boolean>(false);
   const [reSave, setReSave] = React.useState(false);
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
@@ -146,7 +155,7 @@ export default function ModalCreateAuditPlan({
     userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
       ? userInfo.acl['service.posback-stock'].includes(ACTIONS.STOCK_SA_MANAGE)
       : false;
-  const isBranchPermission = !!(env.branch.channel === 'branch');
+  const isBranchPermission = (env.branch.channel === 'branch');
   const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const [alertTextError, setAlertTextError] = React.useState('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
   const dataDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
@@ -154,7 +163,6 @@ export default function ModalCreateAuditPlan({
   const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
   const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
   const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
-
   useEffect(() => {
     if (Action.UPDATE === action && !objectNullOrEmpty(dataDetail)) {
       setStatus(dataDetail.status);
@@ -164,26 +172,59 @@ export default function ModalCreateAuditPlan({
         name: dataDetail.branchName,
       });
       setValues({
+        ...values,
         id: dataDetail.id,
         branch: dataDetail.branchCode,
         documentNumber: dataDetail.documentNumber,
         createDate: dataDetail.createdDate,
         countingDate: dataDetail.countingDate ? dataDetail.countingDate : null,
         stockCounter: dataDetail.stockCounter ? dataDetail.stockCounter : 0,
+        recountingBy: dataDetail.recountingBy ? dataDetail.recountingBy : 0
       });
-      const products = dataDetail.product
-        ? dataDetail.product.map((item: any) => {
+      setRecounting(dataDetail.recounting ? dataDetail.recounting : false)
+      if (dataDetail.appliedProduct.appliedProducts && dataDetail.appliedProduct.appliedCategories && dataDetail.status == StockActionStatus.DRAFT) {
+        let listProducts = dataDetail.appliedProduct.appliedProducts.map((item: any) => {
             return {
-              skuName: item.name,
-              skuCode: item.sku,
+              barcode: item.barcode ? item.barcode : '',
+              skuCode: item.skuCode,
+              unitName: item.unitName,
+              barcodeName: item.name,
+              productTypeCode: item.categoryTypeCode,
+              productFromSA: dataDetail.recounting ? dataDetail.recounting : false,
               selectedType: 2,
+              skuName: item.skuName,
+              productByType: dataDetail.appliedProduct.appliedCategories
+                .some((el1:any) => el1.code == item.categoryTypeCode),
             };
-          })
-        : [];
-      dispatch(updateAddTypeAndProductState(products));
+          });
+        let listCategories = dataDetail.appliedProduct.appliedCategories.map((item: any) => {
+            return {
+              productTypeCode: item.code,
+              productTypeName: item.name,
+              selectedType: 1,
+            };
+          });
+        dispatch(updateAddTypeAndProductState(listProducts.concat(listCategories)));
+      } else {
+        const products = dataDetail.product
+          ? dataDetail.product.map((item: any) => {
+              return {
+                skuName: item.name,
+                skuCode: item.sku,
+                selectedType: 2,
+                productFromSA: dataDetail.recounting ? dataDetail.recounting : false,
+              };
+            })
+          : [];
+        dispatch(updateAddTypeAndProductState(products));
+      }
       dispatch(setCheckEdit(false));
     }
   }, [dataDetail]);
+
+  useEffect(() => {
+    setRecounting(!!payloadAddTypeProduct.filter((el: any) => el.productFromSA).length)
+  },[payloadAddTypeProduct])
 
   useEffect(() => {
     if (moment(values.countingDate).endOf('day').isBefore(moment(new Date()))) {
@@ -196,6 +237,7 @@ export default function ModalCreateAuditPlan({
     setReSave(true);
   }, [values.countingDate, values.branch]);
   const handleChangeBranch = (branchCode: string) => {
+    setErrorBranch(false)
     if (branchCode !== null) {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branch: JSON.parse(codes) });
@@ -213,24 +255,34 @@ export default function ModalCreateAuditPlan({
     try {
       const products = _.uniqBy(
         payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
-        'skuName'
+        'skuCode'
       ).map((item: any) => {
         return {
           name: item.skuName,
           sku: item.skuCode,
-          unitName: item.unitName,
-          barcode: item.barcode,
         };
       });
-      const payload: PayloadCounting = {
-        auditPlanning: {
+      const auditPlanning = recounting ?  {
           id: values.id,
           product: products,
           documentNumber: values.documentNumber,
           branchCode: values.branch,
           branchName: getBranchName(branchList, values.branch),
-          stockCounter: values.stockCounter
-        },
+          stockCounter: values.stockCounter,
+          recounting: true,
+          recountingBy: values.recountingBy
+      } :
+        {
+        id: values.id,
+        product: products,
+        documentNumber: values.documentNumber,
+        branchCode: values.branch,
+        branchName: getBranchName(branchList, values.branch),
+        stockCounter: values.stockCounter,
+        recounting: false,
+      };
+      const payload: PayloadCounting = {
+        auditPlanning: auditPlanning,
         storeType: store,
       };
       const rs = await countingAuditPlan(payload);
@@ -243,6 +295,7 @@ export default function ModalCreateAuditPlan({
         await dispatch(getAuditPlanDetail(values.id));
       } else {
         setOpenModalError(true);
+        setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
       }
     } catch (error) {}
   };
@@ -253,8 +306,11 @@ export default function ModalCreateAuditPlan({
       stockCounter: e.target.value,
     });
   };
-  const handleOpenAddItems = () => {
-    setOpenModelAddItems(true);
+  const handleChangeRecounting = (e: any) => {
+    setValues({
+      ...values,
+      recountingBy: e.target.value,
+    });
   };
 
   const handleCloseModalAddItems = async () => {
@@ -262,12 +318,18 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleOpenCancel = async () => {
-    await dispatch(getAuditPlanDetail(values.id));
-    if (dataDetail.relatedScDocuments && dataDetail.relatedScDocuments.length > 0) {
-      setOpenModalError(true);
-      setAlertTextError('กรุณายกเลิกเอกสารที่เกี่ยวข้องก่อนดำเนินการ');
+    const rs = await dispatch(getAuditPlanDetail(values.id));
+    const payload:any = rs.payload;
+    if (payload && payload.data){
+      if (payload.data.relatedScDocuments || payload.data.relatedSaDocuments) {
+        setOpenModalError(true);
+        setAlertTextError('กรุณายกเลิกเอกสารที่เกี่ยวข้องก่อนดำเนินการ');
+      } else {
+        setOpenModalCancel(true);
+      }
     } else {
-      setOpenModalCancel(true);
+        setOpenModalError(true);
+        setAlertTextError('เกิดข้อผิดพลาดระหว่างการดำเนินการ');
     }
   };
 
@@ -284,8 +346,10 @@ export default function ModalCreateAuditPlan({
   };
 
   const handleClose = async () => {
-    dispatch(updateAddTypeAndProductState([]));
-    dispatch(clearDataFilter());
+    if (!notClearWhenClose) {
+      dispatch(updateAddTypeAndProductState([]));
+      dispatch(clearDataFilter());
+    }
     setOpen(false);
     onClickClose();
   };
@@ -305,25 +369,62 @@ export default function ModalCreateAuditPlan({
     try {
       const products = _.uniqBy(
         payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
-        'skuName'
+        'skuCode'
       ).map((item: any) => {
         return {
           name: item.skuName,
           sku: item.skuCode,
-          unitName: item.unitName,
-          barcode: item.barcode,
         };
       });
-      const body = {
-        branchCode: values.branch,
-        branchName: getBranchName(branchList, values.branch),
-        countingDate: moment(values.countingDate).endOf('day').toISOString(true),
-        stockCounter: values.stockCounter,
-        product: products,
+      let listAppliedCategories = payloadAddTypeProduct
+        .filter((el: any) => el.selectedType === 1)
+        .filter((item: any) =>
+          payloadAddTypeProduct
+            .filter((el1: any) => el1.selectedType === 2 && el1.productByType)
+            .some((el2: any) => el2.productTypeCode == item.productTypeCode)
+        );
+      const appliedProduct = {
+        appliedProducts: payloadAddTypeProduct
+          .filter((el: any) => el.selectedType === 2)
+          .map((item: any) => {
+            return {
+              name: item.barcodeName,
+              skuCode: item.skuCode,
+              barcode: item.barcode,
+              unitName: item.unitName,
+              skuName: item.skuName,
+              categoryTypeCode: item.productTypeCode,
+            };
+          }),
+        appliedCategories: listAppliedCategories.map((item: any) => {
+          return {
+            name: item.productTypeName,
+            code: item.productTypeCode,
+          };
+        }),
       };
+      const body = recounting
+        ? {
+            branchCode: values.branch,
+            branchName: getBranchName(branchList, values.branch),
+            countingDate: moment(values.countingDate).endOf('day').toISOString(true),
+            stockCounter: values.stockCounter,
+            recountingBy: values.recountingBy,
+            recounting: recounting,
+            product: products,
+            appliedProduct: appliedProduct,
+          }
+        : {
+            branchCode: values.branch,
+            branchName: getBranchName(branchList, values.branch),
+            countingDate: moment(values.countingDate).endOf('day').toISOString(true),
+            stockCounter: values.stockCounter,
+            product: products,
+            appliedProduct: appliedProduct,
+          };
       if (!!values.id) {
         const rs = await updateAuditPlan(values.id, body);
-        if (rs.code === 20000) {
+        if (rs.code == 20000) {
           dispatch(setCheckEdit(false));
           setOpenPopupModal(true);
           setTextPopup('คุณได้ทำการบันทึกข้อมูลเรียบร้อยแล้ว');
@@ -382,11 +483,8 @@ export default function ModalCreateAuditPlan({
           dispatch(setCheckEdit(false));
           setOpenPopup(true);
           setPopupMsg('คุณได้ทำการสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
-          if (action == Action.INSERT) {
-            if (onReSearchMain) onReSearchMain(values.branch);
-          } else {
-            if (onSearchMain) onSearchMain();
-          }
+          if (onReSearchMain) onReSearchMain(values.branch);
+
           handleClose();
         }
       } catch (error) {}
@@ -401,12 +499,8 @@ export default function ModalCreateAuditPlan({
         if (rs.code === 20000) {
           setOpenPopup(true);
           setPopupMsg('คุณได้ยกเลิกสร้างแผนตรวจนับสต๊อกเรียบร้อยแล้ว');
-          if (action == Action.INSERT && !!values.branch) {
-            if (onReSearchMain) onReSearchMain(values.branch);
-          } else {
-            if (onSearchMain) onSearchMain();
-          }
-
+          dispatch(setCheckEdit(false));
+          if (onReSearchMain) onReSearchMain(values.branch);
           handleClose();
         } else {
           setOpenModalError(true);
@@ -466,14 +560,26 @@ export default function ModalCreateAuditPlan({
     ) {
       return 'none';
     } else {
-      if (
-        (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !isGroupAuditParam(_group)) ||
-        (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.AUDIT && isGroupAuditParam(_group))
-      ) {
-        displayCounting = undefined;
-      } else {
-        displayCounting = 'none';
+      if(recounting){
+        if (
+          (values.recountingBy == STOCK_COUNTER_TYPE.BRANCH && !isGroupAuditParam(_group)) ||
+          (values.recountingBy == STOCK_COUNTER_TYPE.AUDIT && isGroupAuditParam(_group))
+        ) {
+          displayCounting = undefined;
+        } else {
+          displayCounting = 'none';
+        }
+      } else{
+        if (
+          (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.BRANCH && !isGroupAuditParam(_group)) ||
+          (groupBranch && values.stockCounter == STOCK_COUNTER_TYPE.AUDIT && isGroupAuditParam(_group))
+        ) {
+          displayCounting = undefined;
+        } else {
+          displayCounting = 'none';
+        }
       }
+
     }
     return displayCounting;
   };
@@ -499,17 +605,44 @@ export default function ModalCreateAuditPlan({
     dispatch(getAuditPlanDetail(dataDetail.id));
   };
   const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
-  const handleOpenAP = async () => {
+  const handleOpenSADetail = async () => {
+    if (viewMode) return;
     setOpenLoadingModal(true);
     try {
       await dispatch(getStockAdjustmentDetail(dataDetail.relatedSaDocuments[0].id));
       if (stockAdjustDetail) {
         setOpenSADetail(true);
+        await dispatch(updateRefresh(true));
       }
     } catch (error) {
       console.log(error);
     }
     setOpenLoadingModal(false);
+  };
+  const options = isGroupAuditParam(_group) ?  ['เพิ่มสินค้าทั่วไป', 'เพิ่มสินค้าจากเอกสาร SA'] : ['เพิ่มสินค้าทั่วไป'];
+  const [openListbtn, setOpenListbtn] = React.useState(false);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+
+  const handleMenuItemClick = (index: number) => {
+    if (index == 0){
+      setOpenModelAddItems(true);
+    } else if (index == 1){
+      if (!values.branch) {
+        setErrorBranch(true)
+      } else {
+        setOpenModalAddItemFromSA(true)
+      }
+    }
+    setSelectedIndex(index);
+    setOpenListbtn(false);
+  };
+
+  const handleToggle = () => {
+    setOpenListbtn(!openListbtn)
+  }
+  const handleCloseAddBtn = (event: Event) => {
+    setOpenListbtn(false);
   };
 
   return (
@@ -531,7 +664,7 @@ export default function ModalCreateAuditPlan({
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 วันที่สร้างรายการ :
               </Grid>
               <Grid item xs={8}>
@@ -574,11 +707,12 @@ export default function ModalCreateAuditPlan({
                   disable={groupBranch || viewMode || steps.indexOf(status) > 0}
                   isFilterAuthorizedBranch={true}
                   placeHolder={'กรุณาเลือก'}
+                  error={errorBranch}
                 />
               </Grid>
             </Grid>
             <Grid item container xs={4} mb={5}>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 ผู้นับสต๊อก :
               </Grid>
               <Grid item xs={8}>
@@ -614,14 +748,53 @@ export default function ModalCreateAuditPlan({
                 </Box>
               </Grid>
             </Grid>
-            <Grid item container xs={4} mb={5} pl={2}>
+            {recounting &&
+                <Grid item container xs={4} mb={5} pl={2}>
+                    <Grid item xs={3}>
+                        ผผู้ทวน :
+                    </Grid>
+                    <Grid item xs={8}>
+                        <Box textAlign={'center'}>
+                            <FormControl sx={{ width: '100%', textAlign: 'left' }} className={classes.Mselect}>
+                                <Select
+                                    id="status"
+                                    name="status"
+                                    value={values.recountingBy}
+                                    disabled={
+                                      (action == Action.INSERT && !userGroups.includes(KEYCLOAK_GROUP_AUDIT)) ||
+                                      steps.indexOf(status) > 0 ||
+                                      (action == Action.UPDATE &&
+                                        !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
+                                        currentName == 'posaudit') ||
+                                      (action == Action.UPDATE &&
+                                        !userGroups.includes(KEYCLOAK_GROUP_AUDIT) &&
+                                        currentName != 'posaudit') ||
+                                      (action == Action.UPDATE && !isGroupAuditParam(dataDetail.createdByGroup)) ||
+                                      (status == StockActionStatus.CANCEL)
+                                    }
+                                    onChange={handleChangeRecounting}
+                                    inputProps={{ 'aria-label': 'Without label' }}
+                                    renderValue={
+                                      values.recountingBy !== 0
+                                        ? undefined
+                                        : () => <Typography color={'#AEAEAE'}>กรุณาเลือก</Typography>
+                                    }>
+                                    <MenuItem value={STOCK_COUNTER_TYPE.BRANCH}>สาขา </MenuItem>
+                                    <MenuItem value={STOCK_COUNTER_TYPE.AUDIT}>Audit</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
+                </Grid>
+            }
+            <Grid item container xs={4} mb={5} pl={recounting ? 0 : 2}>
               {steps.indexOf(status) > 1 && dataDetail.relatedScDocuments && (
                 <>
                   <Grid item xs={3}>
                     เอกสาร SC :
                   </Grid>
                   <Grid item xs={8}>
-                    <DocumentList viewMode={viewMode} handleUpdateAgain={handleUpdateAgainDetailAP} relatedDocuments={dataDetail.relatedScDocuments} type={'SC'}/>
+                    <DocumentList openLink={openLink} handleUpdateAgain={handleUpdateAgainDetailAP} relatedDocuments={dataDetail.relatedScDocuments} type={'SC'}/>
                   </Grid>
                 </>
               )}
@@ -634,7 +807,7 @@ export default function ModalCreateAuditPlan({
                     เอกสาร SA :
                   </Grid>
                   <Grid item xs={8}>
-                  <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenAP}>
+                  <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'} onClick={handleOpenSADetail}>
                   {dataDetail.relatedSaDocuments[0].documentNumber}
                 </Link>
                   </Grid>
@@ -652,7 +825,7 @@ export default function ModalCreateAuditPlan({
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
               <Box>
-                <Button
+                {/* <Button
                   id="btnAddItem"
                   variant="contained"
                   color="info"
@@ -672,7 +845,62 @@ export default function ModalCreateAuditPlan({
                         : undefined,
                   }}>
                   เพิ่มสินค้า
-                </Button>
+                </Button> */}
+                <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button" >
+                  <Button
+                    id="btnAddItem"
+                    variant="contained"
+                    color="info"
+                    className={classes.MbtnSearch}
+                    startIcon={<AddCircleOutlineOutlinedIcon />}
+                    sx={{ width: 126}}
+                    onClick={handleToggle}
+                    disabled={
+                      steps.indexOf(status) > 0 ||
+                      (action == Action.UPDATE &&
+                        _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
+                    }
+                    style={{
+                      display:
+                        steps.indexOf(status) > 0 || !managePermission || viewMode || status == StockActionStatus.CANCEL
+                          ? 'none'
+                          : undefined,
+                    }}>
+                    เพิ่มสินค้า
+                  </Button>
+                </ButtonGroup>
+                <Popper
+                  style={{ zIndex: 1, width: 170  }}
+                  open={openListbtn}
+                  anchorEl={anchorRef.current}
+                  transition
+                  disablePortal>
+                  {({ TransitionProps }) => (
+                    <Fade
+                      {...TransitionProps}
+                      >
+                      <Paper>
+                        <ClickAwayListener onClickAway={handleCloseAddBtn}>
+                          <MenuList id="split-button-menu" autoFocusItem>
+                            {options.map((option, index) => (
+                              <MenuItem
+                                sx={{ fontSize:'14px', color: '#446EF2' }}
+                                key={option}
+                                disabled={
+                                  index == 0 && payloadAddTypeProduct.length && recounting ||
+                                  index == 1 && payloadAddTypeProduct.length && !recounting
+                                }
+                                selected={index === selectedIndex}
+                                onClick={() => handleMenuItemClick(index)}>
+                                {option}
+                              </MenuItem>
+                            ))}
+                          </MenuList>
+                        </ClickAwayListener>
+                      </Paper>
+                    </Fade>
+                  )}
+                </Popper>
                 <label htmlFor="import-st-button-file">
                   {Object.keys(payloadAddTypeProduct).length === 0 && (
                     <Input
@@ -688,7 +916,7 @@ export default function ModalCreateAuditPlan({
                     color="primary"
                     className={classes.MbtnSearch}
                     startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
-                    sx={{ width: 126, mr: '17px' }}
+                    sx={{ width: 126, margin: 'auto 0px 11.5px 17px' }}
                     component="span"
                     style={{
                       display:
@@ -707,7 +935,7 @@ export default function ModalCreateAuditPlan({
                   className={classes.MbtnSearch}
                   startIcon={<AddCircleOutlineOutlinedIcon />}
                   onClick={handleOpenSA}
-                  sx={{ width: 150 , height: '36.5px', mr: '17px'}}
+                  sx={{ width: 150 , height: '36.5px',margin: 'auto 17px 11.5px 17px' }}
                   disabled={
                     !(dataDetail.relatedScDocuments && dataDetail.relatedScDocuments.length > 0
                     && dataDetail.relatedScDocuments.filter((it:any) => it.status === StockActionStatus.CONFIRM).length > 0)
@@ -738,7 +966,8 @@ export default function ModalCreateAuditPlan({
                     disableCounting ||
                     values.branch == '' ||
                     values.stockCounter == 0 ||
-                    (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]))
+                    (action == Action.UPDATE && _group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`])) ||
+                    (recounting && values.recountingBy == 0)
                   }
                   style={{
                     display:
@@ -757,8 +986,10 @@ export default function ModalCreateAuditPlan({
                   sx={{ margin: '0 17px' }}
                   disabled={
                     steps.indexOf(status) < 0 ||
+                    (payloadAddTypeProduct && payloadAddTypeProduct.length === 0) ||
                     !managePermission ||
                     (steps.indexOf(status) > 1 && !isBranchPermission) ||
+                    (recounting && values.recountingBy == 0) ||
                     values.branch == '' ||
                     values.countingDate == null ||
                     disableCounting
@@ -813,7 +1044,7 @@ export default function ModalCreateAuditPlan({
                 </Button>
               </Box>
             </Box>
-            <Box>
+            <Box mt={2}>
             <AuditPlanCreateItem
                 status={status}
                 viewMode={
@@ -831,7 +1062,7 @@ export default function ModalCreateAuditPlan({
           {!!urlModalValidate ? (
             <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
               <a href={urlModalValidate} target="_blank">
-                ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้{' '}
+                บางรายการไม่สามารถ import file ได้{' '}
               </a>
             </Typography>
           ) : (
@@ -844,7 +1075,7 @@ export default function ModalCreateAuditPlan({
             onClick={() => {
               setOpenModalValidate(false);
             }}>
-            ปิด
+            ตกลง
           </Button>
         </Box>
       </ModalValidateImport>
@@ -860,6 +1091,7 @@ export default function ModalCreateAuditPlan({
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
+          onSearchMain={handleUpdateAgainDetailAP}
         />
       )}
 
@@ -872,6 +1104,7 @@ export default function ModalCreateAuditPlan({
           setPopupMsg={setPopupMsg}
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
+          onSearchMain={handleUpdateAgainDetailAP}
         />
       )}
 
@@ -888,13 +1121,19 @@ export default function ModalCreateAuditPlan({
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
         title="เพิ่มรายการสินค้า"
-        showSearch={false}
+        showSearch={true}
         textBtn="เพิ่มสินค้า"
         requestBody={{
           isControlStock: true,
         }}
         isControlStockType={true}
       />
+
+      <ModalAddProductFromSA
+        open={openModalAddItemFromSA}
+        onClose={() => setOpenModalAddItemFromSA(false)}
+        branch={values.branch}/>
+
 
       <ModalConfirmCounting
         open={openModalConfirmCounting}
@@ -908,7 +1147,7 @@ export default function ModalCreateAuditPlan({
         onConfirm={handleDeleteDraft}
         barCode={values.documentNumber}
         headerTitle={'ยืนยันยกเลิกสร้างแผนตรวจนับสต๊อก'}
-        documentField={'เลขที่เอกสารเบิก'}
+        documentField={'เลขที่เอกสาร'}
       />
       <SnackbarStatus open={openPopupModal} onClose={handleClosePopup} isSuccess={true} contentMsg={textPopup} />
       <AlertError open={openModalError} onClose={handleCloseModalError} textError={alertTextError} />

@@ -85,6 +85,7 @@ function StockMovementSearch() {
   };
 
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [clearSKUDropDown, setClearSKUDropDown] = React.useState<boolean>(false);
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const [branchFromCode, setBranchFromCode] = React.useState('');
   const [ownBranch, setOwnBranch] = React.useState(
@@ -154,9 +155,13 @@ function StockMovementSearch() {
     handleOpenLoading('open', true);
     setStartDate(null);
     setEndDate(null);
-    setClearBranchDropDown(!clearBranchDropDown);
-    setBranchFromCode('');
     setValues({ storeId: 0, locationId: 'ALL', skuCodes: '', branchCode: '', dateFrom: '', dateTo: '' });
+    setClearSKUDropDown(!clearSKUDropDown);
+
+    if (!groupBranch) {
+      setClearBranchDropDown(!clearBranchDropDown);
+      setBranchFromCode('');
+    }
     await dispatch(updateAddTypeAndProductState([]));
     dispatch(clearSearchAllProductAsync({}));
     setTimeout(() => {
@@ -227,7 +232,7 @@ function StockMovementSearch() {
             </Typography>
             <TextBoxSearchProduct
               onSelectItem={handleChangeProduct}
-              isClear={clearBranchDropDown}
+              isClear={clearSKUDropDown}
               requestBody={{
                 isControlStock: true,
               }}

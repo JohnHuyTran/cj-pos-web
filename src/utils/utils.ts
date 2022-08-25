@@ -61,6 +61,10 @@ export const stringNullOrEmpty = (value: any) => {
   return value === null || value === undefined || value === '' || value === 'Invalid date';
 };
 
+export const stringNumberNullOrEmpty = (value: any) => {
+  return value === null || value === undefined || value === '' || value === 'Invalid date' || value === 0;
+};
+
 export const objectNullOrEmpty = (object: any) => {
   if (object === undefined || object === null) {
     return true;
@@ -97,11 +101,26 @@ export function handleNumberBeforeUse(value: any): number {
 }
 
 export const numberWithCommas = (num: any) => {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  let currentValue;
+  if (stringNullOrEmpty(num)) currentValue = 0;
+  else currentValue = num;
+  try {
+    return currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  } catch (e) {
+    return '0';
+  }
 };
 
 export function isOwnBranch(branch: any): boolean {
   return env.branch.code === branch;
+}
+
+export const formatNumber = (value: any, decimalPoint: number = 0, type: string = 'string') => {
+  if (type === 'string') {
+    return ''+((+value).toFixed(decimalPoint)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  } else if (type === 'number') {
+    return (+(''+value).replaceAll(',', ''))
+  }
 }
 
 // export function isBranchDC(userInfo: KeyCloakTokenInfo): boolean {
@@ -178,4 +197,35 @@ export const getEncodeBarcode = ({
 export const isToteNo = (value: string) => {
   const regex = /^(T|B).*/;
   return regex.test(value);
+};
+
+export const isFilterFieldInExpense = (value: string) => {
+  return value === 'date' || value === 'total' || value === 'id' || value === 'description';
+};
+
+export const isFilterOutFieldInAdd = (value: string) => {
+  return (
+    value === 'date' ||
+    value === 'total' ||
+    value === 'id' ||
+    value === 'description' ||
+    value === 'SUMOTHER' ||
+    value === 'otherDetail' ||
+    value === 'dateTime' ||
+    value === 'isOverApprovalLimit1' ||
+    value === 'isOverApprovalLimit2'
+  );
+};
+
+export const isFilterOutFieldForPayload = (value: string) => {
+  return (
+    value === 'date' ||
+    value === 'total' ||
+    value === 'id' ||
+    value === 'description' ||
+    value === 'otherDetail' ||
+    value === 'dateTime' ||
+    value === 'isOverApprovalLimit1' ||
+    value === 'isOverApprovalLimit2'
+  );
 };

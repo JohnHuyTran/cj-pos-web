@@ -12,6 +12,7 @@ export enum MOVEMENT_TYPE {
   ADJ_TRNS_OUT_SRC_BT = 'ADJ_TRNS_OUT_SRC_BT',
   ADJ_TRNS_IN_DEST_BT = 'ADJ_TRNS_IN_DEST_BT',
   BRANCH_TRANSFER_OUT = 'BRANCH_TRANSFER_OUT',
+  TRANSFER_OUT_BAO = 'TRANSFER_OUT_BAO',
 }
 
 const movementShowDetail = [
@@ -28,6 +29,7 @@ const movementShowDetail = [
   MOVEMENT_TYPE.ADJ_TRNS_OUT_SRC_BT,
   MOVEMENT_TYPE.ADJ_TRNS_IN_DEST_BT,
   MOVEMENT_TYPE.BRANCH_TRANSFER_OUT,
+  MOVEMENT_TYPE.TRANSFER_OUT_BAO,
 ];
 
 export const isShowMovementDetail = (type: string) => {

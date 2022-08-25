@@ -115,6 +115,17 @@ export async function approveOrderShipmentsOC(sdNo: string) {
   }
 }
 
+export async function rejectOrderShipmentsOC(payload: any) {
+  try {
+    const path = getPathUrl(environment.orders.shipment.rejectOC.url, { sdNo: payload.sdNo });
+    const response = await post(path, payload).then((result: any) => result);
+    return response;
+  } catch (error) {
+    console.log('error = ', error);
+    throw error;
+  }
+}
+
 export async function submitTote(payload: ItemSubmitToteRequst) {
   try {
     const response = await post(environment.orders.tote.submitTote.url, payload).then((result: any) => result);

@@ -34,6 +34,7 @@ import { featchorderDetailDCAsync } from '../../../store/slices/dc-check-order-d
 import StockTransferBT from '../../stock-transfer/branch-transfer/stock-transfer-bt';
 import { featchBranchTransferDetailAsync } from '../../../store/slices/stock-transfer-branch-request-slice';
 import DCOrderDetail from '../../dc-check-orders/dc-ckeck-order-detail';
+import ModalCreateToRawMaterial from '../../transfer-out-raw-material/modal-create-to-raw-material';
 
 function StockMovementSearchList() {
   const classes = useStyles();
@@ -70,7 +71,7 @@ function StockMovementSearchList() {
   const [docType, setDocType] = React.useState<string>('');
 
   const handleModelAction = (params: GridRenderCellParams) => {
-    const barcodes: any = params.getValue(params.id, 'barcodes');
+    const barcodes: any = params.row.barcodes;
 
     const handleOpenModalTransaction = () => {
       setMovementTransaction(barcodes);
@@ -147,14 +148,12 @@ function StockMovementSearchList() {
             ? String(params.getValue(params.id, 'docRefNo'))
             : '';
         const docType: string =
-          params.getValue(params.id, 'docType') && params.getValue(params.id, 'docType') !== undefined
-            ? String(params.getValue(params.id, 'docType'))
-            : '';
+          params.row.docType && params.row.docType !== undefined ? String(params.row.docType) : '';
         const movementTypeCode: string =
-          params.getValue(params.id, 'movementTypeCode') && params.getValue(params.id, 'movementTypeCode') !== undefined
-            ? String(params.getValue(params.id, 'movementTypeCode'))
+          params.row.movementTypeCode && params.row.movementTypeCode !== undefined
+            ? String(params.row.movementTypeCode)
             : '';
-        if (params.getValue(params.id, 'movementAction') === true && docNo) {
+        if (params.row.movementAction === true && docNo) {
           return (
             <Typography
               color='secondary'
@@ -165,7 +164,7 @@ function StockMovementSearchList() {
             </Typography>
           );
         } else {
-          return <Typography variant="body2">{params.value}</Typography>;
+          return <Typography variant='body2'>{params.value}</Typography>;
         }
       },
     },
@@ -450,6 +449,23 @@ function StockMovementSearchList() {
           setOpenAlert(true);
           setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
         });
+    } else if (MOVEMENT_TYPE.TRANSFER_OUT_BAO === movementTypeCode) {
+      await dispatch(getTransferOutDetail(docNo))
+        .then((value: any) => {
+          if (value) {
+            if (isErrorCode(value.payload.code)) {
+              setOpenAlert(true);
+              setTextError('ไม่พบข้อมูล');
+            } else {
+              handleOpenModalDocDetail();
+              setMovementTypeCodeState(movementTypeCode);
+            }
+          }
+        })
+        .catch((err) => {
+          setOpenAlert(true);
+          setTextError('พบข้อผิดพลาด\nกรุณาลองใหม่อีกครั้ง');
+        });
     }
     handleOpenLoading('open', false);
   };
@@ -496,6 +512,7 @@ function StockMovementSearchList() {
             onCellClick={currentlySelected}
             loading={loading}
             rowHeight={65}
+            columnBuffer={10}
           />
         </div>
       </Box>
@@ -566,7 +583,17 @@ function StockMovementSearchList() {
       {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.BRANCH_TRANSFER_OUT && (
         <StockTransferBT isOpen={openModalDocDetail} onClickClose={handleCloseModalDocDetail} />
       )}
-
+      {openModalDocDetail && movementTypeCodeState === MOVEMENT_TYPE.TRANSFER_OUT_BAO && (
+        <ModalCreateToRawMaterial
+          isOpen={openModalDocDetail}
+          onClickClose={handleCloseModalDocDetail}
+          action={Action.UPDATE}
+          setPopupMsg={''}
+          setOpenPopup={setOpenPopup}
+          onSearchMain={handleGetData}
+          userPermission={getUserInfo().acl}
+        />
+      )}
       <LoadingModal open={openLoadingModal.open} />
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
     </React.Fragment>

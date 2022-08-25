@@ -497,6 +497,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
             onCellFocusOut={handleOnFocusOut}
             onCellOut={handleOnCellOut}
             onCellClick={currentlySelected}
+            columnBuffer={10}
           />
         </div>
         <ModalDeleteItem open={openModalDeleteConfirm} itemInfo={itemDelete} onClose={handleDeleteIterm} />

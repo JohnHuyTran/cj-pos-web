@@ -6,6 +6,7 @@ import { useAppSelector, useAppDispatch } from '../../store/store';
 import { useStyles } from '../../styles/makeTheme';
 import { SearchOff } from '@mui/icons-material';
 import { featchStockBalanceSearchAsync, savePayloadSearch } from '../../store/slices/stock/stock-balance-search-slice';
+import { numberWithCommas } from 'utils/utils';
 
 function StockBalance() {
   const classes = useStyles();
@@ -80,10 +81,10 @@ function StockBalance() {
     if (Number(value) < 0)
       return (
         <Typography variant='body2' sx={{ color: '#F54949' }}>
-          {value}
+          {numberWithCommas(value)}
         </Typography>
       );
-    return value;
+    return numberWithCommas(value);
   };
 
   const rows = items.data.map((data: StockInfo, indexs: number) => {

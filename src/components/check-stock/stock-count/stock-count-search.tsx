@@ -243,7 +243,7 @@ const StockCountSearch = () => {
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
               fullWidth
-              placeholder={'เลขที่เอกสาร SC'}
+              placeholder={'เลขที่เอกสาร SC/AP/SA'}
             />
           </Grid>
           <Grid item xs={4}>

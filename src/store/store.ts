@@ -62,7 +62,7 @@ import stockAdjustmentSearchSlice from './slices/stock-adjustment-search-slice';
 import stockAdjustmentCriteriaSearchSlice from './slices/stock-adjustment-criteria-search-slice';
 import stockAdjustmentSlice from './slices/stock-adjustment-slice';
 import stockAdjustmentDetailSlice from './slices/stock-adjustment-detail-slice';
-import stockAdjustCalculateSlice  from './slices/stock-adjust-calculate-slice';
+import stockAdjustCalculateSlice from './slices/stock-adjust-calculate-slice';
 import updateBTSkuSlice from './slices/stock-transfer-bt-sku-slice';
 import updateBTProductSlice from './slices/stock-transfer-bt-product-slice';
 import stockRequestItems from './slices/stock-request-items-slice';
@@ -88,8 +88,23 @@ import purchaseBRDetailSlice from './slices/purchase/purchase-branch-request-det
 import purchaseBranchRequestSlice from './slices/purchase-branch-request-slice';
 import saveSearchPurchaseBranchRequest from './slices/save-search-purchase-branch-request-slice';
 import verifyReasonsRejectListSlice from './slices/master/verify-order-reject-reasons-slice';
+import masterExpenseListSlice from './slices/master/expense-list-slice';
+import expenseAccountDetailSlice from './slices/accounting/accounting-slice';
+import expenseDetailSlice from './slices/accounting/accounting-detail-slice';
+import searchBranchAccountingSlice from './slices/accounting/accounting-search-slice';
+import searchBranchAccountingConfigSlice from './slices/accounting/accounting-search-config-slice';
+import saveExpenseSearchRequest from './slices/accounting/save-accounting-search-slice';
+import expensePeriodTypeSlice from './slices/accounting/accounting-period-type-slice';
+import saveExpenseConfigSearchRequest from './slices/accounting/save-accounting-search-config-slice';
+import closeSaleShiftSlice from './slices/accounting/close-saleshift-slice';
 import auditPlanDetailSlice from './slices/audit-plan-detail-slice';
 import auditPlanSearchSlice from './slices/audit-plan-search-slice';
+import searchCashStatementSlice from './slices/accounting/cash-statement/cash-search-slice';
+import saveCashStatementSearchRequest from './slices/accounting/cash-statement/save-cash-search-slice';
+import searchOpenEndSlice from './slices/accounting/open-end/open-end-search-slice';
+import viewOpenEndSlice from './slices/accounting/open-end/open-end-slice';
+
+import stockAdjustHasTempStockSearchSlice from './slices/stock-adjust-has-temp-stock-search';
 import auditHistory from './slices/audit-history-search-slice';
 import auditHistorySearchSlice from './slices/audit-history-search-slice';
 import auditHistoryCriteriaSearchSlice from './slices/audit-history-criteria-search-slice'
@@ -183,8 +198,22 @@ const store = configureStore({
     purchaseBranchRequestSlice: purchaseBranchRequestSlice,
     saveSearchPurchaseBranchRequest: saveSearchPurchaseBranchRequest,
     verifyReasonsRejectListSlice: verifyReasonsRejectListSlice,
+    masterExpenseListSlice: masterExpenseListSlice,
+    expenseAccountDetailSlice: expenseAccountDetailSlice,
+    searchBranchAccounting: searchBranchAccountingSlice,
+    searchBranchAccountingConfig: searchBranchAccountingConfigSlice,
+    saveExpenseSearchRequest: saveExpenseSearchRequest,
+    expenseDetail: expenseDetailSlice,
+    expensePeriodTypeSlice: expensePeriodTypeSlice,
+    saveExpenseConfigSearchRequest: saveExpenseConfigSearchRequest,
     auditPlanDetailSlice: auditPlanDetailSlice,
     auditPlanSearchSlice: auditPlanSearchSlice,
+    closeSaleShiftSlice: closeSaleShiftSlice,
+    searchCashStatement: searchCashStatementSlice,
+    saveCashStatementSearchRequest: saveCashStatementSearchRequest,
+    searchOpenEndSlice: searchOpenEndSlice,
+    viewOpenEndSlice: viewOpenEndSlice,
+    stockAdjustHasTempStockSearchSlice: stockAdjustHasTempStockSearchSlice,
     auditHistorySearchSlice: auditHistorySearchSlice,
     auditHistoryCriteriaSearchSlice: auditHistoryCriteriaSearchSlice,
   },

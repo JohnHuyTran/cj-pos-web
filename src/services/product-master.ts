@@ -71,6 +71,15 @@ export async function getProductBySKUCodes(codes: any) {
   }
 }
 
+export async function findProductSKU(payload: any) {
+  try {
+    const path = `${environment.products.sku.productMaster.findProductSKU.url}/${payload.skuCode}?skuTypes=${payload.skuTypes}&limit=100`;
+    return await get(path);
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getProductBySupplierCode = (supplierCode: string) => {
   return getPathUrl(`${environment.products.addItem.productsBySupplierCode.url}`, {
     supplierCode: supplierCode,

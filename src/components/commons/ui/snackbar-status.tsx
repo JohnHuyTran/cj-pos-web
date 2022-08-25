@@ -7,9 +7,10 @@ interface Props {
   onClose: () => void;
   isSuccess: boolean;
   contentMsg: string;
+  durationTime?: number;
 }
 
-export default function SnackbarStatus({ open, onClose, isSuccess, contentMsg }: Props): ReactElement {
+export default function SnackbarStatus({ open, onClose, isSuccess, contentMsg, durationTime }: Props): ReactElement {
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
@@ -18,7 +19,7 @@ export default function SnackbarStatus({ open, onClose, isSuccess, contentMsg }:
       data-testid='txtSnackbar'
       open={open}
       onClose={onClose}
-      autoHideDuration={6000}
+      autoHideDuration={durationTime && durationTime > 0 ? durationTime : 6000}
       anchorOrigin={{
         vertical: 'top',
         horizontal: 'right',

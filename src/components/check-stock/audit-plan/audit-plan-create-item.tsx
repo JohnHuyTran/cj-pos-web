@@ -29,7 +29,7 @@ export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactE
   };
   useEffect(() => {
     if (Object.keys(payloadAddTypeProduct).length !== 0) {
-      let listProducts = _.uniqBy(payloadAddTypeProduct.filter((el: any) => el.selectedType === 2), 'skuName')
+      let listProducts = _.uniqBy(payloadAddTypeProduct.filter((el: any) => el.selectedType === 2), 'skuCode')
       let rows = _.sortBy(listProducts, 'skuCode')
         .map((item: any, index: number) => {
           return {
@@ -108,7 +108,7 @@ export default function AuditPlanCreateItem({ status, viewMode }: Props): ReactE
             });
             dispatch(updateAddTypeAndProductState(listAdd));
           } else {
-            dispatch(setCheckEdit(!!(status == StockActionStatus.DRAFT)));
+            dispatch(setCheckEdit(status == StockActionStatus.DRAFT));
             dispatch(updateAddTypeAndProductState([]));
           }
           setOpenModalDelete(false);

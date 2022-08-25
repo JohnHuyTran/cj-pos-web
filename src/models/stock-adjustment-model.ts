@@ -10,6 +10,17 @@ export interface StockAdjustmentSearchRequest {
   type?: string | undefined;
 }
 
+export interface StockAdjustHasTempStockSearchRequest {
+  perPage: string;
+  page: string;
+  docNo: string;
+  branch: string;
+  creationDateFrom: string;
+  creationDateTo: string;
+  clearSearch?: boolean;
+  type?: string | undefined;
+}
+
 export interface StockAdjustmentSearchResponse {
   ref: string;
   code: number;
@@ -85,6 +96,11 @@ export interface BarcodeCalculate {
   difference: number;
   tempStock: number;
   unitName: string;
+  unitPrice: number;
+  stockMovementBack: number;
+  stockMovementFront: number;
+  backStock: number;
+  frontStock: number;
 }
 
 export interface SASkuCalculateResponse {
@@ -110,7 +126,11 @@ export interface SkuCalculate {
   difference: number;
   tempStock: number;
   unitName: string;
-  adjustedPrice: number;
-  remark: string,
+  unitPrice: number;
+  remark: string;
+  stockMovementBack: number;
+  stockMovementFront: number;
+  backStock: number;
+  frontStock: number;
 }
 

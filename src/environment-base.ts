@@ -25,6 +25,9 @@ export const environment = {
       approveOC: {
         url: '/order/stock-diff/{sdNo}/approve-oc',
       },
+      rejectOC: {
+        url: '/order/stock-diff/{sdNo}/reject-oc',
+      },
       closejob: {
         url: '/order/stock-diff/{sdNo}/close',
       },
@@ -225,6 +228,9 @@ export const environment = {
       delFileHuawei: {
         url: '/purchase/remove-file',
       },
+      deletePI: {
+        url: '/purchase/purchase-invoice/{piNo}/delete',
+      },
     },
     purchaseNote: {
       detail: {
@@ -238,6 +244,9 @@ export const environment = {
       },
       exportFile: {
         url: '/purchase/purchase-note/export/{pnNo}',
+      },
+      deletePN: {
+        url: '/purchase/purchase-note/{pnNo}/delete',
       },
     },
     purchaseBranchRequest: {
@@ -288,6 +297,9 @@ export const environment = {
         },
         searchItem: {
           url: 'products/product/find',
+        },
+        findProductSKU: {
+          url: 'products/skus',
         },
       },
     },
@@ -438,6 +450,12 @@ export const environment = {
       search: {
         url: '/stock/stock-adjust',
       },
+      tempStockSearch: {
+        url: '/stock/stock-adjust/has-temp-stock'
+      },
+      getSkuCode: {
+        url: '/stock/stock-adjust/get-sku'
+      },
       saveDraft: {
         url: '/stock/stock-adjust',
       },
@@ -514,6 +532,11 @@ export const environment = {
         },
       },
     },
+    expense: {
+      retrive: {
+        url: 'accounting/expense-config',
+      },
+    },
   },
   authority: {
     authorizedBranch: {
@@ -553,6 +576,134 @@ export const environment = {
   tote: {
     inquiryTote: {
       url: '/webtote/toteinquiry',
+    },
+  },
+  branchAccounting: {
+    expense: {
+      search: {
+        url: 'accounting/expense',
+      },
+      searchConfig: {
+        url: 'accounting/expense-config/search',
+      },
+      save: {
+        url: 'accounting/expense',
+      },
+      detail: {
+        url: 'accounting/expense/{docNo}',
+      },
+      approve: {
+        branch: {
+          url: 'accounting/expense/submit/{docNo}',
+        },
+        ocArea: {
+          url: 'accounting/expense/approve1-2',
+        },
+        account: {
+          url: 'accounting/expense/approve-by-acc/{docNo}',
+        },
+        accountManager: {
+          url: 'accounting/expense/approve3/{docNo}',
+        },
+      },
+      approve3: {
+        byNo: {
+          url: 'accounting/expense/approve3-by-no',
+        },
+        byCriteria: {
+          url: 'accounting/expense/approve3-by-criteria',
+        },
+      },
+      reject: {
+        ocArea: {
+          url: 'accounting/expense/reject1-2/{docNo}',
+        },
+        account: {
+          url: 'accounting/expense/reject-by-acc/{docNo}',
+        },
+        accountManager: {
+          url: 'accounting/expense/reject3/{docNo}',
+        },
+      },
+      periodType: {
+        url: 'accounting/expense-period/{type}',
+      },
+      summarize: {
+        byNo: {
+          url: 'accounting/expense/summarize-by-no',
+        },
+        byCriteria: {
+          url: 'accounting/expense/summarize-by-criteria',
+        },
+      },
+    },
+    expenseConfig: {
+      createExpenseConfig: {
+        url: 'accounting/expense-config',
+      },
+      updateExpenseConfig: {
+        url: 'accounting/expense-config/{expenseNo}',
+      },
+    },
+    closeSaleShift: {
+      search: {
+        url: 'sale/shift-closes',
+      },
+      shiftClose: {
+        url: 'sale/shift-closes/end',
+      },
+      updateConfirmShiftCloses: {
+        url: 'sale/shift-closes/confirm/{shiftCode}',
+      },
+      checkInfo: {
+        url: 'sale/shift-closes/check-info',
+      },
+      byPassByBranch: {
+        url: 'sale/shift-closes/bypass',
+      },
+      byPassBySupport: {
+        url: 'sale/shift-closes/bypass/confirm',
+      },
+    },
+    cashStatement: {
+      search: {
+        url: 'accounting/cash-statement/cash',
+      },
+      edit: {
+        url: 'accounting/cash-statement/edit',
+      },
+      downloadTemplate: {
+        url: 'accounting/cash-statement/download-template',
+      },
+      import: {
+        url: 'accounting/cash-statement/import',
+      },
+      delete: {
+        url: 'accounting/cash-statement/delete/{id}',
+      },
+      approve: {
+        url: 'accounting/cash-statement/approve-list',
+      },
+    },
+    openEnd: {
+      search: {
+        url: 'accounting/open-end',
+      },
+      save: {
+        url: 'accounting/open-end',
+      },
+      submitApprove: {
+        url: 'accounting/open-end/submit/{docNo}',
+      },
+      approved: {
+        url: 'accounting/open-end/approve/{docNo}',
+      },
+      exportPayInFile: {
+        url: 'accounting/open-end/export/pay-in/{OENo}',
+      },
+      view: {
+        url: 'accounting/open-end/{docNo}',
+      },
     },
   },
 };
