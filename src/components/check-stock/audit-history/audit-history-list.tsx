@@ -54,7 +54,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
     if (lstAuditHistory != null && lstAuditHistory.length > 0) {
       let rows = lstAuditHistory.map((data: AuditHistory, index: number) => {
         return {
-          id: data.document.id,
+          id: (currentPage - 1) * parseInt(pageSize) + index + 1,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
           checked: !!data.type,
           skuName: data.skuName,
@@ -67,7 +67,8 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
           confirmDateTime:convertUtcToBkkDate(data.confirmDate, DateFormat.DATE_TIME_DISPLAY_FORMAT),
           creator: data.creator,
           remark:data.remark,
-          typeOf: data.document.type
+          typeOf: data.document.type,
+          idSA: data.document.id,
         };
       });
       setLstAuditHistory(rows);
@@ -89,7 +90,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
   const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
   const handleOpenSADetail = async (params:any) => {
     try {
-      await dispatch(getStockAdjustmentDetail(params.row.id));
+      await dispatch(getStockAdjustmentDetail(params.row.idSA));
       if (stockAdjustDetail) {
         setOpenSADetail(true);
         await dispatch(updateRefresh(true));
@@ -162,7 +163,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
     {
         field: 'difference',
         headerName: 'ผลต่าง\n' + 'การนับ',
-        minWidth: 63,
+        minWidth: 130,
         headerAlign: 'center',
         align: 'right',
         disableColumnMenu: true,
@@ -172,7 +173,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
     {
         field: 'numberOfAdjusted',
         headerName: 'จำนวนที่\n' + 'ปรับสต๊อก',
-        minWidth: 79,
+        minWidth: 130,
         headerAlign: 'center',
         align: 'right',
         disableColumnMenu: true,
@@ -201,7 +202,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
         headerName: 'วันที่ทำรายการ',
         headerAlign: 'center',
         sortable: false,
-        minWidth: 130,
+        minWidth: 150,
 
     },
     {
