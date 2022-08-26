@@ -1,12 +1,11 @@
 import { Box, Typography,Checkbox, Link } from '@mui/material';
-import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import { useStyles } from '../../../styles/makeTheme';
 import { useTranslation } from 'react-i18next';
-import { Action, DateFormat, StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
+import { Action, AuditHistoryType, DateFormat } from '../../../utils/enum/common-enum';
 import { KEYCLOAK_GROUP_AUDIT } from "../../../utils/enum/permission-enum";
-import { objectNullOrEmpty, stringNullOrEmpty,numberWithCommas } from '../../../utils/utils';
-import HtmlTooltip from '../../commons/ui/html-tooltip';
+import { objectNullOrEmpty,numberWithCommas } from '../../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
 import SnackbarStatus from '../../commons/ui/snackbar-status';
 import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
@@ -19,10 +18,6 @@ import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment
 import { updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
 const _ = require('lodash');
-
-interface loadingModalState {
-  open: boolean;
-}
 
 interface StateProps {
   onSearch: () => void;
@@ -56,7 +51,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
         return {
           id: (currentPage - 1) * parseInt(pageSize) + index + 1,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
-          checked: !!data.type,
+          checked: AuditHistoryType.CANTCOUNT === data.type,
           skuName: data.skuName,
           skuCode: data.sku,
           documentNumber: data.document.documentNumber,
@@ -279,7 +274,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
       <Box mt={2} bgcolor="background.paper">
         <div
           className={classes.MdataGridPaginationTop}
-          style={{ height: lstAuditHistory.length >= 10 ? '60vh' : 'auto' }}
+          style={{ height: lstAuditHistory.length >= 10 ? '72vh' : 'auto' }}
         >
           <DataGrid
             rows={lstAuditHistory}
@@ -287,7 +282,6 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
             disableColumnMenu
             hideFooterSelectedRowCount={true}
             autoHeight={lstAuditHistory.length < 10}
-            // onCellClick={currentlySelected}
             scrollbarSize={10}
             pagination
             page={currentPage - 1}
@@ -298,7 +292,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
-            rowHeight={45}
+            rowHeight={55}
           />
         </div>
       </Box>
