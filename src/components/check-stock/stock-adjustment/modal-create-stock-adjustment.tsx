@@ -374,7 +374,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
 
   const handleOpenAP = async () => {
-    if (viewMode) return;
+    if (viewMode && openFromAP) return;
     handleOpenLoading('open', true);
     try {
       await dispatch(getAuditPlanDetail(dataDetail.APId));

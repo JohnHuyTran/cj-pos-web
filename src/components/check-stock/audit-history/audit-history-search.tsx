@@ -85,7 +85,7 @@ const AuditHistorySearch = () => {
   const handleCloseModalAddItems = async () => {
     setOpenModelAddItems(false);
   };
-  
+
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     skuCodes: '',
@@ -132,12 +132,12 @@ const AuditHistorySearch = () => {
     const listSkuCodes = _.uniqBy(
       payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
       'skuCode'
-    ).map((item:any) => item.skuCode).join(',')
+    ).map((item: any) => item.skuCode).join(',')
     setValues({
       ...values,
       skuCodes: listSkuCodes
     })
-  },[payloadAddTypeProduct])
+  }, [payloadAddTypeProduct])
 
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
@@ -189,8 +189,9 @@ const AuditHistorySearch = () => {
   const validateSearch = () => {
     let isValid = true;
     if (stringNullOrEmpty(values.startDate) || stringNullOrEmpty(values.endDate) ||
-      (!requestPermission && (stringNullOrEmpty(values.branch) || 'ALL' === values.branch)))
-    {
+      (!requestPermission && (stringNullOrEmpty(values.branch) || 'ALL' === values.branch))
+      || stringNullOrEmpty(values.skuCodes)
+    ) {
       isValid = false;
       setOpenAlert(true);
       setTextError('กรุณากรอกข้อมูลค้นหา');
@@ -230,7 +231,7 @@ const AuditHistorySearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <AuditHistoryList onSearch={onSearch} />;
+      dataTable = <AuditHistoryList onSearch={onSearch}/>;
       // dataTable = <AuditHistoryList />;
     } else {
       dataTable = (
@@ -265,8 +266,10 @@ const AuditHistorySearch = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-                {'ค้นหาสินค้า*'}
+            <Typography gutterBottom variant='subtitle1' component='div' mb={1}
+                        align='left' sx={{ display: 'flex', width: '100%' }}>
+              {'ค้นหาสินค้า'}
+              <Typography sx={{ color: '#F54949', marginRight: '5px' }}> * </Typography>
             </Typography>
             <TextField
               id='products'
@@ -279,7 +282,7 @@ const AuditHistorySearch = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <SearchIcon/>
                   </InputAdornment>
                 ),
               }}
@@ -302,7 +305,7 @@ const AuditHistorySearch = () => {
             />
           </Grid>
         </Grid>
-        <Typography mt={2}>วันที่สร้างรายการ</Typography>
+        <Typography mt={2}>วันที่ตรวจนับ</Typography>
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}
@@ -334,8 +337,8 @@ const AuditHistorySearch = () => {
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
-                id='status'
-                name='status'
+                id='type'
+                name='type'
                 value={values.type}
                 onChange={onChange.bind(this, setValues, values)}
                 inputProps={{ 'aria-label': 'Without label' }}>

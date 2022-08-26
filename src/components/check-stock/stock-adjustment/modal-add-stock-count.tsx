@@ -244,7 +244,7 @@ export const ModalAddStockCount = (props: DataGridProps) => {
           <Typography sx={{ fontSize: '1em' }}><b>เลือกรายการเอกสาร SC :</b></Typography>
         </BootstrapDialogTitle>
         <DialogContent>
-          <div style={{ width: '100%', height: dataTable.length >= 5 ? '35vh' : 'auto' }}
+          <div style={{ width: '100%', height: dataTable.length >= 5 ? '41vh' : 'auto' }}
                className={classes.MdataGridDetail}>
             <DataGrid
               rows={dataTable}
@@ -257,7 +257,7 @@ export const ModalAddStockCount = (props: DataGridProps) => {
               disableColumnMenu
               autoHeight={dataTable.length < 5}
               scrollbarSize={10}
-              rowHeight={45}
+              rowHeight={54}
               components={{
                 NoRowsOverlay: () => (
                   <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">

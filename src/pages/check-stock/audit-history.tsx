@@ -5,7 +5,7 @@ import AuditHistorySearch from '../../components/check-stock/audit-history/audit
 const AuditHistory = () => {
   return (
     <Container maxWidth="xl">
-      <TitleHeader title={'สร้างแผนตรวจนับสต๊อก'} />
+      <TitleHeader title={'ประวัตินับสต๊อก'} />
       <AuditHistorySearch />
     </Container>
   );
