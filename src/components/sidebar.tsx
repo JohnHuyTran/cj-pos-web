@@ -103,7 +103,10 @@ export default function Sidebar({}: Props): ReactElement {
   );
   const [openSettingsMenu, setOpenSettingsMenu] = useState(selectedByPath('reserves'));
   const [openCheckStockMenu, setOpenCheckStockMenu] = useState(
-    selectedByPath('audit-plan') || selectedByPath('stock-count') || selectedByPath('stock-adjustment')
+    selectedByPath('audit-plan') ||
+      selectedByPath('stock-count') ||
+      selectedByPath('stock-adjustment') ||
+      selectedByPath('audit-history')
   );
 
   const navState = useAppSelector((state) => state.navigator.state);
@@ -584,7 +587,7 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuAuditHistory'>
               <ListItemButton
                 key='AuditHistory'
-                // selected={selectedIndex === 17}
+                selected={selectedByPath('audit-history')}
                 // onClick={() => handleListItemClick(18)}
                 sx={{ pl: 7 }}>
                 <ListItemText primary='ประวัตินับสต๊อก' />
