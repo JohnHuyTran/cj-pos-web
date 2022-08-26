@@ -28,18 +28,19 @@ export const getAuditHistorySearch = createAsyncThunk(
   async (payload: AuditHistorySearchRequest) => {
     try {
       const apiRootPath = environment.checkStock.auditHistory.search.url;
+      // const apiRootPath = 'http://192.168.110.127:8000/audit-history';
       let path = `${apiRootPath}?perPage=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.docNo)) {
-        path = path + `&docNo=${payload.docNo}`;
+        path = path + `&documentNumber=${payload.docNo}`;
       }
-      if(!stringNullOrEmpty(payload.skuName)){
-        path = path + `&skuName=${payload.skuName}`
+      if(!stringNullOrEmpty(payload.skuCodes)){
+        path = path + `&skuCodes=${payload.skuCodes}`
       }
       if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
         path = path + `&branch=${payload.branch}`;
       }
-      if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
-        path = path + `&status=${payload.status}`;
+      if (!stringNullOrEmpty(payload.type) && 'ALL' !== payload.type) {
+        path = path + `&type=${payload.type}`;
       }
       if (!stringNullOrEmpty(payload.creationDateFrom)) {
         path = path + `&creationDateFrom=${payload.creationDateFrom}`;

@@ -2,13 +2,12 @@ export interface AuditHistorySearchRequest {
     perPage: string;
     page: string;
     docNo: string;
-    skuName: string;
+    skuCodes: string;
     branch: string;
-    status: string;
+    type: string;
     creationDateFrom: string;
     creationDateTo: string;
     clearSearch?: boolean;
-    type?: string | undefined;
   }
   
   export interface AuditHistorySearchResponse {
@@ -25,28 +24,25 @@ export interface AuditHistorySearchRequest {
   export interface AuditHistory {
     id: string;
     branchCode: string;
-    branchName: string;
-    requester: string;
-    documentNumber: string;
-    status: string;
-    storeType: number;
-    createdDate: string;
-    countingTime: number;
-    documentNumberAP: string;
-    createdBy: string;
-    APId: string;
-    APDocumentNumber: string;
-    products: AuditHistoryProductDetail[];
+    type: string;
+    sequence: string;
+    skuName: string;
+    sku: string;
+    numberOfAdjusted: number;
+    creator: string;
+    difference: number;
+    store: string;
+    unitName:string;
+    confirmDate: any;
+    remark: string;
+    document: document;
   }
   
-  export interface AuditHistoryProductDetail {
-    barcode: string;
-    productName: string;
-    sku: string;
-    numberOfRequested: number;
-    numberOfApproved: number;
-    remark: string;
-    unitName: string;
+  export interface document {
+    CreatedDate: any;
+    documentNumber: string;
+    id: string;
+    type: string;
   }
   
   export interface AuditHistoryDetailResponse {

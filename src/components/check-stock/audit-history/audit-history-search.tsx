@@ -25,14 +25,16 @@ import { isChannelBranch } from "../../../utils/role-permission";
 import { AuditHistorySearchRequest } from '../../../models/audit-history-model';
 import { saveSearchCriteriaAH } from "../../../store/slices/audit-history-criteria-search-slice";
 import ModalAddTypeProduct from '../../commons/ui/modal-add-type-products';
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
+import { updateAddTypeAndProductState } from "../../../store/slices/add-type-product-slice";
 
 const _ = require('lodash');
 
 interface State {
   documentNumber: string;
-  skuName: string;
+  skuCodes: string;
   branch: string;
-  status: string;
   type: string;
   startDate: any | Date | number | string;
   endDate: any | Date | number | string;
@@ -79,15 +81,15 @@ const AuditHistorySearch = () => {
   const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
   const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [openModelAddItems, setOpenModelAddItems] = React.useState<boolean>(false);
+  const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
   const handleCloseModalAddItems = async () => {
     setOpenModelAddItems(false);
   };
   
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
-    skuName: '',
+    skuCodes: '',
     branch: groupBranch ? ownBranch : 'ALL',
-    status: 'ALL',
     type: 'ALL',
     startDate: new Date(),
     endDate: new Date(),
@@ -116,10 +118,6 @@ const AuditHistorySearch = () => {
       setRequestPermission(
         userPermissionCampaign != null && userPermissionCampaign.length > 0 ? userPermissionCampaign.includes('campaign.to.create') : false
       );
-      setValues({
-        ...values,
-        status: 'ALL',
-      });
     }
   }, []);
 
@@ -129,6 +127,17 @@ const AuditHistorySearch = () => {
       setValues({ ...values, branch: branches });
     }
   }, [listBranchSelect]);
+
+  useEffect(() => {
+    const listSkuCodes = _.uniqBy(
+      payloadAddTypeProduct.filter((el: any) => el.selectedType === 2),
+      'skuCode'
+    ).map((item:any) => item.skuCode).join(',')
+    setValues({
+      ...values,
+      skuCodes: listSkuCodes
+    })
+  },[payloadAddTypeProduct])
 
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
@@ -152,9 +161,8 @@ const AuditHistorySearch = () => {
     setFlagSearch(false);
     setValues({
       documentNumber: '',
-      skuName: '',
+      skuCodes: '',
       branch: groupBranch ? ownBranch : 'ALL',
-      status: 'ALL',
       type: 'ALL',
       startDate: new Date(),
       endDate: new Date(),
@@ -164,14 +172,15 @@ const AuditHistorySearch = () => {
       perPage: (limit ? limit : 10).toString(),
       page: page,
       docNo: values.documentNumber,
-      skuName: values.skuName,
+      skuCodes: values.skuCodes,
       branch: values.branch,
-      status: values.status,
+      type: values.type,
       creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
       creationDateTo: moment(values.endDate).endOf('day').toISOString(),
       clearSearch: true
     };
     dispatch(getAuditHistorySearch(payload));
+    dispatch(updateAddTypeAndProductState([]));
     if (!requestPermission) {
       setListBranchSelect([]);
     }
@@ -203,13 +212,12 @@ const AuditHistorySearch = () => {
       perPage: limits,
       page: page,
       docNo: values.documentNumber.trim(),
-      skuName: values.skuName,
+      skuCodes: values.skuCodes,
       branch: values.branch,
-      status: values.status,
+      type: values.type,
       creationDateFrom: moment(values.startDate).startOf('day').toISOString(),
       creationDateTo: moment(values.endDate).endOf('day').toISOString(),
     };
-
     handleOpenLoading('open', true);
     await dispatch(getAuditHistorySearch(payload));
     await dispatch(saveSearchCriteriaAH(payload));
@@ -222,7 +230,7 @@ const AuditHistorySearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      // dataTable = <AuditHistoryList onSearch={onSearch} type={values.type}/>;
+      dataTable = <AuditHistoryList onSearch={onSearch} />;
       // dataTable = <AuditHistoryList />;
     } else {
       dataTable = (
@@ -260,19 +268,22 @@ const AuditHistorySearch = () => {
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
                 {'ค้นหาสินค้า*'}
             </Typography>
-            <TextField fullWidth size='small' className={classes.MtextField}>
-            <ModalAddTypeProduct
-            open={openModelAddItems}
-            onClose={handleCloseModalAddItems}
-            title="เพิ่มรายการสินค้า"
-            showSearch={false}
-            textBtn="เพิ่มสินค้า"
-            requestBody={{
-              isControlStock: true,
-            }}
-            isControlStockType={true}
-          />
-            </TextField>
+            <TextField
+              id='products'
+              name='products'
+              fullWidth
+              size='small'
+              className={classes.MtextField}
+              onClick={() => setOpenModelAddItems(true)}
+              placeholder={'รหัสสินค้า/ชื่อสินค้า/บาร์โค้ด'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}
@@ -325,7 +336,7 @@ const AuditHistorySearch = () => {
               <Select
                 id='status'
                 name='status'
-                value={values.status}
+                value={values.type}
                 onChange={onChange.bind(this, setValues, values)}
                 inputProps={{ 'aria-label': 'Without label' }}>
                 <MenuItem value={'ALL'} selected={true}>
@@ -363,6 +374,17 @@ const AuditHistorySearch = () => {
         </Grid>
       </Box>
       {dataTable}
+      <ModalAddTypeProduct
+        open={openModelAddItems}
+        onClose={handleCloseModalAddItems}
+        title="เพิ่มรายการสินค้า"
+        showSearch={true}
+        textBtn="เพิ่มสินค้า"
+        requestBody={{
+          isControlStock: true,
+        }}
+        isControlStockType={true}
+      />
       <LoadingModal open={openLoadingModal.open}/>
       <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError}/>
       <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>

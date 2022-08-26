@@ -105,7 +105,6 @@ import searchOpenEndSlice from './slices/accounting/open-end/open-end-search-sli
 import viewOpenEndSlice from './slices/accounting/open-end/open-end-slice';
 
 import stockAdjustHasTempStockSearchSlice from './slices/stock-adjust-has-temp-stock-search';
-import auditHistory from './slices/audit-history-search-slice';
 import auditHistorySearchSlice from './slices/audit-history-search-slice';
 import auditHistoryCriteriaSearchSlice from './slices/audit-history-criteria-search-slice'
 const store = configureStore({

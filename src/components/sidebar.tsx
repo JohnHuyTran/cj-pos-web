@@ -584,10 +584,10 @@ export default function Sidebar({}: Props): ReactElement {
               id='subMenuAuditHistory'>
               <ListItemButton
                 key='AuditHistory'
-                selected={selectedIndex === 17}
-                onClick={() => handleListItemClick(18)}
+                // selected={selectedIndex === 17}
+                // onClick={() => handleListItemClick(18)}
                 sx={{ pl: 7 }}>
-                <ListItemText primary='รายละเอียดตรวจนับสต๊อก' />
+                <ListItemText primary='ประวัตินับสต๊อก' />
               </ListItemButton>
             </Link>
           </List>
