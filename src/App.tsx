@@ -38,7 +38,7 @@ import AuditPlan from './pages/check-stock/audit-plan';
 import CloseSaleShift from './pages/accounting/close-saleshift';
 import StockCount from './pages/check-stock/stock-count';
 import StockAdjustment from './pages/check-stock/stock-adjustment';
-
+import AuditHistory from './pages/check-stock/audit-history';
 import OpenEnd from './pages/accounting/open-end';
 const drawerWidth = 240;
 
@@ -126,6 +126,7 @@ export default function App2() {
           <Route path='/cash-statement' component={CashStatement} />
           <Route path='/stock-adjustment' component={StockAdjustment} />
           <Route path='/open-end' component={OpenEnd} />
+          <Route path='/audit-history' component={AuditHistory} />
         </Switch>
       </Main>
     </Box>

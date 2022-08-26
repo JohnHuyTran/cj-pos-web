@@ -477,7 +477,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                 </Link>
               </Grid>
             </Grid>
-            {dataDetail && dataDetail.relatedSCs && dataDetail.relatedSCs && (
+            {dataDetail && dataDetail.relatedSCs && dataDetail.relatedSCs.length > 0 && (
               <Grid item container xs={4} pr={4}>
                 <Grid item xs={4}>
                   เอกสาร SC :

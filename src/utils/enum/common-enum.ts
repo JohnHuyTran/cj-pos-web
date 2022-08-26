@@ -71,3 +71,8 @@ export enum StockActionStatus {
   END = 'END',
   CANCEL = 'CANCEL',
 }
+
+export enum AuditHistoryType{
+  CANTCOUNT = 'CANTCOUNT',
+  RECHECK = 'RECHECK',
+}

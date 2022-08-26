@@ -105,6 +105,8 @@ import searchOpenEndSlice from './slices/accounting/open-end/open-end-search-sli
 import viewOpenEndSlice from './slices/accounting/open-end/open-end-slice';
 
 import stockAdjustHasTempStockSearchSlice from './slices/stock-adjust-has-temp-stock-search';
+import auditHistorySearchSlice from './slices/audit-history-search-slice';
+import auditHistoryCriteriaSearchSlice from './slices/audit-history-criteria-search-slice'
 const store = configureStore({
   reducer: {
     auth: authSlice,
@@ -211,6 +213,8 @@ const store = configureStore({
     searchOpenEndSlice: searchOpenEndSlice,
     viewOpenEndSlice: viewOpenEndSlice,
     stockAdjustHasTempStockSearchSlice: stockAdjustHasTempStockSearchSlice,
+    auditHistorySearchSlice: auditHistorySearchSlice,
+    auditHistoryCriteriaSearchSlice: auditHistoryCriteriaSearchSlice,
   },
 });
 
