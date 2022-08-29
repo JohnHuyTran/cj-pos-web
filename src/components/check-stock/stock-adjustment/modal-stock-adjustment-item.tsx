@@ -338,6 +338,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
             name: item.skuName,
             sku: item.sku,
             remark: item.remark,
+            unitName: item.unitName,
           });
         } else {
           skuRechecks = skuRechecks.filter((it: any) => it.sku !== item.sku);

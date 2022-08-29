@@ -751,7 +751,7 @@ export default function ModalCreateAuditPlan({
             {recounting &&
                 <Grid item container xs={4} mb={5} pl={2}>
                     <Grid item xs={3}>
-                        ผผู้ทวน :
+                        ผู้ทวน :
                     </Grid>
                     <Grid item xs={8}>
                         <Box textAlign={'center'}>
