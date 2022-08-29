@@ -168,8 +168,18 @@ function STCreateModal({
         endTime: moment(saleLimitTimeDetail.stEndTime).format('HH:mm'),
       });
       setRemark(saleLimitTimeDetail.remark);
-      let listProducts = saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts
-        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts.map((item: any) => {
+      let appliedProducts = saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts
+        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts : [];
+      let appliedCategories = saleLimitTimeDetail.stDetail.appliedProduct.appliedCategories
+        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedCategories : [];
+      let listCategories = appliedCategories.map((item: any) => {
+          return {
+            productTypeCode: item.code,
+            productTypeName: item.name,
+            selectedType: 1,
+          };
+        })
+      let listProducts = appliedProducts.map((item: any) => {
             return {
               barcode: item.barcode ? item.barcode : '',
               skuCode: item.skuCode,
@@ -177,18 +187,9 @@ function STCreateModal({
               barcodeName: item.name,
               productTypeCode: item.categoryTypeCode,
               selectedType: 2,
+              productByType: true
             };
           })
-        : [];
-      let listCategories = saleLimitTimeDetail.stDetail.appliedProduct.appliedCategories
-        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedCategories.map((item: any) => {
-            return {
-              productTypeCode: item.code,
-              productTypeName: item.name,
-              selectedType: 1,
-            };
-          })
-        : [];
       dispatch(updateAddTypeAndProductState(listProducts.concat(listCategories)));
       dispatch(fetchTotalBranch());
       dispatch(
@@ -959,7 +960,7 @@ function STCreateModal({
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
         title='เพิ่มรายการสินค้า (งด) ขาย'
-        showSearch={false}
+        showSearch={true}
         textBtn='เพิ่มสินค้า'
         requestBody={{
           isSellable: true,
