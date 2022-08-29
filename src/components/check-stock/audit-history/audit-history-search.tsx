@@ -85,7 +85,6 @@ const AuditHistorySearch = () => {
   const handleCloseModalAddItems = async () => {
     setOpenModelAddItems(false);
   };
-
   const [values, setValues] = React.useState<State>({
     documentNumber: '',
     skuCodes: '',
@@ -138,6 +137,10 @@ const AuditHistorySearch = () => {
       skuCodes: listSkuCodes
     })
   }, [payloadAddTypeProduct])
+
+  useEffect(() => {
+    dispatch(updateAddTypeAndProductState([]))
+  },[])
 
   const handleChangeBranch = (branchCode: string) => {
     if (branchCode !== null) {
