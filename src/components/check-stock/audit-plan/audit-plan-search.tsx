@@ -25,6 +25,7 @@ import { SearchOff } from '@mui/icons-material';
 import AuditPlanItemList from './audit-plan-search-item-list';
 import { auditPlanGetSearch, clearDataFilter } from '../../../store/slices/audit-plan-search-slice';
 import { AuditPlanSearchRequest } from '../../../models/audit-plan';
+import { updateAddTypeAndProductState } from "../../../store/slices/add-type-product-slice";
 
 const _ = require('lodash');
 
@@ -105,6 +106,7 @@ const AuditPlanSearch = () => {
   };
 
   const handleOpenModal = () => {
+    dispatch(updateAddTypeAndProductState([]))
     setOpenModal(true);
   };
 

@@ -51,7 +51,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
         return {
           id: (currentPage - 1) * parseInt(pageSize) + index + 1,
           index: (currentPage - 1) * parseInt(pageSize) + index + 1,
-          checked: AuditHistoryType.CANTCOUNT === data.type,
+          checked: AuditHistoryType.CANTCOUNT === data.type.toUpperCase(),
           skuName: data.skuName,
           skuCode: data.sku,
           documentNumber: data.document.documentNumber,
@@ -107,6 +107,7 @@ const AuditHistoryList: React.FC<StateProps> = (props) => {
           <Checkbox
             checked={Boolean(params.value)}
             disabled
+            style={{ color:'#AEAEAE' }}
           />
         ),
     },
