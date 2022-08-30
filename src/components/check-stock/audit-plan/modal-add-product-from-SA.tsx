@@ -355,8 +355,8 @@ export const ModalAddProductFromSA = (props: Props) => {
             </Box>
           </Box>
           <div
-            style={{ width: '100%', height: dataTable.length == 0 ? 231 :  'auto' }}
-            className={classes.MdataGridDetail}>
+            style={{ width: '100%', height: '35vh', overflow: 'hidden'}}
+            className={classes.MdataGridPaginationTop}>
             <DataGrid
               rows={dataTable}
               columns={columns}
@@ -365,7 +365,7 @@ export const ModalAddProductFromSA = (props: Props) => {
               pagination
               page={currentPage - 1}
               disableColumnMenu
-              autoHeight={!!dataTable.length}
+              scrollbarSize={10}
               onPageChange={handlePageChange}
               rowCount={saSearchResponse.total}
               paginationMode="server"
