@@ -23,6 +23,7 @@ export interface StockCountSearchResponse {
 
 export interface StockCount {
   id: string;
+  APId: string;
   branchCode: string;
   branchName: string;
   requester: string;

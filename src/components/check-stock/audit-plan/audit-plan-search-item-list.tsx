@@ -183,7 +183,7 @@ const AuditPlanItemList: React.FC<StateProps> = (props) => {
         statusDisplay = genRowStatusValue('เริ่มตรวจนับ', { color: '#36C690', backgroundColor: '#E7FFE9;' });
         break;
       case StockActionStatus.END:
-        statusDisplay = genRowStatusValue('ปิดงาน', { color: '#F54949', backgroundColor: '#FFD7D7' });
+        statusDisplay = genRowStatusValue('ปิดงาน', { color: '#676767', backgroundColor: '#EAEBEB' });
         break;
       case StockActionStatus.CANCEL:
         statusDisplay = genRowStatusValue('ยกเลิก', { color: '#F54949', backgroundColor: '#FFD7D7' });

@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import moment from 'moment';
 import { useStyles } from '../../../styles/makeTheme';
 import {
   save,
@@ -37,6 +38,7 @@ export const ModalStockCountItem = (props: DataGridProps) => {
   const payloadStockCount = useAppSelector((state) => state.stockCountSlice.createDraft);
   const dataDetail = useAppSelector((state) => state.stockCountSlice.dataDetail);
   const errorList = useAppSelector((state) => state.stockCountSlice.errorList);
+  const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   //permission
   const [managePermission, setManagePermission] = useState<boolean>((userPermission != null && userPermission.length > 0)
@@ -164,6 +166,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
             || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
             || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
             || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting)
+            || auditPlanDetail.status == StockActionStatus.END
+            || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
           }
           onClick={(e) => onCheckCell(e, params.row.index, params.row.skuCode)}
         />
@@ -242,6 +246,8 @@ export const ModalStockCountItem = (props: DataGridProps) => {
                 || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
                 || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting) ||
                 !!params.getValue(params.id, 'checked')
+                || auditPlanDetail.status == StockActionStatus.END
+                || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
               }
             />
             {/* {condition && <div className="title">{errorList[index]?.errorQuantity}</div>} */}

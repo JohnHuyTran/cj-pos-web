@@ -371,14 +371,14 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
   ];
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
-  const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
+  const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
 
   const handleOpenAP = async () => {
     if (viewMode && openFromAP) return;
     handleOpenLoading('open', true);
     try {
       await dispatch(getAuditPlanDetail(dataDetail.APId));
-      if (!objectNullOrEmpty(auditPlanDetail.data)) {
+      if (!objectNullOrEmpty(auditPlanDetail)) {
         setOpenDetailAP(true);
       }
     } catch (error) {
@@ -500,7 +500,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={!managePermission}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole)
+                      || auditPlanDetail.status == StockActionStatus.END
+                      || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
+                      ? 'none' : undefined
                   }}
                   onClick={async () => {
                     await dispatch(getAuditPlanDetail(dataDetail.APId));
@@ -523,7 +526,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={!(relatedSCs && relatedSCs.length > 0)}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole)
+                      || auditPlanDetail.status == StockActionStatus.END
+                      || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
+                      ? 'none' : undefined
                   }}
                   onClick={() => handleCreateDraft(relatedSCs, false)}
                   className={classes.MbtnSearch}
@@ -538,7 +544,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={stringNullOrEmpty(status) || status != StockActionStatus.DRAFT}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole)
+                      || auditPlanDetail.status == StockActionStatus.END
+                      || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
+                      ? 'none' : undefined
                   }}
                   startIcon={<CheckCircleOutlineIcon/>}
                   onClick={handleOpenModalConfirm}
@@ -552,7 +561,10 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                   disabled={stringNullOrEmpty(status) || status != StockActionStatus.DRAFT}
                   style={{
                     display: ((!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT)
-                      || !managePermission || viewMode || !displayFollowRole) ? 'none' : undefined
+                      || !managePermission || viewMode || !displayFollowRole)
+                      || auditPlanDetail.status == StockActionStatus.END
+                      || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
+                      ? 'none' : undefined
                   }}
                   startIcon={<HighlightOffIcon/>}
                   onClick={handleOpenCancel}

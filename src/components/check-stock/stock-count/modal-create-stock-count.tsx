@@ -351,13 +351,13 @@ export default function ModalCreateStockCount({
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
-  const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail);
+  const auditPlanDetail = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
   const handleOpenAP = async () => {
     if (!openLink) return;
     handleOpenLoading('open', true);
     try {
       await dispatch(getAuditPlanDetail(dataDetail.APId));
-      if (!objectNullOrEmpty(auditPlanDetail.data)) {
+      if (!objectNullOrEmpty(auditPlanDetail)) {
         setOpenDetailAP(true);
       }
     } catch (error) {
@@ -469,8 +469,10 @@ export default function ModalCreateStockCount({
                     (!stringNullOrEmpty(status) && status != StockActionStatus.DRAFT) ||
                     !isGroupAuditParam(_group) ||
                     dataDetail.stockCounter == STOCK_COUNTER_TYPE.BRANCH || viewMode ||
-                    (isGroupAuditParam(_group) && dataDetail.recounting && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH) ||
-                    !groupBranch
+                    (isGroupAuditParam(_group) && dataDetail.recounting && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH)
+                    || auditPlanDetail.status == StockActionStatus.END
+                    || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
+                    || !groupBranch
                       ? 'none'
                       : undefined,
                 }}>
@@ -493,6 +495,8 @@ export default function ModalCreateStockCount({
                     || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
                     || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
                     || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting)
+                    || auditPlanDetail.status == StockActionStatus.END
+                    || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
                       ? 'none'
                       : undefined,
                 }}
@@ -514,6 +518,8 @@ export default function ModalCreateStockCount({
                     || (isGroupBranchParam(_group) && dataDetail.stockCounter == STOCK_COUNTER_TYPE.AUDIT && !dataDetail.recounting)
                     || (isGroupAuditParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.BRANCH && dataDetail.recounting)
                     || (isGroupBranchParam(_group) && dataDetail.recountingBy == STOCK_COUNTER_TYPE.AUDIT && dataDetail.recounting)
+                    || auditPlanDetail.status == StockActionStatus.END
+                    || moment(auditPlanDetail.countingDate).endOf('day').isBefore(moment(new Date()))
                       ? 'none'
                       : undefined,
                 }}

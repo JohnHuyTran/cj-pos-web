@@ -627,6 +627,7 @@ export default function ModalCreateAuditPlan({
       !countingPermission ||
       viewMode ||
       status == StockActionStatus.CANCEL ||
+      status == StockActionStatus.END ||
       !groupBranch
     ) {
       return 'none';
@@ -1097,6 +1098,7 @@ export default function ModalCreateAuditPlan({
                       !managePermission ||
                       viewMode ||
                       status == StockActionStatus.CANCEL ||
+                      status == StockActionStatus.END ||
                       (_group != getUserGroup([`/service.posback/${dataDetail.createdByGroup}`]) && steps.indexOf(status) >= 0 && action == Action.UPDATE)
                         ? 'none'
                         : undefined,
