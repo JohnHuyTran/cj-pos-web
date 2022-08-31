@@ -17,6 +17,7 @@ import { getStockCountDetail } from "../../../store/slices/stock-count-detail-sl
 import { getStockCountSearch } from "../../../store/slices/stock-count-search-slice";
 import { saveSearchCriteriaSC } from "../../../store/slices/stock-count-criteria-search-slice";
 import LoadingModal from '../../commons/ui/loading-modal';
+import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 
 const _ = require('lodash');
 
@@ -66,6 +67,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
               : data.branchName
             : data.branchCode + ' - ' + (stringNullOrEmpty(data.branchName) ? '' : data.branchName),
           createdBy: data.createdBy,
+          APId: data.APId, 
         };
       });
       setLstStockCount(rows);
@@ -288,6 +290,7 @@ const StockCountList: React.FC<StateProps> = (props) => {
     handleOpenLoading('open', true);
     if (chkPN !== 'checked') {
       try {
+        await dispatch(getAuditPlanDetail(params.row.APId));
         await dispatch(getStockCountDetail(params.row.id));
         if (stockCountDetail.data.length > 0 || stockCountDetail.data) {
             setOpenDetail(true);
