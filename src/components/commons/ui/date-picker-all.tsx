@@ -19,7 +19,6 @@ interface StateProps {
   disabled?: boolean;
   isError?: boolean;
   hyperText?: string;
-  error?: boolean;
   placeHolder?: string;
   disableMinDateMsg?: boolean;
 }
@@ -58,7 +57,6 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
         variant='inline'
         inputVariant='outlined'
         format='DD/MM/YYYY'
-        error={props.error}
         className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}

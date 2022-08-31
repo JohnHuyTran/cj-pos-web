@@ -559,7 +559,7 @@ export const ModalStockAdjustmentItem = (props: DataGridProps) => {
               onChange={(e) => {
                 handleChangeRemark(e, params.row.index);
               }}
-              disabled={!auditPermission}
+              disabled={!auditPermission || dataDetail.status == StockActionStatus.CONFIRM}
             />
           </HtmlTooltip>
         ) : <></>
