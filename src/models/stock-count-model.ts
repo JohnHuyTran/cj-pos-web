@@ -35,6 +35,10 @@ export interface StockCount {
   documentNumberAP: string;
   createdBy: string;
   products: StockCountProductDetail[];
+  relatedSaDocuments: {
+    documentNumber: string;
+    id: string;
+  }
 }
 
 export interface StockCountProductDetail {

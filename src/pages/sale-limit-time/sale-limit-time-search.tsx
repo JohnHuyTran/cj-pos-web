@@ -280,7 +280,7 @@ const SaleLimitTimeSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              วันที่เริ่มงดขายสินค้า ตั้งแต่ <b style={{ fontSize: '18px' }}> *</b>
+              วันที่เริ่มงดขายสินค้า ตั้งแต่ <span style={{  color: 'red' }}> *</span>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'startDate')}
@@ -289,7 +289,7 @@ const SaleLimitTimeSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant='subtitle1' component='div' mb={1}>
-              ถึง<b style={{ fontSize: '18px' }}> *</b>
+              ถึง<span style={{  color: 'red' }}> *</span>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'endDate')}

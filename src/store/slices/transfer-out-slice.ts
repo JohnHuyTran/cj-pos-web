@@ -18,6 +18,7 @@ const initialState: ItemsState = {
     products: [],
     attachFiles: [],
     transferOutReason: '',
+    activityEndDate: null,
     store: '',
     type: 0,
   },
@@ -29,6 +30,7 @@ const initialState: ItemsState = {
     approvedDate: null,
     createdDate: moment(new Date()).toISOString(),
     transferOutReason: '',
+    activityEndDate: null,
     store: '2'
   },
   approveReject: {

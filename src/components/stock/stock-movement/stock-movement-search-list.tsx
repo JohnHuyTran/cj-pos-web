@@ -93,6 +93,31 @@ function StockMovementSearchList() {
   const getMovementType = (key: string) =>
     masterStockMovementType.find((item: StockMovementMasterInfo) => item.code === key);
 
+  const getMovementTypeName = (key: string) => {
+    let typeName;
+    switch (key) {
+      case MOVEMENT_TYPE.BRANCH_STOCK_ADJUST:
+        typeName = 'ปรับสต๊อกสาขา';
+        break;
+      case MOVEMENT_TYPE.AUDIT_STOCK_ADJUST:
+        typeName = 'ปรับสต๊อก Audit';
+        break;
+      case MOVEMENT_TYPE.STOCK_LOST:
+        typeName = 'เคลียร์บ้านพักสต๊อก';
+        break;
+      case MOVEMENT_TYPE.TRANSFER_OUT:
+        typeName = 'เบิกใช้ในกิจกรรม';
+        break;
+      case MOVEMENT_TYPE.TRANSFER_OUT_DESTROY:
+        typeName = 'เบิกทำลายมีส่วนลด';
+        break;
+      case MOVEMENT_TYPE.TRANSFER_OUT_BAO:
+        typeName = 'TO-Bao ขอใช้วัตถุดิบร้านบาว';
+        break;
+    }
+    return typeName
+  }
+
   const columns: GridColDef[] = [
     {
       field: 'index',
@@ -258,7 +283,7 @@ function StockMovementSearchList() {
       docNo: data.docNo ? data.docNo : '',
       docRefNo: data.docRefNo,
       locationCode: t(`stock.location.${data.locationCode}`),
-      movementTypeName: movementType?.nameTH,
+      movementTypeName: movementType?.nameTH ? movementType?.nameTH : getMovementTypeName(data.movementTypeCode),
       movementTypeCode: data.movementTypeCode,
       movementQty: data.movementQty,
       balanceQty: data.balanceQty,

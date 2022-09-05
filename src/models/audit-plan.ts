@@ -57,6 +57,10 @@ export interface AuditPlan {
   appliedProduct: any;
   relatedScDocuments: relatedScDocuments[];
   relatedSaDocuments: relatedSaDocuments[];
+  relatedSlDocuments: {
+    documentNumber: string;
+    id: string;
+  }
 }
 
 export interface AuditPlanProductDetail {

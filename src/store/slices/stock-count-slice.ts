@@ -22,6 +22,7 @@ const initialState: ItemsState = {
     storeType: '',
     countingTime: '',
     APDocumentNumber: '',
+    relatedSaDocuments: {},
     stockCounter: 0,
     recounting: false,
     recountingBy: 0,

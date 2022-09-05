@@ -306,7 +306,7 @@ export default function ModalCreateToDestroyDiscount({
               item.errorNumberOfApproved = 'จำนวนการทำลายต้องมากกว่าหรือเท่ากับ 0';
             } else if (preData.numberOfApproved > preData.numberOfRequested) {
               isValid = false;
-              item.errorNumberOfApproved = 'จำนวนที่อนุมัติต้องไม่น้อยกว่าจำนวนที่ทำลายจริง';
+              item.errorNumberOfApproved = 'จำนวนทำลายจริงต้องไม่เกินจำนวนขอส่วนลด';
             }
           }
         } else {
@@ -756,7 +756,7 @@ export default function ModalCreateToDestroyDiscount({
             </Grid>
             <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
-                รูปก่อนทำลาย* :
+                รูปก่อนทำลาย<span style={{ color: '#F54949'}}>*</span> :
               </Grid>
               <Grid item xs={8} pl={2}>
                 <AccordionUploadFile
@@ -778,7 +778,7 @@ export default function ModalCreateToDestroyDiscount({
             </Grid>
             <Grid item container xs={4} mb={5} pl={3}>
               <Grid item xs={4}>
-                รูปหลังทำลาย* :
+                รูปหลังทำลาย<span style={{ color: '#F54949' }}>*</span> :
               </Grid>
               <Grid item xs={8}>
                 <AttachFileAfter
