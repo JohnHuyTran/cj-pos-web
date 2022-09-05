@@ -36,6 +36,9 @@ import ModalConfirmSC from './modal-confirm-SC';
 import { getUserInfo } from '../../../store/sessionStore';
 import { getUserGroup, isChannelBranch, isGroupAuditParam, isGroupBranchParam } from '../../../utils/role-permission';
 import LoadingModal from '../../commons/ui/loading-modal';
+import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment-detail-slice";
+import { updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
+import ModalCreateStockAdjustment from "../stock-adjustment/modal-create-stock-adjustment";
 
 
 interface Props {
@@ -196,6 +199,7 @@ export default function ModalCreateStockCount({
           stockCounter: stockCountDetail.stockCounter,
           recounting: !!stockCountDetail.recounting,
           recountingBy: stockCountDetail.recountingBy ? stockCountDetail.recountingBy : 0,
+          relatedSaDocuments: stockCountDetail.relatedSaDocuments
         })
       );
       //set value for products
@@ -347,6 +351,7 @@ export default function ModalCreateStockCount({
   };
 
   const [openDetailAP, setOpenDetailAP] = React.useState(false);
+  const [openDetailSA, setOpenDetailSA] = React.useState(false);
   const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
@@ -359,6 +364,21 @@ export default function ModalCreateStockCount({
       await dispatch(getAuditPlanDetail(dataDetail.APId));
       if (!objectNullOrEmpty(auditPlanDetail)) {
         setOpenDetailAP(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    handleOpenLoading('open', false);
+  };
+  const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
+  const handleOpenSA = async () => {
+    if (!openLink) return;
+    handleOpenLoading('open', true);
+    try {
+      await dispatch(getStockAdjustmentDetail(dataDetail.relatedSaDocuments.id));
+      if (!objectNullOrEmpty(stockAdjustDetail)) {
+        setOpenDetailSA(true);
+        await dispatch(updateRefresh(true));
       }
     } catch (error) {
       console.log(error);
@@ -454,6 +474,19 @@ export default function ModalCreateStockCount({
                 </Link>
               </Grid>
             </Grid>
+            {dataDetail.status == StockActionStatus.CONFIRM && dataDetail.relatedSaDocuments && !!dataDetail.relatedSaDocuments.documentNumber &&
+                <Grid item container xs={4} mb={5}>
+                    <Grid item xs={4}>
+                        เอกสาร SA :
+                    </Grid>
+                    <Grid item xs={8}>
+                        <Link color={'secondary'} component={'button'} variant={'subtitle1'} underline={'always'}
+                              onClick={handleOpenSA}>
+                          {dataDetail.relatedSaDocuments.documentNumber}
+                        </Link>
+                    </Grid>
+                </Grid>
+            }
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>
@@ -548,6 +581,19 @@ export default function ModalCreateStockCount({
           setOpenPopup={setOpenPopup}
           userPermission={userPermission}
           viewMode
+        />
+      )}
+
+      {openDetailSA && (
+        <ModalCreateStockAdjustment
+          isOpen={openDetailSA}
+          openFromAP={false}
+          onClickClose={() => setOpenDetailSA(false)}
+          action={Action.UPDATE}
+          setPopupMsg={setPopupMsg}
+          setOpenPopup={setOpenPopup}
+          userPermission={userPermission}
+          viewMode={true}
         />
       )}
       <ModelConfirm

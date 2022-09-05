@@ -221,6 +221,7 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
           relatedSCs: stockAdjustDetail.relatedSCs ? stockAdjustDetail.relatedSCs : [],
           recheckSkus: stockAdjustDetail.recheckSkus ? stockAdjustDetail.recheckSkus : [],
           notCountableSkus: stockAdjustDetail.notCountableSkus ? stockAdjustDetail.notCountableSkus : [],
+          relatedSlDocuments: stockAdjustDetail.relatedSlDocuments,
           skuDifferenceEqual: 0,
           skuDifferenceNegative: 0,
           skuDifferencePositive: 0,
@@ -487,6 +488,16 @@ export default function ModalCreateStockAdjustment(props: Props): ReactElement {
                 </Grid>
               </Grid>
             )}
+            {dataDetail && dataDetail.relatedSlDocuments && !!dataDetail.relatedSlDocuments.documentNumber &&
+                <Grid container item xs={4} mb={5} mt={-1}>
+                    <Grid item xs={3}>
+                        เอกสาร SL :
+                    </Grid>
+                    <Grid item xs={8}>
+                      {dataDetail.relatedSlDocuments.documentNumber}
+                    </Grid>
+                </Grid>
+            }
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>

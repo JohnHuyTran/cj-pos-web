@@ -761,7 +761,6 @@ export default function ModalCreateAuditPlan({
                     }
                     isError={errorCounting}
                     placeHolder={'กรุณาเลือก'}
-                    disableMinDateMsg={true}
                 />
                 {errorCounting && <Typography color={'red'}>กรุณาระบุวันที่ตรวจนับ</Typography>}
               </Grid>
@@ -889,12 +888,16 @@ export default function ModalCreateAuditPlan({
               )}
             </Grid>
             {/*line 3*/}
-            <Grid container item xs={4} mb={5} mt={-1}>
-              {/* <Grid item xs={3}>
-                เอกสาร SL :
-              </Grid> */}
-              <Grid item xs={8}></Grid>
-            </Grid>
+            {steps.indexOf(status) > 1 && dataDetail.relatedSlDocuments && !!dataDetail.relatedSlDocuments.documentNumber &&
+                <Grid container item xs={4} mb={5} mt={-1}>
+                    <Grid item xs={3}>
+                        เอกสาร SL :
+                    </Grid>
+                    <Grid item xs={8}>
+                      {dataDetail.relatedSlDocuments.documentNumber}
+                    </Grid>
+                </Grid>
+            }
           </Grid>
           <Box>
             <Box sx={{ display: 'flex', marginBottom: '18px' }}>

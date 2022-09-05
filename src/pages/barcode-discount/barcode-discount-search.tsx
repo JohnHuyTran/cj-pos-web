@@ -363,7 +363,7 @@ const BarcodeDiscountSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('fromDate')}<b style={{ fontSize:'18px' }}> *</b>
+              {t('fromDate')}<span style={{  color: 'red' }}> *</span>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'fromDate')}
@@ -372,7 +372,7 @@ const BarcodeDiscountSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('toDate')} <b style={{ fontSize:'18px' }}> *</b>
+              {t('toDate')} <span style={{  color: 'red' }}> *</span>
             </Typography>
             <DatePickerComponent
               onClickDate={onChangeDate.bind(this, setValues, values, 'toDate')}

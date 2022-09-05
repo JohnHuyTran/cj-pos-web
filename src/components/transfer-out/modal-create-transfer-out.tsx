@@ -44,6 +44,7 @@ import {
 } from '../../services/transfer-out';
 import { updateCheckStock } from '../../store/slices/stock-balance-check-slice';
 import { checkStockBalance } from '../../services/common';
+import DatePickerAllComponent from "../commons/ui/date-picker-all";
 
 interface Props {
   action: Action | Action.INSERT;
@@ -167,6 +168,7 @@ export default function ModalCreateTransferOut({
         createdDate: moment(new Date()).toISOString(),
         transferOutReason: '',
         store: '2',
+        activityEndDate: null
       })
     );
     dispatch(updateCheckEdit(false));
@@ -207,6 +209,7 @@ export default function ModalCreateTransferOut({
           createdDate: transferOutDetail.createdDate,
           approvedDate: transferOutDetail.approvedDate,
           transferOutReason: transferOutDetail.transferOutReason,
+          activityEndDate: transferOutDetail.activityEndDate,
           store: transferOutDetail.store,
         })
       );
@@ -263,20 +266,26 @@ export default function ModalCreateTransferOut({
   const validate = (checkApprove: boolean) => {
     let isValid = true;
     //validate data detail
+    let errorTransferOutReason, errorStore, errorActivityEndDate;
     if (stringNullOrEmpty(dataDetail.transferOutReason)) {
+      console.log('run here')
       isValid = false;
-      setErrors({
-        ...errors,
-        transferOutReason: 'กรุณาระบุรายละเอียด',
-      });
+      errorTransferOutReason = 'กรุณาระบุรายละเอียด';
     }
     if (stringNullOrEmpty(dataDetail.store)) {
       isValid = false;
-      setErrors({
-        ...errors,
-        store: 'กรุณาระบุรายละเอียด',
-      });
+      errorStore = 'กรุณาระบุรายละเอียด';
     }
+    if (!dataDetail.activityEndDate) {
+      isValid = false;
+      errorActivityEndDate = 'กรุณาระบุวันที่';
+    }
+    setErrors({
+      ...errors,
+      transferOutReason: errorTransferOutReason,
+      store: errorStore,
+      activityEndDate: errorActivityEndDate
+    })
 
     //validate product
     const data = [...payloadTransferOut.products];
@@ -392,6 +401,7 @@ export default function ModalCreateTransferOut({
               documentNumber: dataDetail.documentNumber,
               attachFiles: allAttachFile,
               transferOutReason: dataDetail.transferOutReason,
+              activityEndDate: moment(dataDetail.activityEndDate).endOf('day').toISOString(true),
               store: dataDetail.store,
               type: TO_TYPE.TO_ACTIVITY,
             }
@@ -399,6 +409,7 @@ export default function ModalCreateTransferOut({
               ...payloadTransferOut,
               attachFiles: allAttachFile,
               transferOutReason: dataDetail.transferOutReason,
+              activityEndDate:  moment(dataDetail.activityEndDate).endOf('day').toISOString(true),
               store: dataDetail.store,
               type: TO_TYPE.TO_ACTIVITY,
             };
@@ -689,7 +700,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5}>
               <Grid item xs={4}>
-                เหตุผลการเบิก<b style={{ fontSize: '18px' }}> *</b> :
+                เหตุผลการเบิก<span style={{  color:'red' }}> *</span> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -728,7 +739,7 @@ export default function ModalCreateTransferOut({
             </Grid>
             <Grid item container xs={4} mb={5} pl={2}>
               <Grid item xs={4}>
-                คลัง<b style={{ fontSize: '18px' }}> *</b> :
+                คลัง<span style={{  color: 'red' }}> *</span> :
               </Grid>
               <Grid item xs={8}>
                 <FormControl fullWidth className={classes.Mselect}>
@@ -766,6 +777,43 @@ export default function ModalCreateTransferOut({
               </Grid>
             </Grid>
             {/*line 3*/}
+            <Grid container item xs={4} mb={5} mt={-1}>
+              <Grid item xs={4}>
+                วันที่สิ้นสุด
+                <br/>
+                กิจกรรม<span style={{  color: 'red' }}> *</span> :
+              </Grid>
+              <Grid item xs={7}>
+                <DatePickerAllComponent
+                  onClickDate={(e:any) => {
+                    dispatch(updateDataDetail({ ...dataDetail, activityEndDate: e }));
+                    setErrors({
+                      ...errors,
+                      activityEndDate: '',
+                    });
+                    dispatch(updateCheckEdit(true));
+                  }}
+                  type={'TO'}
+                  minDateTo={new Date()}
+                  value={dataDetail.activityEndDate}
+                  disabled={
+                    (!stringNullOrEmpty(status) &&
+                      status != TOStatus.DRAFT &&
+                      status != TOStatus.WAIT_FOR_APPROVAL) ||
+                    (TOStatus.WAIT_FOR_APPROVAL == status && !approvePermission)
+                  }
+                  isError={!!errors['activityEndDate']}
+                  placeHolder={'กรุณาเลือก'}
+                />
+                <Typography
+                  hidden={stringNullOrEmpty(errors['activityEndDate'])}
+                  display={'flex'}
+                  justifyContent={'flex-end'}
+                  sx={{ color: '#F54949' }}>
+                  {errors['activityEndDate']}
+                </Typography>
+              </Grid>
+            </Grid>
             <Grid container item xs={4} mb={5} mt={-1}>
               <Grid item xs={4}>
                 รูปภาพ :

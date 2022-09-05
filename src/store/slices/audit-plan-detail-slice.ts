@@ -27,6 +27,10 @@ const initialState: State = {
       appliedProduct: {},
       relatedScDocuments: [],
       relatedSaDocuments: [],
+      relatedSlDocuments: {
+        documentNumber: '',
+        id: ''
+      },
       stockCounter: 0,
       recounting: true,
       recountingBy: 2,

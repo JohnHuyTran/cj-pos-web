@@ -20,6 +20,10 @@ const initialState: ItemsState = {
     APDocumentNumber: '',
     relatedSCs: [],
     recheckSkus: [],
+    relatedSlDocuments: {
+      documentNumber: '',
+      id: ''
+    },
     notCountableSkus: [],
     skuDifferenceEqual: 0,
     skuDifferenceNegative: 0,
