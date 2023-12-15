@@ -1,7 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../../../environment-base';
-import { get } from '../../../../adapters/posback-adapter';
-import { CashStatementSearchRequest, CashStatementSearchResponse } from 'models/branch-accounting-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../../../environment-base";
+import { get } from "../../../../adapters/posback-adapter";
+import {
+  CashStatementSearchRequest,
+  CashStatementSearchResponse,
+} from "models/branch-accounting-model";
 
 type State = {
   cashStatementList: CashStatementSearchResponse;
@@ -10,9 +13,9 @@ type State = {
 
 const initialState: State = {
   cashStatementList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
@@ -21,11 +24,11 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const featchSearchCashStatementAsync = createAsyncThunk(
-  'searchCashStatementList',
+  "searchCashStatementList",
   async (payload: CashStatementSearchRequest) => {
     try {
       const apiRootPath = environment.branchAccounting.cashStatement.search.url;
@@ -40,14 +43,14 @@ export const featchSearchCashStatementAsync = createAsyncThunk(
       if (payload.dateTo) {
         path = path + `&dateTo=${payload.dateTo}`;
       }
-      if (payload.status !== 'ALL') {
+      if (payload.status !== "ALL") {
         path = path + `&status=${payload.status}`;
       }
 
       let response: CashStatementSearchResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -64,11 +67,11 @@ export const featchSearchCashStatementAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const searchCashStatementSlice = createSlice({
-  name: 'searchCashStatement',
+  name: "searchCashStatement",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -77,9 +80,12 @@ const searchCashStatementSlice = createSlice({
     builer.addCase(featchSearchCashStatementAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchSearchCashStatementAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.cashStatementList = action.payload;
-      }),
+      builer.addCase(
+        featchSearchCashStatementAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.cashStatementList = action.payload;
+        },
+      ),
       builer.addCase(featchSearchCashStatementAsync.rejected, () => {
         initialState;
       });

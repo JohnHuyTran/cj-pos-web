@@ -1,17 +1,24 @@
-import React, { ReactElement, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Grid, IconButton, TextField, Typography } from '@mui/material';
-import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { KeyboardArrowUp, KeyboardArrowDown } from "@mui/icons-material";
 
-import theme from '../../../styles/theme';
-import { useStyles } from '../../../styles/makeTheme';
+import theme from "../../../styles/theme";
+import { useStyles } from "../../../styles/makeTheme";
 
-import ModalAlert from '../../modal-alert';
-import { uploadFileState } from '../../../store/slices/upload-file-slice';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { FileType } from '../../../models/supplier-check-order-model';
-import { ApiError } from '../../../models/api-error-model';
-import { getFileUrlHuawei } from '../../../services/master-service';
-import ModalShowHuaweiFile from '../../commons/ui/modal-show-huawei-file';
+import ModalAlert from "../../modal-alert";
+import { uploadFileState } from "../../../store/slices/upload-file-slice";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import { FileType } from "../../../models/supplier-check-order-model";
+import { ApiError } from "../../../models/api-error-model";
+import { getFileUrlHuawei } from "../../../services/master-service";
+import ModalShowHuaweiFile from "../../commons/ui/modal-show-huawei-file";
 
 interface fileDisplayList {
   branchCode?: string;
@@ -29,21 +36,26 @@ interface Props {
   idControl?: string; //set id for in case use more than 1 upload component in 1 form
 }
 
-function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl }: Props): ReactElement {
+function AccordionUploadSingleFile({
+  files,
+  isStatus,
+  disabledControl,
+  idControl,
+}: Props): ReactElement {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
   const [accordionFile, setAccordionFile] = useState<boolean>(false);
 
   const [displayFile, setDisplayFile] = useState<boolean>(false);
-  const [fileUrl, setFileUrl] = useState<string>('');
+  const [fileUrl, setFileUrl] = useState<string>("");
 
-  const [newFilename, setNewFilename] = useState<string>('test-rename');
+  const [newFilename, setNewFilename] = useState<string>("test-rename");
   const [isImage, setIsImage] = useState(false);
 
   const [validationFile, setValidationFile] = React.useState(false);
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
-  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
+  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState("");
   const [fileList, setFileList] = React.useState<File[]>([]);
 
   const [statusSaveFile, setStatusSaveFile] = useState<boolean>(false);
@@ -55,22 +67,26 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
     // console.log('e.target.files: ', e.target.files);
     const fileSize = e.target.files[0].size;
     const fileName = e.target.files[0].name;
-    let parts = fileName.split('.');
+    let parts = fileName.split(".");
     let length = parts.length - 1;
     let checkError: boolean = false;
 
     //match file name
-    const matchFilename: any = newFileDisplayList.find((r: any) => r.fileName === fileName);
+    const matchFilename: any = newFileDisplayList.find(
+      (r: any) => r.fileName === fileName,
+    );
     if (newFileDisplayList.length > 0 && matchFilename) {
       setErrorBrowseFile(true);
-      setMsgErrorBrowseFile('ไม่สามารถอัพโหลดไฟล์ได้ เนื่องจากไฟล์นี้มีอยู่แล้ว');
+      setMsgErrorBrowseFile(
+        "ไม่สามารถอัพโหลดไฟล์ได้ เนื่องจากไฟล์นี้มีอยู่แล้ว",
+      );
       return (checkError = true);
     }
 
     // pdf, .jpg, .jpeg
-    if (parts[length].toLowerCase() !== 'pdf') {
+    if (parts[length].toLowerCase() !== "pdf") {
       setErrorBrowseFile(true);
-      setMsgErrorBrowseFile('ไม่สามารถอัพโหลดไฟล์ได้ กรุณาแนบไฟล์.pdfเท่านั้น');
+      setMsgErrorBrowseFile("ไม่สามารถอัพโหลดไฟล์ได้ กรุณาแนบไฟล์.pdfเท่านั้น");
 
       return (checkError = true);
     }
@@ -84,7 +100,9 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
       let size = fileSize / 1024 / 1024;
       if (size > 50) {
         setErrorBrowseFile(true);
-        setMsgErrorBrowseFile('ไม่สามารถอัพโหลดไฟล์ได้ เนื่องจากขนาดไฟล์เกิน 50MB กรุณาเลือกไฟล์ใหม่');
+        setMsgErrorBrowseFile(
+          "ไม่สามารถอัพโหลดไฟล์ได้ เนื่องจากขนาดไฟล์เกิน 50MB กรุณาเลือกไฟล์ใหม่",
+        );
         return (checkError = true);
       }
     }
@@ -95,7 +113,7 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
     setStatusSaveFile(false);
     setValidationFile(false);
     setErrorBrowseFile(false);
-    setMsgErrorBrowseFile('');
+    setMsgErrorBrowseFile("");
     const isCheckError = checkSizeFile(e);
 
     let files: File = e.target.files[0];
@@ -120,22 +138,22 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
   }, [fileList, !isStatus]);
 
   function getHuaweiFileUrl(item: fileDisplayList) {
-    const keys = item.fileKey ? item.fileKey : '';
-    const branchCode = item.branchCode ? item.branchCode : '';
-    const name = item.fileName ? item.fileName : '';
+    const keys = item.fileKey ? item.fileKey : "";
+    const branchCode = item.branchCode ? item.branchCode : "";
+    const name = item.fileName ? item.fileName : "";
 
-    if (item.status === 'old') {
+    if (item.status === "old") {
       getFileUrlHuawei(keys, branchCode)
         .then((resp) => {
           if (resp && resp.data) {
             setFileUrl(resp.data);
-            setIsImage(item.mimeType === 'image/jpeg');
+            setIsImage(item.mimeType === "image/jpeg");
             setNewFilename(name);
             setDisplayFile(true);
           }
         })
         .catch((error: ApiError) => {
-          console.log('error', error);
+          console.log("error", error);
           setErrorBrowseFile(true);
           setMsgErrorBrowseFile(error.message);
         });
@@ -148,7 +166,7 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
         file: null,
         fileKey: data.fileKey,
         fileName: data.fileName,
-        status: 'old',
+        status: "old",
         mimeType: data.mimeType,
         branchCode: data.branchCode,
       };
@@ -166,10 +184,10 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
     newFileUpload = fileList.map((data: File, index: number) => {
       return {
         file: data,
-        fileKey: '',
+        fileKey: "",
         fileName: data.name,
-        status: 'new',
-        mimeType: '',
+        status: "new",
+        mimeType: "",
       };
     });
   }
@@ -187,7 +205,7 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
 
   const handleFileInputClick = (e: any) => {
     //handle attach file again after remove this file
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const closeDialogConfirm = (value: string) => {
@@ -196,16 +214,22 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
 
   return (
     <>
-      <Grid container spacing={0.5} direction="row" justifyContent="space-between" alignItems="center">
+      <Grid
+        container
+        spacing={0.5}
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Grid item xs={9}>
           <input
-            id={'btnBrowseFile'}
+            id={"btnBrowseFile"}
             data-testid="testid-tbxBrowse"
             type="file"
             accept=".pdf"
             onClick={handleFileInputClick}
             onChange={handleFileInputChange}
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             disabled={disabledControl}
           />
 
@@ -214,12 +238,19 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
               px: 1,
               py: 1,
               mt: 0,
-              borderRadius: '5px',
+              borderRadius: "5px",
               border: `1px dashed ${theme.palette.primary.main}`,
             }}
           >
             {newFileDisplayList.length === 0 && (
-              <Typography sx={{ fontSize: '13px', color: '#676767', whiteSpace: 'normal' }} noWrap>
+              <Typography
+                sx={{
+                  fontSize: "13px",
+                  color: "#676767",
+                  whiteSpace: "normal",
+                }}
+                noWrap
+              >
                 แนบไฟล์รวมไม่เกิน 50 MB
               </Typography>
             )}
@@ -228,16 +259,20 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
               newFileDisplayList.map((item: fileDisplayList, index: number) => (
                 <Box
                   sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    cursor: "pointer",
                   }}
                 >
-                  {item.status === 'old' && (
+                  {item.status === "old" && (
                     <Typography
                       color="secondary"
-                      sx={{ textDecoration: 'underline', fontSize: '13px', whiteSpace: 'normal' }}
+                      sx={{
+                        textDecoration: "underline",
+                        fontSize: "13px",
+                        whiteSpace: "normal",
+                      }}
                       noWrap
                       onClick={() => getHuaweiFileUrl(item)}
                     >
@@ -245,8 +280,12 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
                     </Typography>
                   )}
 
-                  {item.status === 'new' && (
-                    <Typography color="secondary" sx={{ fontSize: '13px', whiteSpace: 'normal' }} noWrap>
+                  {item.status === "new" && (
+                    <Typography
+                      color="secondary"
+                      sx={{ fontSize: "13px", whiteSpace: "normal" }}
+                      noWrap
+                    >
                       {item.fileName}
                     </Typography>
                   )}
@@ -260,8 +299,14 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
         </Grid>
 
         <Grid item xs={3}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
-            <label htmlFor={'btnBrowseFile'}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "flex-end",
+            }}
+          >
+            <label htmlFor={"btnBrowseFile"}>
               <Button
                 data-testid="testid-btnBrowse"
                 variant="contained"
@@ -286,7 +331,11 @@ function AccordionUploadSingleFile({ files, isStatus, disabledControl, idControl
         isImage={isImage}
       />
 
-      <ModalAlert open={errorBrowseFile} onClose={closeDialogConfirm} errormsg={msgErrorBrowseFile} />
+      <ModalAlert
+        open={errorBrowseFile}
+        onClose={closeDialogConfirm}
+        errormsg={msgErrorBrowseFile}
+      />
     </>
   );
 }

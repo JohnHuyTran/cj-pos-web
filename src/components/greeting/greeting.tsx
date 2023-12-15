@@ -1,7 +1,7 @@
-import Typography from '@mui/material/Typography';
-import dateFormat from 'dateformat';
-import { makeStyles } from '@mui/styles';
-import { useTheme } from '@mui/material/styles';
+import Typography from "@mui/material/Typography";
+import dateFormat from "dateformat";
+import { makeStyles } from "@mui/styles";
+import { useTheme } from "@mui/material/styles";
 
 type GreetingPropsType = {
   userName: string;
@@ -12,8 +12,8 @@ export default function Greeting(props: GreetingPropsType) {
 
   const useStyles = makeStyles({
     root: {
-      display: 'flex',
-      flexDirection: 'column',
+      display: "flex",
+      flexDirection: "column",
     },
     greetingText: {
       color: theme.palette.primary.main,
@@ -25,13 +25,13 @@ export default function Greeting(props: GreetingPropsType) {
 
   return (
     <div className={classes.root}>
-      <Typography variant='subtitle1' style={{ alignSelf: 'center' }}>
-        {dateFormat(now, 'dddd, dS mmmm')}
+      <Typography variant="subtitle1" style={{ alignSelf: "center" }}>
+        {dateFormat(now, "dddd, dS mmmm")}
       </Typography>
       <Typography
-        variant='h6'
+        variant="h6"
         className={classes.greetingText}
-        style={{ alignSelf: 'center' }}
+        style={{ alignSelf: "center" }}
       >
         สวัสดีตอนบ่าย, คุณ {props.userName}
       </Typography>

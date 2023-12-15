@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SupplierItem } from '../../mockdata/supplier-items';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { SupplierItem } from "../../mockdata/supplier-items";
 
 type SupplierItemsState = {
   state: any;
@@ -10,7 +10,7 @@ const initialState: SupplierItemsState = {
 };
 
 export const SupplierSearchAddItemsSlice = createSlice({
-  name: 'supplierSearchAddItems',
+  name: "supplierSearchAddItems",
   initialState,
   reducers: {
     updateSearchItemsState: (state, action: PayloadAction<any>) => {

@@ -1,8 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get, post, put } from '../../../adapters/posback-adapter';
-import { environment } from '../../../environment-base';
-import { OutstandingRequest, OutstandingResponse } from '../../../models/stock-model';
-import { ContentType } from '../../../utils/enum/common-enum';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get, post, put } from "../../../adapters/posback-adapter";
+import { environment } from "../../../environment-base";
+import {
+  OutstandingRequest,
+  OutstandingResponse,
+} from "../../../models/stock-model";
+import { ContentType } from "../../../utils/enum/common-enum";
 
 type State = {
   stockList: OutstandingResponse;
@@ -12,9 +15,9 @@ type State = {
 
 const initialState: State = {
   stockList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
@@ -23,14 +26,15 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
   savePayloadSearch: {},
 };
 
 export const featchStockBalanceLocationSearchAsync = createAsyncThunk(
-  'stockBalanceLocationList',
+  "stockBalanceLocationList",
   async (payload: OutstandingRequest) => {
-    const apiRootPath = environment.stock.outStanding.stockBalance.searchByLocation.url;
+    const apiRootPath =
+      environment.stock.outStanding.stockBalance.searchByLocation.url;
 
     const response = await post(apiRootPath, payload, ContentType.JSON)
       .then((result: any) => result)
@@ -38,11 +42,11 @@ export const featchStockBalanceLocationSearchAsync = createAsyncThunk(
         throw error;
       });
     return response;
-  }
+  },
 );
 
 const stockBalanceLocationSearchSlice = createSlice({
-  name: 'stockBalanceSearch',
+  name: "stockBalanceSearch",
   initialState,
   reducers: {
     clearDataLocationFilter: (state) => initialState,
@@ -54,14 +58,18 @@ const stockBalanceLocationSearchSlice = createSlice({
     builer.addCase(featchStockBalanceLocationSearchAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchStockBalanceLocationSearchAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.stockList = action.payload;
-      }),
+      builer.addCase(
+        featchStockBalanceLocationSearchAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.stockList = action.payload;
+        },
+      ),
       builer.addCase(featchStockBalanceLocationSearchAsync.rejected, () => {
         initialState;
       });
   },
 });
 
-export const { clearDataLocationFilter, savePayloadSearchLocation } = stockBalanceLocationSearchSlice.actions;
+export const { clearDataLocationFilter, savePayloadSearchLocation } =
+  stockBalanceLocationSearchSlice.actions;
 export default stockBalanceLocationSearchSlice.reducer;

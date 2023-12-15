@@ -1,8 +1,14 @@
-import { Box, TextField, Typography } from '@mui/material';
-import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridRowData } from '@mui/x-data-grid';
-import React, { useEffect } from 'react';
-import NumberFormat from 'react-number-format';
-import { isNullOrUndefined } from 'util';
+import { Box, TextField, Typography } from "@mui/material";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridRowData,
+} from "@mui/x-data-grid";
+import React, { useEffect } from "react";
+import NumberFormat from "react-number-format";
+import { isNullOrUndefined } from "util";
 import {
   DataItem,
   ExpenseInfo,
@@ -10,19 +16,23 @@ import {
   payLoadAdd,
   SumItems,
   SumItemsItem,
-} from '../../../models/branch-accounting-model';
+} from "../../../models/branch-accounting-model";
 import {
   initialItems,
   updateItemRows,
   addNewItem,
   updateSummaryRows,
-} from '../../../store/slices/accounting/accounting-slice';
-import store, { useAppDispatch, useAppSelector } from '../../../store/store';
-import { useStyles } from '../../../styles/makeTheme';
-import { STATUS } from '../../../utils/enum/accounting-enum';
-import { isFilterFieldInExpense, stringNullOrEmpty, isFilterOutFieldInAdd } from '../../../utils/utils';
-import HtmlTooltip from '../../commons/ui/html-tooltip';
-import ModalAddExpense from './modal-add-expense-format';
+} from "../../../store/slices/accounting/accounting-slice";
+import store, { useAppDispatch, useAppSelector } from "../../../store/store";
+import { useStyles } from "../../../styles/makeTheme";
+import { STATUS } from "../../../utils/enum/accounting-enum";
+import {
+  isFilterFieldInExpense,
+  stringNullOrEmpty,
+  isFilterOutFieldInAdd,
+} from "../../../utils/utils";
+import HtmlTooltip from "../../commons/ui/html-tooltip";
+import ModalAddExpense from "./modal-add-expense-format";
 interface Props {
   onClickAddNewBtn?: () => void;
   type: string;
@@ -30,59 +40,82 @@ interface Props {
   edit: boolean;
 }
 
-function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }: Props) {
+function ExpenseDetailTransaction({
+  onClickAddNewBtn,
+  type,
+  periodProps,
+  edit,
+}: Props) {
   const classes = useStyles();
-  const _ = require('lodash');
+  const _ = require("lodash");
   const dispatch = useAppDispatch();
   const [openModalAddExpense, setOpenModalAddExpense] = React.useState(false);
 
-  const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
+  const expenseMasterList = useAppSelector(
+    (state) => state.masterExpenseListSlice.masterExpenseList.data,
+  );
 
-  const expenseAccountDetail = useAppSelector((state) => state.expenseAccountDetailSlice.expenseAccountDetail);
-  const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
-  const status = expenseData && expenseData.status ? expenseData.status : 'NEW';
+  const expenseAccountDetail = useAppSelector(
+    (state) => state.expenseAccountDetailSlice.expenseAccountDetail,
+  );
+  const expenseData: any = expenseAccountDetail.data
+    ? expenseAccountDetail.data
+    : null;
+  const status = expenseData && expenseData.status ? expenseData.status : "NEW";
 
-  const [newExpenseAllList, setNewExpenseAllList] = React.useState<ExpenseInfo[]>([]);
-  const _initialItems = useAppSelector((state) => state.expenseAccountDetailSlice.intialRows);
-  const [items, setItems] = React.useState<any>(_initialItems && _initialItems.length > 0 ? _initialItems : []);
+  const [newExpenseAllList, setNewExpenseAllList] = React.useState<
+    ExpenseInfo[]
+  >([]);
+  const _initialItems = useAppSelector(
+    (state) => state.expenseAccountDetailSlice.intialRows,
+  );
+  const [items, setItems] = React.useState<any>(
+    _initialItems && _initialItems.length > 0 ? _initialItems : [],
+  );
   const [actionEdit, setActionEdit] = React.useState(false);
-  const payloadNewItem = useAppSelector((state) => state.expenseAccountDetailSlice.addNewItem);
+  const payloadNewItem = useAppSelector(
+    (state) => state.expenseAccountDetailSlice.addNewItem,
+  );
   const getMasterExpenseAll = (key: any) =>
-    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
+    expenseMasterList.find(
+      (e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type,
+    );
   const getMasterExpenInto = (key: any) =>
-    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type);
-  const [expenseType, setExpenseType] = React.useState('');
+    expenseMasterList.find(
+      (e: ExpenseInfo) => e.expenseNo === key && e.typeCode === type,
+    );
+  const [expenseType, setExpenseType] = React.useState("");
   const [period, setPeriod] = React.useState<ExpensePeriod>();
   const [editAction, setEditAction] = React.useState(edit);
   const columns: GridColDef[] = newExpenseAllList.map((i: ExpenseInfo) => {
     const master = getMasterExpenInto(i.expenseNo);
     const hideColumn = master ? master.isOtherExpense : false;
-    if (i.expenseNo === 'date') {
+    if (i.expenseNo === "date") {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
         minWidth: 110,
         // flex: 0.6,
-        headerAlign: 'center',
+        headerAlign: "center",
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             return (
-              <Box component='div' sx={{ paddingLeft: '5px' }}>
+              <Box component="div" sx={{ paddingLeft: "5px" }}>
                 {params.value}
               </Box>
             );
           }
         },
       };
-    } else if (i.expenseNo === 'total') {
+    } else if (i.expenseNo === "total") {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
         flex: 1,
-        headerAlign: 'center',
-        align: 'right',
+        headerAlign: "center",
+        align: "right",
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
@@ -96,8 +129,8 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
                 disabled={true}
                 customInput={TextField}
                 sx={{
-                  '.MuiInputBase-input.Mui-disabled': {
-                    WebkitTextFillColor: '#000',
+                  ".MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor: "#000",
                   },
                 }}
                 fixedDecimalScale
@@ -106,53 +139,67 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
           }
         },
       };
-    } else if (i.expenseNo === 'otherDetail') {
+    } else if (i.expenseNo === "otherDetail") {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
         // minWidth: 70,
         flex: 1,
-        headerAlign: 'center',
-        align: 'left',
+        headerAlign: "center",
+        align: "left",
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
           return (
             <>
-              <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
+              <HtmlTooltip
+                title={<React.Fragment>{params.value}</React.Fragment>}
+              >
                 <TextField
                   className={classes.MtextFieldNumberNotStyleDisable}
                   name={`txb${i.expenseNo}`}
-                  inputProps={{ style: { textAlignLast: 'left', color: '#000000' } }}
+                  inputProps={{
+                    style: { textAlignLast: "left", color: "#000000" },
+                  }}
                   sx={{
-                    '.MuiInputBase-input.Mui-disabled': {
-                      WebkitTextFillColor: '#000',
-                      background: '',
+                    ".MuiInputBase-input.Mui-disabled": {
+                      WebkitTextFillColor: "#000",
+                      background: "",
                     },
                   }}
                   value={params.value}
                   disabled={true}
-                  autoComplete='off'
+                  autoComplete="off"
                 />
               </HtmlTooltip>
             </>
           );
         },
       };
-    } else if (i.expenseNo === 'SUMOTHER') {
+    } else if (i.expenseNo === "SUMOTHER") {
       return {
         field: i.expenseNo,
         headerName: i.accountNameTh,
         // minWidth: 70,
         flex: 1,
-        headerAlign: 'center',
+        headerAlign: "center",
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
-          const otherMaxApprove1 = params.getValue(params.id, 'isOverApprovalLimit1');
-          const otherMaxApprove2 = params.getValue(params.id, 'isOverApprovalLimit2');
+          const otherMaxApprove1 = params.getValue(
+            params.id,
+            "isOverApprovalLimit1",
+          );
+          const otherMaxApprove2 = params.getValue(
+            params.id,
+            "isOverApprovalLimit2",
+          );
           const value = params.value || 0;
-          const condition = otherMaxApprove2 ? 'overLimit2' : otherMaxApprove1 ? 'overLimit1' : 'normal';
+          const condition = otherMaxApprove2
+            ? "overLimit2"
+            : otherMaxApprove1
+            ? "overLimit1"
+            : "normal";
           return (
             // <TextField
             //   variant='outlined'
@@ -177,10 +224,11 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
               disabled={true}
               customInput={TextField}
               sx={{
-                '.MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
-                  background: condition === 'overLimit2' ? '#F54949' : '',
-                  borderRadius: 'inherit',
+                ".MuiInputBase-input.Mui-disabled": {
+                  WebkitTextFillColor:
+                    condition === "overLimit1" ? "#F54949" : "#000",
+                  background: condition === "overLimit2" ? "#F54949" : "",
+                  borderRadius: "inherit",
                 },
               }}
               fixedDecimalScale
@@ -194,13 +242,13 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
         headerName: i.accountNameTh,
         // minWidth: 70,
         flex: 1,
-        headerAlign: 'center',
+        headerAlign: "center",
         sortable: false,
         hide: hideColumn,
         renderCell: (params: GridRenderCellParams) => {
           if (isFilterFieldInExpense(params.field)) {
             return (
-              <Box component='div' sx={{ paddingLeft: '20px' }}>
+              <Box component="div" sx={{ paddingLeft: "20px" }}>
                 {params.value}
               </Box>
             );
@@ -210,10 +258,10 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
             const value = params.value || 0;
             const condition =
               value > (master?.approvalLimit2 || 0)
-                ? 'overLimit2'
+                ? "overLimit2"
                 : value > (master?.approvalLimit1 || 0)
-                ? 'overLimit1'
-                : 'normal';
+                ? "overLimit1"
+                : "normal";
             return (
               // <TextField
               //   variant='outlined'
@@ -238,10 +286,11 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
                 disabled={true}
                 customInput={TextField}
                 sx={{
-                  '.MuiInputBase-input.Mui-disabled': {
-                    WebkitTextFillColor: condition === 'overLimit1' ? '#F54949' : '#000',
-                    background: condition === 'overLimit2' ? '#F54949' : '',
-                    borderRadius: 'inherit',
+                  ".MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor:
+                      condition === "overLimit1" ? "#F54949" : "#000",
+                    background: condition === "overLimit2" ? "#F54949" : "",
+                    borderRadius: "inherit",
                   },
                 }}
                 fixedDecimalScale
@@ -257,66 +306,69 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
     setEditAction(edit);
     let _newExpenseAllList: ExpenseInfo[] = [];
     const headerDescription: ExpenseInfo = {
-      accountNameTh: 'วันที่ค่าใช่จ่าย',
-      skuCode: '',
+      accountNameTh: "วันที่ค่าใช่จ่าย",
+      skuCode: "",
       approvalLimit1: 0,
       approvalLimit2: 0,
       isActive: true,
-      requiredDocumentTh: '',
-      expenseNo: 'date',
+      requiredDocumentTh: "",
+      expenseNo: "date",
       isOtherExpense: false,
-      typeCode: '',
-      accountCode: '',
-      typeNameTh: '',
+      typeCode: "",
+      accountCode: "",
+      typeNameTh: "",
     };
     const headerOtherSum: ExpenseInfo = {
-      accountNameTh: 'อื่นๆ',
-      skuCode: '',
+      accountNameTh: "อื่นๆ",
+      skuCode: "",
       approvalLimit1: 0,
       approvalLimit2: 0,
       isActive: true,
-      requiredDocumentTh: '',
-      expenseNo: 'SUMOTHER',
+      requiredDocumentTh: "",
+      expenseNo: "SUMOTHER",
       isOtherExpense: false,
-      typeCode: '',
-      accountCode: '',
-      typeNameTh: '',
+      typeCode: "",
+      accountCode: "",
+      typeNameTh: "",
     };
     const headerOtherDetail: ExpenseInfo = {
-      accountNameTh: ' ',
-      skuCode: '',
+      accountNameTh: " ",
+      skuCode: "",
       approvalLimit1: 0,
       approvalLimit2: 0,
       isActive: true,
-      requiredDocumentTh: '',
-      expenseNo: 'otherDetail',
+      requiredDocumentTh: "",
+      expenseNo: "otherDetail",
       isOtherExpense: false,
-      typeCode: '',
-      accountCode: '',
-      typeNameTh: '',
+      typeCode: "",
+      accountCode: "",
+      typeNameTh: "",
     };
 
     const headerSum: ExpenseInfo = {
-      skuCode: '',
+      skuCode: "",
       approvalLimit1: 0,
       approvalLimit2: 0,
-      requiredDocumentTh: '',
-      expenseNo: 'total',
+      requiredDocumentTh: "",
+      expenseNo: "total",
       isOtherExpense: false,
-      typeCode: '',
-      accountCode: '',
-      accountNameTh: 'รวม',
+      typeCode: "",
+      accountCode: "",
+      accountNameTh: "รวม",
       isActive: false,
-      typeNameTh: '',
+      typeNameTh: "",
     };
 
     _newExpenseAllList.push(headerDescription);
 
     const summary: SumItems = expenseData ? expenseData.sumItems : null;
-    const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
+    const entries: SumItemsItem[] =
+      summary && summary.items ? summary.items : [];
     if (edit && entries.length > 0) {
       entries
-        .filter((entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo))
+        .filter(
+          (entrie: SumItemsItem) => !isFilterOutFieldInAdd(entrie.expenseNo),
+        )
         .map((entrie: SumItemsItem, i: number) => {
           const master = getMasterExpenseAll(entrie.expenseNo);
           if (master) {
@@ -363,7 +415,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
 
   const [pageSize, setPageSize] = React.useState<number>(10);
   const storeItemAddItem = async (_newItem: any) => {
-    const isNewItem = sessionStorage.getItem('ADD_NEW_ITEM') === 'Y';
+    const isNewItem = sessionStorage.getItem("ADD_NEW_ITEM") === "Y";
     if (!stringNullOrEmpty(_newItem)) {
       let _item = [...items];
 
@@ -390,7 +442,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
             return new Date(object.dateTime);
           },
         ],
-        ['asc']
+        ["asc"],
       );
       setItems(sortData);
 
@@ -408,15 +460,20 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
     let totalApprove: number = 0;
     let rows: any[] = [];
     let _otherSum: number = 0;
-    const expenseAccountDetail = store.getState().expenseAccountDetailSlice.expenseAccountDetail;
-    const expenseData: any = expenseAccountDetail.data ? expenseAccountDetail.data : null;
+    const expenseAccountDetail =
+      store.getState().expenseAccountDetailSlice.expenseAccountDetail;
+    const expenseData: any = expenseAccountDetail.data
+      ? expenseAccountDetail.data
+      : null;
     const summary: SumItems = expenseData ? expenseData.sumItems : null;
-    const entries: SumItemsItem[] = summary && summary.items ? summary.items : [];
+    const entries: SumItemsItem[] =
+      summary && summary.items ? summary.items : [];
     if (entries && entries.length > 0) {
       entries.map((entrie: SumItemsItem, i: number) => {
         infosWithDraw = {
           ...infosWithDraw,
-          [entrie.expenseNo]: Math.round(_.sumBy(_item, entrie.expenseNo) * 100) / 100,
+          [entrie.expenseNo]:
+            Math.round(_.sumBy(_item, entrie.expenseNo) * 100) / 100,
         };
         const sum = _.sumBy(_item, entrie.expenseNo);
         if (!isFilterOutFieldInAdd(entrie.expenseNo)) {
@@ -433,7 +490,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
         {
           ...infosWithDraw,
           id: 1,
-          description: 'ยอดเงินเบิก',
+          description: "ยอดเงินเบิก",
           total: totalWithDraw,
           SUMOTHER: Math.round(_otherSum * 100) / 100,
         },
@@ -449,14 +506,14 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
           infosWithDraw = {
             ...infosWithDraw,
             id: 1,
-            description: 'ยอดเงินเบิก',
+            description: "ยอดเงินเบิก",
             [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
           };
 
           infosApprove = {
             ...infosApprove,
             id: 2,
-            description: 'ยอดเงินอนุมัติ',
+            description: "ยอดเงินอนุมัติ",
             [entrie.expenseNo]: _.sumBy(_item, entrie.expenseNo),
           };
 
@@ -468,7 +525,11 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
           }
         });
       rows = [
-        { ...infosWithDraw, total: _.sumBy(_item, 'total'), SUMOTHER: _otherSum },
+        {
+          ...infosWithDraw,
+          total: _.sumBy(_item, "total"),
+          SUMOTHER: _otherSum,
+        },
         // { ...infosApprove, total: _.sumBy(_item, 'total') },
       ];
       dispatch(updateSummaryRows(rows));
@@ -487,7 +548,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
     let listPayload: payLoadAdd[] = [];
     const arr = Object.entries(params.row);
     await arr.forEach((element: any, index: number) => {
-      const _title = getMasterExpenInto(element[0])?.accountNameTh || 'Field';
+      const _title = getMasterExpenInto(element[0])?.accountNameTh || "Field";
       const item: payLoadAdd = {
         id: index,
         key: element[0],
@@ -496,7 +557,7 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
       };
       listPayload.push(item);
     });
-    sessionStorage.setItem('ADD_NEW_ITEM', 'F');
+    sessionStorage.setItem("ADD_NEW_ITEM", "F");
     await setActionEdit(true);
     await setPayloadAdd(listPayload);
     setOpenModalAddExpense(true);
@@ -507,10 +568,13 @@ function ExpenseDetailTransaction({ onClickAddNewBtn, type, periodProps, edit }:
   };
   return (
     <React.Fragment>
-      <Box mt={2} bgcolor='background.paper'>
-        <div style={{ width: '100%', height: items.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+      <Box mt={2} bgcolor="background.paper">
+        <div
+          style={{ width: "100%", height: items.length >= 8 ? "70vh" : "auto" }}
+          className={classes.MdataGridDetail}
+        >
           <Box>
-            <Typography variant='body2'>รายการจ่ายตามวัน</Typography>
+            <Typography variant="body2">รายการจ่ายตามวัน</Typography>
           </Box>
           <DataGrid
             rows={items}

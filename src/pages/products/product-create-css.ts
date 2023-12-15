@@ -1,5 +1,5 @@
 import { makeStyles } from "@mui/styles";
-import theme from '../../styles/theme';
+import theme from "../../styles/theme";
 
 export const createProductStyles = makeStyles({
   root: {},

@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { StockTransferRequest } from '../../models/stock-transfer-model';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { StockTransferRequest } from "../../models/stock-transfer-model";
 
 type State = {
   searchStockTransfer: StockTransferRequest;
@@ -7,20 +7,20 @@ type State = {
 
 const initialState: State = {
   searchStockTransfer: {
-    limit: '10',
-    page: '1',
-    docNo: '',
-    branchFrom: '',
-    branchTo: '',
-    dateFrom: '',
-    dateTo: '',
-    statuses: '',
-    transferReason: '',
+    limit: "10",
+    page: "1",
+    docNo: "",
+    branchFrom: "",
+    branchTo: "",
+    dateFrom: "",
+    dateTo: "",
+    statuses: "",
+    transferReason: "",
   },
 };
 
 const saveSearchStock = createSlice({
-  name: 'searchStockTransfer',
+  name: "searchStockTransfer",
   initialState,
   reducers: {
     saveSearchStockTransfer: (state, action: PayloadAction<any>) => {
@@ -32,5 +32,6 @@ const saveSearchStock = createSlice({
   },
 });
 
-export const { saveSearchStockTransfer, clearSearchStockTransfer } = saveSearchStock.actions;
+export const { saveSearchStockTransfer, clearSearchStockTransfer } =
+  saveSearchStock.actions;
 export default saveSearchStock.reducer;

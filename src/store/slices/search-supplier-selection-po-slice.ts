@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { SupplierPOResponse } from '../../models/supplier-po-model';
-import { SupplierPO } from '../../mockdata/supplier-po';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
+import { SupplierPOResponse } from "../../models/supplier-po-model";
+import { SupplierPO } from "../../mockdata/supplier-po";
 
 type State = {
   supplierPOResp: SupplierPOResponse;
@@ -11,34 +11,37 @@ type State = {
 
 const initialState: State = {
   supplierPOResp: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
   },
-  error: '',
+  error: "",
 };
 
-export const searchSupplierPOAsync = createAsyncThunk('supplierPO', async (code: string) => {
-  try {
-    const apiRootPath = `${environment.purchase.supplierOrder.searchSupplierPO.url}/${code}`;
-    let response: SupplierPOResponse = {
-      ref: '',
-      code: 0,
-      message: '',
-      data: [],
-    };
+export const searchSupplierPOAsync = createAsyncThunk(
+  "supplierPO",
+  async (code: string) => {
+    try {
+      const apiRootPath = `${environment.purchase.supplierOrder.searchSupplierPO.url}/${code}`;
+      let response: SupplierPOResponse = {
+        ref: "",
+        code: 0,
+        message: "",
+        data: [],
+      };
 
-    response = await get(apiRootPath).then();
-    // response = SupplierPO;
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+      response = await get(apiRootPath).then();
+      // response = SupplierPO;
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const searchSupplierPOSlice = createSlice({
-  name: 'supplierPO',
+  name: "supplierPO",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -47,9 +50,12 @@ const searchSupplierPOSlice = createSlice({
     builer.addCase(searchSupplierPOAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(searchSupplierPOAsync.fulfilled, (state, { payload }: PayloadAction<any>) => {
-        state.supplierPOResp = payload;
-      }),
+      builer.addCase(
+        searchSupplierPOAsync.fulfilled,
+        (state, { payload }: PayloadAction<any>) => {
+          state.supplierPOResp = payload;
+        },
+      ),
       builer.addCase(searchSupplierPOAsync.rejected, () => {
         initialState;
       });

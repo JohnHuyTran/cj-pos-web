@@ -1,16 +1,27 @@
-import React from 'react';
-import { useStyles } from '../../../styles/makeTheme';
-import Box from '@mui/material/Box';
-import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
+import React from "react";
+import { useStyles } from "../../../styles/makeTheme";
+import Box from "@mui/material/Box";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
+import Typography from "@mui/material/Typography";
 
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { Item, ItemGroups, StockBalanceResponseType, StockBalanceType } from '../../../models/stock-transfer-model';
-import { checkStockBalance } from '../../../services/stock-transfer';
-import _ from 'lodash';
-import { numberWithCommas, objectNullOrEmpty } from '../../../utils/utils';
-import { ApiError } from '../../../models/api-error-model';
-import BranchTransferListItem from './stock-transfer-bt-item';
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import {
+  Item,
+  ItemGroups,
+  StockBalanceResponseType,
+  StockBalanceType,
+} from "../../../models/stock-transfer-model";
+import { checkStockBalance } from "../../../services/stock-transfer";
+import _ from "lodash";
+import { numberWithCommas, objectNullOrEmpty } from "../../../utils/utils";
+import { ApiError } from "../../../models/api-error-model";
+import BranchTransferListItem from "./stock-transfer-bt-item";
 
 interface Props {
   onSelectSku: (value: any) => void;
@@ -19,104 +30,120 @@ interface Props {
 }
 const columns: GridColDef[] = [
   {
-    field: 'index',
-    headerName: 'ลำดับ',
+    field: "index",
+    headerName: "ลำดับ",
     minWidth: 70,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: "20px" }}>
         {params.value}
       </Box>
     ),
   },
   {
-    field: 'productName',
-    headerName: 'รายละเอียดสินค้า',
-    headerAlign: 'center',
+    field: "productName",
+    headerName: "รายละเอียดสินค้า",
+    headerAlign: "center",
     minWidth: 220,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
-          {params.getValue(params.id, 'skuCode') || ''}
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, "skuCode") || ""}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'remainingQty',
-    headerName: 'สต๊อกสินค้าคงเหลือ',
+    field: "remainingQty",
+    headerName: "สต๊อกสินค้าคงเหลือ",
     minWidth: 200,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     sortable: false,
     renderCell: (params) => numberWithCommas(params.value),
   },
   {
-    field: 'orderAllQty',
-    headerName: 'สั่ง(ชิ้น)',
+    field: "orderAllQty",
+    headerName: "สั่ง(ชิ้น)",
     minWidth: 200,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
-    align: 'right',
+    align: "right",
     renderCell: (params) => params.value,
   },
   {
-    field: 'actualAllQty',
-    headerName: 'จัด(ชิ้น)',
+    field: "actualAllQty",
+    headerName: "จัด(ชิ้น)",
     minWidth: 200,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
-    align: 'right',
+    align: "right",
     renderCell: (params) => params.value,
   },
   {
-    field: 'unitDiff',
-    headerName: 'ส่วนต่าง',
+    field: "unitDiff",
+    headerName: "ส่วนต่าง",
     minWidth: 200,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
-    align: 'right',
+    align: "right",
     renderCell: (params: GridRenderCellParams) => calProductDiff(params),
   },
 ];
 var calProductDiff = function (params: GridValueGetterParams) {
-  let diff = Number(params.getValue(params.id, 'actualAllQty')) - Number(params.getValue(params.id, 'orderAllQty'));
+  let diff =
+    Number(params.getValue(params.id, "actualAllQty")) -
+    Number(params.getValue(params.id, "orderAllQty"));
 
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
-  if (diff > 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> +{diff} </label>;
+  if (diff < 0)
+    return (
+      <label style={{ color: "#F54949", fontWeight: 700 }}> {diff} </label>
+    );
+  if (diff > 0)
+    return (
+      <label style={{ color: "#F54949", fontWeight: 700 }}> +{diff} </label>
+    );
   return diff;
 };
-function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props) {
+function BranchTransferListSKU({
+  onSelectSku,
+  skuList,
+  onUpdateItemList,
+}: Props) {
   const classes = useStyles();
 
   const dispatch = useAppDispatch();
 
-  const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
+  const branchTransferRslList = useAppSelector(
+    (state) => state.branchTransferDetailSlice.branchTransferRs,
+  );
 
-  const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
+  const branchTransferInfo: any = branchTransferRslList.data
+    ? branchTransferRslList.data
+    : null;
   const [btItemGroups, setBtItemGroups] = React.useState<ItemGroups[]>(
-    branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : []
+    branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : [],
   );
 
   const [isDraft, setIsDraft] = React.useState(false);
 
   const [pageSize, setPageSize] = React.useState<number>(5);
-  const [selectSKU, setSelectSKU] = React.useState('');
-  const [selectSKUName, setSelectSKUName] = React.useState('');
+  const [selectSKU, setSelectSKU] = React.useState("");
+  const [selectSKUName, setSelectSKUName] = React.useState("");
   const [isClickCell, setIsClickCell] = React.useState(false);
   const currentlySelected = async (params: GridCellParams) => {
-    const skuCode = objectNullOrEmpty(params.getValue(params.id, 'skuCode'))
-      ? ''
-      : params.getValue(params.id, 'skuCode')?.toString();
-    const skuName = objectNullOrEmpty(params.getValue(params.id, 'productName'))
-      ? ''
-      : params.getValue(params.id, 'productName')?.toString();
-    setSelectSKU(skuCode ? skuCode : '');
-    setSelectSKUName(skuName ? skuName : '');
+    const skuCode = objectNullOrEmpty(params.getValue(params.id, "skuCode"))
+      ? ""
+      : params.getValue(params.id, "skuCode")?.toString();
+    const skuName = objectNullOrEmpty(params.getValue(params.id, "productName"))
+      ? ""
+      : params.getValue(params.id, "productName")?.toString();
+    setSelectSKU(skuCode ? skuCode : "");
+    setSelectSKUName(skuName ? skuName : "");
     onSelectSku(skuCode);
     setIsClickCell(!isClickCell);
   };
@@ -144,7 +171,7 @@ function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props
 
   async function fetchStockBalance() {
     const _skuSlice = skuList;
-    const list = _.uniqBy(_skuSlice, 'skuCode');
+    const list = _.uniqBy(_skuSlice, "skuCode");
     const skucodeList: string[] = [];
     list.map((i: any) => {
       skucodeList.push(i.skuCode);
@@ -161,7 +188,9 @@ function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props
       .catch((error: ApiError) => {});
   }
 
-  const mappingSkuWithRemainingQty = (stockBalanceRs: StockBalanceResponseType) => {
+  const mappingSkuWithRemainingQty = (
+    stockBalanceRs: StockBalanceResponseType,
+  ) => {
     const stockBalanceList: StockBalanceType[] = stockBalanceRs.data;
     const _skuSlice = skuList;
     let _newSku: ItemGroups[] = [];
@@ -206,7 +235,11 @@ function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props
         })
         .reduce((sum, dataItem: Item) => {
           return (
-            sum + Number((dataItem.actualQty ? dataItem.actualQty : 0) * (dataItem.barFactor ? dataItem.barFactor : 0))
+            sum +
+            Number(
+              (dataItem.actualQty ? dataItem.actualQty : 0) *
+                (dataItem.barFactor ? dataItem.barFactor : 0),
+            )
           );
         }, 0);
 
@@ -225,7 +258,10 @@ function BranchTransferListSKU({ onSelectSku, skuList, onUpdateItemList }: Props
 
   return (
     <>
-      <div style={{ width: '100%', height: rows.length >= 5 ? '45vh' : 'auto' }} className={classes.MdataGridDetail}>
+      <div
+        style={{ width: "100%", height: rows.length >= 5 ? "45vh" : "auto" }}
+        className={classes.MdataGridDetail}
+      >
         <DataGrid
           rows={rows}
           columns={columns}

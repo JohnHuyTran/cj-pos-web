@@ -1,4 +1,4 @@
-import { FileType, ReasonType } from './common-model';
+import { FileType, ReasonType } from "./common-model";
 
 export interface CheckOrderRequest {
   limit: string;

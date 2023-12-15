@@ -1,26 +1,28 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { env } from './environmentConfigs';
-import { ContentType } from '../utils/enum/common-enum';
-import { refreshToken } from './keycloak-adapter';
-import { logout } from '../store/slices/authSlice';
-import { getSessionId, getAccessToken } from '../store/sessionStore';
-import { ApiError } from '../models/api-error-model';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { env } from "./environmentConfigs";
+import { ContentType } from "../utils/enum/common-enum";
+import { refreshToken } from "./keycloak-adapter";
+import { logout } from "../store/slices/authSlice";
+import { getSessionId, getAccessToken } from "../store/sessionStore";
+import { ApiError } from "../models/api-error-model";
 
 const defaultForJSON = ContentType.JSON;
 let contentType: string;
 const instance = axios.create({
   timeout: env.backEnd.timeout,
   headers: {
-    'Content-Type': defaultForJSON,
+    "Content-Type": defaultForJSON,
   },
 });
 
 instance.interceptors.request.use(function (config: AxiosRequestConfig) {
   const token = getAccessToken();
   const sessionState = getSessionId();
-  config.headers.common['x-trace'] = sessionState;
-  config.headers.Authorization = token ? `Bearer ${token}` : '';
-  config.headers.common['Content-Type'] = contentType ? contentType : defaultForJSON;
+  config.headers.common["x-trace"] = sessionState;
+  config.headers.Authorization = token ? `Bearer ${token}` : "";
+  config.headers.common["Content-Type"] = contentType
+    ? contentType
+    : defaultForJSON;
   return config;
 });
 
@@ -33,7 +35,11 @@ instance.interceptors.response.use(
   },
   async function (error) {
     const originalRequest = error.config;
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      originalRequest._retry
+    ) {
       originalRequest._retry = true;
       await refreshToken().then(
         function (value) {
@@ -47,15 +53,15 @@ instance.interceptors.response.use(
           // return history.push({
           //   pathname: '/login',
           // });
-        }
+        },
       );
 
       const token = getAccessToken();
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
       return instance(originalRequest);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export function getReport(url: string, contentType = defaultForJSON) {
@@ -70,7 +76,11 @@ export function getReport(url: string, contentType = defaultForJSON) {
       }
     })
     .catch((error: any) => {
-      const err = new ApiError(error.response?.status, error.response?.data.code, error.response?.data.message);
+      const err = new ApiError(
+        error.response?.status,
+        error.response?.data.code,
+        error.response?.data.message,
+      );
       throw err;
     });
 }

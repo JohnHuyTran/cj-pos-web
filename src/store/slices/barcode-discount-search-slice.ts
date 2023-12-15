@@ -2,8 +2,11 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 import { environment } from "../../environment-base";
 import { get } from "../../adapters/posback-adapter";
-import {BarcodeDiscountSearchRequest, BarcodeDiscountSearchResponse} from "../../models/barcode-discount-model";
-import {stringNullOrEmpty} from "../../utils/utils";
+import {
+  BarcodeDiscountSearchRequest,
+  BarcodeDiscountSearchResponse,
+} from "../../models/barcode-discount-model";
+import { stringNullOrEmpty } from "../../utils/utils";
 
 type State = {
   bdSearchResponse: BarcodeDiscountSearchResponse;
@@ -19,7 +22,7 @@ const initialState: State = {
     total: 0,
     page: 0,
     perPage: 0,
-    totalPage: 0
+    totalPage: 0,
   },
   error: "",
 };
@@ -33,10 +36,10 @@ export const barcodeDiscountSearch = createAsyncThunk(
       if (!stringNullOrEmpty(payload.query)) {
         path = path + `&query=${payload.query}`;
       }
-      if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
+      if (!stringNullOrEmpty(payload.branch) && "ALL" !== payload.branch) {
         path = path + `&branch=${payload.branch}`;
       }
-      if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
+      if (!stringNullOrEmpty(payload.status) && "ALL" !== payload.status) {
         path = path + `&status=${payload.status}`;
       }
       if (!stringNullOrEmpty(payload.startDate)) {
@@ -62,7 +65,7 @@ export const barcodeDiscountSearch = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const barcodeDiscountSearchSlice = createSlice({
@@ -76,10 +79,10 @@ const barcodeDiscountSearchSlice = createSlice({
       initialState;
     }),
       builer.addCase(
-          barcodeDiscountSearch.fulfilled,
+        barcodeDiscountSearch.fulfilled,
         (state, action: PayloadAction<any>) => {
           state.bdSearchResponse = action.payload;
-        }
+        },
       ),
       builer.addCase(barcodeDiscountSearch.rejected, () => {
         initialState;

@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { ShipmentDetailResponse } from '../../models/order-model';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { ShipmentDetailResponse } from "../../models/order-model";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
 
 type State = {
   orderDetail: ShipmentDetailResponse;
@@ -11,38 +11,41 @@ type State = {
 
 const initialState: State = {
   orderDetail: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: null,
   },
-  error: '',
+  error: "",
   isReloadScreen: false,
 };
 
-export const featchOrderDetailAsync = createAsyncThunk('orderDetail', async (SD?: string) => {
-  try {
-    const apiRootPath = environment.orders.shipment.detail.url;
-    let path = `${apiRootPath}/${SD}`;
-    let response: ShipmentDetailResponse = {
-      ref: '',
-      code: 0,
-      message: '',
-      data: [],
-    };
+export const featchOrderDetailAsync = createAsyncThunk(
+  "orderDetail",
+  async (SD?: string) => {
+    try {
+      const apiRootPath = environment.orders.shipment.detail.url;
+      let path = `${apiRootPath}/${SD}`;
+      let response: ShipmentDetailResponse = {
+        ref: "",
+        code: 0,
+        message: "",
+        data: [],
+      };
 
-    if (SD) {
-      return (response = await get(path).then());
-    } else {
-      return response;
+      if (SD) {
+        return (response = await get(path).then());
+      } else {
+        return response;
+      }
+    } catch (error) {
+      throw error;
     }
-  } catch (error) {
-    throw error;
-  }
-});
+  },
+);
 
 const checkOrderSlice = createSlice({
-  name: 'checkOrderDetail',
+  name: "checkOrderDetail",
   initialState,
   reducers: {
     clearDataFilter: () => {
@@ -56,9 +59,12 @@ const checkOrderSlice = createSlice({
     builer.addCase(featchOrderDetailAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchOrderDetailAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.orderDetail = action.payload;
-      }),
+      builer.addCase(
+        featchOrderDetailAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.orderDetail = action.payload;
+        },
+      ),
       builer.addCase(featchOrderDetailAsync.rejected, () => {
         initialState;
       });

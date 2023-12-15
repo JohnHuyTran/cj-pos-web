@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type ItemsState = {
   state: any;
@@ -9,11 +9,11 @@ type ItemsState = {
 const initialState: ItemsState = {
   state: {},
   checkEdit: false,
-  productList: 'รายการสินค้าทั้งหมด',
+  productList: "รายการสินค้าทั้งหมด",
 };
 
 export const saleLimitTime = createSlice({
-  name: 'saleLimitTime',
+  name: "saleLimitTime",
   initialState,
   reducers: {
     updatesaleLimitTimeState: (state, action: PayloadAction<any>) => {
@@ -28,6 +28,7 @@ export const saleLimitTime = createSlice({
   },
 });
 
-export const { updatesaleLimitTimeState, setCheckEdit, setProductList } = saleLimitTime.actions;
+export const { updatesaleLimitTimeState, setCheckEdit, setProductList } =
+  saleLimitTime.actions;
 
 export default saleLimitTime.reducer;

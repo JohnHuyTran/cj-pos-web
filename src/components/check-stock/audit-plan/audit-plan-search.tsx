@@ -1,33 +1,42 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import TextField from '@mui/material/TextField';
-import React, { useEffect, useState } from 'react';
-import { useStyles } from '../../../styles/makeTheme';
-import { getBranchName, objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../../utils/utils';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import DatePickerComponent from '../../commons/ui/date-picker';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import AlertError from '../../commons/ui/alert-error';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import LoadingModal from '../../commons/ui/loading-modal';
-import { Action, StockActionStatus } from '../../../utils/enum/common-enum';
-import SnackbarStatus from '../../commons/ui/snackbar-status';
-import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
-import { getUserInfo } from '../../../store/sessionStore';
-import { BranchListOptionType } from '../../../models/branch-model';
-import { isChannelBranch } from '../../../utils/role-permission';
-import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
-import ModalCreateAuditPlan from './audit-plan-create';
-import moment from 'moment';
-import { SearchOff } from '@mui/icons-material';
-import AuditPlanItemList from './audit-plan-search-item-list';
-import { auditPlanGetSearch, clearDataFilter } from '../../../store/slices/audit-plan-search-slice';
-import { AuditPlanSearchRequest } from '../../../models/audit-plan';
+import { Box, Button, Grid, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import TextField from "@mui/material/TextField";
+import React, { useEffect, useState } from "react";
+import { useStyles } from "../../../styles/makeTheme";
+import {
+  getBranchName,
+  objectNullOrEmpty,
+  onChange,
+  onChangeDate,
+  stringNullOrEmpty,
+} from "../../../utils/utils";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import DatePickerComponent from "../../commons/ui/date-picker";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import AlertError from "../../commons/ui/alert-error";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import LoadingModal from "../../commons/ui/loading-modal";
+import { Action, StockActionStatus } from "../../../utils/enum/common-enum";
+import SnackbarStatus from "../../commons/ui/snackbar-status";
+import { KeyCloakTokenInfo } from "../../../models/keycolak-token-info";
+import { getUserInfo } from "../../../store/sessionStore";
+import { BranchListOptionType } from "../../../models/branch-model";
+import { isChannelBranch } from "../../../utils/role-permission";
+import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
+import ModalCreateAuditPlan from "./audit-plan-create";
+import moment from "moment";
+import { SearchOff } from "@mui/icons-material";
+import AuditPlanItemList from "./audit-plan-search-item-list";
+import {
+  auditPlanGetSearch,
+  clearDataFilter,
+} from "../../../store/slices/audit-plan-search-slice";
+import { AuditPlanSearchRequest } from "../../../models/audit-plan";
 import { updateAddTypeAndProductState } from "../../../store/slices/add-type-product-slice";
 
-const _ = require('lodash');
+const _ = require("lodash");
 
 interface State {
   documentNumber: string;
@@ -44,34 +53,45 @@ interface loadingModalState {
 const AuditPlanSearch = () => {
   const classes = useStyles();
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
-  const [popupMsg, setPopupMsg] = React.useState<string>('');
+  const [textError, setTextError] = React.useState("");
+  const [popupMsg, setPopupMsg] = React.useState<string>("");
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const branchList = useAppSelector((state) => state.searchBranchSlice)
+    .branchList.data;
   const [ownBranch, setOwnBranch] = React.useState(
-    getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
+    getUserInfo().branch
+      ? getBranchName(branchList, getUserInfo().branch)
+        ? getUserInfo().branch
+        : ""
+      : "",
   );
   const branchName = getBranchName(branchList, ownBranch);
   const [groupBranch, setGroupBranch] = React.useState(isChannelBranch);
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [clearBranchDropDown, setClearBranchDropDown] =
+    React.useState<boolean>(false);
   const [branchMap, setBranchMap] = React.useState<BranchListOptionType>({
     code: ownBranch,
-    name: branchName ? branchName : '',
+    name: branchName ? branchName : "",
   });
   const dispatch = useAppDispatch();
-  const page = '1';
+  const page = "1";
 
-  const auditPlanSearchSlice = useAppSelector((state) => state.auditPlanSearchSlice);
+  const auditPlanSearchSlice = useAppSelector(
+    (state) => state.auditPlanSearchSlice,
+  );
   const limit = auditPlanSearchSlice.apSearchResponse.perPage;
 
-  const [branchOptions, setBranchOptions] = React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [branchOptions, setBranchOptions] =
+    React.useState<BranchListOptionType | null>(groupBranch ? branchMap : null);
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
   const userInfo = getUserInfo();
   const managePermission =
-    userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
-      ? userInfo.acl['service.posback-stock'].includes('stock.ap.manage')
+    userInfo.acl["service.posback-stock"] != null &&
+    userInfo.acl["service.posback-stock"].length > 0
+      ? userInfo.acl["service.posback-stock"].includes("stock.ap.manage")
       : false;
   const [openModal, setOpenModal] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -82,13 +102,13 @@ const AuditPlanSearch = () => {
       let codes = JSON.stringify(branchCode);
       setValues({ ...values, branch: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branch: '' });
+      setValues({ ...values, branch: "" });
     }
   };
   const [values, setValues] = React.useState<State>({
-    documentNumber: '',
-    branch: groupBranch ? ownBranch : 'ALL',
-    status: 'ALL',
+    documentNumber: "",
+    branch: groupBranch ? ownBranch : "ALL",
+    status: "ALL",
     fromDate: new Date(),
     toDate: new Date(),
   });
@@ -96,7 +116,11 @@ const AuditPlanSearch = () => {
   useEffect(() => {
     if (groupBranch) {
       setOwnBranch(
-        getUserInfo().branch ? (getBranchName(branchList, getUserInfo().branch) ? getUserInfo().branch : '') : ''
+        getUserInfo().branch
+          ? getBranchName(branchList, getUserInfo().branch)
+            ? getUserInfo().branch
+            : ""
+          : "",
       );
     }
   }, [branchList]);
@@ -106,7 +130,7 @@ const AuditPlanSearch = () => {
   };
 
   const handleOpenModal = () => {
-    dispatch(updateAddTypeAndProductState([]))
+    dispatch(updateAddTypeAndProductState([]));
     setOpenModal(true);
   };
 
@@ -122,9 +146,9 @@ const AuditPlanSearch = () => {
     setClearBranchDropDown(!clearBranchDropDown);
     setFlagSearch(false);
     setValues({
-      documentNumber: '',
-      branch: groupBranch ? ownBranch : 'ALL',
-      status: 'ALL',
+      documentNumber: "",
+      branch: groupBranch ? ownBranch : "ALL",
+      status: "ALL",
       fromDate: new Date(),
       toDate: new Date(),
     });
@@ -133,10 +157,14 @@ const AuditPlanSearch = () => {
 
   const validateSearch = () => {
     let isValid = true;
-    if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.toDate) || values.branch == 'ALL') {
+    if (
+      stringNullOrEmpty(values.fromDate) ||
+      stringNullOrEmpty(values.toDate) ||
+      values.branch == "ALL"
+    ) {
       isValid = false;
       setOpenAlert(true);
-      setTextError('กรุณาระบุข้อมูล');
+      setTextError("กรุณาระบุข้อมูล");
     }
     return isValid;
   };
@@ -145,9 +173,9 @@ const AuditPlanSearch = () => {
     if (!validateSearch()) return;
     let limits;
     if (limit === 0) {
-      limits = '10';
+      limits = "10";
     } else {
-      limits = limit ? limit.toString() : '10';
+      limits = limit ? limit.toString() : "10";
     }
     const payload: AuditPlanSearchRequest = {
       perPage: limits,
@@ -155,22 +183,22 @@ const AuditPlanSearch = () => {
       docNo: values.documentNumber.trim(),
       branch: values.branch,
       status: values.status,
-      creationDateFrom: moment(values.fromDate).startOf('day').toISOString(),
-      creationDateTo: moment(values.toDate).endOf('day').toISOString(),
+      creationDateFrom: moment(values.fromDate).startOf("day").toISOString(),
+      creationDateTo: moment(values.toDate).endOf("day").toISOString(),
     };
 
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     await dispatch(auditPlanGetSearch(payload));
     setFlagSearch(true);
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
 
   const onReSearch = async (branch: string) => {
     let limits;
     if (limit === 0) {
-      limits = '10';
+      limits = "10";
     } else {
-      limits = limit ? limit.toString() : '10';
+      limits = limit ? limit.toString() : "10";
     }
     const payload: AuditPlanSearchRequest = {
       perPage: limits,
@@ -178,14 +206,14 @@ const AuditPlanSearch = () => {
       docNo: values.documentNumber.trim(),
       branch: branch,
       status: values.status,
-      creationDateFrom: moment(values.fromDate).startOf('day').toISOString(),
-      creationDateTo: moment(values.toDate).endOf('day').toISOString(),
+      creationDateFrom: moment(values.fromDate).startOf("day").toISOString(),
+      creationDateTo: moment(values.toDate).endOf("day").toISOString(),
     };
 
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     await dispatch(auditPlanGetSearch(payload));
     setFlagSearch(true);
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
   let dataTable;
   const res = auditPlanSearchSlice.apSearchResponse;
@@ -193,13 +221,19 @@ const AuditPlanSearch = () => {
   const [flagSearch, setFlagSearch] = React.useState(false);
   if (flagSearch) {
     if (res && res.data && res.data.length > 0) {
-      dataTable = <AuditPlanItemList values={values} onSearch={onSearch} reSearch={onReSearch} />;
+      dataTable = (
+        <AuditPlanItemList
+          values={values}
+          onSearch={onSearch}
+          reSearch={onReSearch}
+        />
+      );
     } else {
       dataTable = (
         <Grid item container xs={12} justifyContent="center">
           <Box color="#CBD4DB">
             <h2>
-              {'ไม่มีข้อมูล'} <SearchOff fontSize="large" />
+              {"ไม่มีข้อมูล"} <SearchOff fontSize="large" />
             </h2>
           </Box>
         </Grid>
@@ -223,12 +257,12 @@ const AuditPlanSearch = () => {
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
               fullWidth
-              placeholder={'เลขที่เอกสาร AP/SC/SA/SL'}
+              placeholder={"เลขที่เอกสาร AP/SC/SA/SL"}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              สาขา<span style={{ color: '#F54949' }}>*</span>
+              สาขา<span style={{ color: "#F54949" }}>*</span>
             </Typography>
             <BranchListDropDown
               valueBranch={branchOptions}
@@ -237,7 +271,7 @@ const AuditPlanSearch = () => {
               isClear={clearBranchDropDown}
               disable={groupBranch}
               isFilterAuthorizedBranch={true}
-              placeHolder={'กรุณาเลือก'}
+              placeHolder={"กรุณาเลือก"}
             />
           </Grid>
           <Grid item xs={4}>
@@ -250,11 +284,14 @@ const AuditPlanSearch = () => {
                 name="status"
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}>
-                <MenuItem value={'ALL'}>ทั้งหมด</MenuItem>
+                inputProps={{ "aria-label": "Without label" }}
+              >
+                <MenuItem value={"ALL"}>ทั้งหมด</MenuItem>
                 <MenuItem value={StockActionStatus.DRAFT}>บันทึก</MenuItem>
                 <MenuItem value={StockActionStatus.CONFIRM}>ยืนยัน</MenuItem>
-                <MenuItem value={StockActionStatus.COUNTING}>เริ่มตรวจนับ</MenuItem>
+                <MenuItem value={StockActionStatus.COUNTING}>
+                  เริ่มตรวจนับ
+                </MenuItem>
                 <MenuItem value={StockActionStatus.END}>ปิดงาน</MenuItem>
                 <MenuItem value={StockActionStatus.CANCEL}>ยกเลิก</MenuItem>
               </Select>
@@ -265,20 +302,25 @@ const AuditPlanSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              ตั้งแต่ <span style={{ color: '#F54949' }}>*</span>
+              ตั้งแต่ <span style={{ color: "#F54949" }}>*</span>
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(this, setValues, values, 'fromDate')}
+              onClickDate={onChangeDate.bind(
+                this,
+                setValues,
+                values,
+                "fromDate",
+              )}
               value={values.fromDate}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              ถึง <span style={{ color: '#F54949' }}>*</span>
+              ถึง <span style={{ color: "#F54949" }}>*</span>
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(this, setValues, values, 'toDate')}
-              type={'TO'}
+              onClickDate={onChangeDate.bind(this, setValues, values, "toDate")}
+              type={"TO"}
               minDateTo={values.fromDate}
               value={values.toDate}
             />
@@ -286,16 +328,17 @@ const AuditPlanSearch = () => {
           <Grid item xs={4}></Grid>
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
-          <Grid item xs={12} style={{ textAlign: 'right' }}>
+          <Grid item xs={12} style={{ textAlign: "right" }}>
             {managePermission && (
               <Button
                 id="btnCreate"
                 variant="contained"
-                sx={{ width: '150px', height: '40px' }}
+                sx={{ width: "150px", height: "40px" }}
                 className={classes.MbtnSearch}
                 color="secondary"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
-                onClick={handleOpenModal}>
+                onClick={handleOpenModal}
+              >
                 สร้างเอกสารใหม่
               </Button>
             )}
@@ -303,19 +346,21 @@ const AuditPlanSearch = () => {
             <Button
               id="btnClear"
               variant="contained"
-              sx={{ width: '126px', height: '40px', ml: 2 }}
+              sx={{ width: "126px", height: "40px", ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
-              onClick={onClear}>
+              onClick={onClear}
+            >
               เคลียร์
             </Button>
             <Button
               id="btnSearch"
               variant="contained"
               color="primary"
-              sx={{ width: '126px', height: '40px', ml: 2 }}
+              sx={{ width: "126px", height: "40px", ml: 2 }}
               className={classes.MbtnSearch}
-              onClick={onSearch}>
+              onClick={onSearch}
+            >
               ค้นหา
             </Button>
           </Grid>
@@ -323,7 +368,11 @@ const AuditPlanSearch = () => {
       </Box>
       {dataTable}
       <LoadingModal open={openLoadingModal.open} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+      />
       {openModal && (
         <ModalCreateAuditPlan
           isOpen={openModal}
@@ -335,7 +384,12 @@ const AuditPlanSearch = () => {
           onReSearchMain={onReSearch}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus
+        open={openPopup}
+        onClose={handleClosePopup}
+        isSuccess={true}
+        contentMsg={popupMsg}
+      />
     </>
   );
 };

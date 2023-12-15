@@ -1,7 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
+import {
+  StockTransferRequest,
+  StockTransferResponse,
+} from "../../models/stock-transfer-model";
 
 type State = {
   orderList: StockTransferResponse;
@@ -10,9 +13,9 @@ type State = {
 
 const initialState: State = {
   orderList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
@@ -21,11 +24,11 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const featchSearchStockTransferAsync = createAsyncThunk(
-  'stockTransferList',
+  "stockTransferList",
   async (payload: StockTransferRequest) => {
     try {
       const apiRootPath = environment.stock.searchStockTransfer.url;
@@ -45,7 +48,7 @@ export const featchSearchStockTransferAsync = createAsyncThunk(
       if (payload.dateTo) {
         path = path + `&dateTo=${payload.dateTo}`;
       }
-      if (payload.statuses !== 'ALL') {
+      if (payload.statuses !== "ALL") {
         path = path + `&statuses=${payload.statuses}`;
       }
       if (payload.transferReason) {
@@ -53,9 +56,9 @@ export const featchSearchStockTransferAsync = createAsyncThunk(
       }
 
       let response: StockTransferResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -74,11 +77,11 @@ export const featchSearchStockTransferAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const stockTransferSlice = createSlice({
-  name: 'stockTransfer',
+  name: "stockTransfer",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -87,9 +90,12 @@ const stockTransferSlice = createSlice({
     builer.addCase(featchSearchStockTransferAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchSearchStockTransferAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.orderList = action.payload;
-      }),
+      builer.addCase(
+        featchSearchStockTransferAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.orderList = action.payload;
+        },
+      ),
       builer.addCase(featchSearchStockTransferAsync.rejected, () => {
         initialState;
       });

@@ -1,6 +1,6 @@
 //@ts-nocheck
 const thai = {
-  name: 'thai',
+  name: "thai",
   startYear: 1,
   yearLength: 365,
   epoch: 1523097,
@@ -18,7 +18,8 @@ const thai = {
     let year = currentYear > 0 ? 1 : -1;
 
     let leaps = [],
-      condition = () => (currentYear > 0 ? year <= currentYear : currentYear <= year),
+      condition = () =>
+        currentYear > 0 ? year <= currentYear : currentYear <= year,
       increase = () => (currentYear > 0 ? year++ : year--);
 
     while (condition()) {
@@ -41,10 +42,18 @@ const thai = {
   getAllDays(date) {
     const { year } = date;
 
-    return this.yearLength * (year - 1) + this.leapsLength(year) + this.getDayOfYear(date);
+    return (
+      this.yearLength * (year - 1) +
+      this.leapsLength(year) +
+      this.getDayOfYear(date)
+    );
   },
   leapsLength(year) {
-    return (((year - 1) / 4) | 0) + (-((year - 1) / 100) | 0) + (((year - 1) / 400) | 0);
+    return (
+      (((year - 1) / 4) | 0) +
+      (-((year - 1) / 100) | 0) +
+      (((year - 1) / 400) | 0)
+    );
   },
   guessYear(days, currentYear) {
     let year = ~~(days / 365.24);

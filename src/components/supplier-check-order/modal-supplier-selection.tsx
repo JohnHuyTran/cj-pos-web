@@ -1,50 +1,55 @@
-import React, { useState } from 'react';
-import { styled } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Radio from '@mui/material/Radio';
-import RadioGroup, { useRadioGroup } from '@mui/material/RadioGroup';
-import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
-import Button from '@mui/material/Button';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
+import React, { useState } from "react";
+import { styled } from "@mui/material/styles";
+import { makeStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Radio from "@mui/material/Radio";
+import RadioGroup, { useRadioGroup } from "@mui/material/RadioGroup";
+import FormControlLabel, {
+  FormControlLabelProps,
+} from "@mui/material/FormControlLabel";
+import Button from "@mui/material/Button";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
 
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { searchSupplierAsync, clearDataFilter } from '../../store/slices/search-supplier-selection-slice';
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import {
+  searchSupplierAsync,
+  clearDataFilter,
+} from "../../store/slices/search-supplier-selection-slice";
 import {
   searchSupplierPOAsync,
   clearDataFilter as clearDataFilterPO,
-} from '../../store/slices/search-supplier-selection-po-slice';
-import { updateState } from '../../store/slices/supplier-selection-slice';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
-import SupplierOrderDetail from './supplier-pi-detail';
-import LoadingModal from '../commons/ui/loading-modal';
-import theme from '../../styles/theme';
+} from "../../store/slices/search-supplier-selection-po-slice";
+import { updateState } from "../../store/slices/supplier-selection-slice";
+import { updateItemsState } from "../../store/slices/supplier-add-items-slice";
+import SupplierOrderDetail from "./supplier-pi-detail";
+import LoadingModal from "../commons/ui/loading-modal";
+import theme from "../../styles/theme";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialogContent-root': {
+  "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
   },
 }));
 
 const useStyles = makeStyles({
   MTextField: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '5px !important',
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "5px !important",
       padding: theme.spacing(1.8),
     },
   },
   MBtnAddSupplier: {
-    borderRadius: '5px !important',
+    borderRadius: "5px !important",
   },
   textLabelInput: { fontSize: 14, fontWeight: 400 },
   textListSupplier: {
@@ -60,13 +65,13 @@ interface StyledFormControlLabelProps extends FormControlLabelProps {
   checked: boolean;
 }
 
-const StyledFormControlLabel = styled((props: StyledFormControlLabelProps) => <FormControlLabel {...props} />)(
-  ({ theme, checked }) => ({
-    '.MuiFormControlLabel-label': checked && {
-      color: theme.palette.primary.main,
-    },
-  })
-);
+const StyledFormControlLabel = styled((props: StyledFormControlLabelProps) => (
+  <FormControlLabel {...props} />
+))(({ theme, checked }) => ({
+  ".MuiFormControlLabel-label": checked && {
+    color: theme.palette.primary.main,
+  },
+}));
 
 function ColorFormControlLabel(props: FormControlLabelProps) {
   const radioGroup = useRadioGroup();
@@ -103,31 +108,43 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme) => theme.palette.cancelColor.main,
           }}
         >
-          <CancelOutlinedIcon id="iconCloseModal" fontSize="large" stroke={'white'} strokeWidth={1} />
+          <CancelOutlinedIcon
+            id="iconCloseModal"
+            fontSize="large"
+            stroke={"white"}
+            strokeWidth={1}
+          />
         </IconButton>
       ) : null}
     </DialogTitle>
   );
 };
 
-export default function ModalSupplierSelection({ openModal, handleCloseModal }: Props) {
+export default function ModalSupplierSelection({
+  openModal,
+  handleCloseModal,
+}: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const [havePOValue, setHavePOValue] = useState<string>('');
+  const [havePOValue, setHavePOValue] = useState<string>("");
   const [supplier, setSupplier] = useState<any>(null);
   const [poSelection, setPoSelection] = useState<any>(null);
   const [submitDisable, setSubmitDisable] = useState<boolean>(true);
 
-  const resp = useAppSelector((state) => state.searchSupplierSelectionSlice.supplierResp);
+  const resp = useAppSelector(
+    (state) => state.searchSupplierSelectionSlice.supplierResp,
+  );
   const options = resp.data && resp.data.length > 0 ? resp.data : [];
 
-  const poResp = useAppSelector((state) => state.searchSupplierSelectionPOSlice.supplierPOResp);
+  const poResp = useAppSelector(
+    (state) => state.searchSupplierSelectionPOSlice.supplierPOResp,
+  );
   const poData = poResp.data && poResp.data.length > 0 ? poResp.data : [];
 
   const onInputChange = async (event: any, value: string, reason: string) => {
@@ -148,16 +165,16 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
     setSupplier(null);
     setPoSelection(null);
 
-    if (option && reason === 'selectOption') {
+    if (option && reason === "selectOption") {
       setSupplier(option);
 
       if (option.isRefPO) {
         setSubmitDisable(true);
-        setHavePOValue('มีเอกสาร PO');
+        setHavePOValue("มีเอกสาร PO");
         await dispatch(searchSupplierPOAsync(option.code));
       } else {
         setSubmitDisable(false);
-        setHavePOValue('ไม่มีเอกสาร PO');
+        setHavePOValue("ไม่มีเอกสาร PO");
       }
     } else {
       clearData();
@@ -197,7 +214,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
 
   const clearData = async () => {
     setSubmitDisable(true);
-    setHavePOValue('');
+    setHavePOValue("");
     await dispatch(clearDataFilter());
     await dispatch(clearDataFilterPO());
   };
@@ -208,7 +225,7 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
 
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
-      <List {...props} sx={{ width: '100%' }} key={option.code}>
+      <List {...props} sx={{ width: "100%" }} key={option.code}>
         <ListItem alignItems="flex-start" disablePadding>
           <ListItemText primary={option.name} secondary={option.code} />
         </ListItem>
@@ -233,12 +250,15 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
         maxWidth="sm"
         id="addSupplierModal"
       >
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={onCloseModal}>
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={onCloseModal}
+        >
           เพิ่มผู้จำหน่าย
         </BootstrapDialogTitle>
 
         <DialogContent id="addSupplierContentModal">
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ display: "flex" }}>
             <Box sx={{ flex: 3 }}>
               <label className={classes.textLabelInput} id="titleSupplierLabel">
                 ผู้จำหน่าย
@@ -249,14 +269,16 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
                 fullWidth
                 freeSolo
                 loadingText="กำลังโหลด..."
-                sx={{ mt: 1, width: '100%' }}
+                sx={{ mt: 1, width: "100%" }}
                 options={options}
                 filterOptions={filterOptions}
                 renderOption={autocompleteRenderListItem}
                 onChange={onChange}
                 onInputChange={onInputChange}
-                getOptionLabel={(option) => (option.name ? option.name : '')}
-                isOptionEqualToValue={(option, value) => option.name === value.name}
+                getOptionLabel={(option) => (option.name ? option.name : "")}
+                isOptionEqualToValue={(option, value) =>
+                  option.name === value.name
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -290,7 +312,12 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
               <label className={classes.textListSupplier} id="listPOModal">
                 รายการเอกสารใบสั่งซื้อ PO
               </label>
-              <RadioGroup name="use-radio-group" defaultValue="first" id="listSupplierDocPO" onChange={onRadioChange}>
+              <RadioGroup
+                name="use-radio-group"
+                defaultValue="first"
+                id="listSupplierDocPO"
+                onChange={onRadioChange}
+              >
                 {poData.map((row, index) => (
                   <ColorFormControlLabel
                     id={`item-po-${index}`}
@@ -305,8 +332,8 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
           )}
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'row-reverse',
+              display: "flex",
+              flexDirection: "row-reverse",
               p: 1,
             }}
           >
@@ -325,7 +352,12 @@ export default function ModalSupplierSelection({ openModal, handleCloseModal }: 
       </BootstrapDialog>
 
       <LoadingModal open={openLoadingModal} />
-      {openPIDetail && <SupplierOrderDetail isOpen={openPIDetail} onClickClose={isClosModalPIDetail} />}
+      {openPIDetail && (
+        <SupplierOrderDetail
+          isOpen={openPIDetail}
+          onClickClose={isClosModalPIDetail}
+        />
+      )}
     </div>
   );
 }

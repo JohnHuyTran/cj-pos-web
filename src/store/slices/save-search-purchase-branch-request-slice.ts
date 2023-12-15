@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PurchaseBranchSearchRequest } from '../../models/purchase-branch-request-model';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PurchaseBranchSearchRequest } from "../../models/purchase-branch-request-model";
 
 type State = {
   searchPurchaseBranchRequest: PurchaseBranchSearchRequest;
@@ -7,18 +7,18 @@ type State = {
 
 const initialState: State = {
   searchPurchaseBranchRequest: {
-    limit: '10',
-    page: '1',
-    docNo: '',
-    branchCode: '',
-    dateFrom: '',
-    dateTo: '',
-    status: '',
+    limit: "10",
+    page: "1",
+    docNo: "",
+    branchCode: "",
+    dateFrom: "",
+    dateTo: "",
+    status: "",
   },
 };
 
 const saveSearchPurchaseBranchRequest = createSlice({
-  name: 'searchPurchaseBranchRequest',
+  name: "searchPurchaseBranchRequest",
   initialState,
   reducers: {
     saveSearchPurchaseBranch: (state, action: PayloadAction<any>) => {
@@ -30,5 +30,6 @@ const saveSearchPurchaseBranchRequest = createSlice({
   },
 });
 
-export const { saveSearchPurchaseBranch, clearSearchPurchaseBranchRequest } = saveSearchPurchaseBranchRequest.actions;
+export const { saveSearchPurchaseBranch, clearSearchPurchaseBranchRequest } =
+  saveSearchPurchaseBranchRequest.actions;
 export default saveSearchPurchaseBranchRequest.reducer;

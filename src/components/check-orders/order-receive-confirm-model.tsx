@@ -1,10 +1,10 @@
-import React, { ReactElement } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
+import React, { ReactElement } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
 
 interface Props {
   open: boolean;
@@ -26,12 +26,12 @@ export default function OrderReceiveConfirmModel({
   toteCode,
 }: Props): ReactElement {
   const handleConfirm = () => {
-    onUpdateAction('ok');
+    onUpdateAction("ok");
     onClose();
   };
 
   const handleClose = () => {
-    onUpdateAction('cancel');
+    onUpdateAction("cancel");
     onClose();
   };
 
@@ -47,20 +47,27 @@ export default function OrderReceiveConfirmModel({
         {isTote && (
           <>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+              <DialogContentText
+                id="alert-dialog-description"
+                sx={{ color: "#263238" }}
+              >
+                <Typography
+                  variant="h6"
+                  align="center"
+                  sx={{ marginBottom: 2 }}
+                >
                   ยืนยันการรับ-โอนสินค้า(Tote)
                 </Typography>
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-                  <label style={{ color: '#36C690' }}>
+                  เลขที่เอกสาร <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+                  <label style={{ color: "#36C690" }}>
                     <b>{docRefNo}</b>
                   </label>
                 </Typography>
 
                 <Typography variant="body1" align="center">
-                  เลข Tote <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-                  <label style={{ color: '#36C690' }}>
+                  เลข Tote <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+                  <label style={{ color: "#36C690" }}>
                     <b>{toteCode}</b>
                   </label>
                 </Typography>
@@ -72,20 +79,27 @@ export default function OrderReceiveConfirmModel({
         {!isTote && (
           <>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
-                <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
+              <DialogContentText
+                id="alert-dialog-description"
+                sx={{ color: "#263238" }}
+              >
+                <Typography
+                  variant="h6"
+                  align="center"
+                  sx={{ marginBottom: 2 }}
+                >
                   ยืนยันการรับ-โอนสินค้า
                 </Typography>
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-                  <label style={{ color: '#36C690' }}>
+                  เลขที่เอกสาร <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+                  <label style={{ color: "#36C690" }}>
                     <b>{docRefNo}</b>
                   </label>
                 </Typography>
 
                 <Typography variant="body1" align="center">
-                  เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-                  <label style={{ color: '#36C690' }}>
+                  เลขที่เอกสาร SD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+                  <label style={{ color: "#36C690" }}>
                     <b>{sdNo}</b>
                   </label>
                 </Typography>
@@ -94,7 +108,7 @@ export default function OrderReceiveConfirmModel({
           </>
         )}
 
-        <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+        <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
           <Button
             id="btnCancle"
             variant="contained"

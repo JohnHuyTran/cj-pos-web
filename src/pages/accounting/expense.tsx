@@ -1,8 +1,8 @@
-import { Box, Button, Container } from '@mui/material';
-import React, { useEffect } from 'react';
-import ExpenseDetail from '../../components/accounting/expense/expense-detail';
-import TitleHeader from '../../components/title-header';
-import { periodMockData } from '../../mockdata/branch-accounting';
+import { Box, Button, Container } from "@mui/material";
+import React, { useEffect } from "react";
+import ExpenseDetail from "../../components/accounting/expense/expense-detail";
+import TitleHeader from "../../components/title-header";
+import { periodMockData } from "../../mockdata/branch-accounting";
 import {
   addNewItem,
   featchExpenseDetailAsync,
@@ -10,16 +10,16 @@ import {
   updateItemRows,
   updateSummaryRows,
   updateToInitialState,
-} from '../../store/slices/accounting/accounting-slice';
-import { useAppDispatch } from '../../store/store';
-import { useStyles } from '../../styles/makeTheme';
+} from "../../store/slices/accounting/accounting-slice";
+import { useAppDispatch } from "../../store/store";
+import { useStyles } from "../../styles/makeTheme";
 
-import SearchExpense from '../../components/accounting/expense/search-expense';
-import { useTranslation } from 'react-i18next';
-import { setInit } from '../../store/sessionStore';
+import SearchExpense from "../../components/accounting/expense/search-expense";
+import { useTranslation } from "react-i18next";
+import { setInit } from "../../store/sessionStore";
 
 export default function Expense() {
-  const { t } = useTranslation(['expense', 'common']);
+  const { t } = useTranslation(["expense", "common"]);
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
@@ -31,7 +31,7 @@ export default function Expense() {
   const onOpenNew = async () => {
     setOpen(true);
     setEdit(false);
-    setInit('N');
+    setInit("N");
     await dispatch(updateToInitialState());
     await dispatch(updateSummaryRows([]));
     await dispatch(updateItemRows([]));
@@ -41,8 +41,8 @@ export default function Expense() {
     // await dispatch(updateItemRows([]));
   };
   return (
-    <Container maxWidth='xl'>
-      <TitleHeader title={t('title.documentSearch')} />
+    <Container maxWidth="xl">
+      <TitleHeader title={t("title.documentSearch")} />
       <Box mt={3}>
         <SearchExpense />
       </Box>

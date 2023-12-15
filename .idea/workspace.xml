@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0f6cffb1-49b5-46aa-94ea-cf964163f8a5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.old.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.old.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jest.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/jest.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/barcodeDiscount.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/barcodeDiscount.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/cashStatement.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/cashStatement.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/common.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/common.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/error.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/error.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/expense.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/expense.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/openEnd.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/openEnd.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/orderReceive.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/orderReceive.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/reserves.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/reserves.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/saleLimitTime.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/saleLimitTime.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/stockTransfer.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/stockTransfer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/taxInvoice.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/taxInvoice.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/barcodeDiscount.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/barcodeDiscount.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/cashStatement.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/cashStatement.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/common.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/common.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/error.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/error.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/expense.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/expense.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/openEnd.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/openEnd.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/orderReceive.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/orderReceive.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/purchaseBranch.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/purchaseBranch.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/reserves.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/reserves.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/saleLimitTime.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/saleLimitTime.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/stockTransfer.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/stockTransfer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/th/taxInvoice.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/th/taxInvoice.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reacti18nextMock.js" beforeDir="false" afterPath="$PROJECT_DIR$/reacti18nextMock.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/adapters/environmentConfigs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/adapters/environmentConfigs.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/adapters/externalApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/adapters/externalApi.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/adapters/keycloak-adapter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/adapters/keycloak-adapter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/adapters/posback-adapter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/adapters/posback-adapter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/adapters/posback-printer-adapter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/adapters/posback-printer-adapter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/cash-statement/cash-statement-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/cash-statement/cash-statement-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/cash-statement/cash-statement-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/cash-statement/cash-statement-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-approve-search-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-approve-search-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-cash-statement-import.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-cash-statement-import.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-delete-search-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-delete-search-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-download-error-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-download-error-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-edit-search-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/cash-statement/modal-edit-search-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/close-saleshift/close-saleshift-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/close-saleshift/close-saleshift-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/close-saleshift/close-saleshift-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/close-saleshift/close-saleshift-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-bypass-branch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-bypass-branch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-bypass-support.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-bypass-support.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-close-sale.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-close-sale.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-save-close-shift-key.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/close-saleshift/modal-save-close-shift-key.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/confirm/confirm-content.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/confirm/confirm-content.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/confirm/modal-confirm-accounting.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/confirm/modal-confirm-accounting.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/confirm/modal-confirm-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/confirm/modal-confirm-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/confirm/modal-confirm-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/confirm/modal-confirm-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/expense-detail-summary.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/expense-detail-summary.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/expense-detail-transaction.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/expense-detail-transaction.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/expense-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/expense-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/expense-search-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/expense-search-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/modal-add-expense-format.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/modal-add-expense-format.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/modal-add-expense.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/modal-add-expense.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/modal-confirm-expense.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/modal-confirm-expense.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/modal-description-expense.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/modal-description-expense.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/modal-select-period.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/modal-select-period.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/modal-update-expense-sumary-format.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/modal-update-expense-sumary-format.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/modal-update-expense-sumary.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/modal-update-expense-sumary.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/search-expense.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/search-expense.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/expense/steppers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/expense/steppers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/open-end/confirm/modal-confirm-approval.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/open-end/confirm/modal-confirm-approval.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/open-end/confirm/modal-confirm-approved.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/open-end/confirm/modal-confirm-approved.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/open-end/modal-detail-cash.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/open-end/modal-detail-cash.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/open-end/modal-sale-shift-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/open-end/modal-sale-shift-details.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/open-end/open-end-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/open-end/open-end-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/accounting/open-end/open-end-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/accounting/open-end/open-end-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/modal-barcode-transfer-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/modal-barcode-transfer-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/modal-check-price.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/modal-check-price.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/modal-check-stock.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/modal-check-stock.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/modal-confirm-printed-barcode.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/modal-confirm-printed-barcode.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/modal-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/modal-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/modal-create-barcode-discount.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/modal-create-barcode-discount.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/modal-reject.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/modal-reject.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/barcode-discount/stepper-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/barcode-discount/stepper-bar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/card-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/card-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/add-tote-model.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/add-tote-model.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order-confirm-model.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order-confirm-model.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-items.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-items.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-list-tote.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-list-tote.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-sd.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-sd.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-tote.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order-detail-tote.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/check-order.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/check-order.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/confirm-model.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/confirm-model.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/modal-reject.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/modal-reject.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/order-css.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/order-css.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/order-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/order-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/order-receive-confirm-model.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/order-receive-confirm-model.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/order-receive-detail-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/order-receive-detail-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/order-receive-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/order-receive-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-orders/table-diff-info.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-orders/table-diff-info.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-history/audit-history-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-history/audit-history-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-history/audit-history-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-history/audit-history-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-create-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-create-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-create.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-create.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-search-item-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-search-item-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/audit-plan-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/modal-add-product-from-SA.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/modal-add-product-from-SA.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/modal-confirm-counting.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/modal-confirm-counting.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/modal-documents-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/modal-documents-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/audit-plan/stepper-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/audit-plan/stepper-bar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-add-stock-count.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-add-stock-count.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-confirm-stock-adjust.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-confirm-stock-adjust.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-create-stock-adjustment.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-create-stock-adjustment.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-stock-adjustment-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/modal-stock-adjustment-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/stock-adjustment-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/stock-adjustment-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/stock-adjustment-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-adjustment/stock-adjustment-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-count/modal-confirm-SC.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-count/modal-confirm-SC.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-count/modal-create-stock-count.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-count/modal-create-stock-count.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-count/modal-stock-count-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-count/modal-stock-count-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-count/stock-count-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-count/stock-count-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/check-stock/stock-count/stock-count-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/check-stock/stock-count/stock-count-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/OverwriteMoment.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/OverwriteMoment.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/_modal-add-type-product.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/_modal-add-type-product.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/accordion-huawei-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/accordion-huawei-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/accordion-upload-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/accordion-upload-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/accordion-upload-single-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/accordion-upload-single-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/alert-error.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/alert-error.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/alert-warning.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/alert-warning.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/branch-list-dropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/branch-list-dropdown.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/confirm-exit-model.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/confirm-exit-model.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/date-picker-all.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/date-picker-all.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/date-picker-css.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/date-picker-css.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/date-picker-current-month.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/date-picker-current-month.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/date-picker-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/date-picker-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/date-picker-month.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/date-picker-month.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/date-picker-v2.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/date-picker-v2.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/date-picker.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/date-picker.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/dialog-title.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/dialog-title.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/html-tooltip.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/html-tooltip.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/loading-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/loading-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-add-items-tote.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-add-items-tote.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-add-items.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-add-items.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-add-type-products.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-add-type-products.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-confirm-delete-product.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-confirm-delete-product.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-delete-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-delete-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-requisition-summary.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-requisition-summary.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-select-exclude-branch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-select-exclude-branch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-show-before-after-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-show-before-after-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-show-element-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-show-element-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-show-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-show-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/modal-show-huawei-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/modal-show-huawei-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/search-branch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/search-branch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/search-districts-dropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/search-districts-dropdown.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/search-provinces-dropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/search-provinces-dropdown.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/search-subDistricts-dropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/search-subDistricts-dropdown.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/snackbar-status.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/snackbar-status.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/stepper-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/stepper-bar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/steppers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/steppers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/texbox-commentList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/texbox-commentList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/texbox-search-product.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/texbox-search-product.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/texbox-search-sku.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/texbox-search-sku.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/textbox-comment.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/textbox-comment.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/thai.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/thai.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/commons/ui/thai_th.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/commons/ui/thai_th.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/dc-check-orders/dc-check-order-detail-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dc-check-orders/dc-check-order-detail-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/dc-check-orders/dc-check-order.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dc-check-orders/dc-check-order.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/dc-check-orders/dc-ckeck-order-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dc-check-orders/dc-ckeck-order-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/dc-check-orders/dc-order-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dc-check-orders/dc-order-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/dc-check-orders/modal-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dc-check-orders/modal-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/greeting/greeting.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/greeting/greeting.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/login/login-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/login/login-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/login/loginForm-css.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/login/loginForm-css.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modal-alert.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/modal-alert.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modal-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/modal-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/news/news-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/news/news-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/notifications/notification-announcement.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/notifications/notification-announcement.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/notifications/notification-reminder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/notifications/notification-reminder.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/notifications/notification-task.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/notifications/notification-task.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/product/product-create-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/product-create-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/product/product-list-css.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/product-list-css.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/product/product-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/product-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-list-item-draft.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-list-item-draft.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-list-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-list-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-request-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-request-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-request.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-branch-request.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-mock.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/create-purchase-branch/purchase-mock.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/modal-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/modal-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/purchase-branch-request/modal-mockup-case.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/purchase-branch-request/modal-mockup-case.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/ST-product-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/ST-product-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/ST-product-type-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/ST-product-type-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/date-picker-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/date-picker-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/modal-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/modal-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/modal-validate-import.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/modal-validate-import.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/modalConfirmCopy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/modalConfirmCopy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/sale-limit-time-create-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/sale-limit-time-create-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/steppers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/steppers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sale-limit-time/view-branch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sale-limit-time/view-branch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/settings/reserves/modal-settings-expense.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/settings/reserves/modal-settings-expense.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/settings/reserves/reserves-detail-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/settings/reserves/reserves-detail-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/settings/reserves/search-reserves.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/settings/reserves/search-reserves.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/steppers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/steppers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/alert-error-stock.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/alert-error-stock.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/branch-transfer/stock-transfer-bt-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/branch-transfer/stock-transfer-bt-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/branch-transfer/stock-transfer-bt-sku.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/branch-transfer/stock-transfer-bt-sku.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/branch-transfer/stock-transfer-bt.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/branch-transfer/stock-transfer-bt.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/modal-confirm-transaction.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/modal-confirm-transaction.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/modal-delete-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/modal-delete-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/modal-delete-item-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/modal-delete-item-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/steppers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/steppers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-pack.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-pack.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-list-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-list-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-list-sku.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-list-sku.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-upload-file.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-request-upload-file.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer-rt-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer-rt-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer-rt.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer-rt.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/stock-transfer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock-transfer/transfer-reasons-list-dropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock-transfer/transfer-reasons-list-dropdown.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/product-master/modal-barcode-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/product-master/modal-barcode-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/product-master/product-list-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/product-master/product-list-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/product-master/product-master-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/product-master/product-master-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/product-master/text-box-search-product.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/product-master/text-box-search-product.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/stock-balance-location.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/stock-balance-location.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/stock-balance-negative.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/stock-balance-negative.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/stock-balance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/stock-balance.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/stock-movement/stock-movement-search-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/stock-movement/stock-movement-search-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/stock-movement/stock-movement-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/stock-movement/stock-movement-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/stock-movement/stock-movement-transaction.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/stock-movement/stock-movement-transaction.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/stock/stock-outstanding-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/stock/stock-outstanding-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/modal-add-items.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/modal-add-items.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/modal-confirm-order-return.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/modal-confirm-order-return.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/modal-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/modal-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/modal-delete-confirm-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/modal-delete-confirm-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/modal-delete-confirm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/modal-delete-confirm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/modal-supplier-selection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/modal-supplier-selection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-check-order.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-check-order.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-order-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-order-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-order-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-order-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-order-return.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-order-return.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-pi-detail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/supplier-check-order/supplier-pi-detail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/tax-invoice/_customer-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/tax-invoice/_customer-details.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/tax-invoice/_tax-invoice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/tax-invoice/_tax-invoice.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/tax-invoice/request-tax-invoice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/tax-invoice/request-tax-invoice.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-details.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-details.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-history.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-history.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-search-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-search-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/tax-invoice/tax-invoice-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/title-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/title-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/attach-file-after.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/attach-file-after.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-add-product-to-destroy-discount.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-add-product-to-destroy-discount.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-create-to-destroy-discount.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-create-to-destroy-discount.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-create-transfer-out-destroy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-create-transfer-out-destroy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-to-destroy-discount-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-to-destroy-discount-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-transfer-out-destroy-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/modal-transfer-out-destroy-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/stepper-bar-to-destroy-discount.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/stepper-bar-to-destroy-discount.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-destroy/stepper-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-destroy/stepper-bar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-raw-material/modal-asking-password.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-raw-material/modal-asking-password.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-raw-material/modal-create-to-raw-material.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-raw-material/modal-create-to-raw-material.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-raw-material/modal-to-raw-material-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-raw-material/modal-to-raw-material-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out-raw-material/stepper-bar-to-raw-material.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out-raw-material/stepper-bar-to-raw-material.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out/modal-create-transfer-out.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out/modal-create-transfer-out.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out/modal-transfer-out-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out/modal-transfer-out-item.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/transfer-out/stepper-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/transfer-out/stepper-bar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/environment-base.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/environment-base.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/expanded-theme.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/expanded-theme.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/globals.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/globals.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/useScrollTop.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useScrollTop.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/locales/i18n.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/locales/i18n.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/branch-accounting-search.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/branch-accounting-search.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/branch-accounting.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/branch-accounting.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/order-shipment-update.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/order-shipment-update.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/order-shipment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/order-shipment.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/orders.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/orders.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/product-master.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/product-master.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/product.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/product.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/provinces.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/provinces.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/purchase-branch-detail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/purchase-branch-detail.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/purchase-branch-search.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/purchase-branch-search.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/purchase-branch-send.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/purchase-branch-send.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/purchase-invoice-detail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/purchase-invoice-detail.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/sale.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/sale.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/stock-transfer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/stock-transfer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/stock.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/stock.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/supplier-items.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/supplier-items.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/supplier-payload.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/supplier-payload.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/supplier-pn.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/supplier-pn.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/supplier-po.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/supplier-po.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mockdata/supplier.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/mockdata/supplier.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/api-error-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/api-error-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/audit-history-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/audit-history-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/audit-plan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/audit-plan.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/barcode-discount-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/barcode-discount-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/barcode-discount.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/barcode-discount.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/branch-accounting-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/branch-accounting-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/branch-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/branch-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/common-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/common-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/dc-check-order-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/dc-check-order-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/keycolak-token-info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/keycolak-token-info.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/modal-add-all-items-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/modal-add-all-items-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/modal-add-item-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/modal-add-item-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/order-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/order-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/product-master.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/product-master.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/product-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/product-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/purchase-branch-request-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/purchase-branch-request-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/purchase-credit-note.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/purchase-credit-note.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sale-limit-time-search-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sale-limit-time-search-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sale-limit-time.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sale-limit-time.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/search-branch-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/search-branch-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/search-branch-province-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/search-branch-province-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/search-districts-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/search-districts-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/search-provinces-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/search-provinces-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/search-subDistricts-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/search-subDistricts-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/snackbar-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/snackbar-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/step-item-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/step-item-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/stock-adjustment-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/stock-adjustment-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/stock-count-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/stock-count-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/stock-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/stock-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/stock-transfer-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/stock-transfer-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/supplier-check-order-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/supplier-check-order-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/supplier-po-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/supplier-po-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/supplier-search-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/supplier-search-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/tax-invoice-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/tax-invoice-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/tote-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/tote-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/transfer-out-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/transfer-out-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/transfer-out.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/transfer-out.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/transfer-reasons-model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/transfer-reasons-model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/user-interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/user-interface.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/accounting/cash-statement.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/accounting/cash-statement.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/accounting/close-saleshift.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/accounting/close-saleshift.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/accounting/expense.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/accounting/expense.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/accounting/open-end.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/accounting/open-end.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/barcode-discount/barcode-discount-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/barcode-discount/barcode-discount-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/barcode-discount/barcode-discount-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/barcode-discount/barcode-discount-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/barcode-discount/barcode-discount.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/barcode-discount/barcode-discount.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/check-order.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/check-order.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/check-stock/audit-history.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/check-stock/audit-history.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/check-stock/audit-plan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/check-stock/audit-plan.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/check-stock/stock-adjustment.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/check-stock/stock-adjustment.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/check-stock/stock-count.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/check-stock/stock-count.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/dc-check-order.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/dc-check-order.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/home.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/notification.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/notification.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/products/product-create-css.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/products/product-create-css.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/products/product-create.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/products/product-create.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/products/product.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/products/product.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/products/products-css.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/products/products-css.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/purchase-branch-request/create-purchase-branch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/purchase-branch-request/create-purchase-branch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/purchase.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/purchase.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/sale-limit-time/sale-limit-time-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/sale-limit-time/sale-limit-time-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/sale-limit-time/sale-limit-time-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/sale-limit-time/sale-limit-time-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/sale-limit-time/sale-limit-time.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/sale-limit-time/sale-limit-time.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/sale.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/sale.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/settings/reserves.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/settings/reserves.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/stock-transfer-rt.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/stock-transfer-rt.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/stock-transfer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/stock-transfer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/stock/product-master.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/stock/product-master.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/stock/stock-balance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/stock/stock-balance.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/stock/stock-movement.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/stock/stock-movement.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/supplier-check-order.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/supplier-check-order.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/tax-invoice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/tax-invoice.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy-branch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy-branch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out-destroy/transfer-out-destroy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out-raw-masterial/transfer-out-raw-masterial-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out-raw-masterial/transfer-out-raw-masterial-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out-raw-masterial/transfer-out-raw-masterial-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out-raw-masterial/transfer-out-raw-masterial-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out-raw-masterial/transfer-out-raw-masterial.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out-raw-masterial/transfer-out-raw-masterial.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out-branch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out-branch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out-list.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out-list.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out-search.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out-search.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/transfer-out/transfer-out.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/unit-test-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/unit-test-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/user.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/user.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/react-app-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/react-app-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reportWebVitals.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/reportWebVitals.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/accounting.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/accounting.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/audit-plan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/audit-plan.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/barcode-discount.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/barcode-discount.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/base-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/base-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/common.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/common.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/master-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/master-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/notification.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/notification.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/order-shipment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/order-shipment.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/product-master.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/product-master.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/purchase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/purchase.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/sale-limit-time.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/sale-limit-time.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/sale.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/sale.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/stock-adjustment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/stock-adjustment.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/stock-count.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/stock-count.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/stock-transfer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/stock-transfer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/tote-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/tote-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/transfer-out.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/transfer-out.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/setupTests.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/setupTests.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/sessionStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/sessionStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/accounting-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/accounting-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/accounting-period-type-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/accounting-period-type-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/accounting-search-config-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/accounting-search-config-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/accounting-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/accounting-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/accounting-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/accounting-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/cash-statement/cash-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/cash-statement/cash-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/cash-statement/save-cash-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/cash-statement/save-cash-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/close-saleshift-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/close-saleshift-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/open-end/open-end-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/open-end/open-end-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/open-end/open-end-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/open-end/open-end-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/save-accounting-search-config-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/save-accounting-search-config-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/accounting/save-accounting-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/accounting/save-accounting-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/add-items-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/add-items-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/add-to-destroy-product-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/add-to-destroy-product-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/add-type-product-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/add-type-product-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/audit-history-criteria-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/audit-history-criteria-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/audit-history-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/audit-history-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/audit-plan-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/audit-plan-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/audit-plan-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/audit-plan-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/authSlice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/authSlice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/authority/authorized-branch-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/authority/authorized-branch-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/authorized-branch-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/authorized-branch-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/barcode-discount-criteria-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/barcode-discount-criteria-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/barcode-discount-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/barcode-discount-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/barcode-discount-print-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/barcode-discount-print-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/barcode-discount-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/barcode-discount-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/barcode-discount-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/barcode-discount-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/check-order-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/check-order-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/check-order-detail-tote-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/check-order-detail-tote-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/check-order-sd-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/check-order-sd-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/check-order-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/check-order-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/dc-check-order-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/dc-check-order-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/dc-check-order-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/dc-check-order-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/items-tote-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/items-tote-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/master/expense-list-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/master/expense-list-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/master/search-districts-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/master/search-districts-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/master/search-provinces-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/master/search-provinces-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/master/search-subDistricts-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/master/search-subDistricts-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/master/stock-movement-type-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/master/stock-movement-type-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/master/verify-order-reject-reasons-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/master/verify-order-reject-reasons-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/nav-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/nav-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/order-receive-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/order-receive-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/productSlice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/productSlice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/products/search-item-by-supplier-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/products/search-item-by-supplier-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/purchase-branch-request-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/purchase-branch-request-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/purchase/purchase-branch-request-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/purchase/purchase-branch-request-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/sale-limit-time-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/sale-limit-time-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/sale-limit-time-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/sale-limit-time-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/sale-limit-time-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/sale-limit-time-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/sale/tax-invoice-print-history-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/sale/tax-invoice-print-history-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/save-search-order-dc-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/save-search-order-dc-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/save-search-order-supplier-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/save-search-order-supplier-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/save-search-order.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/save-search-order.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/save-search-purchase-branch-request-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/save-search-purchase-branch-request-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/save-search-stock-transfer-rt-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/save-search-stock-transfer-rt-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/save-search-stock-transfer-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/save-search-stock-transfer-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-all-items.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-all-items.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-branches-province-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-branches-province-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-branches-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-branches-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-item-by-barcode-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-item-by-barcode-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-product-discount.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-product-discount.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-supplier-selection-po-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-supplier-selection-po-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-supplier-selection-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-supplier-selection-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-tote-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-tote-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/search-type-product-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/search-type-product-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-adjust-calculate-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-adjust-calculate-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-adjust-has-temp-stock-search.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-adjust-has-temp-stock-search.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-adjustment-criteria-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-adjustment-criteria-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-adjustment-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-adjustment-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-adjustment-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-adjustment-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-adjustment-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-adjustment-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-balance-check-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-balance-check-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-count-criteria-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-count-criteria-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-count-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-count-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-count-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-count-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-count-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-count-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-request-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-request-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-request-items-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-request-items-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-transfer-branch-request-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-transfer-branch-request-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-transfer-bt-product-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-transfer-bt-product-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-transfer-bt-sku-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-transfer-bt-sku-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-transfer-rt-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-transfer-rt-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock-transfer-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock-transfer-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock/stock-balance-location-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock/stock-balance-location-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock/stock-balance-negative-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock/stock-balance-negative-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock/stock-balance-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock/stock-balance-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/stock/stock-movement-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/stock/stock-movement-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-add-items-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-add-items-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-check-order-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-check-order-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-order-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-order-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-order-pi-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-order-pi-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-order-return-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-order-return-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-pi-calculate-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-pi-calculate-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-search-add-items-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-search-add-items-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/supplier-selection-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/supplier-selection-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/tax-invoice-search-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/tax-invoice-search-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/tax-invoice-search-list-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/tax-invoice-search-list-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/to-destroy-discount-attach-after-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/to-destroy-discount-attach-after-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-out-criteria-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-out-criteria-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-out-destroy-discount-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-out-destroy-discount-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-out-destroy-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-out-destroy-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-out-detail-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-out-detail-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-out-raw-material-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-out-raw-material-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-out-search-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-out-search-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-out-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-out-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/transfer-reasons-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/transfer-reasons-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/slices/upload-file-slice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/slices/upload-file-slice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/store.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles/makeTheme.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/makeTheme.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles/theme.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/theme.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/close-saleshift-list.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/close-saleshift-list.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/close-saleshift-search.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/close-saleshift-search.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-bypass-branch.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-bypass-branch.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-bypass-support.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-bypass-support.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-close-sale.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-close-sale.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-save-close-shift-key.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/accounting/close-saleshift/modal-save-close-shift-key.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-check-price.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-check-price.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-check-stock.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-check-stock.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-confirm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-confirm.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-reject.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/barcode-discount/modal-reject.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/accordion-huawei-file.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/accordion-huawei-file.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/accordion-upload-file.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/accordion-upload-file.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/alert-error.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/alert-error.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/alert-warning.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/alert-warning.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/branch-list-dropdown.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/branch-list-dropdown.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/confirm-exit-model.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/confirm-exit-model.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/dailog-title.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/dailog-title.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker-all.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker-all.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker-detail.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker-detail.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker-v2.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker-v2.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/date-picker.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/html-tooltip.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/html-tooltip.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/modal-add-items.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/modal-add-items.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/modal-add-type-product.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/modal-add-type-product.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/modal-delete-confirm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/modal-delete-confirm.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/modal-show-file.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/modal-show-file.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/modal-show-huawei-file.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/modal-show-huawei-file.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/search-branch.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/search-branch.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/snackbar-status.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/snackbar-status.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/steppers.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/steppers.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/texbox-search-product.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/texbox-search-product.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/common/ui/textbox-comment.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/common/ui/textbox-comment.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-check-order-detail-list.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-check-order-detail-list.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-check-order.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-check-order.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-ckeck-order-detail.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-ckeck-order-detail.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-order-list.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/dc-check-orders/dc-order-list.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/dc-check-orders/modal-confirm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/dc-check-orders/modal-confirm.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock-transfer/branch-transfer/stock-transfer-bt-item.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock-transfer/branch-transfer/stock-transfer-bt-item.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock-transfer/branch-transfer/stock-transfer-bt-sku.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock-transfer/branch-transfer/stock-transfer-bt-sku.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock-transfer/branch-transfer/stock-transfer-bt.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock-transfer/branch-transfer/stock-transfer-bt.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock-transfer/stock-transfer-list.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock-transfer/stock-transfer-list.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock-transfer/stock-transfer.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock-transfer/stock-transfer.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock/stock-movement/stock-movement-search-list.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock/stock-movement/stock-movement-search-list.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock/stock-movement/stock-movement-search.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock/stock-movement/stock-movement-search.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/components/stock/stock-movement/stock-movement-transaction.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/components/stock/stock-movement/stock-movement-transaction.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mock-i18next.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mock-i18next.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mockData.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mockData.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mockStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mockStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-accounting.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-accounting.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-dc-check-order.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-dc-check-order.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-stock-transfer-bt.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-stock-transfer-bt.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-stock.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mockdata-store/mock-store-stock.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/unit-test-component.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/unit-test-component.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/utils/date-utill.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/utils/date-utill.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/utils/enum/barcode-discount-enum.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/utils/enum/barcode-discount-enum.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/utils/enum/check-order-enum.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/utils/enum/check-order-enum.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/utils/enum/stock-transfer-enum.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/utils/enum/stock-transfer-enum.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/utils/enum/supplier-order-enum.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/utils/enum/supplier-order-enum.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/utils/role-permission.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/utils/role-permission.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/utils/utils.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/utils/utils.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/custom-testing-library.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/custom-testing-library.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/date-utill.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/date-utill.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/accounting-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/accounting-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/barcode-discount-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/barcode-discount-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/cash-statement-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/cash-statement-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/check-order-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/check-order-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/common-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/common-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/permission-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/permission-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/purchase-branch-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/purchase-branch-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/setting-reserve-expense-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/setting-reserve-expense-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/stock-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/stock-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/stock-transfer-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/stock-transfer-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/enum/supplier-order-enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/enum/supplier-order-enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/exception/pos-exception.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/exception/pos-exception.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/role-permission.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/role-permission.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/svgTransform.js" beforeDir="false" afterPath="$PROJECT_DIR$/svgTransform.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="features/imp_UAT_update_warning_message_vtanh4" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2OiTqZ9vWAlRFofvNb435abbKjz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;artifact/transfer-out&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin/Downloads/ethereum-wallet-react-native&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/Admin/Downloads/cj-pos-back-web/node_modules/react-scripts&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\Admin\\Downloads\\cj-pos-back-web\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="Jest.component search branch">
+    <configuration name="component search branch" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/src/tests/components/common/ui/search-branch.test.tsx" />
+      <test-names>
+        <test-name value="component search branch" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="component search branch.find placeholder combo-box-branch " type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/tests/components/common/ui/search-branch.test.tsx" />
+      <test-names>
+        <test-name value="component search branch" />
+        <test-name value="find placeholder combo-box-branch " />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="component tooltip" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/src/tests/components/common/ui/accordion-huawei-file.test.tsx" />
+      <test-names>
+        <test-name value="component tooltip" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0f6cffb1-49b5-46aa-94ea-cf964163f8a5" name="Changes" comment="" />
+      <created>1682042593259</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1682042593259</updated>
+      <workItem from="1682042595225" duration="48000" />
+      <workItem from="1682042696826" duration="66000" />
+      <workItem from="1682306276308" duration="200000" />
+      <workItem from="1683626985550" duration="905000" />
+      <workItem from="1683684819062" duration="5310000" />
+      <workItem from="1683710911617" duration="26000" />
+      <workItem from="1683773471667" duration="3639000" />
+      <workItem from="1683855518822" duration="2840000" />
+      <workItem from="1683941671536" duration="23000" />
+      <workItem from="1683942225872" duration="2931000" />
+      <workItem from="1683947639764" duration="2693000" />
+      <workItem from="1684116391661" duration="2255000" />
+      <workItem from="1684219194702" duration="4487000" />
+      <workItem from="1684286766243" duration="3259000" />
+      <workItem from="1684305776451" duration="4061000" />
+      <workItem from="1684374432708" duration="2732000" />
+      <workItem from="1684718608593" duration="991000" />
+      <workItem from="1684739507874" duration="4344000" />
+      <workItem from="1684805510732" duration="7268000" />
+      <workItem from="1684825316089" duration="1288000" />
+      <workItem from="1684893104202" duration="416000" />
+      <workItem from="1684989207196" duration="894000" />
+      <workItem from="1685520988762" duration="3155000" />
+      <workItem from="1685584331638" duration="3272000" />
+      <workItem from="1685598701061" duration="3498000" />
+      <workItem from="1685669150715" duration="17231000" />
+      <workItem from="1685757060210" duration="5523000" />
+      <workItem from="1685929247700" duration="2273000" />
+      <workItem from="1686021022593" duration="3971000" />
+      <workItem from="1686286311651" duration="5875000" />
+      <workItem from="1686363377004" duration="2303000" />
+      <workItem from="1686533822160" duration="4732000" />
+      <workItem from="1686551642393" duration="4670000" />
+      <workItem from="1686558146325" duration="1823000" />
+      <workItem from="1688715395734" duration="7000" />
+      <workItem from="1688953480163" duration="5000" />
+      <workItem from="1694752659061" duration="39000" />
+      <workItem from="1694752719274" duration="78000" />
+      <workItem from="1694752815367" duration="15000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+</project>

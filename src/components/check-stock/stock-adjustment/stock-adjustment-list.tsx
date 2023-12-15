@@ -1,20 +1,30 @@
-import { Box, Typography } from '@mui/material';
-import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import React, { useEffect, useState } from 'react';
-import { useStyles } from '../../../styles/makeTheme';
-import { useTranslation } from 'react-i18next';
-import { Action, DateFormat, StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
-import { objectNullOrEmpty, stringNullOrEmpty } from '../../../utils/utils';
-import HtmlTooltip from '../../commons/ui/html-tooltip';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import SnackbarStatus from '../../commons/ui/snackbar-status';
-import { KeyCloakTokenInfo } from '../../../models/keycolak-token-info';
-import { getUserInfo } from '../../../store/sessionStore';
+import { Box, Typography } from "@mui/material";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
+import React, { useEffect, useState } from "react";
+import { useStyles } from "../../../styles/makeTheme";
+import { useTranslation } from "react-i18next";
+import {
+  Action,
+  DateFormat,
+  StockActionStatus,
+  STORE_TYPE,
+} from "../../../utils/enum/common-enum";
+import { objectNullOrEmpty, stringNullOrEmpty } from "../../../utils/utils";
+import HtmlTooltip from "../../commons/ui/html-tooltip";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import SnackbarStatus from "../../commons/ui/snackbar-status";
+import { KeyCloakTokenInfo } from "../../../models/keycolak-token-info";
+import { getUserInfo } from "../../../store/sessionStore";
 import { convertUtcToBkkDate } from "../../../utils/date-utill";
 import {
   StockAdjustment,
   StockAdjustmentSearchRequest,
-  StockAdjustmentSearchResponse
+  StockAdjustmentSearchResponse,
 } from "../../../models/stock-adjustment-model";
 import { getStockAdjustmentSearch } from "../../../store/slices/stock-adjustment-search-slice";
 import { saveSearchCriteriaSA } from "../../../store/slices/stock-adjustment-criteria-search-slice";
@@ -23,7 +33,7 @@ import { getStockAdjustmentDetail } from "../../../store/slices/stock-adjustment
 import { getAuditPlanDetail } from "../../../store/slices/audit-plan-detail-slice";
 import { updateRefresh } from "../../../store/slices/stock-adjust-calculate-slice";
 
-const _ = require('lodash');
+const _ = require("lodash");
 
 interface loadingModalState {
   open: boolean;
@@ -36,51 +46,69 @@ interface StateProps {
 
 const StockAdjustmentList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
-  const { t } = useTranslation(['barcodeDiscount']);
+  const { t } = useTranslation(["barcodeDiscount"]);
   const [lstStockAdjustment, setLstStockAdjustment] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
-  const [popupMsg, setPopupMsg] = React.useState<string>('');
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({ open: false });
+  const [popupMsg, setPopupMsg] = React.useState<string>("");
   const [openDetail, setOpenDetail] = React.useState(false);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
 
   const dispatch = useAppDispatch();
-  const stockAdjustmentSearchSlice = useAppSelector((state) => state.stockAdjustmentSearchSlice);
-  const toSearchResponse: StockAdjustmentSearchResponse = stockAdjustmentSearchSlice.toSearchResponse;
-  const currentPage = useAppSelector((state) => state.stockAdjustmentSearchSlice.toSearchResponse.page);
-  const limit = useAppSelector((state) => state.stockAdjustmentSearchSlice.toSearchResponse.perPage);
+  const stockAdjustmentSearchSlice = useAppSelector(
+    (state) => state.stockAdjustmentSearchSlice,
+  );
+  const toSearchResponse: StockAdjustmentSearchResponse =
+    stockAdjustmentSearchSlice.toSearchResponse;
+  const currentPage = useAppSelector(
+    (state) => state.stockAdjustmentSearchSlice.toSearchResponse.page,
+  );
+  const limit = useAppSelector(
+    (state) => state.stockAdjustmentSearchSlice.toSearchResponse.perPage,
+  );
   const [pageSize, setPageSize] = React.useState(limit.toString());
-  const payload = useAppSelector((state) => state.stockAdjustmentCriteriaSearchSlice.searchCriteria);
+  const payload = useAppSelector(
+    (state) => state.stockAdjustmentCriteriaSearchSlice.searchCriteria,
+  );
   const [userPermission, setUserPermission] = useState<any[]>([]);
 
   useEffect(() => {
     const lstStockAdjustment = toSearchResponse.data;
     if (lstStockAdjustment != null && lstStockAdjustment.length > 0) {
-      let rows = lstStockAdjustment.map((data: StockAdjustment, index: number) => {
-        return {
-          id: data.id,
-          index: (currentPage - 1) * parseInt(pageSize) + index + 1,
-          documentNumber: data.documentNumber,
-          createdDate: convertUtcToBkkDate(data.createdDate, DateFormat.DATE_FORMAT),
-          status: data.status,
-          branch: stringNullOrEmpty(data.branchCode)
-            ? stringNullOrEmpty(data.branchName)
-              ? ''
-              : data.branchName
-            : data.branchCode + ' - ' + (stringNullOrEmpty(data.branchName) ? '' : data.branchName),
-          createdBy: data.createdBy,
-          APId: data.APId,
-          APDocumentNumber: data.APDocumentNumber,
-        };
-      });
+      let rows = lstStockAdjustment.map(
+        (data: StockAdjustment, index: number) => {
+          return {
+            id: data.id,
+            index: (currentPage - 1) * parseInt(pageSize) + index + 1,
+            documentNumber: data.documentNumber,
+            createdDate: convertUtcToBkkDate(
+              data.createdDate,
+              DateFormat.DATE_FORMAT,
+            ),
+            status: data.status,
+            branch: stringNullOrEmpty(data.branchCode)
+              ? stringNullOrEmpty(data.branchName)
+                ? ""
+                : data.branchName
+              : data.branchCode +
+                " - " +
+                (stringNullOrEmpty(data.branchName) ? "" : data.branchName),
+            createdBy: data.createdBy,
+            APId: data.APId,
+            APDocumentNumber: data.APDocumentNumber,
+          };
+        },
+      );
       setLstStockAdjustment(rows);
       //permission
       const userInfo: KeyCloakTokenInfo = getUserInfo();
       if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
         setUserPermission(
-          userInfo.acl['service.posback-stock'] != null && userInfo.acl['service.posback-stock'].length > 0
-            ? userInfo.acl['service.posback-stock']
-            : []
+          userInfo.acl["service.posback-stock"] != null &&
+            userInfo.acl["service.posback-stock"].length > 0
+            ? userInfo.acl["service.posback-stock"]
+            : [],
         );
       }
     }
@@ -100,87 +128,86 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
 
   const columns: GridColDef[] = [
     {
-      field: 'index',
-      headerName: t('numberOrder'),
-      headerAlign: 'center',
+      field: "index",
+      headerName: t("numberOrder"),
+      headerAlign: "center",
       sortable: false,
       flex: 0.6,
       renderCell: (params) => (
-        <Box component="div" sx={{ margin: '0 auto' }}>
+        <Box component="div" sx={{ margin: "0 auto" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'documentNumber',
-      headerName: 'เลขที่เอกสาร',
-      headerAlign: 'center',
+      field: "documentNumber",
+      headerName: "เลขที่เอกสาร",
+      headerAlign: "center",
       sortable: false,
       flex: 1.2,
     },
     {
-      field: 'createdDate',
-      headerName: 'วันที่สร้างรายการ',
-      headerAlign: 'center',
-      align: 'center',
+      field: "createdDate",
+      headerName: "วันที่สร้างรายการ",
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       flex: 1,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '0.2rem' }}>
+        <Box component="div" sx={{ marginLeft: "0.2rem" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'branch',
-      headerName: 'สาขาที่สร้างรายการ',
-      headerAlign: 'center',
+      field: "branch",
+      headerName: "สาขาที่สร้างรายการ",
+      headerAlign: "center",
       sortable: false,
       flex: 1.5,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '0 auto' }}>
+        <Box component="div" sx={{ marginLeft: "0 auto" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'createdBy',
-      headerName: 'ผู้สร้างรายการ',
-      headerAlign: 'center',
+      field: "createdBy",
+      headerName: "ผู้สร้างรายการ",
+      headerAlign: "center",
       sortable: false,
       flex: 1.2,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '1rem' }}>
+        <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'status',
-      headerName: t('status'),
-      headerAlign: 'center',
-      align: 'center',
+      field: "status",
+      headerName: t("status"),
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       flex: 1.2,
       renderCell: (params) => genRowStatus(params),
     },
-
   ];
 
   const genRowStatus = (params: GridValueGetterParams) => {
     let statusDisplay;
-    let status = params.value ? params.value.toString() : '';
+    let status = params.value ? params.value.toString() : "";
     switch (status) {
       case StockActionStatus.DRAFT:
-        statusDisplay = genRowStatusValue('บันทึก', {
-          color: '#FBA600',
-          backgroundColor: '#FFF0CA',
+        statusDisplay = genRowStatusValue("บันทึก", {
+          color: "#FBA600",
+          backgroundColor: "#FFF0CA",
         });
         break;
       case StockActionStatus.CONFIRM:
-        statusDisplay = genRowStatusValue('ยืนยัน', {
-          color: '#20AE79',
-          backgroundColor: '#E7FFE9',
+        statusDisplay = genRowStatusValue("ยืนยัน", {
+          color: "#20AE79",
+          backgroundColor: "#E7FFE9",
         });
         break;
     }
@@ -221,7 +248,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
     setLoading(true);
     const payloadNewPage: StockAdjustmentSearchRequest = {
       perPage: pageSize.toString(),
-      page: '1',
+      page: "1",
       docNo: payload.docNo,
       branch: payload.branch,
       status: payload.status,
@@ -247,11 +274,13 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
     await dispatch(getStockAdjustmentSearch(payloadNew));
   };
 
-  const stockAdjustDetail = useAppSelector((state) => state.stockAdjustmentDetailSlice.stockAdjustDetail);
+  const stockAdjustDetail = useAppSelector(
+    (state) => state.stockAdjustmentDetailSlice.stockAdjustDetail,
+  );
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
-    handleOpenLoading('open', true);
-    if (chkPN !== 'checked') {
+    handleOpenLoading("open", true);
+    if (chkPN !== "checked") {
       try {
         await dispatch(getAuditPlanDetail(params.row.APId));
         await dispatch(getStockAdjustmentDetail(params.row.id));
@@ -263,7 +292,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
         console.log(error);
       }
     }
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
 
   return (
@@ -271,7 +300,7 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
       <Box mt={2} bgcolor="background.paper">
         <div
           className={classes.MdataGridPaginationTop}
-          style={{ height: lstStockAdjustment.length >= 10 ? '60vh' : 'auto' }}
+          style={{ height: lstStockAdjustment.length >= 10 ? "60vh" : "auto" }}
         >
           <DataGrid
             rows={lstStockAdjustment}
@@ -306,7 +335,12 @@ const StockAdjustmentList: React.FC<StateProps> = (props) => {
           onSearchMain={onSearchAgain}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg}/>
+      <SnackbarStatus
+        open={openPopup}
+        onClose={handleClosePopup}
+        isSuccess={true}
+        contentMsg={popupMsg}
+      />
     </div>
   );
 };

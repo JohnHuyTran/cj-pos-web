@@ -8,17 +8,17 @@ import {
   IconButton,
   TextField,
   Typography,
-} from '@mui/material';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import React, { ReactElement, useEffect, useMemo, useRef } from 'react';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import { ItemInfo } from '../../models/modal-add-item-model';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+} from "@mui/material";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import React, { ReactElement, useEffect, useMemo, useRef } from "react";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import { ItemInfo } from "../../models/modal-add-item-model";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { updateItemsState } from "../../store/slices/supplier-add-items-slice";
 
-import { useStyles } from '../../styles/makeTheme';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { DeleteForever } from '@mui/icons-material';
+import { useStyles } from "../../styles/makeTheme";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { DeleteForever } from "@mui/icons-material";
 import {
   DataGrid,
   GridCellParams,
@@ -27,9 +27,9 @@ import {
   GridRowData,
   GridRowId,
   useGridApiRef,
-} from '@mui/x-data-grid';
-import LoadingModal from '../commons/ui/loading-modal';
-import _ from 'lodash';
+} from "@mui/x-data-grid";
+import LoadingModal from "../commons/ui/loading-modal";
+import _ from "lodash";
 
 interface Props {
   open: boolean;
@@ -39,62 +39,62 @@ interface Props {
 
 const columns: GridColDef[] = [
   {
-    field: 'barcode',
-    headerName: 'บาร์โค้ด',
+    field: "barcode",
+    headerName: "บาร์โค้ด",
     flex: 1.2,
     // minWidth: 125,
-    headerAlign: 'center',
+    headerAlign: "center",
     // disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: 'barcodeName',
-    headerName: 'รายละเอียด',
-    headerAlign: 'center',
+    field: "barcodeName",
+    headerName: "รายละเอียด",
+    headerAlign: "center",
     flex: 1.7,
     // minWidth: 180,
     // disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: 'unitName',
-    headerName: 'หน่วย',
+    field: "unitName",
+    headerName: "หน่วย",
     flex: 0.7,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'actualQty',
-    headerName: 'จำนวน',
+    field: "actualQty",
+    headerName: "จำนวน",
     flex: 0.7,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant='outlined'
-        name='txnQuantityActual'
-        type='number'
-        inputProps={{ style: { textAlign: 'right' } }}
+        variant="outlined"
+        name="txnQuantityActual"
+        type="number"
+        inputProps={{ style: { textAlign: "right" } }}
         value={params.value}
         onChange={(e) => {
-          var value = e.target.value ? parseInt(e.target.value) : '';
+          var value = e.target.value ? parseInt(e.target.value) : "";
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        autoComplete='off'
+        autoComplete="off"
       />
     ),
   },
   {
-    field: 'delete',
-    headerName: 'ลบ',
+    field: "delete",
+    headerName: "ลบ",
     // flex: 0.5,
     width: 50,
     minWidth: 0,
-    align: 'center',
+    align: "center",
     sortable: false,
     renderCell: () => {
-      return <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />;
+      return <DeleteForever fontSize="medium" sx={{ color: "#F54949" }} />;
     },
   },
 ];
@@ -104,7 +104,7 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '',
+        field: "",
         width: 0,
         minWidth: 0,
         sortable: false,
@@ -113,7 +113,7 @@ function useApiRef() {
           return null;
         },
       }),
-    [columns]
+    [columns],
   );
 
   return { apiRef, columns: _columns };
@@ -127,7 +127,9 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   // const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [values, setValues] = React.useState<string[]>([]);
-  const [newAddItemListArray, setNewAddItemListArray] = React.useState<ItemInfo[]>([]);
+  const [newAddItemListArray, setNewAddItemListArray] = React.useState<
+    ItemInfo[]
+  >([]);
   let rows: any = [];
   rows = newAddItemListArray.map((item: any, index: number) => {
     return {
@@ -147,8 +149,12 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     setNewAddItemListArray([]);
   };
 
-  const _itemsList = useAppSelector((state) => state.searchItemListBySupplier.itemList);
-  const [itemsList, setItemList] = React.useState(_itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : []);
+  const _itemsList = useAppSelector(
+    (state) => state.searchItemListBySupplier.itemList,
+  );
+  const [itemsList, setItemList] = React.useState(
+    _itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : [],
+  );
   let options: any = itemsList && itemsList.length > 0 ? itemsList : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.barcodeName + option.barcode,
@@ -158,8 +164,8 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     return (
       <li {...props} key={option.barcode}>
         <div>
-          <Typography variant='body2'>{option.barcodeName}</Typography>
-          <Typography color='textSecondary' variant='caption'>
+          <Typography variant="body2">{option.barcodeName}</Typography>
+          <Typography color="textSecondary" variant="caption">
             {option.barcode}
           </Typography>
         </div>
@@ -170,12 +176,12 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   const autocompleteRenderInput = (params: any) => {
     return (
       <TextField
-        id='tbxSearch'
+        id="tbxSearch"
         {...params}
-        placeholder='บาร์โค้ด/รายละเอียดสินค้า'
+        placeholder="บาร์โค้ด/รายละเอียดสินค้า"
         className={classes.MtextField}
-        variant='outlined'
-        size='small'
+        variant="outlined"
+        size="small"
         fullWidth
         onMouseDown={handleOnMouseDown}
         onChange={handleOnMouseDown}
@@ -184,10 +190,12 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
   };
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
-    if (option && reason === 'selectOption') {
+    if (option && reason === "selectOption") {
       let barcode = option?.barcode;
       // setSearchItem(null);
-      const chkduplicate: any = newAddItemListArray.find((r: any) => r.barcode === barcode);
+      const chkduplicate: any = newAddItemListArray.find(
+        (r: any) => r.barcode === barcode,
+      );
       if (chkduplicate) {
         let duplicateIems: any = [];
         newAddItemListArray.forEach((data: any) => {
@@ -211,7 +219,8 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       } else {
         const itemsList: any = [];
         if (rows.length > 0) {
-          const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
+          const rowsEdit: Map<GridRowId, GridRowData> =
+            apiRef.current.getRowModels();
           rowsEdit.forEach((data: GridRowData) => {
             itemsList.push(data);
           });
@@ -235,16 +244,17 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     setValues([]);
   };
 
-  const [barcodeNameDel, setBarcodeNameDel] = React.useState('');
-  const [skuCodeDel, setSkuCodeDel] = React.useState('');
-  const [barCodeDel, setBarCodeDel] = React.useState('');
-  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [barcodeNameDel, setBarcodeNameDel] = React.useState("");
+  const [skuCodeDel, setSkuCodeDel] = React.useState("");
+  const [barCodeDel, setBarCodeDel] = React.useState("");
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] =
+    React.useState(false);
   const currentlyDelete = (params: GridCellParams) => {
     const value = params.colDef.field;
-    if (value === 'delete') {
-      setBarcodeNameDel(String(params.getValue(params.id, 'barcodeName')));
-      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
-      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
+    if (value === "delete") {
+      setBarcodeNameDel(String(params.getValue(params.id, "barcodeName")));
+      setSkuCodeDel(String(params.getValue(params.id, "skuCode")));
+      setBarCodeDel(String(params.getValue(params.id, "barcode")));
       setOpenModelDeleteConfirm(true);
     }
   };
@@ -252,11 +262,15 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
     setOpenModelDeleteConfirm(false);
   };
   const handleDeleteItem = () => {
-    setNewAddItemListArray(newAddItemListArray.filter((r: any) => r.barcode !== barCodeDel));
+    setNewAddItemListArray(
+      newAddItemListArray.filter((r: any) => r.barcode !== barCodeDel),
+    );
     setOpenModelDeleteConfirm(false);
   };
 
-  const payloadAddItem = useAppSelector((state) => state.supplierAddItems.state);
+  const payloadAddItem = useAppSelector(
+    (state) => state.supplierAddItems.state,
+  );
   const handleAddItems = async () => {
     setOpenLoadingModal(true);
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
@@ -302,7 +316,7 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
       if (event && event.keyCode && event.keyCode === 13) {
         return false;
       }
-      if (reason == 'reset') {
+      if (reason == "reset") {
         clearInput();
       }
       const keyword = value.trim();
@@ -321,62 +335,76 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
           unitPriceText: _option[0].unitPriceText,
         };
         setItemList([]);
-        handleChangeItem(null, item, 'selectOption');
+        handleChangeItem(null, item, "selectOption");
       }
     }, 200);
     searchDebouceRef.current();
   };
 
   const handleOnMouseDown = () => {
-    setItemList(_itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : []);
+    setItemList(
+      _itemsList.data && _itemsList.data.length > 0 ? _itemsList.data : [],
+    );
   };
 
   return (
     <div>
-      <Dialog open={open} maxWidth='sm' fullWidth={true}>
+      <Dialog open={open} maxWidth="sm" fullWidth={true}>
         <DialogContent>
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ display: "flex" }}>
             <Box pt={1.5} sx={{ flex: 2 }}>
               รายการสินค้า :
             </Box>
             <Box sx={{ flex: 7 }}>
               <Autocomplete
-                id='selAddItem'
+                id="selAddItem"
                 value={values}
                 fullWidth
-                loadingText='กำลังโหลด...'
+                loadingText="กำลังโหลด..."
                 options={options}
                 filterOptions={filterOptions}
                 renderOption={autocompleteRenderListItem}
                 onChange={handleChangeItem}
                 onInputChange={onInputChange}
-                getOptionLabel={(option) => (option.barcodeName ? option.barcodeName : '')}
-                isOptionEqualToValue={(option, value) => option.barcodeName === value.barcodeName}
+                getOptionLabel={(option) =>
+                  option.barcodeName ? option.barcodeName : ""
+                }
+                isOptionEqualToValue={(option, value) =>
+                  option.barcodeName === value.barcodeName
+                }
                 renderInput={autocompleteRenderInput}
-                noOptionsText=''
+                noOptionsText=""
               />
             </Box>
 
             <Box sx={{ flex: 1, ml: 2 }}>
               {handldCloseAddItemModal ? (
                 <IconButton
-                  aria-label='close'
+                  aria-label="close"
                   onClick={handldCloseAddItemModal}
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     right: 8,
                     top: 8,
                     color: (theme: any) => theme.palette.grey[400],
-                  }}>
-                  <CancelOutlinedIcon fontSize='large' stroke={'white'} strokeWidth={1} />
+                  }}
+                >
+                  <CancelOutlinedIcon
+                    fontSize="large"
+                    stroke={"white"}
+                    strokeWidth={1}
+                  />
                 </IconButton>
               ) : null}
             </Box>
           </Box>
 
           {newAddItemListArray.length > 0 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <div style={{ width: '100%' }} className={classes.MdataGridPaginationTop}>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+              <div
+                style={{ width: "100%" }}
+                className={classes.MdataGridPaginationTop}
+              >
                 <DataGrid
                   rows={rows}
                   columns={columns}
@@ -389,21 +417,25 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
             </Box>
           )}
           {newAddItemListArray.length == 0 && _itemsList.code === 204 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }} color='#CBD4DB'>
+            <Box
+              sx={{ display: "flex", justifyContent: "center", mt: 4 }}
+              color="#CBD4DB"
+            >
               <h4>ไม่พบสินค้า</h4>
             </Box>
           )}
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
             <Button
-              id='btnSearch'
-              variant='contained'
-              color='secondary'
+              id="btnSearch"
+              variant="contained"
+              color="secondary"
               onClick={handleAddItems}
               className={classes.MbtnSearch}
-              size='large'
+              size="large"
               disabled={newAddItemListArray.length === 0}
-              startIcon={<AddCircleOutlineIcon />}>
+              startIcon={<AddCircleOutlineIcon />}
+            >
               เพิ่มสินค้า
             </Button>
           </Box>
@@ -413,47 +445,63 @@ function ModalAddItem({ open, onClose, supNo }: Props): ReactElement {
 
       <Dialog
         open={openModelDeleteConfirm}
-        aria-labelledby='alert-dialog-title'
-        aria-describedby='alert-dialog-description'
-        maxWidth='md'
-        sx={{ minWidth: 800 }}>
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="md"
+        sx={{ minWidth: 800 }}
+      >
         <DialogContent sx={{ pl: 6, pr: 8 }}>
-          <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
-            <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{ color: "#263238" }}
+          >
+            <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
               ต้องการลบสินค้า
             </Typography>
-            <Typography variant='body1' align='left'>
-              สินค้า <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
+            <Typography variant="body1" align="left">
+              สินค้า{" "}
+              <label style={{ color: "#AEAEAE", marginRight: 5 }}>|</label>{" "}
+              <label style={{ color: "#36C690" }}>
                 <b>{barcodeNameDel}</b>
                 <br />
-                <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCodeDel}</label>
+                <label
+                  style={{
+                    color: "#AEAEAE",
+                    fontSize: 14,
+                    marginLeft: "3.8em",
+                  }}
+                >
+                  {skuCodeDel}
+                </label>
               </label>
             </Typography>
-            <Typography variant='body1' align='left'>
-              บาร์โค้ด <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
+            <Typography variant="body1" align="left">
+              บาร์โค้ด{" "}
+              <label style={{ color: "#AEAEAE", marginRight: 5 }}>|</label>{" "}
+              <label style={{ color: "#36C690" }}>
                 <b>{barCodeDel}</b>
               </label>
             </Typography>
           </DialogContentText>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
+        <DialogActions sx={{ justifyContent: "center", mb: 2, pl: 6, pr: 8 }}>
           <Button
-            id='btnCancle'
-            variant='contained'
-            color='cancelColor'
+            id="btnCancle"
+            variant="contained"
+            color="cancelColor"
             sx={{ borderRadius: 2, width: 90, mr: 2 }}
-            onClick={handleModelDeleteConfirm}>
+            onClick={handleModelDeleteConfirm}
+          >
             ยกเลิก
           </Button>
           <Button
-            id='btnConfirm'
-            variant='contained'
-            color='error'
+            id="btnConfirm"
+            variant="contained"
+            color="error"
             sx={{ borderRadius: 2, width: 90 }}
-            onClick={handleDeleteItem}>
+            onClick={handleDeleteItem}
+          >
             ลบสินค้า
           </Button>
         </DialogActions>

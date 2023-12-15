@@ -31,7 +31,7 @@ export default class OverwriteMomentBE extends DateUtils {
       .format(
         format
           .replace("YYYY", buddhishYear)
-          .replace("YY", buddhishYear.substring(2, 4))
+          .replace("YY", buddhishYear.substring(2, 4)),
       )
       .replace(christianYear, buddhishYear);
   }

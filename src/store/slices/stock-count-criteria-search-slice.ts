@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { StockCountSearchRequest } from "../../models/stock-count-model";
 
 type State = {
@@ -7,18 +7,18 @@ type State = {
 
 const initialState: State = {
   searchCriteria: {
-    perPage: '10',
-    page: '1',
-    query: '',
-    branch: '',
-    status: '',
-    startDate: '',
-    endDate: '',
+    perPage: "10",
+    page: "1",
+    query: "",
+    branch: "",
+    status: "",
+    startDate: "",
+    endDate: "",
   },
 };
 
 const stockCountCriteriaSearchSlice = createSlice({
-  name: 'stockCountCriteriaSearchSlice',
+  name: "stockCountCriteriaSearchSlice",
   initialState,
   reducers: {
     saveSearchCriteriaSC: (state, action: PayloadAction<any>) => {

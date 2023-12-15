@@ -1,60 +1,70 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import React, { ReactElement } from 'react';
-import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import { useStyles } from '../../../styles/makeTheme';
-import { Barcode } from '../../../models/stock-model';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+} from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import React, { ReactElement } from "react";
+import { BootstrapDialogTitle } from "../../commons/ui/dialog-title";
+import { useStyles } from "../../../styles/makeTheme";
+import { Barcode } from "../../../models/stock-model";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   movementTransaction: Barcode[];
 }
-function StockMovementTransaction({ open, onClose, movementTransaction }: Props): ReactElement {
+function StockMovementTransaction({
+  open,
+  onClose,
+  movementTransaction,
+}: Props): ReactElement {
   const classes = useStyles();
   const columns: GridColDef[] = [
     {
-      field: 'barcode',
-      headerName: 'บาร์โค้ด',
-      headerAlign: 'center',
-      align: 'center',
+      field: "barcode",
+      headerName: "บาร์โค้ด",
+      headerAlign: "center",
+      align: "center",
       minWidth: 150,
       flex: 0.5,
       sortable: false,
     },
     {
-      field: 'qty',
-      headerName: 'จำนวน',
+      field: "qty",
+      headerName: "จำนวน",
       minWidth: 150,
       // flex: 0.5,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
     },
     {
-      field: 'unitName',
-      headerName: 'หน่วย',
+      field: "unitName",
+      headerName: "หน่วย",
       minWidth: 150,
       // flex: 0.5,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'barFactor',
-      headerName: 'Unit Factor',
+      field: "barFactor",
+      headerName: "Unit Factor",
       minWidth: 150,
       // flex: 0.5,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
     },
     {
-      field: 'baseUnitQty',
-      headerName: 'จำนวนที่ทำรายการ(ชิ้น)',
+      field: "baseUnitQty",
+      headerName: "จำนวนที่ทำรายการ(ชิ้น)",
       minWidth: 200,
       // flex: 0.5,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
     },
   ];
@@ -74,13 +84,24 @@ function StockMovementTransaction({ open, onClose, movementTransaction }: Props)
   return (
     <Dialog
       open={open}
-      aria-labelledby='alert-dialog-title'
-      aria-describedby='alert-dialog-description'
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
       fullWidth={true}
-      maxWidth='md'>
-      <DialogContent sx={{ padding: '1em' }}>
-        <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line', color: '#000000', pt: 3 }}>
-          <div className={classes.MdataGridPaginationTop} style={{ width: '100%' }}>
+      maxWidth="md"
+    >
+      <DialogContent sx={{ padding: "1em" }}>
+        <DialogContentText
+          sx={{
+            textAlign: "center",
+            whiteSpace: "pre-line",
+            color: "#000000",
+            pt: 3,
+          }}
+        >
+          <div
+            className={classes.MdataGridPaginationTop}
+            style={{ width: "100%" }}
+          >
             <DataGrid
               rows={rows}
               columns={columns}
@@ -93,14 +114,17 @@ function StockMovementTransaction({ open, onClose, movementTransaction }: Props)
           </div>
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: 'center', margin: '10px 0px 10px 0px' }}>
+      <DialogActions
+        sx={{ justifyContent: "center", margin: "10px 0px 10px 0px" }}
+      >
         <Button
-          data-testid='testid-btnClose'
-          id='btnClose'
-          variant='contained'
-          color='error'
-          sx={{ borderRadius: '5px', width: '126px' }}
-          onClick={onClose}>
+          data-testid="testid-btnClose"
+          id="btnClose"
+          variant="contained"
+          color="error"
+          sx={{ borderRadius: "5px", width: "126px" }}
+          onClick={onClose}
+        >
           ปิด
         </Button>
       </DialogActions>

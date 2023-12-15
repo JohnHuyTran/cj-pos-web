@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type NavState = {
   state: boolean;
@@ -9,7 +9,7 @@ const initialState: NavState = {
 };
 
 export const navSlice = createSlice({
-  name: 'navigate',
+  name: "navigate",
   initialState,
   reducers: {
     changeState: (state, action: PayloadAction<boolean>) => {

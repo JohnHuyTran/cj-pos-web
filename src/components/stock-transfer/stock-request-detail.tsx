@@ -1,27 +1,34 @@
-import React, { ReactElement, useEffect } from 'react';
-import moment from 'moment';
-import { useAppSelector } from '../../store/store';
-import DialogContent from '@mui/material/DialogContent';
-import Dialog from '@mui/material/Dialog';
-import Typography from '@mui/material/Typography';
-import { Box, Button, DialogTitle, Grid, IconButton } from '@mui/material';
-import { CheckCircleOutline, ControlPoint, HighlightOff } from '@mui/icons-material';
-import SaveIcon from '@mui/icons-material/Save';
-import Steppers from './steppers';
-import { useStyles } from '../../styles/makeTheme';
-import DatePickerComponent from '../commons/ui/date-picker-detail';
-import BranchListDropDown from '../commons/ui/branch-list-dropdown';
-import StockRequestSKU from './stock-request-list-sku';
-import { useAppDispatch } from '../../store/store';
-import ModalAddItems from '../commons/ui/modal-add-items';
-import TransferReasonsListDropDown from './transfer-reasons-list-dropdown';
-import { updateAddItemsState, updateErrorList } from '../../store/slices/add-items-slice';
+import React, { ReactElement, useEffect } from "react";
+import moment from "moment";
+import { useAppSelector } from "../../store/store";
+import DialogContent from "@mui/material/DialogContent";
+import Dialog from "@mui/material/Dialog";
+import Typography from "@mui/material/Typography";
+import { Box, Button, DialogTitle, Grid, IconButton } from "@mui/material";
+import {
+  CheckCircleOutline,
+  ControlPoint,
+  HighlightOff,
+} from "@mui/icons-material";
+import SaveIcon from "@mui/icons-material/Save";
+import Steppers from "./steppers";
+import { useStyles } from "../../styles/makeTheme";
+import DatePickerComponent from "../commons/ui/date-picker-detail";
+import BranchListDropDown from "../commons/ui/branch-list-dropdown";
+import StockRequestSKU from "./stock-request-list-sku";
+import { useAppDispatch } from "../../store/store";
+import ModalAddItems from "../commons/ui/modal-add-items";
+import TransferReasonsListDropDown from "./transfer-reasons-list-dropdown";
+import {
+  updateAddItemsState,
+  updateErrorList,
+} from "../../store/slices/add-items-slice";
 import {
   Approve1StockTransferRequest,
   Approve2StockTransferRequest,
   SaveStockTransferRequest,
-} from '../../models/stock-transfer-model';
-import { ApiError } from '../../models/api-error-model';
+} from "../../models/stock-transfer-model";
+import { ApiError } from "../../models/api-error-model";
 import {
   approve1StockRequest,
   approve2BySCMStockRequest,
@@ -31,32 +38,35 @@ import {
   removeStockRequest,
   saveStockRequest,
   submitStockRequest,
-} from '../../services/stock-transfer';
-import SnackbarStatus from '../commons/ui/snackbar-status';
-import LoadingModal from '../commons/ui/loading-modal';
-import AlertError from '../commons/ui/alert-error';
-import TextBoxComment from '../commons/ui/textbox-comment';
-import { getBranchName, getReasonLabel } from '../../utils/utils';
-import ModalConfirmTransaction from './modal-confirm-transaction';
-import { featchSearchStockTransferRtAsync } from '../../store/slices/stock-transfer-rt-slice';
-import ConfirmModelExit from '../commons/ui/confirm-exit-model';
-import { featchStockRequestDetailAsync } from '../../store/slices/stock-request-detail-slice';
+} from "../../services/stock-transfer";
+import SnackbarStatus from "../commons/ui/snackbar-status";
+import LoadingModal from "../commons/ui/loading-modal";
+import AlertError from "../commons/ui/alert-error";
+import TextBoxComment from "../commons/ui/textbox-comment";
+import { getBranchName, getReasonLabel } from "../../utils/utils";
+import ModalConfirmTransaction from "./modal-confirm-transaction";
+import { featchSearchStockTransferRtAsync } from "../../store/slices/stock-transfer-rt-slice";
+import ConfirmModelExit from "../commons/ui/confirm-exit-model";
+import { featchStockRequestDetailAsync } from "../../store/slices/stock-request-detail-slice";
 
-import { isAllowActionPermission, isGroupBranch } from '../../utils/role-permission';
-import { env } from '../../adapters/environmentConfigs';
-import { getUserInfo } from '../../store/sessionStore';
-import { ACTIONS, PERMISSION_GROUP } from '../../utils/enum/permission-enum';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { isPreferredUsername } from '../../utils/role-permission';
-import ModelDeleteConfirm from './modal-delete-confirm';
-import { SuperviseBranchRequest } from '../../models/search-branch-model';
+import {
+  isAllowActionPermission,
+  isGroupBranch,
+} from "../../utils/role-permission";
+import { env } from "../../adapters/environmentConfigs";
+import { getUserInfo } from "../../store/sessionStore";
+import { ACTIONS, PERMISSION_GROUP } from "../../utils/enum/permission-enum";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { isPreferredUsername } from "../../utils/role-permission";
+import ModelDeleteConfirm from "./modal-delete-confirm";
+import { SuperviseBranchRequest } from "../../models/search-branch-model";
 import {
   clearSuperviseBranchFilter,
   featchSuperviseBranchListAsync,
-} from '../../store/slices/authority/authorized-branch-slice';
-import i18n from '../../locales/i18n';
-import { mappingErrorParam } from '../../utils/exception/pos-exception';
-import { ErrorDetailResponse, Header } from '../../models/api-error-model';
+} from "../../store/slices/authority/authorized-branch-slice";
+import i18n from "../../locales/i18n";
+import { mappingErrorParam } from "../../utils/exception/pos-exception";
+import { ErrorDetailResponse, Header } from "../../models/api-error-model";
 
 interface State {
   branchCode: string;
@@ -90,7 +100,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
@@ -103,7 +113,12 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactElement {
+function stockRequestDetail({
+  type,
+  edit,
+  isOpen,
+  onClickClose,
+}: Props): ReactElement {
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -117,17 +132,24 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const [groupOC, setGroupOC] = React.useState(false);
   const [groupSCM, setGroupSCM] = React.useState(false);
   const [groupBranchSCM, setGroupBranchSCM] = React.useState<boolean>(false);
-  const [isAuthorizedBranch, setIsAuthorizedBranch] = React.useState<boolean>(false);
+  const [isAuthorizedBranch, setIsAuthorizedBranch] =
+    React.useState<boolean>(false);
   // const [pageSize, setPageSize] = React.useState(limit.toString());
 
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
-  const reasonsList = useAppSelector((state) => state.transferReasonsList.reasonsList.data);
-  const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
+  const branchList = useAppSelector((state) => state.searchBranchSlice)
+    .branchList.data;
+  const reasonsList = useAppSelector(
+    (state) => state.transferReasonsList.reasonsList.data,
+  );
+  const stockRequestDetail = useAppSelector(
+    (state) => state.stockRequestDetail.stockRequestDetail.data,
+  );
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   let rowLength = 0;
 
-  if (type === 'Create') {
-    if (Object.keys(payloadAddItem).length > 0) rowLength = Object.keys(payloadAddItem).length;
+  if (type === "Create") {
+    if (Object.keys(payloadAddItem).length > 0)
+      rowLength = Object.keys(payloadAddItem).length;
   } else {
     if (Object.keys(payloadAddItem).length > 0) {
       rowLength = Object.keys(payloadAddItem).length;
@@ -139,7 +161,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
   // let deleteMode = false;
   const [canCleMode, setCanCleMode] = React.useState(false);
-  const [preferredUsername, setPreferredUsername] = React.useState(isPreferredUsername());
+  const [preferredUsername, setPreferredUsername] = React.useState(
+    isPreferredUsername(),
+  );
 
   useEffect(() => {
     setOpen(isOpen);
@@ -155,16 +179,16 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setGroupBranchSCM(scm);
     setIsAuthorizedBranch(scm);
 
-    if (type === 'View' && stockRequestDetail) {
+    if (type === "View" && stockRequestDetail) {
       setDisplayBtnAddItem(true);
       setStatus(stockRequestDetail.status);
-      if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_1') {
+      if (stockRequestDetail.status === "WAIT_FOR_APPROVAL_1") {
         if (!oc) {
           setIsDisableOC(false);
         }
 
         setIsDisableSCM(false);
-      } else if (stockRequestDetail.status === 'WAIT_FOR_APPROVAL_2') {
+      } else if (stockRequestDetail.status === "WAIT_FOR_APPROVAL_2") {
         if (!scm) {
           setIsDisableSCM(false);
         }
@@ -182,10 +206,13 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       setStartDate(new Date(starD));
       setEndDate(new Date(endD));
 
-      const branchFrom = getBranchName(branchList, stockRequestDetail.branchFrom);
+      const branchFrom = getBranchName(
+        branchList,
+        stockRequestDetail.branchFrom,
+      );
       const branchFromMap: BranchListOptionType = {
         code: stockRequestDetail.branchFrom,
-        name: branchFrom ? branchFrom : '',
+        name: branchFrom ? branchFrom : "",
       };
 
       setValuebranchFrom(branchFromMap);
@@ -194,27 +221,32 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       const branchTo = getBranchName(branchList, stockRequestDetail.branchTo);
       const branchToMap: BranchListOptionType = {
         code: stockRequestDetail.branchTo,
-        name: branchTo ? branchTo : '',
+        name: branchTo ? branchTo : "",
       };
       setValuebranchTo(branchToMap);
       setToBranch(stockRequestDetail.branchTo);
 
       setReasons(stockRequestDetail.transferReason);
-      const reason = getReasonLabel(reasonsList, stockRequestDetail.transferReason);
-      setReasonText(reason ? reason : '-');
+      const reason = getReasonLabel(
+        reasonsList,
+        stockRequestDetail.transferReason,
+      );
+      setReasonText(reason ? reason : "-");
 
       // auditLog get comment
-      const auditLog = stockRequestDetail.auditLogs ? stockRequestDetail.auditLogs : [];
+      const auditLog = stockRequestDetail.auditLogs
+        ? stockRequestDetail.auditLogs
+        : [];
       const comments = auditLog.filter((r: any) => r.comment !== undefined);
       const commentOC: any[] = [];
       const commentSCM: any[] = [];
       comments.forEach((c: any) => {
-        const comment = `${c.comment ? c.comment : ''}`;
+        const comment = `${c.comment ? c.comment : ""}`;
         const by = JSON.parse(`${comment}`).by;
         const detail = JSON.parse(`${comment}`).detail;
-        if (by === 'OC') {
+        if (by === "OC") {
           commentOC.push(detail);
-        } else if (by === 'SCM') {
+        } else if (by === "SCM") {
           commentSCM.push(detail);
         }
       });
@@ -226,7 +258,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     }
 
     if (
-      (stockRequestDetail?.status === 'DRAFT' || stockRequestDetail?.status === 'AWAITING_FOR_REQUESTER') &&
+      (stockRequestDetail?.status === "DRAFT" ||
+        stockRequestDetail?.status === "AWAITING_FOR_REQUESTER") &&
       !groupOC &&
       stockRequestDetail?.createdBy === preferredUsername
     ) {
@@ -236,15 +269,15 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     dispatch(updateErrorList({}));
   }, [open === true]);
 
-  const [status, setStatus] = React.useState('');
-  const [rtNo, setRTNo] = React.useState('');
+  const [status, setStatus] = React.useState("");
+  const [rtNo, setRTNo] = React.useState("");
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
   const [values, setValues] = React.useState<State>({
-    branchCode: '',
+    branchCode: "",
   });
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
-  const [contentMsg, setContentMsg] = React.useState('');
+  const [contentMsg, setContentMsg] = React.useState("");
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -256,10 +289,13 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const handleChkSaveClose = async () => {
     if (flagSave && edit) {
       setConfirmModelExit(true);
-    } else if (!flagSave && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
-      if (type === 'View' && rowLength !== Object.keys(payloadAddItem).length) {
+    } else if (
+      !flagSave &&
+      (status === "DRAFT" || status === "AWAITING_FOR_REQUESTER")
+    ) {
+      if (type === "View" && rowLength !== Object.keys(payloadAddItem).length) {
         setConfirmModelExit(true);
-      } else if (type === 'Create' && rowLength > 0 && !flagCreateSave) {
+      } else if (type === "Create" && rowLength > 0 && !flagCreateSave) {
         setConfirmModelExit(true);
       } else {
         handleClose();
@@ -299,32 +335,36 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     }
   }
 
-  const [fromBranch, setFromBranch] = React.useState('');
+  const [fromBranch, setFromBranch] = React.useState("");
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch
       ? getBranchName(branchList, getUserInfo().branch)
         ? getUserInfo().branch
         : env.branch.code
-      : env.branch.code
+      : env.branch.code,
   );
   const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
     code: ownBranch,
-    name: branchFrom ? branchFrom : '',
+    name: branchFrom ? branchFrom : "",
   };
-  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
-    groupBranch ? branchFromMap : null
-  );
+  const [valuebranchFrom, setValuebranchFrom] =
+    React.useState<BranchListOptionType | null>(
+      groupBranch ? branchFromMap : null,
+    );
 
   if (valuebranchFrom?.code) {
     if (!displayBtnAddItem) setDisplayBtnAddItem(true);
-    if (fromBranch === '') setFromBranch(valuebranchFrom?.code);
+    if (fromBranch === "") setFromBranch(valuebranchFrom?.code);
   }
 
-  const [valuebranchTo, setValuebranchTo] = React.useState<BranchListOptionType | null>(null);
-  const [toBranch, setToBranch] = React.useState('');
-  const [clearBranchFromDropDown, setClearBranchFromDropDown] = React.useState<boolean>(false);
-  const [clearBranchToDropDown, setClearBranchToDropDown] = React.useState<boolean>(false);
+  const [valuebranchTo, setValuebranchTo] =
+    React.useState<BranchListOptionType | null>(null);
+  const [toBranch, setToBranch] = React.useState("");
+  const [clearBranchFromDropDown, setClearBranchFromDropDown] =
+    React.useState<boolean>(false);
+  const [clearBranchToDropDown, setClearBranchToDropDown] =
+    React.useState<boolean>(false);
   const handleChangeFromBranch = (branchCode: string) => {
     if (groupSCM) {
       getSuperviseBranch(branchCode);
@@ -339,8 +379,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       setDisplayBtnAddItem(true);
       setFromBranch(branchCode);
     } else {
-      setValues({ ...values, branchCode: '' });
-      setFromBranch('');
+      setValues({ ...values, branchCode: "" });
+      setFromBranch("");
     }
 
     if (!clearBranchToDropDown) setClearBranchToDropDown(true);
@@ -355,23 +395,23 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       setValues({ ...values, branchCode: JSON.parse(codes) });
       setToBranch(branchCode);
     } else {
-      setValues({ ...values, branchCode: '' });
-      setToBranch('');
+      setValues({ ...values, branchCode: "" });
+      setToBranch("");
     }
   };
 
   const getSuperviseBranch = async (branchCode: string) => {
     await dispatch(clearSuperviseBranchFilter());
     const payload: SuperviseBranchRequest = {
-      role: 'dc',
+      role: "dc",
       branchCode: branchCode,
       isDC: true,
     };
     await dispatch(featchSuperviseBranchListAsync(payload));
   };
 
-  const [reasons, setReasons] = React.useState('');
-  const [reasonText, setReasonText] = React.useState('');
+  const [reasons, setReasons] = React.useState("");
+  const [reasonText, setReasonText] = React.useState("");
   const handleChangeReasons = (ReasonsCode: string) => {
     setFlagSave(true);
     setReasons(ReasonsCode);
@@ -399,8 +439,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setFlagSave(true);
   };
 
-  const [commentOC, setCommentOC] = React.useState('');
-  const [commentSCM, setCommentSCM] = React.useState('');
+  const [commentOC, setCommentOC] = React.useState("");
+  const [commentSCM, setCommentSCM] = React.useState("");
   const [isDisableOC, setIsDisableOC] = React.useState(true);
   const [isDisableSCM, setIsDisableSCM] = React.useState(true);
 
@@ -414,7 +454,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   };
 
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
+  const [textError, setTextError] = React.useState("");
   // const [titleError, setTitleError] = React.useState('');
   const [payloadError, setPayloadError] = React.useState<ErrorDetailResponse>();
   const [errorDetail, setErrorDetail] = React.useState<any>();
@@ -437,36 +477,38 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
     if (!startDate || !endDate) {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกวันที่โอนสินค้า');
-    } else if (fromBranch === '' || toBranch === '') {
+      setTextError("กรุณาเลือกวันที่โอนสินค้า");
+    } else if (fromBranch === "" || toBranch === "") {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกสาขาโอนสินค้า');
-    } else if (reasons === 'All' || reasons === undefined || reasons === '') {
+      setTextError("กรุณาเลือกสาขาโอนสินค้า");
+    } else if (reasons === "All" || reasons === undefined || reasons === "") {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกสาเหตุการโอน');
+      setTextError("กรุณาเลือกสาเหตุการโอน");
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
-      setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      setTextError("กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0");
     } else if (validateStockQty.length > 0) {
       setOpenAlert(true);
-      setTextError('กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ');
+      setTextError(
+        "กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ",
+      );
     } else {
       const payloadSave: any = await handleMapPayloadSave();
       await saveStockRequest(payloadSave)
         .then(async (value) => {
           await dispatch(featchStockRequestDetailAsync(value.docNo));
 
-          if (type === 'Create') {
-            type = 'View';
+          if (type === "Create") {
+            type = "View";
             setFlagCreateSave(true);
           }
 
           setFlagSave(false);
           setRTNo(value.docNo);
-          setStatus('DRAFT');
+          setStatus("DRAFT");
           setShowSnackBar(true);
           setSnackbarIsStatus(true);
-          setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+          setContentMsg("คุณได้บันทึกข้อมูลเรียบร้อยแล้ว");
           setErrorDetail([]);
         })
         .catch((error: ApiError) => {
@@ -513,12 +555,12 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
       });
     }
 
-    let rt = '';
+    let rt = "";
     if (rtNo) rt = rtNo;
     const payload: SaveStockTransferRequest = {
       rtNo: rt,
-      startDate: moment(startDate).startOf('day').toISOString(),
-      endDate: moment(endDate).startOf('day').toISOString(),
+      startDate: moment(startDate).startOf("day").toISOString(),
+      endDate: moment(endDate).startOf("day").toISOString(),
       branchFrom: fromBranch,
       branchTo: toBranch,
       transferReason: reasons,
@@ -539,29 +581,31 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
     if (!startDate || !endDate) {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกวันที่โอนสินค้า');
-    } else if (fromBranch === '' || toBranch === '') {
+      setTextError("กรุณาเลือกวันที่โอนสินค้า");
+    } else if (fromBranch === "" || toBranch === "") {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกสาขาโอนสินค้า');
-    } else if (reasons === 'All' || reasons === undefined || reasons === '') {
+      setTextError("กรุณาเลือกสาขาโอนสินค้า");
+    } else if (reasons === "All" || reasons === undefined || reasons === "") {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกสาเหตุการโอน');
+      setTextError("กรุณาเลือกสาเหตุการโอน");
     } else if (validateActualQty.length > 0) {
       setOpenAlert(true);
-      setTextError('กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0');
+      setTextError("กรุณาระบุจำนวนสินค้าที่รับ ต้องมีค่ามากกว่า 0");
     } else if (validateStockQty.length > 0) {
       setOpenAlert(true);
-      setTextError('กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ');
+      setTextError(
+        "กรุณาแก้ไขจำนวนที่สั่ง เนื่องจากสต๊อกสินค้าคงเหลือไม่เพียงพอ",
+      );
     } else {
-      if (rtNo === '') {
+      if (rtNo === "") {
         const payloadSave: any = await handleMapPayloadSave();
         await saveStockRequest(payloadSave)
           .then((value) => {
             setFlagSave(false);
             setRTNo(value.docNo);
-            setStatus('DRAFT');
+            setStatus("DRAFT");
 
-            setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
+            setTextHeaderConfirm("ยืนยันส่งงาน รายการโอนสินค้า");
             setOpenModelConfirm(true);
           })
           .catch((error: ApiError) => {
@@ -582,7 +626,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setOpenAlert(true);
           });
       } else {
-        setTextHeaderConfirm('ยืนยันส่งงาน รายการโอนสินค้า');
+        setTextHeaderConfirm("ยืนยันส่งงาน รายการโอนสินค้า");
         setOpenModelConfirm(true);
       }
     }
@@ -592,16 +636,16 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
 
   const handleApprove = async () => {
     setOpenLoadingModal(true);
-    if (status === 'WAIT_FOR_APPROVAL_1') {
-      setTextHeaderConfirm('ยืนยันส่งรายการโอนสินค้าให้ SCM');
+    if (status === "WAIT_FOR_APPROVAL_1") {
+      setTextHeaderConfirm("ยืนยันส่งรายการโอนสินค้าให้ SCM");
       setOpenModelConfirm(true);
-    } else if (status === 'WAIT_FOR_APPROVAL_2') {
-      if (toBranch === '') {
+    } else if (status === "WAIT_FOR_APPROVAL_2") {
+      if (toBranch === "") {
         setOpenAlert(true);
-        setTextError('กรุณาเลือกสาขาโอนสินค้าปลายทาง');
+        setTextError("กรุณาเลือกสาขาโอนสินค้าปลายทาง");
       } else {
         setOpenModelConfirm(true);
-        setTextHeaderConfirm('ยืนยันรายการโอนสินค้า');
+        setTextHeaderConfirm("ยืนยันรายการโอนสินค้า");
       }
     }
 
@@ -611,25 +655,25 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   const [flagReject, setFlagReject] = React.useState(false);
   const handleReject = async () => {
     setOpenLoadingModal(true);
-    if (status === 'WAIT_FOR_APPROVAL_1') {
-      if (commentOC === '' || commentOC === undefined) {
+    if (status === "WAIT_FOR_APPROVAL_1") {
+      if (commentOC === "" || commentOC === undefined) {
         setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจากผู้อนุมัติ 1');
+        setTextError("กรุณากรอกหมายเหตุจากผู้อนุมัติ 1");
       } else {
         setFlagReject(true);
-        setTextHeaderConfirm('ยืนยันไม่อนุมัติรายการโอนสินค้า');
+        setTextHeaderConfirm("ยืนยันไม่อนุมัติรายการโอนสินค้า");
         setOpenModelConfirm(true);
       }
-    } else if (status === 'WAIT_FOR_APPROVAL_2') {
-      if (commentSCM === '' || commentSCM === undefined) {
+    } else if (status === "WAIT_FOR_APPROVAL_2") {
+      if (commentSCM === "" || commentSCM === undefined) {
         setOpenAlert(true);
-        setTextError('กรุณากรอกหมายเหตุจากผู้อนุมัติ 2');
-      } else if (toBranch === '') {
+        setTextError("กรุณากรอกหมายเหตุจากผู้อนุมัติ 2");
+      } else if (toBranch === "") {
         setOpenAlert(true);
-        setTextError('กรุณาเลือกสาขาโอนสินค้าปลายทาง');
+        setTextError("กรุณาเลือกสาขาโอนสินค้าปลายทาง");
       } else {
         setFlagReject(true);
-        setTextHeaderConfirm('ยืนยันไม่อนุมัติรายการโอนสินค้า');
+        setTextHeaderConfirm("ยืนยันไม่อนุมัติรายการโอนสินค้า");
         setOpenModelConfirm(true);
       }
     }
@@ -637,9 +681,11 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setOpenLoadingModal(false);
   };
 
-  const payloadSearch = useAppSelector((state) => state.searchStockTransferRt.searchStockTransferRt);
+  const payloadSearch = useAppSelector(
+    (state) => state.searchStockTransferRt.searchStockTransferRt,
+  );
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
-  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState('');
+  const [textHeaderConfirm, setTextHeaderConfirm] = React.useState("");
   const handleCloseModelConfirm = () => {
     setFlagReject(false);
     setOpenModelConfirm(false);
@@ -648,7 +694,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
     setOpenModelConfirm(false);
     setOpenLoadingModal(true);
 
-    if (edit && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) {
+    if (edit && (status === "DRAFT" || status === "AWAITING_FOR_REQUESTER")) {
       const itemsList: any = [];
       if (Object.keys(payloadAddItem).length > 0) {
         await payloadAddItem.forEach((data: any) => {
@@ -671,8 +717,8 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         }
 
         const payloadSubmit: any = {
-          startDate: moment(startDate).startOf('day').toISOString(),
-          endDate: moment(endDate).startOf('day').toISOString(),
+          startDate: moment(startDate).startOf("day").toISOString(),
+          endDate: moment(endDate).startOf("day").toISOString(),
           branchFrom: fromBranch,
           branchTo: toBranch,
           transferReason: reasons,
@@ -686,7 +732,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               setFlagSave(false);
               setShowSnackBar(true);
               setSnackbarIsStatus(true);
-              setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+              setContentMsg("คุณได้ส่งงานเรียบร้อยแล้ว");
 
               dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
@@ -716,7 +762,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               setFlagSave(false);
               setShowSnackBar(true);
               setSnackbarIsStatus(true);
-              setContentMsg('คุณได้ส่งงานเรียบร้อยแล้ว');
+              setContentMsg("คุณได้ส่งงานเรียบร้อยแล้ว");
 
               dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
@@ -742,10 +788,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             });
         }
       }
-    } else if (status === 'WAIT_FOR_APPROVAL_1') {
+    } else if (status === "WAIT_FOR_APPROVAL_1") {
       const payload1: Approve1StockTransferRequest = {
         comment: {
-          by: 'OC',
+          by: "OC",
           detail: commentOC,
         },
       };
@@ -757,7 +803,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
-            setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
+            setContentMsg("คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว");
             dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
             setTimeout(() => {
@@ -776,7 +822,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
-            setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
+            setContentMsg("คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว");
             dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
             setTimeout(() => {
@@ -790,11 +836,11 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setOpenAlert(true);
           });
       }
-    } else if (status === 'WAIT_FOR_APPROVAL_2') {
+    } else if (status === "WAIT_FOR_APPROVAL_2") {
       const payload2: Approve2StockTransferRequest = {
         branchTo: toBranch,
         comment: {
-          by: 'SCM',
+          by: "SCM",
           detail: commentSCM,
         },
       };
@@ -806,7 +852,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             setFlagSave(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
-            setContentMsg('คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว');
+            setContentMsg("คุณได้ปฎิเสธข้อมูลเรียบร้อยแล้ว");
             dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
             setTimeout(() => {
@@ -833,7 +879,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         setFlagSave(false);
         setShowSnackBar(true);
         setSnackbarIsStatus(true);
-        setContentMsg('คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว');
+        setContentMsg("คุณได้อนุมัติข้อมูลเรียบร้อยแล้ว");
         dispatch(featchSearchStockTransferRtAsync(payloadSearch));
 
         setTimeout(() => {
@@ -859,13 +905,14 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   };
 
   const topFunction = () => {
-    document.getElementById('top-item')?.scrollIntoView({
-      block: 'start',
-      behavior: 'smooth',
+    document.getElementById("top-item")?.scrollIntoView({
+      block: "start",
+      behavior: "smooth",
     });
   };
 
-  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] =
+    React.useState(false);
 
   const handleCancle = () => {
     setOpenModelDeleteConfirm(true);
@@ -888,14 +935,22 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
   return (
     <div>
       <Dialog open={open} maxWidth="xl" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkSaveClose}>
-          <Typography sx={{ fontSize: '1em' }}>
-            {type === 'Create' && 'สร้างรายการโอนสินค้า'}
-            {type !== 'Create' && (status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && 'รายการโอนสินค้า'}
-            {type !== 'Create' && status !== 'DRAFT' && status !== 'AWAITING_FOR_REQUESTER' && 'ตรวจสอบรายการโอนสินค้า'}
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleChkSaveClose}
+        >
+          <Typography sx={{ fontSize: "1em" }}>
+            {type === "Create" && "สร้างรายการโอนสินค้า"}
+            {type !== "Create" &&
+              (status === "DRAFT" || status === "AWAITING_FOR_REQUESTER") &&
+              "รายการโอนสินค้า"}
+            {type !== "Create" &&
+              status !== "DRAFT" &&
+              status !== "AWAITING_FOR_REQUESTER" &&
+              "ตรวจสอบรายการโอนสินค้า"}
           </Typography>
-          {status !== '' && <Steppers status={status} type="RT"></Steppers>}
-          {status === '' && <Steppers status="DRAFT" type="RT"></Steppers>}
+          {status !== "" && <Steppers status={status} type="RT"></Steppers>}
+          {status === "" && <Steppers status="DRAFT" type="RT"></Steppers>}
         </BootstrapDialogTitle>
 
         <DialogContent>
@@ -904,14 +959,14 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               เลขที่เอกสาร RT :
             </Grid>
             <Grid item xs={4}>
-              {rtNo !== '' && rtNo}
-              {rtNo === '' && '-'}
+              {rtNo !== "" && rtNo}
+              {rtNo === "" && "-"}
             </Grid>
             <Grid item xs={2}>
               วันที่สร้างรายการ :
             </Grid>
             <Grid item xs={4}>
-              {moment(createDate).add(543, 'y').format('DD/MM/YYYY')}
+              {moment(createDate).add(543, "y").format("DD/MM/YYYY")}
             </Grid>
           </Grid>
 
@@ -922,7 +977,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   วันที่โอน* :
                 </Grid>
                 <Grid item xs={3}>
-                  <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+                  <DatePickerComponent
+                    onClickDate={handleStartDatePicker}
+                    value={startDate}
+                  />
                 </Grid>
                 <Grid item xs={1}></Grid>
                 <Grid item xs={2}>
@@ -932,7 +990,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   <DatePickerComponent
                     onClickDate={handleEndDatePicker}
                     value={endDate}
-                    type={'TO'}
+                    type={"TO"}
                     minDateTo={startDate}
                   />
                 </Grid>
@@ -995,14 +1053,14 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   วันที่โอน :
                 </Grid>
                 <Grid item xs={3}>
-                  {moment(startDate).add(543, 'y').format('DD/MM/YYYY')}
+                  {moment(startDate).add(543, "y").format("DD/MM/YYYY")}
                 </Grid>
                 <Grid item xs={1}></Grid>
                 <Grid item xs={2}>
                   วันที่สิ้นสุด :
                 </Grid>
                 <Grid item xs={3}>
-                  {moment(endDate).add(543, 'y').format('DD/MM/YYYY')}
+                  {moment(endDate).add(543, "y").format("DD/MM/YYYY")}
                 </Grid>
                 <Grid item xs={1}></Grid>
               </Grid>
@@ -1018,8 +1076,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                   สาขาปลายทาง :
                 </Grid>
                 <Grid item xs={3}>
-                  {status !== 'WAIT_FOR_APPROVAL_2' && `${toBranch}-${valuebranchTo?.name}`}
-                  {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
+                  {status !== "WAIT_FOR_APPROVAL_2" &&
+                    `${toBranch}-${valuebranchTo?.name}`}
+                  {groupSCM && status === "WAIT_FOR_APPROVAL_2" && (
                     <BranchListDropDown
                       valueBranch={valuebranchTo}
                       sourceBranchCode={fromBranch}
@@ -1030,7 +1089,9 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     />
                   )}
 
-                  {!groupSCM && status === 'WAIT_FOR_APPROVAL_2' && `${toBranch}-${valuebranchTo?.name}`}
+                  {!groupSCM &&
+                    status === "WAIT_FOR_APPROVAL_2" &&
+                    `${toBranch}-${valuebranchTo?.name}`}
                 </Grid>
                 <Grid item xs={1}></Grid>
               </Grid>
@@ -1046,82 +1107,92 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
             </div>
           )}
 
-          {edit && !groupOC && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER') && (
-            <Grid container spacing={2} mt={4} mb={2}>
-              <Grid item xs={5}>
-                <Button
-                  id="btnAddItem"
-                  variant="contained"
-                  color="info"
-                  className={classes.MbtnPrint}
-                  onClick={handleOpenAddItems}
-                  startIcon={<ControlPoint />}
-                  // sx={{ width: 200, display: `${!displayBtnAddItem ? 'none' : ''}` }}
-                  sx={{ width: 200 }}
-                  disabled={!displayBtnAddItem}
-                >
-                  เพิ่มสินค้า
-                </Button>
+          {edit &&
+            !groupOC &&
+            (status === "" ||
+              status === "DRAFT" ||
+              status === "AWAITING_FOR_REQUESTER") && (
+              <Grid container spacing={2} mt={4} mb={2}>
+                <Grid item xs={5}>
+                  <Button
+                    id="btnAddItem"
+                    variant="contained"
+                    color="info"
+                    className={classes.MbtnPrint}
+                    onClick={handleOpenAddItems}
+                    startIcon={<ControlPoint />}
+                    // sx={{ width: 200, display: `${!displayBtnAddItem ? 'none' : ''}` }}
+                    sx={{ width: 200 }}
+                    disabled={!displayBtnAddItem}
+                  >
+                    เพิ่มสินค้า
+                  </Button>
+                </Grid>
+                <Grid item xs={7} sx={{ textAlign: "end" }}>
+                  <Button
+                    id="btnSave"
+                    variant="contained"
+                    color="warning"
+                    className={classes.MbtnSave}
+                    onClick={handleSave}
+                    startIcon={<SaveIcon />}
+                    sx={{
+                      width: 140,
+                      display: `${displayBtnSave ? "none" : ""}`,
+                    }}
+                    disabled={rowLength == 0}
+                  >
+                    บันทึก
+                  </Button>
+
+                  <Button
+                    id="btnCreateTransfer"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSave}
+                    onClick={handleSubmit}
+                    startIcon={<CheckCircleOutline />}
+                    sx={{
+                      width: 140,
+                      display: `${displayBtnSubmit ? "none" : ""}`,
+                    }}
+                    disabled={rowLength == 0}
+                  >
+                    ส่งงาน
+                  </Button>
+
+                  <Button
+                    id="btnCreateTransfer"
+                    variant="contained"
+                    color="primary"
+                    className={classes.MbtnSave}
+                    onClick={handleSubmit}
+                    startIcon={<CheckCircleOutline />}
+                    sx={{ width: 140, display: `${!groupSCM ? "none" : ""}` }}
+                    disabled={rowLength == 0}
+                  >
+                    ส่งงาน
+                  </Button>
+
+                  <Button
+                    id="btnCancle"
+                    variant="contained"
+                    color="error"
+                    className={classes.MbtnSave}
+                    onClick={handleCancle}
+                    sx={{ width: 140 }}
+                    disabled={!canCleMode}
+                  >
+                    ยกเลิก
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item xs={7} sx={{ textAlign: 'end' }}>
-                <Button
-                  id="btnSave"
-                  variant="contained"
-                  color="warning"
-                  className={classes.MbtnSave}
-                  onClick={handleSave}
-                  startIcon={<SaveIcon />}
-                  sx={{ width: 140, display: `${displayBtnSave ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
-                  บันทึก
-                </Button>
-
-                <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
-                  className={classes.MbtnSave}
-                  onClick={handleSubmit}
-                  startIcon={<CheckCircleOutline />}
-                  sx={{ width: 140, display: `${displayBtnSubmit ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
-                  ส่งงาน
-                </Button>
-
-                <Button
-                  id="btnCreateTransfer"
-                  variant="contained"
-                  color="primary"
-                  className={classes.MbtnSave}
-                  onClick={handleSubmit}
-                  startIcon={<CheckCircleOutline />}
-                  sx={{ width: 140, display: `${!groupSCM ? 'none' : ''}` }}
-                  disabled={rowLength == 0}
-                >
-                  ส่งงาน
-                </Button>
-
-                <Button
-                  id="btnCancle"
-                  variant="contained"
-                  color="error"
-                  className={classes.MbtnSave}
-                  onClick={handleCancle}
-                  sx={{ width: 140 }}
-                  disabled={!canCleMode}
-                >
-                  ยกเลิก
-                </Button>
-              </Grid>
-            </Grid>
-          )}
+            )}
 
           <Grid container spacing={2} mt={4} mb={2}>
             <Grid item xs={5}></Grid>
-            <Grid item xs={7} sx={{ textAlign: 'end' }}>
-              {groupOC && status === 'WAIT_FOR_APPROVAL_1' && (
+            <Grid item xs={7} sx={{ textAlign: "end" }}>
+              {groupOC && status === "WAIT_FOR_APPROVAL_1" && (
                 <div>
                   <Button
                     id="btnSave"
@@ -1130,7 +1201,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
+                    sx={{
+                      width: 140,
+                      display: `${displayBtnReject ? "none" : ""}`,
+                    }}
                   >
                     ปฎิเสธ
                   </Button>
@@ -1141,14 +1215,17 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
+                    sx={{
+                      width: 140,
+                      display: `${displayBtnApprove ? "none" : ""}`,
+                    }}
                   >
                     อนุมัติ
                   </Button>
                 </div>
               )}
 
-              {groupSCM && status === 'WAIT_FOR_APPROVAL_2' && (
+              {groupSCM && status === "WAIT_FOR_APPROVAL_2" && (
                 <div>
                   <Button
                     id="btnSave"
@@ -1157,7 +1234,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleReject}
                     startIcon={<SaveIcon />}
-                    sx={{ width: 140, display: `${displayBtnReject ? 'none' : ''}` }}
+                    sx={{
+                      width: 140,
+                      display: `${displayBtnReject ? "none" : ""}`,
+                    }}
                   >
                     ปฎิเสธ
                   </Button>
@@ -1168,7 +1248,10 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                     className={classes.MbtnSave}
                     onClick={handleApprove}
                     startIcon={<CheckCircleOutline />}
-                    sx={{ width: 140, display: `${displayBtnApprove ? 'none' : ''}` }}
+                    sx={{
+                      width: 140,
+                      display: `${displayBtnApprove ? "none" : ""}`,
+                    }}
                   >
                     อนุมัติ
                   </Button>
@@ -1188,7 +1271,7 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
               status={status}
             />
           </Box>
-          {status !== '' && status !== 'DRAFT' && (
+          {status !== "" && status !== "DRAFT" && (
             <Grid container spacing={2} mb={2}>
               <Grid item xs={3}>
                 <TextBoxComment
@@ -1218,12 +1301,12 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
                 <IconButton onClick={topFunction}>
                   <ArrowForwardIosIcon
                     sx={{
-                      fontSize: '41px',
-                      padding: '6px',
-                      backgroundColor: '#C8E8FF',
-                      transform: 'rotate(270deg)',
-                      color: '#fff',
-                      borderRadius: '50%',
+                      fontSize: "41px",
+                      padding: "6px",
+                      backgroundColor: "#C8E8FF",
+                      transform: "rotate(270deg)",
+                      color: "#fff",
+                      borderRadius: "50%",
                     }}
                   />
                 </IconButton>
@@ -1276,7 +1359,11 @@ function stockRequestDetail({ type, edit, isOpen, onClickClose }: Props): ReactE
         onConfirm={handleExitModelConfirm}
       />
 
-      <ModelDeleteConfirm open={openModelDeleteConfirm} onClose={handleModelDeleteConfirm} rtNo={rtNo} />
+      <ModelDeleteConfirm
+        open={openModelDeleteConfirm}
+        onClose={handleModelDeleteConfirm}
+        rtNo={rtNo}
+      />
     </div>
   );
 }

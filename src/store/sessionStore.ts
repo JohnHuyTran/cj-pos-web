@@ -1,12 +1,22 @@
-import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
+import { KeyCloakTokenInfo } from "../models/keycolak-token-info";
 
-const ACCESS_TOKEN = 'access_token';
-const REFRESH_TOKEN = 'refresh_token';
-const SESSION_ID = 'session_id';
-const USER_INFO = 'user_info';
+const ACCESS_TOKEN = "access_token";
+const REFRESH_TOKEN = "refresh_token";
+const SESSION_ID = "session_id";
+const USER_INFO = "user_info";
+const SESSION_STATE = "session_state";
+const SESSION_STORE = "session_store";
 
 export const getAccessToken = () => {
   return sessionStorage.getItem(ACCESS_TOKEN);
+};
+
+export const getSessionState = () => {
+  return sessionStorage.getItem(SESSION_STATE);
+};
+
+export const getSessionStore = () => {
+  return sessionStorage.getItem(SESSION_STORE);
 };
 
 export const setAccessToken = (value: string) => {
@@ -58,13 +68,13 @@ export const removeUserInfo = () => {
 };
 
 export const getInit = () => {
-  return sessionStorage.getItem('INTIAL') === 'Y';
+  return sessionStorage.getItem("INTIAL") === "Y";
 };
 
 export const setInit = (value: string) => {
-  return sessionStorage.setItem('INTIAL', value);
+  return sessionStorage.setItem("INTIAL", value);
 };
 
 export const removeInit = () => {
-  return sessionStorage.removeItem('INTIAL');
+  return sessionStorage.removeItem("INTIAL");
 };

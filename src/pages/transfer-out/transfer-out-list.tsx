@@ -12,9 +12,10 @@ import { convertUtcToBkkDate } from "../../utils/date-utill";
 import {
   Action,
   BDStatus,
-  DateFormat, TO_TYPE,
+  DateFormat,
+  TO_TYPE,
   TOStatus,
-} from '../../utils/enum/common-enum';
+} from "../../utils/enum/common-enum";
 import { objectNullOrEmpty, stringNullOrEmpty } from "../../utils/utils";
 import HtmlTooltip from "../../components/commons/ui/html-tooltip";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -56,19 +57,19 @@ const TransferOutList: React.FC<StateProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const transferOuttSearchSlice = useAppSelector(
-    (state) => state.transferOutSearchSlice
+    (state) => state.transferOutSearchSlice,
   );
   const toSearchResponse: TransferOutSearchResponse =
     transferOuttSearchSlice.toSearchResponse;
   const currentPage = useAppSelector(
-    (state) => state.transferOutSearchSlice.toSearchResponse.page
+    (state) => state.transferOutSearchSlice.toSearchResponse.page,
   );
   const limit = useAppSelector(
-    (state) => state.transferOutSearchSlice.toSearchResponse.perPage
+    (state) => state.transferOutSearchSlice.toSearchResponse.perPage,
   );
   const [pageSize, setPageSize] = React.useState(limit.toString());
   const payload = useAppSelector(
-    (state) => state.transferOutCriterSearchSlice.searchCriteria
+    (state) => state.transferOutCriterSearchSlice.searchCriteria,
   );
   const [userPermission, setUserPermission] = useState<any[]>([]);
 
@@ -83,7 +84,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
           status: genStatusIncludeExpiredCase(data),
           transactionDate: convertUtcToBkkDate(
             data.createdDate,
-            DateFormat.DATE_FORMAT
+            DateFormat.DATE_FORMAT,
           ),
           approvalDate: stringNullOrEmpty(data.approvedDate)
             ? ""
@@ -103,7 +104,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
           userInfo.acl["service.posback-campaign"] != null &&
             userInfo.acl["service.posback-campaign"].length > 0
             ? userInfo.acl["service.posback-campaign"]
-            : []
+            : [],
         );
       }
     }
@@ -121,7 +122,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
         (itPro: any) =>
           itPro.numberOfApproved > 0 &&
           !stringNullOrEmpty(itPro.expiredDate) &&
-          moment(itPro.expiredDate).isSameOrAfter(moment(new Date()), "day")
+          moment(itPro.expiredDate).isSameOrAfter(moment(new Date()), "day"),
       );
       if (productPassValidation.length === 0) {
         status = Number(BDStatus.ALREADY_EXPIRED);
@@ -156,16 +157,16 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       ),
     },
     {
-      field: 'branch',
-      headerName: 'สาขา',
-      headerAlign: 'center',
+      field: "branch",
+      headerName: "สาขา",
+      headerAlign: "center",
       sortable: false,
       flex: 1,
     },
     {
-      field: 'documentNumber',
-      headerName: 'เอกสารเบิก',
-      headerAlign: 'center',
+      field: "documentNumber",
+      headerName: "เอกสารเบิก",
+      headerAlign: "center",
       sortable: false,
       flex: 0.9,
     },
@@ -287,7 +288,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
-      type: TO_TYPE.TO_ACTIVITY + '',
+      type: TO_TYPE.TO_ACTIVITY + "",
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -306,7 +307,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
       status: payload.status,
       startDate: payload.startDate,
       endDate: payload.endDate,
-      type: TO_TYPE.TO_ACTIVITY + '',
+      type: TO_TYPE.TO_ACTIVITY + "",
     };
 
     await dispatch(transferOutGetSearch(payloadNewPage));
@@ -315,7 +316,7 @@ const TransferOutList: React.FC<StateProps> = (props) => {
   };
 
   const transferOutDetail = useAppSelector(
-    (state) => state.transferOutDetailSlice.transferOutDetail
+    (state) => state.transferOutDetailSlice.transferOutDetail,
   );
   const currentlySelected = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;

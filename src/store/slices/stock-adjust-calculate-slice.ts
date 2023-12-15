@@ -1,10 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../adapters/posback-adapter';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "../../adapters/posback-adapter";
 import { StockCountSearchResponse } from "../../models/stock-count-model";
 import {
   SABarcodeCalculateResponse,
   SACalculateRequest,
-  SASkuCalculateResponse
+  SASkuCalculateResponse,
 } from "../../models/stock-adjustment-model";
 import { stringNullOrEmpty } from "../../utils/utils";
 import { environment } from "../../environment-base";
@@ -23,19 +23,19 @@ const initialState: State = {
   barcodeCalculateCriteria: {
     perPage: 10,
     page: 1,
-    id: '',
-    filterDifference: '',
+    id: "",
+    filterDifference: "",
   },
   skuCalculateCriteria: {
     perPage: 10,
     page: 1,
-    id: '',
-    filterDifference: '',
+    id: "",
+    filterDifference: "",
   },
   barcodeCalculateResponse: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 1,
@@ -43,9 +43,9 @@ const initialState: State = {
     totalPage: 0,
   },
   skuCalculateResponse: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 1,
@@ -57,7 +57,7 @@ const initialState: State = {
 };
 
 export const getSkuCalculate = createAsyncThunk(
-  'getSkuCalculate',
+  "getSkuCalculate",
   async (payload: SACalculateRequest) => {
     try {
       const apiRootPath = `${environment.checkStock.stockAdjustment.calculate.skuTab.url}/${payload.id}`;
@@ -66,9 +66,9 @@ export const getSkuCalculate = createAsyncThunk(
         path = path + `&filterDifference=${payload.filterDifference}`;
       }
       let response: StockCountSearchResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -80,11 +80,11 @@ export const getSkuCalculate = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 export const getBarcodeCalculate = createAsyncThunk(
-  'getBarcodeCalculate',
+  "getBarcodeCalculate",
   async (payload: SACalculateRequest) => {
     try {
       const apiRootPath = `${environment.checkStock.stockAdjustment.calculate.barcodeTab.url}/${payload.id}`;
@@ -93,9 +93,9 @@ export const getBarcodeCalculate = createAsyncThunk(
         path = path + `&filterDifference=${payload.filterDifference}`;
       }
       let response: StockCountSearchResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -107,11 +107,11 @@ export const getBarcodeCalculate = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const stockAdjustCalculateSlice = createSlice({
-  name: 'stockAdjustCalculateSlice',
+  name: "stockAdjustCalculateSlice",
   initialState,
   reducers: {
     saveBarcodeCalculateCriteria: (state, action: PayloadAction<any>) => {
@@ -132,18 +132,24 @@ const stockAdjustCalculateSlice = createSlice({
     builer.addCase(getBarcodeCalculate.pending, () => {
       initialState;
     }),
-      builer.addCase(getBarcodeCalculate.fulfilled, (state, action: PayloadAction<any>) => {
-        state.barcodeCalculateResponse = action.payload;
-      }),
+      builer.addCase(
+        getBarcodeCalculate.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.barcodeCalculateResponse = action.payload;
+        },
+      ),
       builer.addCase(getBarcodeCalculate.rejected, () => {
         initialState;
       }),
       builer.addCase(getSkuCalculate.pending, () => {
         initialState;
       }),
-      builer.addCase(getSkuCalculate.fulfilled, (state, action: PayloadAction<any>) => {
-        state.skuCalculateResponse = action.payload;
-      }),
+      builer.addCase(
+        getSkuCalculate.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.skuCalculateResponse = action.payload;
+        },
+      ),
       builer.addCase(getSkuCalculate.rejected, () => {
         initialState;
       });
@@ -155,6 +161,6 @@ export const {
   saveSkuCalculateCriteria,
   updateRefresh,
   updateReload,
-  clearCalculate
+  clearCalculate,
 } = stockAdjustCalculateSlice.actions;
 export default stockAdjustCalculateSlice.reducer;

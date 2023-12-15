@@ -1,7 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { StockTransferRequest, StockTransferResponse } from '../../models/stock-transfer-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
+import {
+  StockTransferRequest,
+  StockTransferResponse,
+} from "../../models/stock-transfer-model";
 
 type State = {
   orderList: StockTransferResponse;
@@ -10,9 +13,9 @@ type State = {
 
 const initialState: State = {
   orderList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
@@ -21,11 +24,11 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const featchSearchStockTransferRtAsync = createAsyncThunk(
-  'stockRequestList',
+  "stockRequestList",
   async (payload: StockTransferRequest) => {
     try {
       const apiRootPath = environment.stock.searchStockTransfer.searchRT.url;
@@ -45,10 +48,10 @@ export const featchSearchStockTransferRtAsync = createAsyncThunk(
       if (payload.dateTo) {
         path = path + `&dateTo=${payload.dateTo}`;
       }
-      if (payload.statuses !== 'ALL') {
+      if (payload.statuses !== "ALL") {
         path = path + `&statuses=${payload.statuses}`;
       }
-      if (payload.transferReason !== 'All') {
+      if (payload.transferReason !== "All") {
         path = path + `&transferReason=${payload.transferReason}`;
       }
 
@@ -56,9 +59,9 @@ export const featchSearchStockTransferRtAsync = createAsyncThunk(
       // console.log('payload.clearSearch: ', payload.clearSearch);
 
       let response: StockTransferResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -77,11 +80,11 @@ export const featchSearchStockTransferRtAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const stockTransferRtSlice = createSlice({
-  name: 'stockTransferRt',
+  name: "stockTransferRt",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -90,9 +93,12 @@ const stockTransferRtSlice = createSlice({
     builer.addCase(featchSearchStockTransferRtAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchSearchStockTransferRtAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.orderList = action.payload;
-      }),
+      builer.addCase(
+        featchSearchStockTransferRtAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.orderList = action.payload;
+        },
+      ),
       builer.addCase(featchSearchStockTransferRtAsync.rejected, () => {
         initialState;
       });

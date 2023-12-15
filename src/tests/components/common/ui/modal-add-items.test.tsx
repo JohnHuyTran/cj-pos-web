@@ -8,27 +8,27 @@ import {
   within,
   wait,
   act,
-} from '@testing-library/react';
-import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
-import { Store, AnyAction } from '@reduxjs/toolkit';
-import { initialState } from '../../../mockStore';
-import { inputAdornmentClasses, TextField, ThemeProvider } from '@mui/material';
-import theme from '../../../../styles/theme';
-import { mockUserInfo } from '../../../mockData';
-import ModalAddItems from '../../../../components/commons/ui/modal-add-items';
-import { getById } from '../../../../utils/custom-testing-library';
+} from "@testing-library/react";
+import { Provider } from "react-redux";
+import configureStore from "redux-mock-store";
+import { Store, AnyAction } from "@reduxjs/toolkit";
+import { initialState } from "../../../mockStore";
+import { inputAdornmentClasses, TextField, ThemeProvider } from "@mui/material";
+import theme from "../../../../styles/theme";
+import { mockUserInfo } from "../../../mockData";
+import ModalAddItems from "../../../../components/commons/ui/modal-add-items";
+import { getById } from "../../../../utils/custom-testing-library";
 
 // let wrapper: RenderResult<typeof import('@testing-library/dom/types/queries'), HTMLElement>;
 const mockStore = configureStore();
 
 let store: Store<any, AnyAction>;
-sessionStorage.setItem('user_info', mockUserInfo);
+sessionStorage.setItem("user_info", mockUserInfo);
 const handleOnClose = jest.fn();
 beforeEach(() => {
   store = mockStore(initialState);
 });
-jest.mock('react-i18next', () => ({
+jest.mock("react-i18next", () => ({
   // this mock makes sure any components using the translate hook can use it without a warning being shown
   useTranslation: () => {
     return {
@@ -39,11 +39,11 @@ jest.mock('react-i18next', () => ({
     };
   },
   initReactI18next: {
-    type: '3rdParty',
+    type: "3rdParty",
     init: jest.fn(),
   },
 }));
-describe('component modal-add-items', () => {
+describe("component modal-add-items", () => {
   // it('find componet and placeholder', async () => {
   //   let rendered: ReturnType<typeof render>;
 
@@ -94,7 +94,7 @@ describe('component modal-add-items', () => {
   //   // }, 5000);
   // });
 
-  it('onselect items', async () => {
+  it("onselect items", async () => {
     store = await mockStore(initialState);
     const { debug, getAllByRole } = await render(
       <Provider store={store}>
@@ -103,17 +103,17 @@ describe('component modal-add-items', () => {
             open={true}
             onClose={handleOnClose}
             requestBody={{
-              skuCodes: ['000000000020039124'],
+              skuCodes: ["000000000020039124"],
               isSellable: true,
               isControlStock: true,
             }}
           />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
     // preview.debug();
-    const autocomplete = screen.getByTestId('autocomplete-search-branch-list');
-    const input = within(autocomplete).getByRole('textbox') as HTMLInputElement;
+    const autocomplete = screen.getByTestId("autocomplete-search-branch-list");
+    const input = within(autocomplete).getByRole("textbox") as HTMLInputElement;
     autocomplete.focus();
     input.focus();
     // await fireEvent.keyDown(autocomplete, { key: '1' });
@@ -136,7 +136,9 @@ describe('component modal-add-items', () => {
     // jest.setTimeout(5000);
 
     // expect(input.value).toEqual('12PLUSบอดี้&แฮร์เพอร์ฟูมลอนดอนแพร์25ml Carton');
-    expect(screen.queryByText('12PLUSบอดี้&แฮร์เพอร์ฟูมลอนดอนแพร์25ml Carton')).toBeNull();
+    expect(
+      screen.queryByText("12PLUSบอดี้&แฮร์เพอร์ฟูมลอนดอนแพร์25ml Carton"),
+    ).toBeNull();
   });
 
   // it('on close modal', async () => {

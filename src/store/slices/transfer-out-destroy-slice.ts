@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import moment from 'moment';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import moment from "moment";
 
 type ItemsState = {
   createDraft: any;
@@ -12,30 +12,30 @@ type ItemsState = {
 };
 const initialState: ItemsState = {
   createDraft: {
-    branchId: '61dffd619bfc3701dce4eda4',
-    regionId: '61de9ddab10bfe85dfab22e9',
-    requesterId: '61de9ddab10bfe85dfab22e9',
+    branchId: "61dffd619bfc3701dce4eda4",
+    regionId: "61de9ddab10bfe85dfab22e9",
+    requesterId: "61de9ddab10bfe85dfab22e9",
     products: [],
     beforeAttachFiles: [],
     afterAttachFiles: [],
-    type: 0
+    type: 0,
   },
   validate: false,
   dataDetail: {
-    id: '',
-    documentNumber: '',
-    status: '',
+    id: "",
+    documentNumber: "",
+    status: "",
     approvedDate: null,
     createdDate: moment(new Date()).toISOString(),
   },
   approveReject: {
-    branchId: '61dffd619bfc3701dce4eda4',
-    regionId: '61de9ddab10bfe85dfab22e9',
-    requesterId: '61de9ddab10bfe85dfab22e9',
-    id: '',
+    branchId: "61dffd619bfc3701dce4eda4",
+    regionId: "61de9ddab10bfe85dfab22e9",
+    requesterId: "61de9ddab10bfe85dfab22e9",
+    id: "",
     products: [],
-    approvalNote: '',
-    reason: '',
+    approvalNote: "",
+    reason: "",
   },
   errorList: [],
   checkStock: [],
@@ -43,7 +43,7 @@ const initialState: ItemsState = {
 };
 
 const transferOutDestroySlice = createSlice({
-  name: 'transferOutDestroySlice',
+  name: "transferOutDestroySlice",
   initialState,
   reducers: {
     save: (state, action: PayloadAction<any>) => {
@@ -76,6 +76,6 @@ export const {
   updateErrorList,
   updateCheckStock,
   updateCheckEdit,
-  updateApproveReject
+  updateApproveReject,
 } = transferOutDestroySlice.actions;
 export default transferOutDestroySlice.reducer;

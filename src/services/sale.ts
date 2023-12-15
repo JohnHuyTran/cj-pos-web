@@ -1,9 +1,12 @@
-import { environment } from '../environment-base';
-import { getPathUrl } from './base-service';
-import { get, put } from '../adapters/posback-adapter';
-import { ContentType } from '../utils/enum/common-enum';
-import { SaveInvoiceRequest, TaxInvoiceRequest } from '../models/tax-invoice-model';
-import { getInvoiceRequest } from '../mockdata/sale';
+import { environment } from "../environment-base";
+import { getPathUrl } from "./base-service";
+import { get, put } from "../adapters/posback-adapter";
+import { ContentType } from "../utils/enum/common-enum";
+import {
+  SaveInvoiceRequest,
+  TaxInvoiceRequest,
+} from "../models/tax-invoice-model";
+import { getInvoiceRequest } from "../mockdata/sale";
 
 export const getPathInvoiceDetail = (billNo: string) => {
   return getPathUrl(`${environment.sale.taxInvoice.detail.url}`, {
@@ -18,7 +21,11 @@ export const getPathInvoicePrintHistory = (billNo: string) => {
 };
 
 export async function saveInvoice(payload: SaveInvoiceRequest) {
-  const response = await put(environment.sale.taxInvoice.saveInvoice.url, payload, ContentType.JSON)
+  const response = await put(
+    environment.sale.taxInvoice.saveInvoice.url,
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -33,7 +40,10 @@ export const getPathSearchMemberInformation = (memberNo: string) => {
 };
 
 export async function searchMemberInformation(memberNo: string) {
-  const response = await get(getPathSearchMemberInformation(memberNo), ContentType.JSON)
+  const response = await get(
+    getPathSearchMemberInformation(memberNo),
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -42,7 +52,7 @@ export async function searchMemberInformation(memberNo: string) {
 }
 
 export async function requestTaxInvoice(payload: TaxInvoiceRequest) {
-  const value = payload.docNo ? payload.docNo : '';
+  const value = payload.docNo ? payload.docNo : "";
   const response = await get(getPathRequestTaxInvoice(value), ContentType.JSON)
     .then((result: any) => result)
     .catch((error) => {
@@ -64,16 +74,24 @@ export const getPathPrintInvoice = (billNo: string) => {
   });
 };
 
-export async function savePrintInvoice(payload: SaveInvoiceRequest, fileList: File[], edit: boolean) {
+export async function savePrintInvoice(
+  payload: SaveInvoiceRequest,
+  fileList: File[],
+  edit: boolean,
+) {
   const bodyFormData = new FormData();
 
-  if (edit) bodyFormData.append('requestBody', JSON.stringify(payload));
+  if (edit) bodyFormData.append("requestBody", JSON.stringify(payload));
 
   fileList.map((data: File) => {
-    return bodyFormData.append('file[]', data);
+    return bodyFormData.append("file[]", data);
   });
 
-  const response = await put(getPathPrintInvoice(payload.billNo), bodyFormData, ContentType.MULTIPART)
+  const response = await put(
+    getPathPrintInvoice(payload.billNo),
+    bodyFormData,
+    ContentType.MULTIPART,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;

@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 type ItemsState = {
   checkStock: any;
@@ -8,7 +8,7 @@ const initialState: ItemsState = {
 };
 
 const stockBalanceCheckSlice = createSlice({
-  name: 'stockBalanceCheckSlice',
+  name: "stockBalanceCheckSlice",
   initialState,
   reducers: {
     updateCheckStock: (state, action: any) => {
@@ -16,7 +16,5 @@ const stockBalanceCheckSlice = createSlice({
     },
   },
 });
-export const {
-  updateCheckStock,
-} = stockBalanceCheckSlice.actions;
+export const { updateCheckStock } = stockBalanceCheckSlice.actions;
 export default stockBalanceCheckSlice.reducer;

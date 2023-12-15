@@ -1,15 +1,22 @@
-import React, { ReactElement } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
-import { ApiError } from '../../models/api-error-model';
-import { SavePurchasePIRequest, SavePurchaseRequest } from '../../models/supplier-check-order-model';
-import { approveSupplierOrder, approveSupplierPI, deleteSupplierPI } from '../../services/purchase';
-import LoadingModal from '../commons/ui/loading-modal';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import React, { ReactElement } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
+import { ApiError } from "../../models/api-error-model";
+import {
+  SavePurchasePIRequest,
+  SavePurchaseRequest,
+} from "../../models/supplier-check-order-model";
+import {
+  approveSupplierOrder,
+  approveSupplierPI,
+  deleteSupplierPI,
+} from "../../services/purchase";
+import LoadingModal from "../commons/ui/loading-modal";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
 interface Props {
   open: boolean;
@@ -47,9 +54,9 @@ export default function ModelConfirm({
   const handleConfirm = async () => {
     setOpenLoadingModal(true);
 
-    if (action === 'delete') {
+    if (action === "delete") {
       canclePI();
-    } else if (action === 'approve') {
+    } else if (action === "approve") {
       if (piDetail) {
         const payloadSave: SavePurchasePIRequest = {
           billNo: billNo,
@@ -64,12 +71,12 @@ export default function ModelConfirm({
         await approveSupplierPI(payloadSave, fileUploadList).then(
           function (value) {
             setTimeout(() => {
-              onUpdateAction(true, '');
+              onUpdateAction(true, "");
             }, 500);
           },
           function (error: ApiError) {
             onUpdateAction(false, error.message);
-          }
+          },
         );
 
         setOpenLoadingModal(false);
@@ -83,12 +90,12 @@ export default function ModelConfirm({
         await approveSupplierOrder(payloadSave, piNo, fileUploadList).then(
           function (value) {
             setTimeout(() => {
-              onUpdateAction(true, '');
+              onUpdateAction(true, "");
             }, 500);
           },
           function (error: ApiError) {
             onUpdateAction(false, error.message);
-          }
+          },
         );
 
         setOpenLoadingModal(false);
@@ -101,7 +108,7 @@ export default function ModelConfirm({
     await deleteSupplierPI(piNo)
       .then((value) => {
         setTimeout(() => {
-          onUpdateAction(true, '');
+          onUpdateAction(true, "");
         }, 500);
       })
       .catch((error: ApiError) => {
@@ -111,47 +118,53 @@ export default function ModelConfirm({
   return (
     <Dialog
       open={open}
-      aria-labelledby='alert-dialog-title'
-      aria-describedby='alert-dialog-description'
-      maxWidth='md'
-      sx={{ minWidth: 500 }}>
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      maxWidth="md"
+      sx={{ minWidth: 500 }}
+    >
       <DialogContent>
-        <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
-          <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
+        <DialogContentText
+          id="alert-dialog-description"
+          sx={{ color: "#263238" }}
+        >
+          <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
             {title}
           </Typography>
           {docNo && (
-            <Typography variant='body1' align='center'>
-              เลขที่ใบสั่งซื้อ PO <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
+            <Typography variant="body1" align="center">
+              เลขที่ใบสั่งซื้อ PO <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+              <label style={{ color: "#36C690" }}>
                 <b>{docNo}</b>
               </label>
             </Typography>
           )}
-          <Typography variant='body1' align='center'>
-            เลขที่ใบเอกสาร PI <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-            <label style={{ color: '#36C690' }}>
+          <Typography variant="body1" align="center">
+            เลขที่ใบเอกสาร PI <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+            <label style={{ color: "#36C690" }}>
               <b>{piNo}</b>
             </label>
           </Typography>
         </DialogContentText>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+      <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
         <Button
-          id='btnCancle'
-          variant='contained'
-          color='cancelColor'
+          id="btnCancle"
+          variant="contained"
+          color="cancelColor"
           sx={{ borderRadius: 2, width: 80, mr: 2 }}
-          onClick={onClose}>
+          onClick={onClose}
+        >
           ยกเลิก
         </Button>
         <Button
-          id='btnConfirm'
-          variant='contained'
-          color='primary'
+          id="btnConfirm"
+          variant="contained"
+          color="primary"
           sx={{ borderRadius: 2, width: 80 }}
-          onClick={handleConfirm}>
+          onClick={handleConfirm}
+        >
           ยืนยัน
         </Button>
 

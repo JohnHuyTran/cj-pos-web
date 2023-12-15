@@ -1,11 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../adapters/posback-adapter';
-import { stringNullOrEmpty } from '../../utils/utils';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "../../adapters/posback-adapter";
+import { stringNullOrEmpty } from "../../utils/utils";
 import { environment } from "../../environment-base";
 import {
   StockAdjustHasTempStockSearchRequest,
   StockAdjustmentSearchRequest,
-  StockAdjustmentSearchResponse
+  StockAdjustmentSearchResponse,
 } from "../../models/stock-adjustment-model";
 
 type State = {
@@ -15,28 +15,29 @@ type State = {
 
 const initialState: State = {
   toSearchResponse: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
     perPage: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const getStockAdjustHasTempStockSearch = createAsyncThunk(
-  'getStockAdjustHasTempStockSearch',
+  "getStockAdjustHasTempStockSearch",
   async (payload: StockAdjustHasTempStockSearchRequest) => {
     try {
-      const apiRootPath = environment.checkStock.stockAdjustment.tempStockSearch.url;
+      const apiRootPath =
+        environment.checkStock.stockAdjustment.tempStockSearch.url;
       let path = `${apiRootPath}?limit=${payload.perPage}&page=${payload.page}`;
       if (!stringNullOrEmpty(payload.docNo)) {
         path = path + `&docNo=${payload.docNo}`;
       }
-      if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
+      if (!stringNullOrEmpty(payload.branch) && "ALL" !== payload.branch) {
         path = path + `&branchCode=${payload.branch}`;
       }
       if (!stringNullOrEmpty(payload.creationDateFrom)) {
@@ -46,9 +47,9 @@ export const getStockAdjustHasTempStockSearch = createAsyncThunk(
         path = path + `&creationDateTo=${payload.creationDateTo}`;
       }
       let response: StockAdjustmentSearchResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -62,11 +63,11 @@ export const getStockAdjustHasTempStockSearch = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const stockAdjustHasTempStockSearchSlice = createSlice({
-  name: 'stockAdjustHasTempStockSearchSlice',
+  name: "stockAdjustHasTempStockSearchSlice",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -75,9 +76,12 @@ const stockAdjustHasTempStockSearchSlice = createSlice({
     builer.addCase(getStockAdjustHasTempStockSearch.pending, () => {
       initialState;
     }),
-      builer.addCase(getStockAdjustHasTempStockSearch.fulfilled, (state, action: PayloadAction<any>) => {
-        state.toSearchResponse = action.payload;
-      }),
+      builer.addCase(
+        getStockAdjustHasTempStockSearch.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.toSearchResponse = action.payload;
+        },
+      ),
       builer.addCase(getStockAdjustHasTempStockSearch.rejected, () => {
         initialState;
       });

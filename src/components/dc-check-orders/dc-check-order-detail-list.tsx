@@ -1,5 +1,5 @@
-import React, { ReactElement, useMemo } from 'react';
-import Box from '@mui/material/Box';
+import React, { ReactElement, useMemo } from "react";
+import Box from "@mui/material/Box";
 import {
   DataGrid,
   GridCellParams,
@@ -9,14 +9,17 @@ import {
   GridRowId,
   GridValueGetterParams,
   useGridApiRef,
-} from '@mui/x-data-grid';
-import { useAppSelector, useAppDispatch } from '../../store/store';
-import { CheckOrderDetailItims } from '../../models/dc-check-order-model';
+} from "@mui/x-data-grid";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import { CheckOrderDetailItims } from "../../models/dc-check-order-model";
 
-import { useStyles } from '../../styles/makeTheme';
-import Typography from '@mui/material/Typography';
-import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
-import { TextField } from '@mui/material';
+import { useStyles } from "../../styles/makeTheme";
+import Typography from "@mui/material/Typography";
+import {
+  featchorderDetailDCAsync,
+  setReloadScreen,
+} from "../../store/slices/dc-check-order-detail-slice";
+import { TextField } from "@mui/material";
 
 interface Props {
   items: any;
@@ -29,123 +32,127 @@ interface Props {
 
 const columns: GridColDef[] = [
   {
-    field: 'index',
-    headerName: 'ลำดับ',
+    field: "index",
+    headerName: "ลำดับ",
     width: 70,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: "20px" }}>
         {params.value}
       </Box>
     ),
   },
   {
-    field: 'productBarCode',
-    headerName: 'บาร์โค้ด',
+    field: "productBarCode",
+    headerName: "บาร์โค้ด",
     minWidth: 130,
     // flex: 0.5,
     sortable: false,
-    headerAlign: 'center',
+    headerAlign: "center",
   },
   {
-    field: 'productDescription',
-    headerName: 'รายละเอียดสินค้า',
+    field: "productDescription",
+    headerName: "รายละเอียดสินค้า",
     minWidth: 160,
     flex: 1,
     sortable: false,
-    headerAlign: 'center',
+    headerAlign: "center",
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
-          {params.getValue(params.id, 'productId') || ''}
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, "productId") || ""}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'productUnit',
-    headerName: 'หน่วย',
+    field: "productUnit",
+    headerName: "หน่วย",
     minWidth: 50,
     sortable: false,
-    headerAlign: 'center',
+    headerAlign: "center",
   },
   {
-    field: 'hhQty',
-    headerName: 'จำนวนที่ scan HH',
+    field: "hhQty",
+    headerName: "จำนวนที่ scan HH",
     minWidth: 135,
     sortable: false,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     renderCell: (params) => calQtyHH(params),
   },
   {
-    field: 'productQuantityRef',
-    headerName: 'จำนวนอ้างอิง',
+    field: "productQuantityRef",
+    headerName: "จำนวนอ้างอิง",
     width: 115,
     sortable: false,
-    align: 'right',
-    headerAlign: 'center',
+    align: "right",
+    headerAlign: "center",
   },
   {
-    field: 'productQuantityActual',
-    headerName: 'จำนวนรับจริง',
+    field: "productQuantityActual",
+    headerName: "จำนวนรับจริง",
     width: 115,
     sortable: false,
-    align: 'right',
-    headerAlign: 'center',
-    type: 'number',
+    align: "right",
+    headerAlign: "center",
+    type: "number",
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        type='number'
-        variant='outlined'
-        name='txbProductQuantityActual'
-        inputProps={{ style: { textAlign: 'right' } }}
+        type="number"
+        variant="outlined"
+        name="txbProductQuantityActual"
+        inputProps={{ style: { textAlign: "right" } }}
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           let value = e.target.value ? parseInt(e.target.value, 10) : 0;
-          const isTote = params.getValue(params.id, 'isTote');
-          const qty = Number(params.getValue(params.id, 'productQuantityActual'));
+          const isTote = params.getValue(params.id, "isTote");
+          const qty = Number(
+            params.getValue(params.id, "productQuantityActual"),
+          );
           if (value < 0) value = 0;
           if (value > 1 && isTote) value = qty;
 
-          params.api.updateRows([{ ...params.row, productQuantityActual: value }]);
+          params.api.updateRows([
+            { ...params.row, productQuantityActual: value },
+          ]);
         }}
-        disabled={Boolean(params.getValue(params.id, 'isDisableChange'))}
-        autoComplete='off'
+        disabled={Boolean(params.getValue(params.id, "isDisableChange"))}
+        autoComplete="off"
       />
     ),
   },
   {
-    field: 'productDifference',
-    headerName: 'จำนวนส่วนต่าง',
+    field: "productDifference",
+    headerName: "จำนวนส่วนต่าง",
     width: 120,
     sortable: false,
-    align: 'right',
-    headerAlign: 'center',
+    align: "right",
+    headerAlign: "center",
     renderCell: (params) => calProductDiff(params),
   },
   {
-    field: 'productComment',
-    headerName: 'หมายเหตุ',
+    field: "productComment",
+    headerName: "หมายเหตุ",
     flex: 0.5,
     sortable: false,
-    headerAlign: 'center',
+    headerAlign: "center",
   },
   {
-    field: 'sdNo',
-    headerName: 'รับสินค้าใน Tote',
+    field: "sdNo",
+    headerName: "รับสินค้าใน Tote",
     // flex: 0.5,
     minWidth: 150,
     sortable: false,
-    headerAlign: 'center',
+    headerAlign: "center",
     renderCell: (params) => {
       return (
         <Typography
-          color='secondary'
-          variant='body2'
-          sx={{ textDecoration: 'underline' }}
+          color="secondary"
+          variant="body2"
+          sx={{ textDecoration: "underline" }}
           // onClick={() => handleOpenReturnModal(params.row.piNo, 'button')}>
         >
           {params.value}
@@ -160,7 +167,7 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '',
+        field: "",
         width: 0,
         minWidth: 0,
         sortable: false,
@@ -169,7 +176,7 @@ function useApiRef() {
           return null;
         },
       }),
-    [columns]
+    [columns],
   );
 
   return { apiRef, columns: _columns };
@@ -177,20 +184,28 @@ function useApiRef() {
 
 var calProductDiff = function (params: GridValueGetterParams) {
   let diff =
-    Number(params.getValue(params.id, 'productQuantityActual')) -
-    Number(params.getValue(params.id, 'productQuantityRef'));
+    Number(params.getValue(params.id, "productQuantityActual")) -
+    Number(params.getValue(params.id, "productQuantityRef"));
 
-  if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{diff} </label>;
-  if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {diff} </label>;
+  if (diff > 0)
+    return (
+      <label style={{ color: "#446EF2", fontWeight: 700 }}> +{diff} </label>
+    );
+  if (diff < 0)
+    return (
+      <label style={{ color: "#F54949", fontWeight: 700 }}> {diff} </label>
+    );
   return diff;
 };
 
 var calQtyHH = function (params: GridValueGetterParams) {
-  const actualQty = Number(params.getValue(params.id, 'productQuantityActual'));
-  const qtyHH = Number(params.getValue(params.id, 'hhQty'));
+  const actualQty = Number(params.getValue(params.id, "productQuantityActual"));
+  const qtyHH = Number(params.getValue(params.id, "hhQty"));
 
   if (actualQty !== qtyHH) {
-    return <label style={{ color: '#FBA600', fontWeight: 700 }}> {qtyHH} </label>;
+    return (
+      <label style={{ color: "#FBA600", fontWeight: 700 }}> {qtyHH} </label>
+    );
   }
   return qtyHH;
 };
@@ -219,8 +234,8 @@ export default function DCOrderEntries({
       hhQty: item.hhQty,
       productDifference: item.qtyDiff,
       productComment: item.comment,
-      sdNo: item.sdNo ? item.sdNo : '',
-      sdID: item.sdID ? item.sdID : '',
+      sdNo: item.sdNo ? item.sdNo : "",
+      sdID: item.sdID ? item.sdID : "",
       isTote: item.isTote ? item.isTote : false,
       isDisableChange: !(isLD && isWaitForCheck),
     };
@@ -230,9 +245,9 @@ export default function DCOrderEntries({
 
   const currentlySelected = async (params: GridCellParams) => {
     const fieldName = params.colDef.field;
-    const sdId: any = params.getValue(params.id, 'sdNo');
-    const sdNo = params.getValue(params.id, 'sdNo');
-    if (fieldName === 'sdNo' && sdId) {
+    const sdId: any = params.getValue(params.id, "sdNo");
+    const sdNo = params.getValue(params.id, "sdNo");
+    if (fieldName === "sdNo" && sdId) {
       try {
         await dispatch(featchorderDetailDCAsync(sdId));
         await dispatch(setReloadScreen(true));
@@ -244,14 +259,14 @@ export default function DCOrderEntries({
   };
 
   if (isTote) {
-    columns[8]['hide'] = false;
+    columns[8]["hide"] = false;
   } else {
-    columns[8]['hide'] = true;
+    columns[8]["hide"] = true;
   }
   if (isLD) {
-    columns[4]['hide'] = false;
+    columns[4]["hide"] = false;
   } else {
-    columns[4]['hide'] = true;
+    columns[4]["hide"] = true;
   }
 
   const handleUpdateItems = () => {
@@ -261,10 +276,10 @@ export default function DCOrderEntries({
     rowsEdit.forEach((dataRow: GridRowData) => {
       const item: CheckOrderDetailItims = {
         skuCode: dataRow.productId,
-        skuType: '',
+        skuType: "",
         barcode: dataRow.productBarCode,
         productName: dataRow.productDescription,
-        unitCode: '',
+        unitCode: "",
         unitName: dataRow.productUnit,
         unitFactor: 0,
         qty: dataRow.productQuantityRef,
@@ -284,10 +299,15 @@ export default function DCOrderEntries({
   };
 
   return (
-    <Box mt={2} bgcolor='background.paper'>
+    <Box mt={2} bgcolor="background.paper">
       <div
         className={classes.MdataGridDetail}
-        style={{ width: '100%', marginBottom: '1em', height: rows.length >= 8 ? '70vh' : 'auto' }}>
+        style={{
+          width: "100%",
+          marginBottom: "1em",
+          height: rows.length >= 8 ? "70vh" : "auto",
+        }}
+      >
         <DataGrid
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

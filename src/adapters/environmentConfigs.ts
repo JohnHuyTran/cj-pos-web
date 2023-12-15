@@ -2,7 +2,8 @@ export const env: any = {
   backEnd: {
     url: process.env.REACT_APP_POS_BACK_BE_URL,
     timeout: process.env.REACT_APP_POS_BACK_BE_TIME_OUT,
-    timeoutpurchasebranch: process.env.REACT_APP_POS_BACK_BE_TIME_OUT_PURCHASE_BRANCH,
+    timeoutpurchasebranch:
+      process.env.REACT_APP_POS_BACK_BE_TIME_OUT_PURCHASE_BRANCH,
   },
   printer: {
     url: process.env.REACT_APP_POS_BACK_PRINTER,

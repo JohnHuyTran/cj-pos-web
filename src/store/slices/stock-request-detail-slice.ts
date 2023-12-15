@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { StockRequestResponse } from '../../models/stock-transfer-model';
-import { getPathStockRequestDetail } from '../../services/stock-transfer';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
+import { StockRequestResponse } from "../../models/stock-transfer-model";
+import { getPathStockRequestDetail } from "../../services/stock-transfer";
 
 type State = {
   stockRequestDetail: StockRequestResponse;
@@ -11,35 +11,38 @@ type State = {
 
 const initialState: State = {
   stockRequestDetail: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: null,
     auditLogs: [],
   },
-  error: '',
+  error: "",
 };
 
-export const featchStockRequestDetailAsync = createAsyncThunk('stockRequestDetail', async (rtNo: string) => {
-  try {
-    const apiRootPath = getPathStockRequestDetail(rtNo);
-    let response: StockRequestResponse = {
-      ref: '',
-      code: 0,
-      message: '',
-      data: null,
-      auditLogs: [],
-    };
+export const featchStockRequestDetailAsync = createAsyncThunk(
+  "stockRequestDetail",
+  async (rtNo: string) => {
+    try {
+      const apiRootPath = getPathStockRequestDetail(rtNo);
+      let response: StockRequestResponse = {
+        ref: "",
+        code: 0,
+        message: "",
+        data: null,
+        auditLogs: [],
+      };
 
-    response = await get(apiRootPath).then();
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+      response = await get(apiRootPath).then();
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const stockRequestDetailSlice = createSlice({
-  name: 'stockRequestDetail',
+  name: "stockRequestDetail",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -48,9 +51,12 @@ const stockRequestDetailSlice = createSlice({
     builer.addCase(featchStockRequestDetailAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchStockRequestDetailAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.stockRequestDetail = action.payload;
-      }),
+      builer.addCase(
+        featchStockRequestDetailAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.stockRequestDetail = action.payload;
+        },
+      ),
       builer.addCase(featchStockRequestDetailAsync.rejected, () => {
         initialState;
       });

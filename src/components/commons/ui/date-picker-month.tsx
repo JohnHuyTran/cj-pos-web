@@ -1,11 +1,11 @@
 //@ts-nocheck
-import DatePicker from 'react-multi-date-picker';
-import { AnySchema } from 'yup';
+import DatePicker from "react-multi-date-picker";
+import { AnySchema } from "yup";
 // import InputIcon from 'react-multi-date-picker/components/input_icon';
-import { useStyles } from './date-picker-css';
+import { useStyles } from "./date-picker-css";
 
-import thai from './thai';
-import thai_th from './thai_th';
+import thai from "./thai";
+import thai_th from "./thai_th";
 // import classes from '*.module.css';
 
 interface StateProps {
@@ -24,8 +24,10 @@ const DatePickerMonth: React.FC<StateProps> = (props) => {
   };
 
   return (
-    <div className={classes.MdatepickerMulti}
-         style={{backgroundColor: props.isDisabled && '#EAEBEB'}}>
+    <div
+      className={classes.MdatepickerMulti}
+      style={{ backgroundColor: props.isDisabled && "#EAEBEB" }}
+    >
       <DatePicker
         onlyMonthPicker
         calendar={thai}

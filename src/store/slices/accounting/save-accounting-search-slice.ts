@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ExpenseSearch } from '../../../models/branch-accounting-model';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ExpenseSearch } from "../../../models/branch-accounting-model";
 
 type State = {
   searchExpense: ExpenseSearch;
@@ -7,11 +7,11 @@ type State = {
 
 const initialState: State = {
   searchExpense: {
-    limit: '10',
-    page: '1',
-    type: '',
-    status: '',
-    branchCode: '',
+    limit: "10",
+    page: "1",
+    type: "",
+    status: "",
+    branchCode: "",
     month: 0,
     year: 0,
     period: 0,
@@ -19,7 +19,7 @@ const initialState: State = {
 };
 
 const saveExpenseSearchRequest = createSlice({
-  name: 'saveExpenseSearchRequest',
+  name: "saveExpenseSearchRequest",
   initialState,
   reducers: {
     saveExpenseSearch: (state, action: PayloadAction<any>) => {
@@ -31,5 +31,6 @@ const saveExpenseSearchRequest = createSlice({
   },
 });
 
-export const { saveExpenseSearch, clearExpenseSearch } = saveExpenseSearchRequest.actions;
+export const { saveExpenseSearch, clearExpenseSearch } =
+  saveExpenseSearchRequest.actions;
 export default saveExpenseSearchRequest.reducer;

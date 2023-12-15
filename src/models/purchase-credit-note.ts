@@ -1,4 +1,4 @@
-import { FileType } from './supplier-check-order-model';
+import { FileType } from "./supplier-check-order-model";
 
 export interface PurchaseCreditNoteType {
   pnNo?: string;

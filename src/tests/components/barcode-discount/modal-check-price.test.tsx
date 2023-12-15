@@ -1,13 +1,13 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
-import { Store, AnyAction } from '@reduxjs/toolkit';
-import React from 'react';
-import { initialState } from '../../mockStore';
-import { mockUserInfo } from '../../mockData';
-import { ThemeProvider } from '@mui/material';
-import theme from '../../../styles/theme';
-import ModalCheckPrice from '../../../components/barcode-discount/modal-check-price';
+import { fireEvent, render, screen } from "@testing-library/react";
+import { Provider } from "react-redux";
+import configureStore from "redux-mock-store";
+import { Store, AnyAction } from "@reduxjs/toolkit";
+import React from "react";
+import { initialState } from "../../mockStore";
+import { mockUserInfo } from "../../mockData";
+import { ThemeProvider } from "@mui/material";
+import theme from "../../../styles/theme";
+import ModalCheckPrice from "../../../components/barcode-discount/modal-check-price";
 
 let wrapper;
 const mockStore = configureStore();
@@ -18,24 +18,24 @@ const inittal = {
   addItems: {
     state: [
       {
-        barcode: '8859065101014',
-        skuCode: '000000000020030140',
-        unitCode: 'ST',
-        unitName: 'ชิ้น',
-        barcodeName: '12นางพญาครีมไวท์ซีรีย์20g Piece',
+        barcode: "8859065101014",
+        skuCode: "000000000020030140",
+        unitCode: "ST",
+        unitName: "ชิ้น",
+        barcodeName: "12นางพญาครีมไวท์ซีรีย์20g Piece",
         unitPrice: 39,
-        unitPriceText: '39.00',
+        unitPriceText: "39.00",
         baseUnit: 1,
         qty: 1,
-        skuName: '12นางพญาครีมไวท์ซีรีย์20g',
-        ProductTypeCode: '31100',
-        ProductTypeName: 'MOISTURIZER FOR FACE',
+        skuName: "12นางพญาครีมไวท์ซีรีย์20g",
+        ProductTypeCode: "31100",
+        ProductTypeName: "MOISTURIZER FOR FACE",
       },
     ],
   },
 };
 
-sessionStorage.setItem('user_info', mockUserInfo);
+sessionStorage.setItem("user_info", mockUserInfo);
 beforeEach(() => {
   store = mockStore(inittal);
   wrapper = render(
@@ -43,10 +43,10 @@ beforeEach(() => {
       <ThemeProvider theme={theme}>
         <ModalCheckPrice products={products} open={true} onClose={onClose} />
       </ThemeProvider>
-    </Provider>
+    </Provider>,
   );
 });
-jest.mock('react-i18next', () => ({
+jest.mock("react-i18next", () => ({
   // this mock makes sure any components using the translate hook can use it without a warning being shown
   useTranslation: () => {
     return {
@@ -57,20 +57,20 @@ jest.mock('react-i18next', () => ({
     };
   },
   initReactI18next: {
-    type: '3rdParty',
+    type: "3rdParty",
     init: jest.fn(),
   },
 }));
 
-describe('component check price', () => {
-  it('find button close', () => {
-    expect(screen.getByText('ปิด')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('ปิด'));
+describe("component check price", () => {
+  it("find button close", () => {
+    expect(screen.getByText("ปิด")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("ปิด"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('find data change price', () => {
-    expect(screen.getByRole('grid')).toBeInTheDocument();
-    expect(screen.getAllByRole('row')[1]).toContainHTML('8859065101014');
+  it("find data change price", () => {
+    expect(screen.getByRole("grid")).toBeInTheDocument();
+    expect(screen.getAllByRole("row")[1]).toContainHTML("8859065101014");
   });
 });

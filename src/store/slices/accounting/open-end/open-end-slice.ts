@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { get } from 'adapters/posback-adapter';
-import { environment } from 'environment-base';
-import { featchViewOpenEndRsMockup } from 'mockdata/branch-accounting';
-import { ViewOpenEndResponse } from 'models/branch-accounting-model';
-import { getPathExpenseDetail } from 'services/accounting';
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "adapters/posback-adapter";
+import { environment } from "environment-base";
+import { featchViewOpenEndRsMockup } from "mockdata/branch-accounting";
+import { ViewOpenEndResponse } from "models/branch-accounting-model";
+import { getPathExpenseDetail } from "services/accounting";
 
 type State = {
   viewOpenEnd: ViewOpenEndResponse;
@@ -12,27 +12,33 @@ type State = {
 
 const initialState: State = {
   viewOpenEnd: {
-    timestamp: '',
-    ref: '',
+    timestamp: "",
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: null,
   },
-  error: '',
+  error: "",
 };
 
-export const featchOpenEndDeatilAsync = createAsyncThunk('OpenEndDeatil', async (docNo: string) => {
-  try {
-    const apiRootPath = getPathExpenseDetail(docNo, environment.branchAccounting.openEnd.view.url);
-    // return featchViewOpenEndRsMockup();
-    return await get(apiRootPath).then();
-  } catch (error) {
-    throw error;
-  }
-});
+export const featchOpenEndDeatilAsync = createAsyncThunk(
+  "OpenEndDeatil",
+  async (docNo: string) => {
+    try {
+      const apiRootPath = getPathExpenseDetail(
+        docNo,
+        environment.branchAccounting.openEnd.view.url,
+      );
+      // return featchViewOpenEndRsMockup();
+      return await get(apiRootPath).then();
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const viewOpenEndSlice = createSlice({
-  name: 'OpenEndDeatil',
+  name: "OpenEndDeatil",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -41,9 +47,12 @@ const viewOpenEndSlice = createSlice({
     builer.addCase(featchOpenEndDeatilAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchOpenEndDeatilAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.viewOpenEnd = action.payload;
-      }),
+      builer.addCase(
+        featchOpenEndDeatilAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.viewOpenEnd = action.payload;
+        },
+      ),
       builer.addCase(featchOpenEndDeatilAsync.rejected, () => {
         initialState;
       });

@@ -13,15 +13,15 @@ import {
   RadioGroup,
   TextField,
   Typography,
-} from '@mui/material';
-import { Box } from '@mui/system';
-import React, { useEffect } from 'react';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import { useStyles } from '../../styles/makeTheme';
-import { useTranslation } from 'react-i18next';
-import { useAppSelector, useAppDispatch } from '../../store/store';
-import { fetchTotalBranch } from '../../store/slices/search-branches-province-slice';
+} from "@mui/material";
+import { Box } from "@mui/system";
+import React, { useEffect } from "react";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import SearchIcon from "@mui/icons-material/Search";
+import { useStyles } from "../../styles/makeTheme";
+import { useTranslation } from "react-i18next";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import { fetchTotalBranch } from "../../store/slices/search-branches-province-slice";
 interface Props {
   values: any;
 }
@@ -36,8 +36,10 @@ export default function ViewBranch({ values }: Props) {
   const province = values.appliedBranches.province || [];
   const excludeBranches = values.appliedBranches.excludedBranchList || [];
   const excludeProvinces = values.appliedBranches.excludedProvinceList || [];
-  const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
-  const { t } = useTranslation(['common']);
+  const totalBranches = useAppSelector(
+    (state) => state.searchBranchProvince.totalBranches,
+  );
+  const { t } = useTranslation(["common"]);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -64,20 +66,26 @@ export default function ViewBranch({ values }: Props) {
 
   return (
     <>
-      {values.appliedBranches && branches.length == 1 && province.length == 0 ? (
+      {values.appliedBranches &&
+      branches.length == 1 &&
+      province.length == 0 ? (
         <Typography variant="body2">
           {branches[0].code}-{branches[0].name}
         </Typography>
       ) : (
         <>
           <Button
-            style={{ color: '#446EF2', textDecoration: 'underline' }}
+            style={{ color: "#446EF2", textDecoration: "underline" }}
             onClick={(e) => {
               e.stopPropagation();
               handleOpenModal();
             }}
           >
-            {allBranches && excludeProvinces.length == 0 && excludeBranches.length == 0 ? 'ทุกสาขา' : 'หลายสาขา'}
+            {allBranches &&
+            excludeProvinces.length == 0 &&
+            excludeBranches.length == 0
+              ? "ทุกสาขา"
+              : "หลายสาขา"}
           </Button>
           <Dialog maxWidth="md" fullWidth open={open}>
             <Box sx={{ flex: 1, ml: 2 }}>
@@ -85,19 +93,25 @@ export default function ViewBranch({ values }: Props) {
                 <IconButton
                   onClick={handleCloseModal}
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     right: 8,
                     top: 8,
                     color: (theme: any) => theme.palette.grey[400],
                   }}
                   data-testid="iconCloseModal"
                 >
-                  <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
+                  <CancelOutlinedIcon
+                    fontSize="large"
+                    stroke={"white"}
+                    strokeWidth={1}
+                  />
                 </IconButton>
               ) : null}
             </Box>
-            <DialogContent sx={{ padding: '45px 24px 32px 60px', minHeight: '438px' }}>
-              <FormControl sx={{ marginBottom: '5px' }}>
+            <DialogContent
+              sx={{ padding: "45px 24px 32px 60px", minHeight: "438px" }}
+            >
+              <FormControl sx={{ marginBottom: "5px" }}>
                 <RadioGroup
                   aria-labelledby="branch-radio-buttons-group-label"
                   value={allBranches}
@@ -109,21 +123,26 @@ export default function ViewBranch({ values }: Props) {
                     label={`เลือกสาขาทั้งหมด (${totalBranches} สาขา)`}
                     disabled={true}
                   />
-                  <FormControlLabel disabled={true} value={false} control={<Radio />} label="เลือกสาขาเอง" />
+                  <FormControlLabel
+                    disabled={true}
+                    value={false}
+                    control={<Radio />}
+                    label="เลือกสาขาเอง"
+                  />
                 </RadioGroup>
               </FormControl>
               <Grid container spacing={1} mb={7}>
                 {allBranches != null && (
                   <>
                     <Grid item xs={12} pr={1} mb={0.5}>
-                      <Typography fontWeight={400} color={'#000000'}>
+                      <Typography fontWeight={400} color={"#000000"}>
                         สาขาที่เลือก
                       </Typography>
                     </Grid>
                     {!allBranches && (
                       <>
-                        <Grid item xs={12} display={'flex'}>
-                          <Box width={'37%'}>
+                        <Grid item xs={12} display={"flex"}>
+                          <Box width={"37%"}>
                             <Autocomplete
                               options={[]}
                               id="combo-box-province"
@@ -133,7 +152,7 @@ export default function ViewBranch({ values }: Props) {
                                   {...params}
                                   FormHelperTextProps={{
                                     style: {
-                                      textAlign: 'right',
+                                      textAlign: "right",
                                       marginRight: 0,
                                     },
                                   }}
@@ -148,7 +167,7 @@ export default function ViewBranch({ values }: Props) {
                             />
                           </Box>
 
-                          <Box width={'37%'} ml={2}>
+                          <Box width={"37%"} ml={2}>
                             <Autocomplete
                               options={[]}
                               id="combo-box-branch"
@@ -159,7 +178,7 @@ export default function ViewBranch({ values }: Props) {
                                   className={classes.MtextField}
                                   FormHelperTextProps={{
                                     style: {
-                                      textAlign: 'right',
+                                      textAlign: "right",
                                       marginRight: 0,
                                     },
                                   }}
@@ -178,7 +197,12 @@ export default function ViewBranch({ values }: Props) {
                                 disabled={true}
                                 control={<Checkbox checked={false} />}
                                 label={
-                                  <Typography fontWeight={400} fontSize={'14px'} mt={0.7} color={'#000000'}>
+                                  <Typography
+                                    fontWeight={400}
+                                    fontSize={"14px"}
+                                    mt={0.7}
+                                    color={"#000000"}
+                                  >
                                     เลือกสาขาทั้งหมด
                                   </Typography>
                                 }
@@ -191,16 +215,24 @@ export default function ViewBranch({ values }: Props) {
                     <Grid item xs={12} pr={5}>
                       <Box className={classes.MWrapperListBranchForm}>
                         {allBranches ? (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                            <BranchItem label={`สาขาทั้งหมด (${totalBranches} สาขา)`} />
+                          <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                            <BranchItem
+                              label={`สาขาทั้งหมด (${totalBranches} สาขา)`}
+                            />
                           </Box>
                         ) : (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                          <Box sx={{ display: "flex", flexWrap: "wrap" }}>
                             {province.map((item: any, index: number) => (
-                              <BranchItem label={`สาขาจังหวัด${item.name}`} key={index} />
+                              <BranchItem
+                                label={`สาขาจังหวัด${item.name}`}
+                                key={index}
+                              />
                             ))}
                             {branches.map((item: any, index: number) => (
-                              <BranchItem label={`${item.code}-${item.name}`} key={index} />
+                              <BranchItem
+                                label={`${item.code}-${item.name}`}
+                                key={index}
+                              />
                             ))}
                           </Box>
                         )}
@@ -209,12 +241,12 @@ export default function ViewBranch({ values }: Props) {
                     {(!!allBranches || province.length > 0) && (
                       <>
                         <Grid item xs={12} pr={1} mb={0.5} mt={2.5}>
-                          <Typography fontWeight={400} color={'#000000'}>
+                          <Typography fontWeight={400} color={"#000000"}>
                             สาขาที่ยกเว้น
                           </Typography>
                         </Grid>
-                        <Grid item xs={12} display={'flex'}>
-                          <Box width={'37%'}>
+                        <Grid item xs={12} display={"flex"}>
+                          <Box width={"37%"}>
                             <Autocomplete
                               options={[]}
                               id="combo-box-province"
@@ -224,7 +256,7 @@ export default function ViewBranch({ values }: Props) {
                                   {...params}
                                   FormHelperTextProps={{
                                     style: {
-                                      textAlign: 'right',
+                                      textAlign: "right",
                                       marginRight: 0,
                                     },
                                   }}
@@ -239,7 +271,7 @@ export default function ViewBranch({ values }: Props) {
                             />
                           </Box>
 
-                          <Box width={'37%'} ml={2}>
+                          <Box width={"37%"} ml={2}>
                             <Autocomplete
                               options={[]}
                               id="combo-box-branch"
@@ -249,7 +281,7 @@ export default function ViewBranch({ values }: Props) {
                                   {...params}
                                   FormHelperTextProps={{
                                     style: {
-                                      textAlign: 'right',
+                                      textAlign: "right",
                                       marginRight: 0,
                                     },
                                   }}
@@ -269,7 +301,12 @@ export default function ViewBranch({ values }: Props) {
                                 disabled={true}
                                 control={<Checkbox checked={false} />}
                                 label={
-                                  <Typography fontWeight={400} fontSize={'14px'} mt={0.7} color={'#000000'}>
+                                  <Typography
+                                    fontWeight={400}
+                                    fontSize={"14px"}
+                                    mt={0.7}
+                                    color={"#000000"}
+                                  >
                                     เลือกสาขาทั้งหมด
                                   </Typography>
                                 }
@@ -280,13 +317,23 @@ export default function ViewBranch({ values }: Props) {
 
                         <Grid item xs={12} pr={5}>
                           <Box className={classes.MWrapperListBranchForm}>
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                              {excludeProvinces.map((item: any, index: number) => (
-                                <BranchItem label={`สาขาจังหวัด${item.name}`} key={index} />
-                              ))}
-                              {excludeBranches.map((item: any, index: number) => (
-                                <BranchItem label={`${item.code}-${item.name}`} key={index} />
-                              ))}
+                            <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                              {excludeProvinces.map(
+                                (item: any, index: number) => (
+                                  <BranchItem
+                                    label={`สาขาจังหวัด${item.name}`}
+                                    key={index}
+                                  />
+                                ),
+                              )}
+                              {excludeBranches.map(
+                                (item: any, index: number) => (
+                                  <BranchItem
+                                    label={`${item.code}-${item.name}`}
+                                    key={index}
+                                  />
+                                ),
+                              )}
                             </Box>
                           </Box>
                         </Grid>
@@ -298,11 +345,11 @@ export default function ViewBranch({ values }: Props) {
                   item
                   xs={12}
                   sx={{
-                    position: 'absolute',
-                    right: '50px',
-                    bottom: '30px',
-                    height: '43px',
-                    marginTop: '30px',
+                    position: "absolute",
+                    right: "50px",
+                    bottom: "30px",
+                    height: "43px",
+                    marginTop: "30px",
                   }}
                 >
                   <Button
@@ -311,7 +358,7 @@ export default function ViewBranch({ values }: Props) {
                     className={classes.MbtnSearch}
                     size="large"
                     disabled={true}
-                    sx={{ marginRight: '15px', width: '126px' }}
+                    sx={{ marginRight: "15px", width: "126px" }}
                     data-testid="buttonClear"
                   >
                     เคลียร์
@@ -323,7 +370,7 @@ export default function ViewBranch({ values }: Props) {
                     size="large"
                     disabled={true}
                     data-testid="buttonAdd"
-                    sx={{ width: '126px' }}
+                    sx={{ width: "126px" }}
                   >
                     เลือกสาขา
                   </Button>

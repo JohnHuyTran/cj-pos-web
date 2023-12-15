@@ -140,7 +140,7 @@ export function getOrderList(payload: ShipmentRequest) {
             "Content-Type": "application/json",
           },
           params: { limit: "20", page: "1" },
-        }
+        },
       )
       .then((response) => {
         console.log(response.data);

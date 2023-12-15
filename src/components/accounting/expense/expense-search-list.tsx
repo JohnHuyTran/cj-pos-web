@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
+import React, { useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppSelector, useAppDispatch } from "../../../store/store";
 import {
   DataGrid,
   GridCellParams,
@@ -10,14 +10,14 @@ import {
   GridRowParams,
   GridValueGetterParams,
   useGridApiRef,
-} from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
-import { convertUtcToBkkDate } from '../../../utils/date-utill';
-import { useStyles } from '../../../styles/makeTheme';
-import LoadingModal from '../../commons/ui/loading-modal';
-import { Chip, TextField, Typography } from '@mui/material';
-import { numberWithCommas, stringNullOrEmpty } from '../../../utils/utils';
-import ExpenseDetail from './expense-detail';
+} from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+import { convertUtcToBkkDate } from "../../../utils/date-utill";
+import { useStyles } from "../../../styles/makeTheme";
+import LoadingModal from "../../commons/ui/loading-modal";
+import { Chip, TextField, Typography } from "@mui/material";
+import { numberWithCommas, stringNullOrEmpty } from "../../../utils/utils";
+import ExpenseDetail from "./expense-detail";
 import {
   addNewItem,
   addSummaryItem,
@@ -27,15 +27,18 @@ import {
   updateItemRows,
   updateSummaryRows,
   updateToInitialState,
-} from '../../../store/slices/accounting/accounting-slice';
-import { uploadFileState } from '../../../store/slices/upload-file-slice';
-import { ExpenseSearch, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
-import { featchBranchAccountingListAsync } from '../../../store/slices/accounting/accounting-search-slice';
-import { saveExpenseSearch } from '../../../store/slices/accounting/save-accounting-search-slice';
-import { getUserInfo, setInit } from '../../../store/sessionStore';
-import { PERMISSION_GROUP } from '../../../utils/enum/permission-enum';
-import NumberFormat from 'react-number-format';
-import HtmlTooltip from 'components/commons/ui/html-tooltip';
+} from "../../../store/slices/accounting/accounting-slice";
+import { uploadFileState } from "../../../store/slices/upload-file-slice";
+import {
+  ExpenseSearch,
+  ExpenseSearchResponse,
+} from "../../../models/branch-accounting-model";
+import { featchBranchAccountingListAsync } from "../../../store/slices/accounting/accounting-search-slice";
+import { saveExpenseSearch } from "../../../store/slices/accounting/save-accounting-search-slice";
+import { getUserInfo, setInit } from "../../../store/sessionStore";
+import { PERMISSION_GROUP } from "../../../utils/enum/permission-enum";
+import NumberFormat from "react-number-format";
+import HtmlTooltip from "components/commons/ui/html-tooltip";
 
 interface loadingModalState {
   open: boolean;
@@ -47,106 +50,106 @@ export interface DataGridProps {
 
 const columns: GridColDef[] = [
   {
-    field: 'index',
-    headerName: 'ลำดับ',
+    field: "index",
+    headerName: "ลำดับ",
     width: 70,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: "20px" }}>
         {params.value}
       </Box>
     ),
   },
   {
-    field: 'branchCode',
-    headerName: 'สาขา',
+    field: "branchCode",
+    headerName: "สาขา",
     minWidth: 180,
     flex: 1,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2' sx={{ lineHeight: '120%' }}>
-          {params.value}-{params.getValue(params.id, 'branchName') || ''}
+        <Typography variant="body2" sx={{ lineHeight: "120%" }}>
+          {params.value}-{params.getValue(params.id, "branchName") || ""}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'docNo',
-    headerName: 'เลขที่เอกสาร',
+    field: "docNo",
+    headerName: "เลขที่เอกสาร",
     minWidth: 180,
     flex: 1,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'expensePeriod',
-    headerName: 'งวดเบิก',
+    field: "expensePeriod",
+    headerName: "งวดเบิก",
     minWidth: 140,
     flex: 1.2,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
   },
   {
-    field: 'typeText',
-    headerName: 'ประเภท',
+    field: "typeText",
+    headerName: "ประเภท",
     minWidth: 130,
     flex: 1,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'status',
-    headerName: 'สถานะ',
+    field: "status",
+    headerName: "สถานะ",
     minWidth: 80,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     renderCell: (params) => {
       if (
-        params.value === 'DRAFT' ||
-        params.value === 'SEND_BACK_EDIT' ||
-        params.value === 'WAITTING_EDIT_ATTACH_FILE' ||
-        params.value === 'WAITTING_APPROVAL1' ||
-        params.value === 'WAITTING_APPROVAL2' ||
-        params.value === 'WAITTING_ACCOUNTING' ||
-        params.value === 'WAITTING_APPROVAL3'
+        params.value === "DRAFT" ||
+        params.value === "SEND_BACK_EDIT" ||
+        params.value === "WAITTING_EDIT_ATTACH_FILE" ||
+        params.value === "WAITTING_APPROVAL1" ||
+        params.value === "WAITTING_APPROVAL2" ||
+        params.value === "WAITTING_ACCOUNTING" ||
+        params.value === "WAITTING_APPROVAL3"
       ) {
         return (
           <Chip
-            label={params.getValue(params.id, 'statusText')}
-            size='small'
-            sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+            label={params.getValue(params.id, "statusText")}
+            size="small"
+            sx={{ color: "#FBA600", backgroundColor: "#FFF0CA" }}
           />
         );
-      } else if (params.value === 'APPROVED' || params.value === 'SAP_ERROR') {
+      } else if (params.value === "APPROVED" || params.value === "SAP_ERROR") {
         return (
           <Chip
-            label={params.getValue(params.id, 'statusText')}
-            size='small'
-            sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+            label={params.getValue(params.id, "statusText")}
+            size="small"
+            sx={{ color: "#20AE79", backgroundColor: "#E7FFE9" }}
           />
         );
-      } else if (params.value === 'CLOSED') {
+      } else if (params.value === "CLOSED") {
         return (
           <Chip
-            label={params.getValue(params.id, 'statusText')}
-            size='small'
-            sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
+            label={params.getValue(params.id, "statusText")}
+            size="small"
+            sx={{ color: "#F54949", backgroundColor: "#FFD7D7" }}
           />
         );
       }
     },
   },
   {
-    field: 'sumWithdrawAmount',
-    headerName: 'ยอดเงินเบิก',
+    field: "sumWithdrawAmount",
+    headerName: "ยอดเงินเบิก",
     minWidth: 105,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     sortable: false,
     // renderCell: (params) => numberWithCommas(params.value),
     renderCell: (params: GridRenderCellParams) => {
@@ -158,28 +161,28 @@ const columns: GridColDef[] = [
           disabled={true}
           customInput={TextField}
           sx={{
-            '.MuiInputBase-input.Mui-disabled': {
-              WebkitTextFillColor: '#000',
+            ".MuiInputBase-input.Mui-disabled": {
+              WebkitTextFillColor: "#000",
             },
-            '.MuiOutlinedInput-notchedOutline': {
-              border: 'none',
+            ".MuiOutlinedInput-notchedOutline": {
+              border: "none",
             },
-            '.MuiInputBase-input': {
-              textAlign: 'right',
+            ".MuiInputBase-input": {
+              textAlign: "right",
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
   },
   {
-    field: 'sumApprovalAmount',
-    headerName: 'ยอดเงินอนุมัติ',
+    field: "sumApprovalAmount",
+    headerName: "ยอดเงินอนุมัติ",
     minWidth: 115,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     sortable: false,
     // renderCell: (params) => numberWithCommas(params.value),
     renderCell: (params: GridRenderCellParams) => {
@@ -191,75 +194,87 @@ const columns: GridColDef[] = [
           disabled={true}
           customInput={TextField}
           sx={{
-            '.MuiInputBase-input.Mui-disabled': {
-              WebkitTextFillColor: '#000',
+            ".MuiInputBase-input.Mui-disabled": {
+              WebkitTextFillColor: "#000",
             },
-            '.MuiOutlinedInput-notchedOutline': {
-              border: 'none',
+            ".MuiOutlinedInput-notchedOutline": {
+              border: "none",
             },
-            '.MuiInputBase-input': {
-              textAlign: 'right',
+            ".MuiInputBase-input": {
+              textAlign: "right",
             },
           }}
           fixedDecimalScale
-          type='text'
+          type="text"
         />
       );
     },
   },
   {
-    field: 'difAmount',
-    headerName: 'ผลต่าง',
+    field: "difAmount",
+    headerName: "ผลต่าง",
     minWidth: 100,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     sortable: false,
     renderCell: (params) => calDiff(params),
   },
   {
-    field: 'expenseDate',
-    headerName: 'วันที่ค่าใช้จ่าย',
+    field: "expenseDate",
+    headerName: "วันที่ค่าใช้จ่าย",
     minWidth: 120,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     renderCell: (params) => {
-      const status = params.getValue(params.id, 'status');
-      if (status === 'APPROVED' || status === 'CLOSED' || status === 'SAP_ERROR') {
+      const status = params.getValue(params.id, "status");
+      if (
+        status === "APPROVED" ||
+        status === "CLOSED" ||
+        status === "SAP_ERROR"
+      ) {
         return params.value;
       } else {
-        return '';
+        return "";
       }
     },
   },
   {
-    field: 'approvedDate',
-    headerName: 'วันที่อนุมัติเงินสำรอง',
+    field: "approvedDate",
+    headerName: "วันที่อนุมัติเงินสำรอง",
     minWidth: 160,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     renderCell: (params) => {
-      const status = params.getValue(params.id, 'status');
-      if (status === 'APPROVED' || status === 'CLOSED' || status === 'SAP_ERROR') {
+      const status = params.getValue(params.id, "status");
+      if (
+        status === "APPROVED" ||
+        status === "CLOSED" ||
+        status === "SAP_ERROR"
+      ) {
         return params.value;
       } else {
-        return '';
+        return "";
       }
     },
   },
   {
-    field: 'errorMsgSap',
-    headerName: 'หมายเหตุ',
+    field: "errorMsgSap",
+    headerName: "หมายเหตุ",
     minWidth: 160,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     renderCell: (params: GridRenderCellParams) => {
       return (
         <>
           <HtmlTooltip title={<React.Fragment>{params.value}</React.Fragment>}>
-            <Typography variant='body2' sx={{ lineHeight: '120%', whiteSpace: 'nowrap' }} noWrap>
+            <Typography
+              variant="body2"
+              sx={{ lineHeight: "120%", whiteSpace: "nowrap" }}
+              noWrap
+            >
               {params.value}
             </Typography>
           </HtmlTooltip>
@@ -274,7 +289,7 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '',
+        field: "",
         width: 0,
         minWidth: 0,
         sortable: false,
@@ -283,7 +298,7 @@ function useApiRef() {
           return null;
         },
       }),
-    [columns]
+    [columns],
   );
 
   return { apiRef, columns: _columns };
@@ -291,13 +306,14 @@ function useApiRef() {
 
 var calDiff = function (params: GridValueGetterParams) {
   if (
-    params.getValue(params.id, 'status') === 'APPROVED' ||
-    params.getValue(params.id, 'status') === 'WAITTING_APPROVAL3' ||
-    params.getValue(params.id, 'status') === 'CLOSED' ||
-    params.getValue(params.id, 'status') === 'SAP_ERROR'
+    params.getValue(params.id, "status") === "APPROVED" ||
+    params.getValue(params.id, "status") === "WAITTING_APPROVAL3" ||
+    params.getValue(params.id, "status") === "CLOSED" ||
+    params.getValue(params.id, "status") === "SAP_ERROR"
   ) {
     const diff =
-      Number(params.getValue(params.id, 'sumApprovalAmount')) - Number(params.getValue(params.id, 'sumWithdrawAmount'));
+      Number(params.getValue(params.id, "sumApprovalAmount")) -
+      Number(params.getValue(params.id, "sumWithdrawAmount"));
 
     // if (diff > 0) return <label style={{ color: '#446EF2', fontWeight: 700 }}> +{numberWithCommas(diff)} </label>;
     // if (diff < 0) return <label style={{ color: '#F54949', fontWeight: 700 }}> {numberWithCommas(diff)} </label>;
@@ -305,7 +321,11 @@ var calDiff = function (params: GridValueGetterParams) {
 
     let _diff = String(diff);
     if (diff > 0) _diff = `+${_diff}`;
-    const frontColor = _diff.includes('+') ? '#446EF2' : _diff.includes('-') ? '#F54949' : '#000';
+    const frontColor = _diff.includes("+")
+      ? "#446EF2"
+      : _diff.includes("-")
+      ? "#F54949"
+      : "#000";
 
     return (
       <NumberFormat
@@ -315,35 +335,41 @@ var calDiff = function (params: GridValueGetterParams) {
         disabled={true}
         customInput={TextField}
         sx={{
-          '.MuiInputBase-input.Mui-disabled': {
+          ".MuiInputBase-input.Mui-disabled": {
             WebkitTextFillColor: frontColor,
           },
-          '.MuiOutlinedInput-notchedOutline': {
-            border: 'none',
+          ".MuiOutlinedInput-notchedOutline": {
+            border: "none",
           },
-          '.MuiInputBase-input': {
-            textAlign: 'right',
+          ".MuiInputBase-input": {
+            textAlign: "right",
           },
         }}
-        prefix={diff > 0 ? '+' : ''}
+        prefix={diff > 0 ? "+" : ""}
         fixedDecimalScale
-        type='text'
+        type="text"
       />
     );
   }
-  return <label style={{ color: '#000', fontSize: '1rem' }}> 0.00 </label>;
+  return <label style={{ color: "#000", fontSize: "1rem" }}> 0.00 </label>;
 };
 
 function ExpenseSearchList({ onSelectRows }: DataGridProps) {
-  const { t } = useTranslation(['expense', 'common']);
+  const { t } = useTranslation(["expense", "common"]);
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
   const items = useAppSelector((state) => state.searchBranchAccounting);
-  const cuurentPage = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.page);
-  const limit = useAppSelector((state) => state.searchBranchAccounting.branchAccountingList.perPage);
+  const cuurentPage = useAppSelector(
+    (state) => state.searchBranchAccounting.branchAccountingList.page,
+  );
+  const limit = useAppSelector(
+    (state) => state.searchBranchAccounting.branchAccountingList.perPage,
+  );
   const res: any = items.branchAccountingList;
-  const payload = useAppSelector((state) => state.saveExpenseSearchRequest.searchExpense);
+  const payload = useAppSelector(
+    (state) => state.saveExpenseSearchRequest.searchExpense,
+  );
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const { apiRef, columns } = useApiRef();
@@ -352,9 +378,9 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
       id: indexs,
       index: (cuurentPage - 1) * parseInt(pageSize) + indexs + 1,
       docNo: data.docNo,
-      expensePeriod: `${convertUtcToBkkDate(data.expensePeriod.startDate)}-${convertUtcToBkkDate(
-        data.expensePeriod.endDate
-      )}`,
+      expensePeriod: `${convertUtcToBkkDate(
+        data.expensePeriod.startDate,
+      )}-${convertUtcToBkkDate(data.expensePeriod.endDate)}`,
       startDate: convertUtcToBkkDate(data.expensePeriod.startDate),
       endDate: convertUtcToBkkDate(data.expensePeriod.endDate),
       branchCode: data.branchCode,
@@ -374,9 +400,10 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
   // console.log('rows:', JSON.stringify(rows));
   // console.log('res.total:', JSON.stringify(res.total));
 
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const handlePageChange = async (newPage: number) => {
@@ -403,7 +430,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
     setLoading(true);
     const payloadNewpage: ExpenseSearch = {
       limit: pageSize.toString(),
-      page: '1',
+      page: "1",
       type: payload.type,
       status: payload.status,
       branchCode: payload.branchCode,
@@ -423,9 +450,9 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
 
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     await handleOpenDetailModal(params.row.docNo);
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
 
   const [edit, setEdit] = React.useState(false);
@@ -440,7 +467,7 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
     await dispatch(initialItems([]));
     await dispatch(addNewItem(null));
     await dispatch(featchExpenseDetailAsync(docNo));
-    setInit('Y');
+    setInit("Y");
 
     setOpenDetailModal(true);
   };
@@ -463,14 +490,18 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
 
   const [groupACCM, setGroupACCM] = React.useState(false);
   useEffect(() => {
-    const accountManager = getUserInfo().group === PERMISSION_GROUP.ACCOUNT_MANAGER;
+    const accountManager =
+      getUserInfo().group === PERMISSION_GROUP.ACCOUNT_MANAGER;
     setGroupACCM(accountManager);
   }, []);
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
-        <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+      <Box mt={2} bgcolor="background.paper">
+        <div
+          className={classes.MdataGridPaginationTop}
+          style={{ height: rows.length >= 10 ? "80vh" : "auto" }}
+        >
           <DataGrid
             rows={rows}
             columns={columns}
@@ -482,14 +513,16 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
             rowHeight={65}
             pagination
             checkboxSelection={groupACCM ? true : false}
-            isRowSelectable={(params: GridRowParams) => params.row.status === 'WAITTING_APPROVAL3'}
+            isRowSelectable={(params: GridRowParams) =>
+              params.row.status === "WAITTING_APPROVAL3"
+            }
             onSelectionModelChange={handleSubmitRowSelect}
             disableSelectionOnClick
           />
@@ -498,7 +531,13 @@ function ExpenseSearchList({ onSelectRows }: DataGridProps) {
 
       <LoadingModal open={openLoadingModal.open} />
 
-      {openDetailModal && <ExpenseDetail isOpen={openDetailModal} onClickClose={handleCloseDetailModal} edit={true} />}
+      {openDetailModal && (
+        <ExpenseDetail
+          isOpen={openDetailModal}
+          onClickClose={handleCloseDetailModal}
+          edit={true}
+        />
+      )}
     </div>
   );
 }

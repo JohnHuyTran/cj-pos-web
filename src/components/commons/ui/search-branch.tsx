@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef } from "react";
 import {
   Autocomplete,
   Button,
@@ -15,24 +15,27 @@ import {
   RadioGroup,
   TextField,
   Typography,
-} from '@mui/material';
-import { Box } from '@mui/system';
+} from "@mui/material";
+import { Box } from "@mui/system";
 // import { useTranslation } from 'react-i18next';
-import SearchIcon from '@mui/icons-material/Search';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import CloseIcon from '@mui/icons-material/Close';
-import _ from 'lodash';
+import SearchIcon from "@mui/icons-material/Search";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import _ from "lodash";
 
-import { useStyles } from '../../../styles/makeTheme';
-import { ItemProps, ListBranches } from '../../../models/search-branch-province-model';
+import { useStyles } from "../../../styles/makeTheme";
+import {
+  ItemProps,
+  ListBranches,
+} from "../../../models/search-branch-province-model";
 import {
   fetchProvinceListAsync,
   fetchBranchProvinceListAsync,
   updatePayloadBranches,
   fetchTotalBranch,
-} from '../../../store/slices/search-branches-province-slice';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { paramsConvert } from '../../../utils/utils';
+} from "../../../store/slices/search-branches-province-slice";
+import { useAppSelector, useAppDispatch } from "../../../store/store";
+import { paramsConvert } from "../../../utils/utils";
 interface Props {
   error?: boolean;
   helperText?: string;
@@ -46,24 +49,36 @@ export default function SearchBranch(props: Props): ReactElement {
   // const { t } = useTranslation(['common']);
   const [province, setProvince] = React.useState<any | null>(null);
   const [branch, setBranch] = React.useState<any | null>(null);
-  const [listBranch, setListBranch] = React.useState<ListBranches>({ branches: [], provinces: [] });
+  const [listBranch, setListBranch] = React.useState<ListBranches>({
+    branches: [],
+    provinces: [],
+  });
   const [checked, setChecked] = React.useState<boolean>(false);
   const [allBranches, setAllBranches] = React.useState<boolean>(true);
   const [errorProvince, setErrorProvince] = React.useState<string | null>();
   const [errorBranch, setErrorBranch] = React.useState<string | null>();
-  const [value, setValue] = React.useState<string>('');
-  const [checkSelectBranch, setCheckSelectBranch] = React.useState<boolean>(false);
-  const provinceList = useAppSelector((state) => state.searchBranchProvince.provinceList);
-  const branchList = useAppSelector((state) => state.searchBranchProvince.branchList);
-  const totalBranches = useAppSelector((state) => state.searchBranchProvince.totalBranches);
-  const payloadBranches = useAppSelector((state) => state.searchBranchProvince.payloadBranches);
+  const [value, setValue] = React.useState<string>("");
+  const [checkSelectBranch, setCheckSelectBranch] =
+    React.useState<boolean>(false);
+  const provinceList = useAppSelector(
+    (state) => state.searchBranchProvince.provinceList,
+  );
+  const branchList = useAppSelector(
+    (state) => state.searchBranchProvince.branchList,
+  );
+  const totalBranches = useAppSelector(
+    (state) => state.searchBranchProvince.totalBranches,
+  );
+  const payloadBranches = useAppSelector(
+    (state) => state.searchBranchProvince.payloadBranches,
+  );
   const searchDebouceRef = useRef<any>();
 
   const dispatch = useAppDispatch();
   const autocompleteRenderListItem = (props: any, option: any) => {
     return (
       <li {...props} key={option.code}>
-        <Box sx={{ display: 'flex', width: '100%' }}>
+        <Box sx={{ display: "flex", width: "100%" }}>
           <Typography variant="body2">
             {option.code}-{option.name}
           </Typography>
@@ -84,9 +99,10 @@ export default function SearchBranch(props: Props): ReactElement {
 
   useEffect(() => {
     if (open) {
-      if (provinceList === null || provinceList.data.length == 0) dispatch(fetchProvinceListAsync());
+      if (provinceList === null || provinceList.data.length == 0)
+        dispatch(fetchProvinceListAsync());
       dispatch(fetchTotalBranch());
-      dispatch(fetchBranchProvinceListAsync('limit=1000'));
+      dispatch(fetchBranchProvinceListAsync("limit=1000"));
     }
   }, [open]);
 
@@ -122,16 +138,16 @@ export default function SearchBranch(props: Props): ReactElement {
     if (payloadBranches.isAllBranches && payloadBranches.saved) {
       setValue(`สาขาทั้งหมด (${totalBranches} สาขา)`);
     } else {
-      const stringProvince = payloadBranches.appliedBranches['province']
+      const stringProvince = payloadBranches.appliedBranches["province"]
         .map((item: any) => `สาขาจังหวัด${item.name}`)
-        .join(', ');
-      const stringBranch = payloadBranches.appliedBranches['branchList']
+        .join(", ");
+      const stringBranch = payloadBranches.appliedBranches["branchList"]
         .map((item: any) => `${item.code}-${item.name}`)
-        .join(', ');
+        .join(", ");
       const stringList =
         !!stringProvince && !!stringBranch
-          ? stringProvince.concat(', ', stringBranch)
-          : stringProvince.concat('', stringBranch);
+          ? stringProvince.concat(", ", stringBranch)
+          : stringProvince.concat("", stringBranch);
       setValue(stringList);
     }
   }, [payloadBranches, totalBranches]);
@@ -140,8 +156,8 @@ export default function SearchBranch(props: Props): ReactElement {
     setOpen(false);
     clearInput();
     setListBranch({
-      branches: payloadBranches.appliedBranches['branchList'],
-      provinces: payloadBranches.appliedBranches['province'],
+      branches: payloadBranches.appliedBranches["branchList"],
+      provinces: payloadBranches.appliedBranches["province"],
     });
     setAllBranches(payloadBranches.isAllBranches);
   };
@@ -164,11 +180,15 @@ export default function SearchBranch(props: Props): ReactElement {
   const handleCheckBox = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
     // event.target.checked && setBranch(null);
-    const existProvince = listBranch['provinces'].some((item: any) => item.code == province.code);
+    const existProvince = listBranch["provinces"].some(
+      (item: any) => item.code == province.code,
+    );
     if (!existProvince) {
-      const preData = [...listBranch['provinces'], province];
-      const newBranches = listBranch['branches'].filter((item: any) => item.province.code !== province.code);
-      const checkArrays = _.difference(listBranch['branches'], newBranches);
+      const preData = [...listBranch["provinces"], province];
+      const newBranches = listBranch["branches"].filter(
+        (item: any) => item.province.code !== province.code,
+      );
+      const checkArrays = _.difference(listBranch["branches"], newBranches);
       if (checkArrays.length > 0) {
         setListBranch({
           ...listBranch,
@@ -194,7 +214,7 @@ export default function SearchBranch(props: Props): ReactElement {
       const payload: { [key: string]: any } = {
         name: keyword,
         code: keyword,
-        limit: '10',
+        limit: "10",
       };
       if (!!province?.name) {
         payload.province = province.name;
@@ -213,7 +233,7 @@ export default function SearchBranch(props: Props): ReactElement {
     try {
       const payload = {
         ...(!!province && { province: province.name }),
-        limit: '10',
+        limit: "10",
       };
       const params = paramsConvert(payload);
       dispatch(fetchBranchProvinceListAsync(params));
@@ -225,24 +245,32 @@ export default function SearchBranch(props: Props): ReactElement {
 
   const handleSelectBranch = (e: any) => {
     setBranch(e);
-    setCheckSelectBranch(!checkSelectBranch)
+    setCheckSelectBranch(!checkSelectBranch);
     if (e) {
-      const existBranch = listBranch['branches'].some((item: any) => item.id == e.id);
-      const existInProvince = listBranch['provinces'].some((item: any) => item.code == e.province.code);
+      const existBranch = listBranch["branches"].some(
+        (item: any) => item.id == e.id,
+      );
+      const existInProvince = listBranch["provinces"].some(
+        (item: any) => item.code == e.province.code,
+      );
       if (!existBranch && !existInProvince) {
-        const preData = [...listBranch['branches'], e];
+        const preData = [...listBranch["branches"], e];
         setListBranch({ ...listBranch, branches: preData });
       }
     }
   };
 
   const handleDeleteBranch = (code: string) => {
-    const newList = listBranch['branches'].filter((item: any) => item.code !== code);
+    const newList = listBranch["branches"].filter(
+      (item: any) => item.code !== code,
+    );
     setListBranch({ ...listBranch, branches: newList });
   };
 
   const handleDeleteProvinceBranch = (code: string) => {
-    const newList = listBranch['provinces'].filter((item: any) => item.code !== code);
+    const newList = listBranch["provinces"].filter(
+      (item: any) => item.code !== code,
+    );
     setListBranch({ ...listBranch, provinces: newList });
   };
 
@@ -250,8 +278,8 @@ export default function SearchBranch(props: Props): ReactElement {
     const payload = {
       isAllBranches: allBranches,
       appliedBranches: {
-        branchList: listBranch['branches'],
-        province: listBranch['provinces'],
+        branchList: listBranch["branches"],
+        province: listBranch["provinces"],
       },
       saved: true,
     };
@@ -281,21 +309,23 @@ export default function SearchBranch(props: Props): ReactElement {
       <TextField
         fullWidth
         className={`${classes.MtextFieldNumber} ${classes.MSearchBranchInput}`}
-        sx={{ textAlign: 'left' }}
+        sx={{ textAlign: "left" }}
         InputProps={{
-          endAdornment: <SearchIcon color="primary" sx={{ marginRight: '12px' }} />,
+          endAdornment: (
+            <SearchIcon color="primary" sx={{ marginRight: "12px" }} />
+          ),
           inputProps: {
-            style: { textAlignLast: 'start' },
+            style: { textAlignLast: "start" },
           },
         }}
-        style={{ backgroundColor: disabled ? '#f1f1f1' : 'transparent' }}
+        style={{ backgroundColor: disabled ? "#f1f1f1" : "transparent" }}
         onClick={handleClickSearch}
         value={value}
         error={error}
         helperText={helperText}
         FormHelperTextProps={{
           style: {
-            textAlign: 'right',
+            textAlign: "right",
             marginRight: 0,
           },
         }}
@@ -308,21 +338,25 @@ export default function SearchBranch(props: Props): ReactElement {
             <IconButton
               onClick={handleCloseModal}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 right: 8,
                 top: 8,
                 color: (theme: any) => theme.palette.grey[400],
               }}
               data-testid="iconCloseModal"
             >
-              <CancelOutlinedIcon fontSize="large" stroke={'white'} strokeWidth={1} />
+              <CancelOutlinedIcon
+                fontSize="large"
+                stroke={"white"}
+                strokeWidth={1}
+              />
             </IconButton>
           ) : null}
         </Box>
-        <DialogContent sx={{ padding: '45px 24px 32px 100px' }}>
+        <DialogContent sx={{ padding: "45px 24px 32px 100px" }}>
           <Grid container spacing={2}>
             <Grid item xs={5} pr={4}>
-              <FormControl sx={{ marginBottom: '15px' }}>
+              <FormControl sx={{ marginBottom: "15px" }}>
                 <RadioGroup
                   aria-labelledby="branch-radio-buttons-group-label"
                   value={allBranches}
@@ -335,13 +369,22 @@ export default function SearchBranch(props: Props): ReactElement {
                     label={`เลือกสาขาทั้งหมด (${totalBranches} สาขา)`}
                     disabled={disabled}
                   />
-                  <FormControlLabel disabled={disabled} value={false} control={<Radio />} label="เลือกสาขาเอง" />
+                  <FormControlLabel
+                    disabled={disabled}
+                    value={false}
+                    control={<Radio />}
+                    label="เลือกสาขาเอง"
+                  />
                 </RadioGroup>
               </FormControl>
               {!allBranches && (
                 <Box>
                   <Box mb={1}>
-                    <Typography gutterBottom variant="subtitle1" component="div">
+                    <Typography
+                      gutterBottom
+                      variant="subtitle1"
+                      component="div"
+                    >
                       จังหวัด
                     </Typography>
                     <Autocomplete
@@ -353,7 +396,7 @@ export default function SearchBranch(props: Props): ReactElement {
                           {...params}
                           FormHelperTextProps={{
                             style: {
-                              textAlign: 'right',
+                              textAlign: "right",
                               marginRight: 0,
                             },
                           }}
@@ -373,17 +416,30 @@ export default function SearchBranch(props: Props): ReactElement {
                       value={province}
                     />
                   </Box>
-                  <Box sx={{ marginBottom: '20px' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography gutterBottom variant="subtitle1" component="div" mr={3}>
+                  <Box sx={{ marginBottom: "20px" }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Typography
+                        gutterBottom
+                        variant="subtitle1"
+                        component="div"
+                        mr={3}
+                      >
                         ค้นหาสาขา
                       </Typography>
                       <FormGroup>
                         <FormControlLabel
                           disabled={
-                            !province || listBranch['provinces'].some((item: any) => item.code == province.code)
+                            !province ||
+                            listBranch["provinces"].some(
+                              (item: any) => item.code == province.code,
+                            )
                           }
-                          control={<Checkbox checked={checked} onChange={handleCheckBox} />}
+                          control={
+                            <Checkbox
+                              checked={checked}
+                              onChange={handleCheckBox}
+                            />
+                          }
                           label="เลือกสาขาทั้งหมด"
                         />
                       </FormGroup>
@@ -399,7 +455,7 @@ export default function SearchBranch(props: Props): ReactElement {
                           helperText={errorBranch}
                           FormHelperTextProps={{
                             style: {
-                              textAlign: 'right',
+                              textAlign: "right",
                               marginRight: 0,
                             },
                           }}
@@ -437,19 +493,22 @@ export default function SearchBranch(props: Props): ReactElement {
             <Grid item xs={7} pr={5} mt={5}>
               <Box className={classes.MWrapperListBranch}>
                 {allBranches ? (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    <BranchItem label={`สาขาทั้งหมด (${totalBranches} สาขา)`} onDelete={() => {}} />
+                  <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                    <BranchItem
+                      label={`สาขาทั้งหมด (${totalBranches} สาขา)`}
+                      onDelete={() => {}}
+                    />
                   </Box>
                 ) : (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {listBranch['provinces'].map((item: any, index: number) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                    {listBranch["provinces"].map((item: any, index: number) => (
                       <BranchItem
                         label={`สาขาจังหวัด${item.name}`}
                         onDelete={() => handleDeleteProvinceBranch(item.code)}
                         key={index}
                       />
                     ))}
-                    {listBranch['branches'].map((item: any, index: number) => (
+                    {listBranch["branches"].map((item: any, index: number) => (
                       <BranchItem
                         label={`${item.code}-${item.name}`}
                         onDelete={() => handleDeleteBranch(item.code)}
@@ -460,14 +519,23 @@ export default function SearchBranch(props: Props): ReactElement {
                 )}
               </Box>
             </Grid>
-            <Grid item xs={12} sx={{ textAlign: 'right', height: '43px', padding: '0 !important', marginTop: '30px' }}>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                textAlign: "right",
+                height: "43px",
+                padding: "0 !important",
+                marginTop: "30px",
+              }}
+            >
               <Button
                 variant="contained"
                 color="cancelColor"
                 className={classes.MbtnSearch}
                 size="large"
                 onClick={handleClearForm}
-                sx={{ marginRight: '15px' }}
+                sx={{ marginRight: "15px" }}
                 data-testid="buttonClear"
               >
                 เคลียร์
@@ -479,7 +547,9 @@ export default function SearchBranch(props: Props): ReactElement {
                 size="large"
                 onClick={handleAddForm}
                 disabled={
-                  (!allBranches && listBranch['branches'].length === 0 && listBranch['provinces'].length === 0) ||
+                  (!allBranches &&
+                    listBranch["branches"].length === 0 &&
+                    listBranch["provinces"].length === 0) ||
                   disabled
                 }
                 data-testid="buttonAdd"

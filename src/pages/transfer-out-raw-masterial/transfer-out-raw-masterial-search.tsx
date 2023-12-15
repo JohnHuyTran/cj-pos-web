@@ -1,37 +1,48 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import TextField from '@mui/material/TextField';
-import React, { useEffect, useState } from 'react';
-import { useStyles } from '../../styles/makeTheme';
-import { getBranchName, objectNullOrEmpty, onChange, onChangeDate, stringNullOrEmpty } from '../../utils/utils';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import DatePickerComponent from '../../components/commons/ui/date-picker';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import { SearchOff } from '@mui/icons-material';
-import AlertError from '../../components/commons/ui/alert-error';
-import moment from 'moment';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { barcodeDiscountSearch } from '../../store/slices/barcode-discount-search-slice';
-import { saveSearchCriteriaTO } from '../../store/slices/transfer-out-criteria-search-slice';
-import LoadingModal from '../../components/commons/ui/loading-modal';
-import { Action, DateFormat, TO_TYPE, TOStatus } from '../../utils/enum/common-enum';
-import SnackbarStatus from '../../components/commons/ui/snackbar-status';
-import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
-import { getUserInfo } from '../../store/sessionStore';
-import { BranchListOptionType } from '../../models/branch-model';
-import { isGroupBranch } from '../../utils/role-permission';
-import TransferOutList from './transfer-out-raw-masterial-list';
-import { TransferOutSearchRequest } from '../../models/transfer-out-model';
-import { transferOutGetSearch } from '../../store/slices/transfer-out-search-slice';
-import BranchListDropDown from '../../components/commons/ui/branch-list-dropdown';
-import ModalCreateToRawMaterial from '../../components/transfer-out-raw-material/modal-create-to-raw-material';
-import { env } from '../../adapters/environmentConfigs';
-import RequisitionSummary from '../../components/commons/ui/modal-requisition-summary';
-import SelectBranch from '../transfer-out/transfer-out-branch';
+import { Box, Button, Grid, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import TextField from "@mui/material/TextField";
+import React, { useEffect, useState } from "react";
+import { useStyles } from "../../styles/makeTheme";
+import {
+  getBranchName,
+  objectNullOrEmpty,
+  onChange,
+  onChangeDate,
+  stringNullOrEmpty,
+} from "../../utils/utils";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import DatePickerComponent from "../../components/commons/ui/date-picker";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import { SearchOff } from "@mui/icons-material";
+import AlertError from "../../components/commons/ui/alert-error";
+import moment from "moment";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { barcodeDiscountSearch } from "../../store/slices/barcode-discount-search-slice";
+import { saveSearchCriteriaTO } from "../../store/slices/transfer-out-criteria-search-slice";
+import LoadingModal from "../../components/commons/ui/loading-modal";
+import {
+  Action,
+  DateFormat,
+  TO_TYPE,
+  TOStatus,
+} from "../../utils/enum/common-enum";
+import SnackbarStatus from "../../components/commons/ui/snackbar-status";
+import { KeyCloakTokenInfo } from "../../models/keycolak-token-info";
+import { getUserInfo } from "../../store/sessionStore";
+import { BranchListOptionType } from "../../models/branch-model";
+import { isGroupBranch } from "../../utils/role-permission";
+import TransferOutList from "./transfer-out-raw-masterial-list";
+import { TransferOutSearchRequest } from "../../models/transfer-out-model";
+import { transferOutGetSearch } from "../../store/slices/transfer-out-search-slice";
+import BranchListDropDown from "../../components/commons/ui/branch-list-dropdown";
+import ModalCreateToRawMaterial from "../../components/transfer-out-raw-material/modal-create-to-raw-material";
+import { env } from "../../adapters/environmentConfigs";
+import RequisitionSummary from "../../components/commons/ui/modal-requisition-summary";
+import SelectBranch from "../transfer-out/transfer-out-branch";
 
-const _ = require('lodash');
+const _ = require("lodash");
 
 interface State {
   documentNumber: string;
@@ -48,29 +59,36 @@ interface loadingModalState {
 const TORawMasterialSearch = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation(['barcodeDiscount', 'common']);
+  const { t } = useTranslation(["barcodeDiscount", "common"]);
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
-  const [popupMsg, setPopupMsg] = React.useState<string>('');
+  const [textError, setTextError] = React.useState("");
+  const [popupMsg, setPopupMsg] = React.useState<string>("");
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
-  const page = '1';
-  const limit = useAppSelector((state) => state.transferOutSearchSlice.toSearchResponse.perPage);
-  const barcodeDiscountSearchSlice = useAppSelector((state) => state.transferOutSearchSlice);
+  const page = "1";
+  const limit = useAppSelector(
+    (state) => state.transferOutSearchSlice.toSearchResponse.perPage,
+  );
+  const barcodeDiscountSearchSlice = useAppSelector(
+    (state) => state.transferOutSearchSlice,
+  );
   const [requestPermission, setRequestPermission] = useState<boolean>(false);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
   const [openModal, setOpenModal] = React.useState(false);
   const [openModalRequisition, setOpenModalRequisition] = React.useState(false);
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
-  const [listBranchSelect, setListBranchSelect] = React.useState<BranchListOptionType[]>([]);
+  const [listBranchSelect, setListBranchSelect] = React.useState<
+    BranchListOptionType[]
+  >([]);
   const dateDefault = new Date();
   const [values, setValues] = React.useState<State>({
-    documentNumber: '',
-    branch: '',
-    status: 'ALL',
+    documentNumber: "",
+    branch: "",
+    status: "ALL",
     fromDate: dateDefault.setDate(dateDefault.getDate() - 6),
     approveDate: new Date(),
   });
@@ -80,11 +98,14 @@ const TORawMasterialSearch = () => {
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
       let userPermission =
-        userInfo.acl['service.posback-campaign'] != null && userInfo.acl['service.posback-campaign'].length > 0
-          ? userInfo.acl['service.posback-campaign']
+        userInfo.acl["service.posback-campaign"] != null &&
+        userInfo.acl["service.posback-campaign"].length > 0
+          ? userInfo.acl["service.posback-campaign"]
           : [];
       setRequestPermission(
-        userPermission != null && userPermission.length > 0 ? userPermission.includes('campaign.to.create') : false
+        userPermission != null && userPermission.length > 0
+          ? userPermission.includes("campaign.to.create")
+          : false,
       );
       // setValues({
       //   ...values,
@@ -98,10 +119,10 @@ const TORawMasterialSearch = () => {
   }, []);
   useEffect(() => {
     if (listBranchSelect.length > 0) {
-      let branches = listBranchSelect.map((item: any) => item.code).join(',');
+      let branches = listBranchSelect.map((item: any) => item.code).join(",");
       setValues({ ...values, branch: branches });
     } else {
-      setValues({ ...values, branch: '' });
+      setValues({ ...values, branch: "" });
     }
   }, [listBranchSelect]);
   const handleCloseAlert = () => {
@@ -132,9 +153,9 @@ const TORawMasterialSearch = () => {
     setListBranchSelect([]);
     setFlagSearch(false);
     setValues({
-      documentNumber: '',
-      branch: '',
-      status: 'ALL',
+      documentNumber: "",
+      branch: "",
+      status: "ALL",
       fromDate: dateDefault,
       approveDate: new Date(),
     });
@@ -145,20 +166,23 @@ const TORawMasterialSearch = () => {
       query: values.documentNumber,
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.fromDate).startOf('day').toISOString(),
-      endDate: moment(values.approveDate).endOf('day').toISOString(),
+      startDate: moment(values.fromDate).startOf("day").toISOString(),
+      endDate: moment(values.approveDate).endOf("day").toISOString(),
       clearSearch: true,
-      type: TO_TYPE.TO_RAW_MATERIAL + '',
+      type: TO_TYPE.TO_RAW_MATERIAL + "",
     };
     dispatch(barcodeDiscountSearch(payload));
   };
 
   const validateSearch = () => {
     let isValid = true;
-    if (stringNullOrEmpty(values.fromDate) || stringNullOrEmpty(values.approveDate)) {
+    if (
+      stringNullOrEmpty(values.fromDate) ||
+      stringNullOrEmpty(values.approveDate)
+    ) {
       isValid = false;
       setOpenAlert(true);
-      setTextError('กรุณากรอกวันที่');
+      setTextError("กรุณากรอกวันที่");
     }
     return isValid;
   };
@@ -169,9 +193,9 @@ const TORawMasterialSearch = () => {
     }
     let limits;
     if (limit === 0) {
-      limits = '10';
+      limits = "10";
     } else {
-      limits = limit ? limit.toString() : '10';
+      limits = limit ? limit.toString() : "10";
     }
     const payload: TransferOutSearchRequest = {
       perPage: limits,
@@ -179,16 +203,16 @@ const TORawMasterialSearch = () => {
       query: values.documentNumber.trim(),
       branch: values.branch,
       status: values.status,
-      startDate: moment(values.fromDate).startOf('day').toISOString(),
-      endDate: moment(values.approveDate).endOf('day').toISOString(),
-      type: TO_TYPE.TO_RAW_MATERIAL + '',
+      startDate: moment(values.fromDate).startOf("day").toISOString(),
+      endDate: moment(values.approveDate).endOf("day").toISOString(),
+      type: TO_TYPE.TO_RAW_MATERIAL + "",
     };
 
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     await dispatch(transferOutGetSearch(payload));
     await dispatch(saveSearchCriteriaTO(payload));
     setFlagSearch(true);
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
 
   let dataTable;
@@ -202,7 +226,7 @@ const TORawMasterialSearch = () => {
         <Grid item container xs={12} justifyContent="center">
           <Box color="#CBD4DB">
             <h2>
-              {t('noData')} <SearchOff fontSize="large" />
+              {t("noData")} <SearchOff fontSize="large" />
             </h2>
           </Box>
         </Grid>
@@ -216,7 +240,7 @@ const TORawMasterialSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6} mt={0.1}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {'เลขที่เอกสารเบิก'}
+              {"เลขที่เอกสารเบิก"}
             </Typography>
             <TextField
               id="documentNumber"
@@ -226,12 +250,12 @@ const TORawMasterialSearch = () => {
               onChange={onChange.bind(this, setValues, values)}
               className={classes.MtextField}
               fullWidth
-              placeholder={'เลขที่เอกสาร TO'}
+              placeholder={"เลขที่เอกสาร TO"}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('branch')}
+              {t("branch")}
             </Typography>
             {/* <BranchListDropDown
               valueBranch={branchOptions}
@@ -249,7 +273,7 @@ const TORawMasterialSearch = () => {
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('status')}
+              {t("status")}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -257,9 +281,9 @@ const TORawMasterialSearch = () => {
                 name="status"
                 value={values.status}
                 onChange={onChange.bind(this, setValues, values)}
-                inputProps={{ 'aria-label': 'Without label' }}
+                inputProps={{ "aria-label": "Without label" }}
               >
-                <MenuItem value={'ALL'}>{t('all')}</MenuItem>
+                <MenuItem value={"ALL"}>{t("all")}</MenuItem>
                 <MenuItem value={TOStatus.DRAFT}>บันทึก</MenuItem>
                 <MenuItem value={TOStatus.APPROVED}>อนุมัติ</MenuItem>
               </Select>
@@ -270,20 +294,30 @@ const TORawMasterialSearch = () => {
         <Grid container rowSpacing={3} columnSpacing={6}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {'ตั้งแต่'}
+              {"ตั้งแต่"}
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(this, setValues, values, 'fromDate')}
+              onClickDate={onChangeDate.bind(
+                this,
+                setValues,
+                values,
+                "fromDate",
+              )}
               value={values.fromDate}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {'ถึง'}
+              {"ถึง"}
             </Typography>
             <DatePickerComponent
-              onClickDate={onChangeDate.bind(this, setValues, values, 'approveDate')}
-              type={'TO'}
+              onClickDate={onChangeDate.bind(
+                this,
+                setValues,
+                values,
+                "approveDate",
+              )}
+              type={"TO"}
               minDateTo={values.fromDate}
               value={values.approveDate}
             />
@@ -293,56 +327,60 @@ const TORawMasterialSearch = () => {
           </Grid>
         </Grid>
         <Grid container rowSpacing={3} columnSpacing={6} mt={1}>
-          <Grid item xs={12} style={{ textAlign: 'right' }}>
+          <Grid item xs={12} style={{ textAlign: "right" }}>
             {requestPermission && (
               <Button
                 id="btnCreate"
                 variant="contained"
-                sx={{ width: 140, height: '40px' }}
+                sx={{ width: 140, height: "40px" }}
                 className={classes.MbtnSearch}
                 color="secondary"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
                 onClick={handleOpenModal}
               >
-                {'ขอใช้วัตถุดิบ'}
+                {"ขอใช้วัตถุดิบ"}
               </Button>
             )}
             <Button
               id="btnDrawdown"
               variant="contained"
-              sx={{ width: 125, height: '40px', ml: 2 }}
+              sx={{ width: 125, height: "40px", ml: 2 }}
               className={classes.MbtnSearch}
               color="warning"
               onClick={handleOpenModalRequisition}
             >
-              {'สรุปรายการเบิก'}
+              {"สรุปรายการเบิก"}
             </Button>
             <Button
               id="btnClear"
               variant="contained"
-              sx={{ width: '126px', height: '40px', ml: 2 }}
+              sx={{ width: "126px", height: "40px", ml: 2 }}
               className={classes.MbtnClear}
               color="cancelColor"
               onClick={onClear}
             >
-              {t('common:button.clear')}
+              {t("common:button.clear")}
             </Button>
             <Button
               id="btnSearch"
               variant="contained"
               color="primary"
-              sx={{ width: '126px', height: '40px', ml: 2 }}
+              sx={{ width: "126px", height: "40px", ml: 2 }}
               className={classes.MbtnSearch}
               onClick={onSearch}
             >
-              {t('common:button.search')}
+              {t("common:button.search")}
             </Button>
           </Grid>
         </Grid>
       </Box>
       {dataTable}
       <LoadingModal open={openLoadingModal.open} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+      />
       {openModal && (
         <ModalCreateToRawMaterial
           isOpen={openModal}
@@ -360,7 +398,12 @@ const TORawMasterialSearch = () => {
           branchSelected={values.branch}
         />
       )}
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus
+        open={openPopup}
+        onClose={handleClosePopup}
+        isSuccess={true}
+        contentMsg={popupMsg}
+      />
     </>
   );
 };

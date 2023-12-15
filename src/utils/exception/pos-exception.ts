@@ -1,4 +1,4 @@
-import i18n from '../../locales/i18n';
+import i18n from "../../locales/i18n";
 
 export class POSException {
   code: any;
@@ -6,7 +6,12 @@ export class POSException {
   message: string;
   params: { [key: string]: string };
 
-  constructor(httpStatus: number, code: any, message: string, params?: { [key: string]: string }) {
+  constructor(
+    httpStatus: number,
+    code: any,
+    message: string,
+    params?: { [key: string]: string },
+  ) {
     this.code = code;
     this.httpStatus = httpStatus;
     this.message = message;
@@ -31,13 +36,19 @@ export function getErrorMessage(error: any) {
     const err_mapping = mappingErrorParam(err_msg, error.params);
     return err_mapping ? err_mapping : err_msg;
   }
-  return err_msg ? err_msg : i18n.t('error:default');
+  return err_msg ? err_msg : i18n.t("error:default");
 }
 
-export const mappingErrorParam = (errorMsg: string, errorParams: { [key: string]: string }) => {
+export const mappingErrorParam = (
+  errorMsg: string,
+  errorParams: { [key: string]: string },
+) => {
   for (const errorParamsKey in errorParams) {
     if (errorParams[errorParamsKey]) {
-      errorMsg = errorMsg.replace(new RegExp(`{${errorParamsKey}}`, 'g'), errorParams[errorParamsKey]);
+      errorMsg = errorMsg.replace(
+        new RegExp(`{${errorParamsKey}}`, "g"),
+        errorParams[errorParamsKey],
+      );
     }
   }
   return errorMsg;
@@ -46,7 +57,7 @@ export const mappingErrorParam = (errorMsg: string, errorParams: { [key: string]
 export function getErrorMessageHttp(error: any) {
   const err = error.data.error ? error.data.error : String(error.status);
   const err_msg = i18n.t(`error:${err}`);
-  return err_msg && err_msg != err ? err_msg : i18n.t('error:default');
+  return err_msg && err_msg != err ? err_msg : i18n.t("error:default");
 }
 
 export const isErrorCode = (code: any) => {

@@ -1,159 +1,182 @@
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAppSelector, useAppDispatch } from '../../store/store';
-import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
-import { ShipmentResponse, ShipmentInfo, ShipmentRequest } from '../../models/order-model';
-import CheckOrderDetail from './check-order-detail';
-import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { getShipmentTypeText, ShipmentDeliveryStatusCodeEnum } from '../../utils/enum/check-order-enum';
-import { useStyles } from '../../styles/makeTheme';
-import { featchOrderListAsync } from '../../store/slices/check-order-slice';
-import { saveSearchCriteria } from '../../store/slices/save-search-order';
-import { featchOrderDetailAsync } from '../../store/slices/check-order-detail-slice';
-import LoadingModal from '../commons/ui/loading-modal';
-import { Chip, Typography } from '@mui/material';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
+import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import { DataGrid, GridColDef, GridCellParams } from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+import {
+  ShipmentResponse,
+  ShipmentInfo,
+  ShipmentRequest,
+} from "../../models/order-model";
+import CheckOrderDetail from "./check-order-detail";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
+import {
+  getShipmentTypeText,
+  ShipmentDeliveryStatusCodeEnum,
+} from "../../utils/enum/check-order-enum";
+import { useStyles } from "../../styles/makeTheme";
+import { featchOrderListAsync } from "../../store/slices/check-order-slice";
+import { saveSearchCriteria } from "../../store/slices/save-search-order";
+import { featchOrderDetailAsync } from "../../store/slices/check-order-detail-slice";
+import LoadingModal from "../commons/ui/loading-modal";
+import { Chip, Typography } from "@mui/material";
+import { updateAddItemsState } from "../../store/slices/add-items-slice";
 
 function OrderList() {
-  const { t } = useTranslation(['orderReceive', 'common']);
+  const { t } = useTranslation(["orderReceive", "common"]);
   const classes = useStyles();
   const items = useAppSelector((state) => state.checkOrderList);
-  const cuurentPages = useAppSelector((state) => state.checkOrderList.orderList.page);
+  const cuurentPages = useAppSelector(
+    (state) => state.checkOrderList.orderList.page,
+  );
   const limit = useAppSelector((state) =>
-    state.checkOrderList.orderList.perPage ? state.checkOrderList.orderList.perPage : 0
+    state.checkOrderList.orderList.perPage
+      ? state.checkOrderList.orderList.perPage
+      : 0,
   );
 
   const res: ShipmentResponse = items.orderList;
-  const payload = useAppSelector((state) => state.saveSearchOrder.searchCriteria);
+  const payload = useAppSelector(
+    (state) => state.saveSearchOrder.searchCriteria,
+  );
   const dispatch = useAppDispatch();
   const [opens, setOpens] = React.useState(false);
-  const [docRefNo, setDocRefNo] = React.useState('');
-  const [docType, setDocType] = React.useState('');
-  const [sdNo, setSdNo] = React.useState('');
+  const [docRefNo, setDocRefNo] = React.useState("");
+  const [docType, setDocType] = React.useState("");
+  const [sdNo, setSdNo] = React.useState("");
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
   const columns: GridColDef[] = [
     {
-      field: 'index',
-      headerName: 'ลำดับ',
+      field: "index",
+      headerName: "ลำดับ",
       // minWidth: 75,
       flex: 0.65,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: "20px" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'docRefNo',
-      headerName: 'เลขที่เอกสาร',
+      field: "docRefNo",
+      headerName: "เลขที่เอกสาร",
       // minWidth: 161,
       flex: 1.3,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'sdNo',
-      headerName: 'เลขที่เอกสาร SD',
+      field: "sdNo",
+      headerName: "เลขที่เอกสาร SD",
       // minWidth: 160,
       flex: 1.3,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'shipBranchFromcode',
-      headerName: 'สาขาต้นทาง',
+      field: "shipBranchFromcode",
+      headerName: "สาขาต้นทาง",
       // minWidth: 90,
       flex: 1.1,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
-            {params.value}-{params.getValue(params.id, 'shipBranchFromname') || ''}
+          <Typography variant="body2" sx={{ lineHeight: "120%" }}>
+            {params.value}-
+            {params.getValue(params.id, "shipBranchFromname") || ""}
           </Typography>
         </div>
       ),
     },
     {
-      field: 'shipBranchTocode',
-      headerName: 'สาขาปลายทาง',
+      field: "shipBranchTocode",
+      headerName: "สาขาปลายทาง",
       // minWidth: 205,
       // width: 195,
       flex: 1.15,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2' sx={{ lineHeight: '120%' }}>
-            {params.value}-{params.getValue(params.id, 'shipBranchToname') || ''}
+          <Typography variant="body2" sx={{ lineHeight: "120%" }}>
+            {params.value}-
+            {params.getValue(params.id, "shipBranchToname") || ""}
           </Typography>
         </div>
       ),
     },
     {
-      field: 'sdType',
-      headerName: 'ประเภท',
+      field: "sdType",
+      headerName: "ประเภท",
       // minWidth: 80,
       flex: 0.9,
       // flex: 1.4,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
-      renderCell: (params) => <div>{getShipmentTypeText(Number(params.value))}</div>,
+      renderCell: (params) => (
+        <div>{getShipmentTypeText(Number(params.value))}</div>
+      ),
     },
     {
-      field: 'sdStatus',
-      headerName: 'สถานะ',
+      field: "sdStatus",
+      headerName: "สถานะ",
       minWidth: 70,
       flex: 0.65,
-      headerAlign: 'center',
-      align: 'left',
+      headerAlign: "center",
+      align: "left",
       sortable: false,
       renderCell: (params) => {
         if (
           params.value === ShipmentDeliveryStatusCodeEnum.STATUS_DRAFT ||
-          params.value === ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1 ||
-          params.value === ShipmentDeliveryStatusCodeEnum.STATUS_REJECT_APPROVAL_1
+          params.value ===
+            ShipmentDeliveryStatusCodeEnum.STATUS_WAITAPPROVEL_1 ||
+          params.value ===
+            ShipmentDeliveryStatusCodeEnum.STATUS_REJECT_APPROVAL_1
         ) {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
-              sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+              size="small"
+              sx={{ color: "#FBA600", backgroundColor: "#FFF0CA" }}
             />
           );
-        } else if (params.value === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE) {
+        } else if (
+          params.value === ShipmentDeliveryStatusCodeEnum.STATUS_APPROVE
+        ) {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
-              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+              size="small"
+              sx={{ color: "#20AE79", backgroundColor: "#E7FFE9" }}
             />
           );
-        } else if (params.value === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB) {
+        } else if (
+          params.value === ShipmentDeliveryStatusCodeEnum.STATUS_CLOSEJOB
+        ) {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
-              sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }}
+              size="small"
+              sx={{ color: "#F54949", backgroundColor: "#FFD7D7" }}
             />
           );
         }
       },
     },
     {
-      field: 'boxCnt',
-      headerName: 'จำนวนลัง',
+      field: "boxCnt",
+      headerName: "จำนวนลัง",
       minWidth: 90,
       flex: 0.8,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
       renderCell: (params) => {
-        if (params.getValue(params.id, 'sdType') === 1) {
+        if (params.getValue(params.id, "sdType") === 1) {
           return <div>-</div>;
         } else {
           <div>{params.value}</div>;
@@ -161,15 +184,15 @@ function OrderList() {
       },
     },
     {
-      field: 'toteCnt',
-      headerName: 'จำนวนTote',
+      field: "toteCnt",
+      headerName: "จำนวนTote",
       minWidth: 99,
       flex: 0.9,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
       renderCell: (params) => {
-        if (params.getValue(params.id, 'sdType') === 1) {
+        if (params.getValue(params.id, "sdType") === 1) {
           return <div>-</div>;
         } else {
           <div>{params.value}</div>;
@@ -177,10 +200,10 @@ function OrderList() {
       },
     },
     {
-      field: 'shipmentDate',
-      headerName: 'วันที่รับสินค้า',
-      headerAlign: 'center',
-      align: 'center',
+      field: "shipmentDate",
+      headerName: "วันที่รับสินค้า",
+      headerAlign: "center",
+      align: "center",
       minWidth: 105,
       flex: 1,
       sortable: false,
@@ -188,20 +211,21 @@ function OrderList() {
         return (
           <div
             style={{
-              textAlign: 'center',
-            }}>
+              textAlign: "center",
+            }}
+          >
             {params.value}
           </div>
         );
       },
     },
     {
-      field: 'comment',
-      headerName: 'เอกสารอ้างอิง',
+      field: "comment",
+      headerName: "เอกสารอ้างอิง",
       minWidth: 145,
       flex: 1.3,
-      headerAlign: 'center',
-      align: 'left',
+      headerAlign: "center",
+      align: "left",
       sortable: false,
     },
   ];
@@ -241,7 +265,7 @@ function OrderList() {
           if (value) {
             setOpens(true);
           }
-        }
+        },
 
         // async function (value) {
         //   setOpens(true);
@@ -251,7 +275,7 @@ function OrderList() {
         // }
       )
       .catch((err) => {
-        console.log('err : ', err);
+        console.log("err : ", err);
       });
     // setOpens(true);
     setOpenLoadingModal(false);
@@ -315,7 +339,7 @@ function OrderList() {
       // limit: payload.limit,
       limit: pageSize.toString(),
       // page: cuurentPages.toString(),
-      page: '1',
+      page: "1",
       paramQuery: payload.paramQuery,
       sdNo: payload.sdNo,
       dateFrom: payload.dateFrom,
@@ -334,7 +358,10 @@ function OrderList() {
   return (
     <div>
       {/* <Box mt={2} bgcolor="background.paper"> */}
-      <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+      <div
+        className={classes.MdataGridPaginationTop}
+        style={{ height: rows.length >= 10 ? "80vh" : "auto" }}
+      >
         <DataGrid
           rows={rows}
           columns={columns}
@@ -346,7 +373,7 @@ function OrderList() {
           pageSize={parseInt(pageSize)}
           rowsPerPageOptions={[10, 20, 50, 100]}
           rowCount={res.total}
-          paginationMode='server'
+          paginationMode="server"
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           loading={loading}

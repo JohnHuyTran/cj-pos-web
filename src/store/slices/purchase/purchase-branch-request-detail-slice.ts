@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../../adapters/posback-adapter';
-import { getPathPurchaseBRDetail } from '../../../services/purchase';
-import { PurchaseBRDetailResponse } from '../../../models/purchase-branch-request-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "../../../adapters/posback-adapter";
+import { getPathPurchaseBRDetail } from "../../../services/purchase";
+import { PurchaseBRDetailResponse } from "../../../models/purchase-branch-request-model";
 
 type State = {
   purchaseBRDetail: PurchaseBRDetailResponse;
@@ -10,33 +10,36 @@ type State = {
 
 const initialState: State = {
   purchaseBRDetail: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: null,
   },
-  error: '',
+  error: "",
 };
 
-export const featchPurchaseBRDetailAsync = createAsyncThunk('purchaseBRDetail', async (docNo: string) => {
-  try {
-    const apiRootPath = getPathPurchaseBRDetail(docNo);
-    let response: PurchaseBRDetailResponse = {
-      ref: '',
-      code: 0,
-      message: '',
-      data: null,
-    };
+export const featchPurchaseBRDetailAsync = createAsyncThunk(
+  "purchaseBRDetail",
+  async (docNo: string) => {
+    try {
+      const apiRootPath = getPathPurchaseBRDetail(docNo);
+      let response: PurchaseBRDetailResponse = {
+        ref: "",
+        code: 0,
+        message: "",
+        data: null,
+      };
 
-    response = await get(apiRootPath).then();
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+      response = await get(apiRootPath).then();
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const purchaseBRDetailSlice = createSlice({
-  name: 'purchaseBRDetail',
+  name: "purchaseBRDetail",
   initialState,
   reducers: {
     clearDataPurchaseBRDetail: (state) => initialState,
@@ -45,9 +48,12 @@ const purchaseBRDetailSlice = createSlice({
     builer.addCase(featchPurchaseBRDetailAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchPurchaseBRDetailAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.purchaseBRDetail = action.payload;
-      }),
+      builer.addCase(
+        featchPurchaseBRDetailAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.purchaseBRDetail = action.payload;
+        },
+      ),
       builer.addCase(featchPurchaseBRDetailAsync.rejected, () => {
         initialState;
       });

@@ -41,7 +41,7 @@ export const featchOrderSDListAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const checkOrderSDSlice = createSlice({
@@ -60,7 +60,7 @@ const checkOrderSDSlice = createSlice({
         featchOrderSDListAsync.fulfilled,
         (state, action: PayloadAction<any>) => {
           state.orderList = action.payload;
-        }
+        },
       ),
       builer.addCase(featchOrderSDListAsync.rejected, () => {
         initialState;

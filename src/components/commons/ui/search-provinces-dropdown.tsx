@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
-import TextField from '@mui/material/TextField';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { CircularProgress, InputAdornment } from '@mui/material';
-import { useStyles } from '../../../styles/makeTheme';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { featchProvincesListAsync } from '../../../store/slices/master/search-provinces-slice';
-import SearchIcon from '@mui/icons-material/Search';
-import dateFormat from 'dateformat';
+import React, { useEffect } from "react";
+import TextField from "@mui/material/TextField";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import { CircularProgress, InputAdornment } from "@mui/material";
+import { useStyles } from "../../../styles/makeTheme";
+import { useAppSelector, useAppDispatch } from "../../../store/store";
+import { featchProvincesListAsync } from "../../../store/slices/master/search-provinces-slice";
+import SearchIcon from "@mui/icons-material/Search";
+import dateFormat from "dateformat";
 
 interface Props {
   valueProvinces: string;
@@ -15,25 +15,34 @@ interface Props {
   disable?: boolean;
 }
 
-function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable }: Props) {
+function ProvincesDropDown({
+  valueProvinces,
+  onChangeProvinces,
+  isClear,
+  disable,
+}: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
 
   const [flagSearchProvinces, setFlagSearchProvinces] = React.useState(false);
-  const provincesList = useAppSelector((state) => state.searchProvincesSlice.provincesList);
+  const provincesList = useAppSelector(
+    (state) => state.searchProvincesSlice.provincesList,
+  );
 
   let payload: any = {
-    code: '',
-    name: '',
+    code: "",
+    name: "",
   };
 
   useEffect(() => {
     // console.log('isClear provinces :', isClear, disable);
     if (isClear) setValues([]);
 
-    if (valueProvinces !== '') {
-      const provincesFilter: any = provincesList.data.filter((r: any) => r.code === Number(valueProvinces));
+    if (valueProvinces !== "") {
+      const provincesFilter: any = provincesList.data.filter(
+        (r: any) => r.code === Number(valueProvinces),
+      );
       setValues(provincesFilter[0]);
     }
 
@@ -43,14 +52,14 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
   }, [isClear, valueProvinces, flagSearchProvinces]);
 
   function getProvincesList() {
-    const key = 'provinces';
+    const key = "provinces";
     const itemStr = localStorage.getItem(key);
     if (!itemStr) {
       return [];
     }
     const item = JSON.parse(itemStr);
     const strDate = new Date(item.expiry);
-    const now = new Date(dateFormat(new Date(), 'yyyy-mm-dd'));
+    const now = new Date(dateFormat(new Date(), "yyyy-mm-dd"));
 
     if (now > strDate) {
       localStorage.removeItem(key);
@@ -63,9 +72,9 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
     const now = new Date();
     const item = {
       value: value,
-      expiry: dateFormat(now, 'yyyy-mm-dd'),
+      expiry: dateFormat(now, "yyyy-mm-dd"),
     };
-    localStorage.setItem('provinces', JSON.stringify(item));
+    localStorage.setItem("provinces", JSON.stringify(item));
   }
 
   const searchProvinces = async (payload: any) => {
@@ -84,23 +93,26 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
           ...params.InputProps,
           endAdornment: (
             <React.Fragment>
-              {loading ? <CircularProgress color='inherit' size={20} /> : null}
+              {loading ? <CircularProgress color="inherit" size={20} /> : null}
               {/* {params.InputProps.endAdornment} */}
-              <InputAdornment position='start'>
+              <InputAdornment position="start">
                 <SearchIcon />
               </InputAdornment>
             </React.Fragment>
           ),
         }}
-        placeholder='กรุณากรอกจังหวัด'
+        placeholder="กรุณากรอกจังหวัด"
         className={classes.MtextFieldAutocomplete}
-        size='small'
+        size="small"
         fullWidth
       />
     );
   };
 
-  let options: any = provincesList && provincesList.data && provincesList.data.length > 0 ? provincesList.data : [];
+  let options: any =
+    provincesList && provincesList.data && provincesList.data.length > 0
+      ? provincesList.data
+      : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.nameTH,
   });
@@ -114,14 +126,14 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
   };
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
-    if (option && reason === 'selectOption') {
-      return onChangeProvinces(option?.code ? option?.code : '');
+    if (option && reason === "selectOption") {
+      return onChangeProvinces(option?.code ? option?.code : "");
     }
   };
 
   if (options.length === 1 && values.length === 0 && !isClear) {
     setValues(options[0]);
-    handleChangeItem('', options[0], 'selectOption');
+    handleChangeItem("", options[0], "selectOption");
   }
 
   const onInputChange = async (event: any, value: string, reason: string) => {
@@ -130,25 +142,25 @@ function ProvincesDropDown({ valueProvinces, onChangeProvinces, isClear, disable
     }
 
     const keyword = value.trim();
-    if (keyword.length === 0 && reason !== 'reset') {
-      return onChangeProvinces('');
+    if (keyword.length === 0 && reason !== "reset") {
+      return onChangeProvinces("");
     }
   };
 
   return (
     <Autocomplete
-      id='selAddItem'
+      id="selAddItem"
       value={values}
       fullWidth
       freeSolo
-      loadingText='กำลังโหลด...'
+      loadingText="กำลังโหลด..."
       loading={loading}
       options={options}
       filterOptions={filterOptions}
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
       onInputChange={onInputChange}
-      getOptionLabel={(option) => (option.nameTH ? option.nameTH : '')}
+      getOptionLabel={(option) => (option.nameTH ? option.nameTH : "")}
       isOptionEqualToValue={(option, value) => option.nameTH === value.nameTH}
       renderInput={autocompleteRenderInput}
       disabled={disable ? true : false}

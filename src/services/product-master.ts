@@ -1,13 +1,13 @@
-import { get, post } from '../adapters/posback-adapter';
-import { environment } from '../environment-base';
-import { FindProductProps } from '../models/product-model';
-import { ContentType } from '../utils/enum/common-enum';
-import { getPathUrl } from './base-service';
+import { get, post } from "../adapters/posback-adapter";
+import { environment } from "../environment-base";
+import { FindProductProps } from "../models/product-model";
+import { ContentType } from "../utils/enum/common-enum";
+import { getPathUrl } from "./base-service";
 
 export async function getProductMaster(query: string, branchCode: string) {
   try {
     const response = await get(
-      `${environment.products.sku.productMaster.search.url}?query=${query}&branchCode=${branchCode}`
+      `${environment.products.sku.productMaster.search.url}?query=${query}&branchCode=${branchCode}`,
     );
     // const response = await get('http://192.168.110.135:8000/sku/product-master?query=000000000020006559');
     return response;
@@ -20,11 +20,13 @@ export async function getProductByType(payload: any) {
   try {
     if (payload.isControlStock) {
       return await get(
-        `${environment.products.type.productByType.url}?product-type=${payload.productTypeCode}&is-control-stock=${payload.isControlStock}`
+        `${environment.products.type.productByType.url}?product-type=${payload.productTypeCode}&is-control-stock=${payload.isControlStock}`,
       );
     }
 
-    return await get(`${environment.products.type.productByType.url}?product-type=${payload.productTypeCode}`);
+    return await get(
+      `${environment.products.type.productByType.url}?product-type=${payload.productTypeCode}`,
+    );
   } catch (error) {
     throw error;
   }
@@ -32,7 +34,7 @@ export async function getProductByType(payload: any) {
 export async function searchProductItem(query: string) {
   try {
     const response = await get(
-      `${environment.products.sku.productMaster.searchItem.url}?query=${query}&limit=10&offset=0`
+      `${environment.products.sku.productMaster.searchItem.url}?query=${query}&limit=10&offset=0`,
     );
     return response;
   } catch (error) {
@@ -49,9 +51,9 @@ export async function getAllProductByBarcode(payload: FindProductProps) {
 
     if (response === 204) {
       let responseCode: any = {
-        ref: '',
+        ref: "",
         code: response,
-        message: '',
+        message: "",
         data: [],
       };
 
@@ -65,7 +67,9 @@ export async function getAllProductByBarcode(payload: FindProductProps) {
 
 export async function getProductBySKUCodes(codes: any) {
   try {
-    return await get(`${environment.products.type.productBySKUCodes.url}?codes=${codes}`);
+    return await get(
+      `${environment.products.type.productBySKUCodes.url}?codes=${codes}`,
+    );
   } catch (error) {
     throw error;
   }
@@ -81,7 +85,10 @@ export async function findProductSKU(payload: any) {
 }
 
 export const getProductBySupplierCode = (supplierCode: string) => {
-  return getPathUrl(`${environment.products.addItem.productsBySupplierCode.url}`, {
-    supplierCode: supplierCode,
-  });
+  return getPathUrl(
+    `${environment.products.addItem.productsBySupplierCode.url}`,
+    {
+      supplierCode: supplierCode,
+    },
+  );
 };

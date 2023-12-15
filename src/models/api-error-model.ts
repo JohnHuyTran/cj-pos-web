@@ -1,4 +1,4 @@
-import i18next from 'i18next';
+import i18next from "i18next";
 
 export class ApiError {
   code: number;
@@ -7,7 +7,13 @@ export class ApiError {
   error_details: any;
   data: any;
 
-  constructor(httpStatus: number, code: any, message: string, error_details?: any, data?: any) {
+  constructor(
+    httpStatus: number,
+    code: any,
+    message: string,
+    error_details?: any,
+    data?: any,
+  ) {
     this.code = code;
     this.httpStatus = httpStatus;
     this.message = this.getErrorMessage();
@@ -18,13 +24,19 @@ export class ApiError {
   getErrorMessage = () => {
     const t = i18next.t;
     const err = this.code ? this.code : String(this.httpStatus);
-    return t(`error:${err}`, t('error:default'));
+    return t(`error:${err}`, t("error:default"));
   };
 
-  mappingErrorParam = (errorMsg: string, errorParams: { [key: string]: string }) => {
+  mappingErrorParam = (
+    errorMsg: string,
+    errorParams: { [key: string]: string },
+  ) => {
     for (const errorParamsKey in errorParams) {
       if (errorParams[errorParamsKey]) {
-        errorMsg = errorMsg.replace(new RegExp(`{${errorParamsKey}}`, 'g'), errorParams[errorParamsKey]);
+        errorMsg = errorMsg.replace(
+          new RegExp(`{${errorParamsKey}}`, "g"),
+          errorParams[errorParamsKey],
+        );
       }
     }
     return errorMsg;
@@ -43,7 +55,7 @@ export class ApiUploadError {
   constructor(httpStatus: number, code: any, message: string, data: any) {
     this.code = code;
     this.httpStatus = httpStatus;
-    this.message = message ? message : 'This transaction is error';
+    this.message = message ? message : "This transaction is error";
     this.data = data ? data : null;
   }
 }

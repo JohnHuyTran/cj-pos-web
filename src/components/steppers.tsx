@@ -1,34 +1,34 @@
-import {
-  styled,
-  Stack,
-  Stepper,
-  Step,
-  StepLabel,
-} from '@mui/material';
-import { CheckCircle, Brightness1 } from '@mui/icons-material'
-import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
+import { styled, Stack, Stepper, Step, StepLabel } from "@mui/material";
+import { CheckCircle, Brightness1 } from "@mui/icons-material";
+import StepConnector, {
+  stepConnectorClasses,
+} from "@mui/material/StepConnector";
 
 interface SteppersProps {
-  steps: Array<any>,
-  actionStep: number
+  steps: Array<any>;
+  actionStep: number;
 }
 
 interface QontoStepIconProps {
-  active: boolean,
-  completed: string ,
-  className: string
+  active: boolean;
+  completed: string;
+  className: string;
 }
 
 interface QontoStepIconRootProps {
-  activeState?: boolean
+  activeState?: boolean;
 }
 
 export default function Steppers(props: SteppersProps) {
-  const { steps, actionStep } = props
-  
+  const { steps, actionStep } = props;
+
   return (
-    <Stack sx={{ width: '100%' }} spacing={4}>
-      <Stepper alternativeLabel activeStep={actionStep} connector={<QontoConnector />}>
+    <Stack sx={{ width: "100%" }} spacing={4}>
+      <Stepper
+        alternativeLabel
+        activeStep={actionStep}
+        connector={<QontoConnector />}
+      >
         {steps.map((label) => (
           <Step key={label}>
             <StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>
@@ -50,43 +50,45 @@ const QontoStepIcon = (props: QontoStepIconProps) => {
       )}
     </QontoStepIconRoot>
   );
-}
+};
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 10,
-    left: 'calc(-50% + 16px)',
-    right: 'calc(50% + 16px)',
+    left: "calc(-50% + 16px)",
+    right: "calc(50% + 16px)",
   },
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      borderColor: '#36c690',
+      borderColor: "#36c690",
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      borderColor: '#36c690',
+      borderColor: "#36c690",
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
-    borderColor: '#EAEBEB',
+    borderColor: "#EAEBEB",
     borderTopWidth: 3,
-    borderRadius: 1
-  }
+    borderRadius: 1,
+  },
 }));
 
-const QontoStepIconRoot = styled('div')<QontoStepIconRootProps>(({ activeState }) => ({
-  display: 'flex',
-  height: 22,
-  alignItems: 'center',
-  '& .QontoStepIcon-completedIcon': {
-    zIndex: 1,
-    fontSize: 30,
-    color: '#36c690',
-  },
-  '& .QontoStepIcon-circle': {
-    zIndex: 1,
-    fontSize: 30,
-    color: activeState ? '#36c690' : '#EAEBEB'
-  }
-}));
+const QontoStepIconRoot = styled("div")<QontoStepIconRootProps>(
+  ({ activeState }) => ({
+    display: "flex",
+    height: 22,
+    alignItems: "center",
+    "& .QontoStepIcon-completedIcon": {
+      zIndex: 1,
+      fontSize: 30,
+      color: "#36c690",
+    },
+    "& .QontoStepIcon-circle": {
+      zIndex: 1,
+      fontSize: 30,
+      color: activeState ? "#36c690" : "#EAEBEB",
+    },
+  }),
+);

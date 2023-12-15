@@ -1,11 +1,11 @@
-import React, { ReactElement } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
-import LoadingModal from '../commons/ui/loading-modal';
+import React, { ReactElement } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
+import LoadingModal from "../commons/ui/loading-modal";
 
 interface Props {
   open: boolean;
@@ -13,7 +13,11 @@ interface Props {
   onClose: (confirm: boolean) => void;
 }
 
-export default function ModelConfirm({ open, onClose, rtNo }: Props): ReactElement {
+export default function ModelConfirm({
+  open,
+  onClose,
+  rtNo,
+}: Props): ReactElement {
   const handleDeleteItem = async () => {
     return onClose(true);
   };
@@ -31,13 +35,17 @@ export default function ModelConfirm({ open, onClose, rtNo }: Props): ReactEleme
       sx={{ minWidth: 800 }}
     >
       <DialogContent sx={{ pl: 6, pr: 8 }}>
-        <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+        <DialogContentText
+          id="alert-dialog-description"
+          sx={{ color: "#263238" }}
+        >
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
             ยืนยันการลบ
           </Typography>
           <Typography variant="body1" align="left">
-            เลขที่เอกสารร้องขอ RT <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
-            <label style={{ color: '#36C690' }}>
+            เลขที่เอกสารร้องขอ RT{" "}
+            <label style={{ color: "#AEAEAE", marginRight: 5 }}>|</label>{" "}
+            <label style={{ color: "#36C690" }}>
               <b>{rtNo}</b>
               {/* <br />
               <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCode}</label> */}
@@ -46,7 +54,7 @@ export default function ModelConfirm({ open, onClose, rtNo }: Props): ReactEleme
         </DialogContentText>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
+      <DialogActions sx={{ justifyContent: "center", mb: 2, pl: 6, pr: 8 }}>
         <Button
           id="btnCancle"
           variant="contained"

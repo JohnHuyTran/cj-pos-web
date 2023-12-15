@@ -1,8 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../adapters/posback-adapter';
-import { stringNullOrEmpty } from '../../utils/utils';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "../../adapters/posback-adapter";
+import { stringNullOrEmpty } from "../../utils/utils";
 import { environment } from "../../environment-base";
-import { StockCountSearchRequest, StockCountSearchResponse } from "../../models/stock-count-model";
+import {
+  StockCountSearchRequest,
+  StockCountSearchResponse,
+} from "../../models/stock-count-model";
 
 type State = {
   toSearchResponse: StockCountSearchResponse;
@@ -11,20 +14,20 @@ type State = {
 
 const initialState: State = {
   toSearchResponse: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
     perPage: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const getStockCountSearch = createAsyncThunk(
-  'getStockCountSearch',
+  "getStockCountSearch",
   async (payload: StockCountSearchRequest) => {
     try {
       const apiRootPath = environment.checkStock.stockCount.search.url;
@@ -32,10 +35,10 @@ export const getStockCountSearch = createAsyncThunk(
       if (!stringNullOrEmpty(payload.query)) {
         path = path + `&documentNumber=${payload.query}`;
       }
-      if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
+      if (!stringNullOrEmpty(payload.branch) && "ALL" !== payload.branch) {
         path = path + `&branchCode=${payload.branch}`;
       }
-      if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
+      if (!stringNullOrEmpty(payload.status) && "ALL" !== payload.status) {
         path = path + `&status=${payload.status}`;
       }
       if (!stringNullOrEmpty(payload.startDate)) {
@@ -45,9 +48,9 @@ export const getStockCountSearch = createAsyncThunk(
         path = path + `&endDate=${payload.endDate}`;
       }
       let response: StockCountSearchResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -61,11 +64,11 @@ export const getStockCountSearch = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const StockCountSearchSlice = createSlice({
-  name: 'StockCountSearchSlice',
+  name: "StockCountSearchSlice",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -74,9 +77,12 @@ const StockCountSearchSlice = createSlice({
     builer.addCase(getStockCountSearch.pending, () => {
       initialState;
     }),
-      builer.addCase(getStockCountSearch.fulfilled, (state, action: PayloadAction<any>) => {
-        state.toSearchResponse = action.payload;
-      }),
+      builer.addCase(
+        getStockCountSearch.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.toSearchResponse = action.payload;
+        },
+      ),
       builer.addCase(getStockCountSearch.rejected, () => {
         initialState;
       });

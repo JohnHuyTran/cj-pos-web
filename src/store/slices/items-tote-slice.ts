@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type ItemsState = {
   state: any;
@@ -9,7 +9,7 @@ const initialState: ItemsState = {
 };
 
 export const itemsToteSlice = createSlice({
-  name: 'itemsTote',
+  name: "itemsTote",
   initialState,
   reducers: {
     updateItemsToteState: (state, action: PayloadAction<any>) => {

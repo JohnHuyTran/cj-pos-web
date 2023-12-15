@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import moment from 'moment';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import moment from "moment";
 
 type ItemsState = {
   createDraft: any;
@@ -13,20 +13,20 @@ const initialState: ItemsState = {
     products: [],
   },
   dataDetail: {
-    id: '',
-    documentNumber: '',
-    status: '',
+    id: "",
+    documentNumber: "",
+    status: "",
     createdDate: moment(new Date()).toISOString(),
-    createdBy: '',
-    branch: '',
-    storeType: '',
-    countingTime: '',
-    APDocumentNumber: '',
+    createdBy: "",
+    branch: "",
+    storeType: "",
+    countingTime: "",
+    APDocumentNumber: "",
     relatedSaDocuments: {},
     stockCounter: 0,
     recounting: false,
     recountingBy: 0,
-    APId: ''
+    APId: "",
   },
   errorList: [],
   checkStock: [],
@@ -34,7 +34,7 @@ const initialState: ItemsState = {
 };
 
 const stockCountSlice = createSlice({
-  name: 'stockCountSlice',
+  name: "stockCountSlice",
   initialState,
   reducers: {
     save: (state, action: PayloadAction<any>) => {
@@ -59,6 +59,6 @@ export const {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
-  updateCheckEdit
+  updateCheckEdit,
 } = stockCountSlice.actions;
 export default stockCountSlice.reducer;

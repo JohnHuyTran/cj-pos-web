@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import moment from 'moment';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import moment from "moment";
 
 type ItemsState = {
   dataDetail: any;
@@ -9,26 +9,26 @@ type ItemsState = {
 };
 const initialState: ItemsState = {
   dataDetail: {
-    id: '',
-    documentNumber: '',
-    status: '',
+    id: "",
+    documentNumber: "",
+    status: "",
     createdDate: moment(new Date()).toISOString(),
-    createdBy: '',
-    branchCode: '',
-    branchName: '',
-    APId: '',
-    APDocumentNumber: '',
+    createdBy: "",
+    branchCode: "",
+    branchName: "",
+    APId: "",
+    APDocumentNumber: "",
     relatedSCs: [],
     recheckSkus: [],
     relatedSlDocuments: {
-      documentNumber: '',
-      id: ''
+      documentNumber: "",
+      id: "",
     },
     notCountableSkus: [],
     skuDifferenceEqual: 0,
     skuDifferenceNegative: 0,
     skuDifferencePositive: 0,
-    stockCounter: '',
+    stockCounter: "",
   },
   errorList: [],
   checkStock: [],
@@ -36,7 +36,7 @@ const initialState: ItemsState = {
 };
 
 const stockAdjustmentSlice = createSlice({
-  name: 'stockAdjustmentSlice',
+  name: "stockAdjustmentSlice",
   initialState,
   reducers: {
     updateDataDetail: (state, action: PayloadAction<any>) => {
@@ -57,6 +57,6 @@ export const {
   updateDataDetail,
   updateErrorList,
   updateCheckStock,
-  updateCheckEdit
+  updateCheckEdit,
 } = stockAdjustmentSlice.actions;
 export default stockAdjustmentSlice.reducer;

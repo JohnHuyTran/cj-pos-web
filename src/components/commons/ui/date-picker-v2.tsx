@@ -1,20 +1,24 @@
 //@ts-nocheck
-import React, { useState } from 'react';
+import React, { useState } from "react";
 // npm i @date-io/moment@1.x moment
-import OverwriteMomentBE from './OverwriteMoment'; // choose your lib
-import { useStyles } from './date-picker-css';
-import { MuiPickersUtilsProvider, KeyboardDatePicker, DatePicker } from '@material-ui/pickers';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import moment from 'moment';
+import OverwriteMomentBE from "./OverwriteMoment"; // choose your lib
+import { useStyles } from "./date-picker-css";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+  DatePicker,
+} from "@material-ui/pickers";
+import { createTheme, ThemeProvider } from "@material-ui/core/styles";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import moment from "moment";
 
 interface StateProps {
   onClickDate: any;
   value: any | Date | number | string;
   type?: string;
   minDateTo?: any | Date | number | string;
-  placeHolder?: string | 'กรุณาเลือกวันที่';
+  placeHolder?: string | "กรุณาเลือกวันที่";
   error?: boolean;
   disabled?: boolean;
 }
@@ -22,11 +26,11 @@ interface StateProps {
 const defaultMaterialTheme = createTheme({
   palette: {
     primary: {
-      main: '#36C690',
+      main: "#36C690",
     },
   },
   typography: {
-    fontFamily: 'Kanit',
+    fontFamily: "Kanit",
   },
 });
 
@@ -39,7 +43,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   };
 
   let datePicker;
-  if (props.type === 'TO') {
+  if (props.type === "TO") {
     datePicker = (
       <DatePicker
         disableToolbar
@@ -49,7 +53,9 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        className={props.error ? classes.MdatepickerError : classes.MdatepickerV2}
+        className={
+          props.error ? classes.MdatepickerError : classes.MdatepickerV2
+        }
         value={props.value}
         onChange={handleDateChange}
         disabled={props.disabled}
@@ -63,7 +69,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         //   readOnly: true,
         // }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
         // maxDate={today}
         minDate={props.minDateTo}
@@ -80,7 +86,9 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        className={props.error ? classes.MdatepickerError : classes.MdatepickerV2}
+        className={
+          props.error ? classes.MdatepickerError : classes.MdatepickerV2
+        }
         value={props.value}
         onChange={handleDateChange}
         data-testid="StartDate"
@@ -93,11 +101,11 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         //   readOnly: true,
         // }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
         // maxDate={today}
         minDate={minDay}
-        minDateMessage={''}
+        minDateMessage={""}
         placeholder={props.placeHolder}
         disabled={props.disabled}
       />

@@ -1,9 +1,9 @@
-import React from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
+import React from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -20,12 +20,24 @@ export default function DialogConfirm(props: SimpleDialogProps) {
 
   return (
     <div>
-      <Dialog open={open} aria-describedby="alert-dialog-description" fullWidth={true} maxWidth="xs">
+      <Dialog
+        open={open}
+        aria-describedby="alert-dialog-description"
+        fullWidth={true}
+        maxWidth="xs"
+      >
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">Are you sure {actionconfirm} ?</DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure {actionconfirm} ?
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" size="small" color="primary" onClick={() => handleListItemClick('OK')}>
+          <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={() => handleListItemClick("OK")}
+          >
             ปิด
           </Button>
         </DialogActions>

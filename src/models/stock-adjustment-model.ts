@@ -133,4 +133,3 @@ export interface SkuCalculate {
   backStock: number;
   frontStock: number;
 }
-

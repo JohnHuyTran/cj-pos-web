@@ -1,7 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { PurchaseBranchSearchRequest, PurchaseBranchSearchrResponse } from '../../models/purchase-branch-request-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
+import {
+  PurchaseBranchSearchRequest,
+  PurchaseBranchSearchrResponse,
+} from "../../models/purchase-branch-request-model";
 
 type State = {
   orderList: PurchaseBranchSearchrResponse;
@@ -10,9 +13,9 @@ type State = {
 
 const initialState: State = {
   orderList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
@@ -21,11 +24,11 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const featchSearchPurchaseBranchRequestAsync = createAsyncThunk(
-  'orderListBranch',
+  "orderListBranch",
   async (payload: PurchaseBranchSearchRequest) => {
     try {
       const apiRootPath = environment.purchase.purchaseBranchRequest.search.url;
@@ -42,7 +45,7 @@ export const featchSearchPurchaseBranchRequestAsync = createAsyncThunk(
       if (payload.dateTo) {
         path = path + `&dateTo=${payload.dateTo}`;
       }
-      if (payload.status !== 'ALL') {
+      if (payload.status !== "ALL") {
         path = path + `&status=${payload.status}`;
       }
 
@@ -50,9 +53,9 @@ export const featchSearchPurchaseBranchRequestAsync = createAsyncThunk(
       // console.log('payload.clearSearch: ', payload.clearSearch);
 
       let response: PurchaseBranchSearchrResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -70,11 +73,11 @@ export const featchSearchPurchaseBranchRequestAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const purchaseBranchRequestSlice = createSlice({
-  name: 'purchaseBranchRequest',
+  name: "purchaseBranchRequest",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -83,9 +86,12 @@ const purchaseBranchRequestSlice = createSlice({
     builer.addCase(featchSearchPurchaseBranchRequestAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchSearchPurchaseBranchRequestAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.orderList = action.payload;
-      }),
+      builer.addCase(
+        featchSearchPurchaseBranchRequestAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.orderList = action.payload;
+        },
+      ),
       builer.addCase(featchSearchPurchaseBranchRequestAsync.rejected, () => {
         initialState;
       });

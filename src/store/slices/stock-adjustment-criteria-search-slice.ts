@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { StockAdjustmentSearchRequest } from "../../models/stock-adjustment-model";
 
 type State = {
@@ -7,18 +7,18 @@ type State = {
 
 const initialState: State = {
   searchCriteria: {
-    perPage: '10',
-    page: '1',
-    docNo: '',
-    branch: '',
-    status: '',
-    creationDateFrom: '',
-    creationDateTo: '',
+    perPage: "10",
+    page: "1",
+    docNo: "",
+    branch: "",
+    status: "",
+    creationDateFrom: "",
+    creationDateTo: "",
   },
 };
 
 const stockAdjustmentCriteriaSearchSlice = createSlice({
-  name: 'stockAdjustmentCriteriaSearchSlice',
+  name: "stockAdjustmentCriteriaSearchSlice",
   initialState,
   reducers: {
     saveSearchCriteriaSA: (state, action: PayloadAction<any>) => {
@@ -27,5 +27,6 @@ const stockAdjustmentCriteriaSearchSlice = createSlice({
   },
 });
 
-export const { saveSearchCriteriaSA } = stockAdjustmentCriteriaSearchSlice.actions;
+export const { saveSearchCriteriaSA } =
+  stockAdjustmentCriteriaSearchSlice.actions;
 export default stockAdjustmentCriteriaSearchSlice.reducer;

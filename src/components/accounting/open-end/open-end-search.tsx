@@ -1,56 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
-import { SearchOff } from '@mui/icons-material';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
+import { SearchOff } from "@mui/icons-material";
 
-import store, { useAppDispatch, useAppSelector } from '../../../store/store';
-import { getUserInfo } from '../../../store/sessionStore';
-import { env } from '../../../adapters/environmentConfigs';
-import moment from 'moment';
+import store, { useAppDispatch, useAppSelector } from "../../../store/store";
+import { getUserInfo } from "../../../store/sessionStore";
+import { env } from "../../../adapters/environmentConfigs";
+import moment from "moment";
 
 //css
-import { useStyles } from '../../../styles/makeTheme';
+import { useStyles } from "../../../styles/makeTheme";
 
 //utils
-import { isAllowActionPermission, isGroupBranch, isGroupFinance } from '../../../utils/role-permission';
-import { getBranchName } from '../../../utils/utils';
-import { openEndStatus } from '../../../utils/enum/accounting-enum';
+import {
+  isAllowActionPermission,
+  isGroupBranch,
+  isGroupFinance,
+} from "../../../utils/role-permission";
+import { getBranchName } from "../../../utils/utils";
+import { openEndStatus } from "../../../utils/enum/accounting-enum";
 
 //component
-import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
-import DatePickerAllComponent from '../../commons/ui/date-picker-all';
-import OpenEndList from './open-end-list';
-import AlertError from 'components/commons/ui/alert-error';
+import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
+import DatePickerAllComponent from "../../commons/ui/date-picker-all";
+import OpenEndList from "./open-end-list";
+import AlertError from "components/commons/ui/alert-error";
 
 //model
-import { BranchListOptionType } from 'models/branch-model';
-import { OpenEndSearchRequest } from 'models/branch-accounting-model';
-import LoadingModal from 'components/commons/ui/loading-modal';
+import { BranchListOptionType } from "models/branch-model";
+import { OpenEndSearchRequest } from "models/branch-accounting-model";
+import LoadingModal from "components/commons/ui/loading-modal";
 
 //api
 import {
   featchSearchOpenEndAsync,
   savePayloadSearch,
   clearOpenEndSearchList,
-} from '../../../store/slices/accounting/open-end/open-end-search-slice';
+} from "../../../store/slices/accounting/open-end/open-end-search-slice";
 
 function OpenEndSearch() {
-  const { t } = useTranslation(['openEnd', 'common']);
+  const { t } = useTranslation(["openEnd", "common"]);
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  const page = '1';
-  const items = useAppSelector((state) => state.searchOpenEndSlice.openEndSearchList);
-  const limit: number = useAppSelector((state) => state.searchOpenEndSlice.openEndSearchList.perPage);
+  const page = "1";
+  const items = useAppSelector(
+    (state) => state.searchOpenEndSlice.openEndSearchList,
+  );
+  const limit: number = useAppSelector(
+    (state) => state.searchOpenEndSlice.openEndSearchList.perPage,
+  );
   const [openLoadingModal, setOpenLoadingModal] = useState(false);
   const [flagSearch, setFlagSearch] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
-  const [textError, setTextError] = useState('');
+  const [textError, setTextError] = useState("");
   const [values, setValues] = useState({
-    branchCode: '',
-    dateFrom: '',
-    dateTo: '',
-    status: 'ALL',
+    branchCode: "",
+    dateFrom: "",
+    dateTo: "",
+    status: "ALL",
   });
 
   const handleChange = (event: any) => {
@@ -64,27 +80,30 @@ function OpenEndSearch() {
   };
 
   //config branch
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const branchList = useAppSelector((state) => state.searchBranchSlice)
+    .branchList.data;
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
   const [groupFinance, setFroupFinanace] = React.useState(isGroupFinance);
-  const [branchFromCode, setBranchFromCode] = React.useState('');
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [branchFromCode, setBranchFromCode] = React.useState("");
+  const [clearBranchDropDown, setClearBranchDropDown] =
+    React.useState<boolean>(false);
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch
       ? getBranchName(branchList, getUserInfo().branch)
         ? getUserInfo().branch
         : env.branch.code
-      : env.branch.code
+      : env.branch.code,
   );
 
   const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
     code: ownBranch,
-    name: branchFrom ? branchFrom : '',
+    name: branchFrom ? branchFrom : "",
   };
-  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
-    groupBranch ? branchFromMap : null
-  );
+  const [valuebranchFrom, setValuebranchFrom] =
+    React.useState<BranchListOptionType | null>(
+      groupBranch ? branchFromMap : null,
+    );
 
   const handleChangeBranchFrom = (branchCode: string) => {
     if (branchCode !== null) {
@@ -92,7 +111,7 @@ function OpenEndSearch() {
       setBranchFromCode(branchCode);
       setValues({ ...values, branchCode: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branchCode: '' });
+      setValues({ ...values, branchCode: "" });
     }
   };
 
@@ -110,7 +129,7 @@ function OpenEndSearch() {
   const validateCriteria = () => {
     if (startDate === null || endDate === null) {
       setOpenAlert(true);
-      setTextError('กรุณากรอกวันที่รับสินค้า');
+      setTextError("กรุณากรอกวันที่รับสินค้า");
       return false;
     } else {
       return true;
@@ -125,7 +144,7 @@ function OpenEndSearch() {
     if (validate) {
       let limits;
       if (limit === 0 || limit === undefined) {
-        limits = '10';
+        limits = "10";
       } else {
         limits = limit.toString();
       }
@@ -133,8 +152,8 @@ function OpenEndSearch() {
       const payloadSearch: OpenEndSearchRequest = {
         branchCode: values.branchCode,
         status: values.status,
-        dateFrom: moment(startDate).startOf('day').toISOString(),
-        dateTo: moment(endDate).startOf('day').toISOString(),
+        dateFrom: moment(startDate).startOf("day").toISOString(),
+        dateTo: moment(endDate).startOf("day").toISOString(),
         limit: limits,
         page: page,
       };
@@ -151,10 +170,10 @@ function OpenEndSearch() {
     setOpenLoadingModal(true);
 
     if (isGroupFinance()) {
-      setBranchFromCode('');
-      setValues({ ...values, status: 'APPROVED', branchCode: '' });
+      setBranchFromCode("");
+      setValues({ ...values, status: "APPROVED", branchCode: "" });
     } else {
-      setValues({ ...values, status: 'ALL' });
+      setValues({ ...values, status: "ALL" });
     }
 
     setFlagSearch(false);
@@ -174,7 +193,7 @@ function OpenEndSearch() {
     }
 
     if (groupFinance) {
-      setValues({ ...values, status: 'APPROVED' });
+      setValues({ ...values, status: "APPROVED" });
     }
   }, []);
 
@@ -184,7 +203,7 @@ function OpenEndSearch() {
         <Grid container rowSpacing={3} columnSpacing={{ xs: 7 }}>
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('documentSearchBranch')}
+              {t("documentSearchBranch")}
             </Typography>
             <BranchListDropDown
               valueBranch={valuebranchFrom}
@@ -198,11 +217,11 @@ function OpenEndSearch() {
 
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('documentSearchStartDate')}
+              {t("documentSearchStartDate")}
             </Typography>
             <DatePickerAllComponent
               onClickDate={handleStartDatePicker}
-              type={'TO'}
+              type={"TO"}
               value={startDate}
               maxDate={new Date()}
             />
@@ -210,12 +229,12 @@ function OpenEndSearch() {
 
           <Grid item xs={4}>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('documentSearchEndDate')}
+              {t("documentSearchEndDate")}
             </Typography>
             <DatePickerAllComponent
               onClickDate={handleEndDatePicker}
               value={endDate}
-              type={'TO'}
+              type={"TO"}
               minDateTo={startDate}
               maxDate={new Date()}
             />
@@ -223,7 +242,7 @@ function OpenEndSearch() {
 
           <Grid item xs={4} container>
             <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
-              {t('documentSearchStatus')}
+              {t("documentSearchStatus")}
             </Typography>
             <FormControl fullWidth className={classes.Mselect}>
               <Select
@@ -231,10 +250,10 @@ function OpenEndSearch() {
                 name="status"
                 value={values.status}
                 onChange={handleChange}
-                inputProps={{ 'aria-label': 'Without label' }}
+                inputProps={{ "aria-label": "Without label" }}
                 disabled={groupFinance}
               >
-                <MenuItem value={'ALL'} selected={true}>
+                <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
                 {openEndStatus.map((item: any, index: number) => {
@@ -247,12 +266,12 @@ function OpenEndSearch() {
 
         <Box>
           <Grid container spacing={2} mt={4} mb={2}>
-            <Grid item xs={12} sx={{ textAlign: 'end' }}>
+            <Grid item xs={12} sx={{ textAlign: "end" }}>
               <Button
                 id="btnClear"
                 variant="contained"
                 onClick={onClickClearBtn}
-                sx={{ width: '12%', ml: 2 }}
+                sx={{ width: "12%", ml: 2 }}
                 className={classes.MbtnClear}
                 color="cancelColor"
               >
@@ -263,7 +282,7 @@ function OpenEndSearch() {
                 variant="contained"
                 color="primary"
                 onClick={onClickSearchBtn}
-                sx={{ width: '12%', ml: 2 }}
+                sx={{ width: "12%", ml: 2 }}
                 className={classes.MbtnSearch}
               >
                 ค้นหา
@@ -284,7 +303,11 @@ function OpenEndSearch() {
         )}
 
         <LoadingModal open={openLoadingModal} />
-        <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+        <AlertError
+          open={openAlert}
+          onClose={handleCloseAlert}
+          textError={textError}
+        />
       </Box>
     </>
   );

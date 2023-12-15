@@ -1,8 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../adapters/posback-adapter';
-import { stringNullOrEmpty } from '../../utils/utils';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "../../adapters/posback-adapter";
+import { stringNullOrEmpty } from "../../utils/utils";
 import { environment } from "../../environment-base";
-import { AuditHistorySearchRequest, AuditHistorySearchResponse } from "../../models/audit-history-model";
+import {
+  AuditHistorySearchRequest,
+  AuditHistorySearchResponse,
+} from "../../models/audit-history-model";
 
 type State = {
   toSearchResponse: AuditHistorySearchResponse;
@@ -11,20 +14,20 @@ type State = {
 
 const initialState: State = {
   toSearchResponse: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
     perPage: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const getAuditHistorySearch = createAsyncThunk(
-  'getAuditHistorySearch',
+  "getAuditHistorySearch",
   async (payload: AuditHistorySearchRequest) => {
     try {
       const apiRootPath = environment.checkStock.auditHistory.search.url;
@@ -33,13 +36,13 @@ export const getAuditHistorySearch = createAsyncThunk(
       if (!stringNullOrEmpty(payload.docNo)) {
         path = path + `&documentNumber=${payload.docNo}`;
       }
-      if(!stringNullOrEmpty(payload.skuCodes)){
-        path = path + `&skuCodes=${payload.skuCodes}`
+      if (!stringNullOrEmpty(payload.skuCodes)) {
+        path = path + `&skuCodes=${payload.skuCodes}`;
       }
-      if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
+      if (!stringNullOrEmpty(payload.branch) && "ALL" !== payload.branch) {
         path = path + `&branch=${payload.branch}`;
       }
-      if (!stringNullOrEmpty(payload.type) && 'ALL' !== payload.type) {
+      if (!stringNullOrEmpty(payload.type) && "ALL" !== payload.type) {
         path = path + `&type=${payload.type}`;
       }
       if (!stringNullOrEmpty(payload.creationDateFrom)) {
@@ -49,9 +52,9 @@ export const getAuditHistorySearch = createAsyncThunk(
         path = path + `&creationDateTo=${payload.creationDateTo}`;
       }
       let response: AuditHistorySearchResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -65,11 +68,11 @@ export const getAuditHistorySearch = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const AuditHistorySearchSlice = createSlice({
-  name: 'AuditHistorySearchSlice',
+  name: "AuditHistorySearchSlice",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -78,9 +81,12 @@ const AuditHistorySearchSlice = createSlice({
     builer.addCase(getAuditHistorySearch.pending, () => {
       initialState;
     }),
-      builer.addCase(getAuditHistorySearch.fulfilled, (state, action: PayloadAction<any>) => {
-        state.toSearchResponse = action.payload;
-      }),
+      builer.addCase(
+        getAuditHistorySearch.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.toSearchResponse = action.payload;
+        },
+      ),
       builer.addCase(getAuditHistorySearch.rejected, () => {
         initialState;
       });

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {BarcodeDiscountSearchRequest} from "../../models/barcode-discount-model";
+import { BarcodeDiscountSearchRequest } from "../../models/barcode-discount-model";
 
 type State = {
   searchCriteria: BarcodeDiscountSearchRequest;
@@ -31,5 +31,5 @@ const barcodeDiscountCriteriaSearchSlice = createSlice({
 });
 
 export const { saveSearchCriteriaBD, clearSearchCriteriaBD } =
-    barcodeDiscountCriteriaSearchSlice.actions;
+  barcodeDiscountCriteriaSearchSlice.actions;
 export default barcodeDiscountCriteriaSearchSlice.reducer;

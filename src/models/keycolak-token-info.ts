@@ -9,18 +9,19 @@ export interface KeyCloakTokenInfo {
   azp: string;
   session_state: string;
   acr: string;
-  'allowed-origins': string[];
+  "allowed-origins": string[];
   scope: string;
   email_verified: boolean;
   name: string;
   groups: string[];
   preferred_username: string;
   acl: ACL;
+
   given_name: string;
   family_name: string;
   email: string;
-  group: string | '';
-  branch: string | '';
+  group: string | "";
+  branch: string | "";
 }
 
 export interface ACL {

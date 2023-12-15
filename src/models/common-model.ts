@@ -16,7 +16,7 @@ export interface AuditLog {
   editBy: string;
   editByName: string;
   editDate: string;
-  comment: AuditLogComment | '';
+  comment: AuditLogComment | "";
 }
 
 export interface AuditLogComment {

@@ -1,15 +1,19 @@
 //@ts-nocheck
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import moment from 'moment';
+import moment from "moment";
 // npm i @date-io/moment@1.x moment
-import OverwriteMomentBE from './OverwriteMoment'; // choose your lib
-import { useStyles } from './date-picker-css';
+import OverwriteMomentBE from "./OverwriteMoment"; // choose your lib
+import { useStyles } from "./date-picker-css";
 
-import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
+import {
+  DatePicker,
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
+import { createTheme, ThemeProvider } from "@material-ui/core/styles";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
 interface StateProps {
   onClickDate: any;
   value: any | Date | number | string;
@@ -26,11 +30,11 @@ interface StateProps {
 const defaultMaterialTheme = createTheme({
   palette: {
     primary: {
-      main: '#36C690',
+      main: "#36C690",
     },
   },
   typography: {
-    fontFamily: 'Kanit',
+    fontFamily: "Kanit",
   },
 });
 
@@ -47,37 +51,42 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
   };
 
   let datePicker;
-  if (props.type === 'TO') {
+  if (props.type === "TO") {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable='true'
+        clearable="true"
         autoOk
         fullWidth
-        variant='inline'
-        inputVariant='outlined'
-        format='DD/MM/YYYY'
+        variant="inline"
+        inputVariant="outlined"
+        format="DD/MM/YYYY"
         className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
             <IconButton
-              size='small'
+              size="small"
               onClick={() => !props.disabled && handleDateChange(null)}
-              data-testid='endDateIconClose'>
-              <CloseIcon fontSize='small' />
+              data-testid="endDateIconClose"
+            >
+              <CloseIcon fontSize="small" />
             </IconButton>
           ),
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
         minDate={props.minDateTo}
-        maxDate={props.maxDate ? props.maxDate : ''}
-        placeholder={props.placeHolder ? props.placeHolder : 'กรุณาเลือกวันที่'}
-        minDateMessage={props.disableMinDateMsg ? '' : 'วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน'}
+        maxDate={props.maxDate ? props.maxDate : ""}
+        placeholder={props.placeHolder ? props.placeHolder : "กรุณาเลือกวันที่"}
+        minDateMessage={
+          props.disableMinDateMsg
+            ? ""
+            : "วันที่ ต้องมากกว่าหรือเท่ากับวันที่ปัจจุบัน"
+        }
         disabled={props.disabled ? props.disabled : false}
         helperText={props.hyperText}
         error={props.isError}
@@ -87,27 +96,31 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable='true'
+        clearable="true"
         autoOk
         fullWidth
-        variant='inline'
-        inputVariant='outlined'
-        format='DD/MM/YYYY'
+        variant="inline"
+        inputVariant="outlined"
+        format="DD/MM/YYYY"
         className={classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
-            <IconButton size='small' onClick={() => handleDateChange(null)} data-testid='startDateIconClose'>
-              <CloseIcon fontSize='small' />
+            <IconButton
+              size="small"
+              onClick={() => handleDateChange(null)}
+              data-testid="startDateIconClose"
+            >
+              <CloseIcon fontSize="small" />
             </IconButton>
           ),
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
-        placeholder='กรุณาเลือกวันที่'
+        placeholder="กรุณาเลือกวันที่"
         disabled={props.disabled ? props.disabled : false}
       />
     );
@@ -115,7 +128,7 @@ const DatePickerAllComponent: React.FC<StateProps> = (props) => {
 
   return (
     <div>
-      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale='th'>
+      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale="th">
         <ThemeProvider theme={defaultMaterialTheme}>{datePicker}</ThemeProvider>
       </MuiPickersUtilsProvider>
     </div>

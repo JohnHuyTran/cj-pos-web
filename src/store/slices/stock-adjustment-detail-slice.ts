@@ -34,7 +34,7 @@ export const getStockAdjustmentDetail = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const stockAdjustmentDetailSlice = createSlice({
@@ -51,7 +51,7 @@ const stockAdjustmentDetailSlice = createSlice({
         getStockAdjustmentDetail.fulfilled,
         (state, action: PayloadAction<any>) => {
           state.stockAdjustDetail = action.payload;
-        }
+        },
       ),
       builder.addCase(getStockAdjustmentDetail.rejected, () => {
         initialState;

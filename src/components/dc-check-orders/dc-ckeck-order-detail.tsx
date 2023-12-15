@@ -1,40 +1,46 @@
-import React, { ReactElement, useEffect } from 'react';
-import DialogContent from '@mui/material/DialogContent';
-import Dialog from '@mui/material/Dialog';
-import Typography from '@mui/material/Typography';
-import { BootstrapDialogTitle } from '../commons/ui/dialog-title';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Button from '@mui/material/Button';
-import ModelConfirm from './modal-confirm';
-import SnackbarStatus from '../commons/ui/snackbar-status';
-import { ContentPaste } from '@mui/icons-material';
-import store, { useAppDispatch, useAppSelector } from '../../store/store';
-import { getDCStatus, getSdType } from '../../utils/utils';
-import DCOrderDetailList from './dc-check-order-detail-list';
-import { convertUtcToBkkDate } from '../../utils/date-utill';
-import ModalShowFile from '../commons/ui/modal-show-file';
-import LoadingModal from '../commons/ui/loading-modal';
-import { useStyles } from '../../styles/makeTheme';
-import { FormControl, MenuItem, Select, TextField } from '@mui/material';
-import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
-import { isAllowActionPermission } from '../../utils/role-permission';
-import { ACTIONS } from '../../utils/enum/permission-enum';
-import AccordionHuaweiFile from '../commons/ui/accordion-huawei-file';
-import { featchorderDetailDCAsync, setReloadScreen } from '../../store/slices/dc-check-order-detail-slice';
-import TextBoxComment from '../commons/ui/textbox-comment';
-import AccordionUploadFile from '../commons/ui/accordion-upload-file';
-import { featchPurchaseNoteAsync } from '../../store/slices/supplier-order-return-slice';
-import AlertError from '../commons/ui/alert-error';
-import { fetchVerifyOrderReasonsRejectListAsync } from '../../store/slices/master/verify-order-reject-reasons-slice';
+import React, { ReactElement, useEffect } from "react";
+import DialogContent from "@mui/material/DialogContent";
+import Dialog from "@mui/material/Dialog";
+import Typography from "@mui/material/Typography";
+import { BootstrapDialogTitle } from "../commons/ui/dialog-title";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
+import Button from "@mui/material/Button";
+import ModelConfirm from "./modal-confirm";
+import SnackbarStatus from "../commons/ui/snackbar-status";
+import { ContentPaste } from "@mui/icons-material";
+import store, { useAppDispatch, useAppSelector } from "../../store/store";
+import { getDCStatus, getSdType } from "../../utils/utils";
+import DCOrderDetailList from "./dc-check-order-detail-list";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
+import ModalShowFile from "../commons/ui/modal-show-file";
+import LoadingModal from "../commons/ui/loading-modal";
+import { useStyles } from "../../styles/makeTheme";
+import { FormControl, MenuItem, Select, TextField } from "@mui/material";
+import { featchOrderListDcAsync } from "../../store/slices/dc-check-order-slice";
+import { isAllowActionPermission } from "../../utils/role-permission";
+import { ACTIONS } from "../../utils/enum/permission-enum";
+import AccordionHuaweiFile from "../commons/ui/accordion-huawei-file";
+import {
+  featchorderDetailDCAsync,
+  setReloadScreen,
+} from "../../store/slices/dc-check-order-detail-slice";
+import TextBoxComment from "../commons/ui/textbox-comment";
+import AccordionUploadFile from "../commons/ui/accordion-upload-file";
+import { featchPurchaseNoteAsync } from "../../store/slices/supplier-order-return-slice";
+import AlertError from "../commons/ui/alert-error";
+import { fetchVerifyOrderReasonsRejectListAsync } from "../../store/slices/master/verify-order-reject-reasons-slice";
 import {
   CheckOrderDetailItims,
   DCOrderApproveRequest,
   VerifyDocLDRequestType,
-} from '../../models/dc-check-order-model';
-import { verifyDCOrderShipmentsBT, verifyDCOrderShipmentsLD } from '../../services/order-shipment';
-import { ApiError } from '../../models/api-error-model';
+} from "../../models/dc-check-order-model";
+import {
+  verifyDCOrderShipmentsBT,
+  verifyDCOrderShipmentsLD,
+} from "../../services/order-shipment";
+import { ApiError } from "../../models/api-error-model";
 
 interface Props {
   isOpen: boolean;
@@ -53,30 +59,36 @@ interface State {
 function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const orderDetailList = useAppSelector((state) => state.dcCheckOrderDetail.orderDetail);
-  const reasonRejectList = useAppSelector((state) => state.verifyReasonsRejectListSlice.reasonsList.data);
+  const orderDetailList = useAppSelector(
+    (state) => state.dcCheckOrderDetail.orderDetail,
+  );
+  const reasonRejectList = useAppSelector(
+    (state) => state.verifyReasonsRejectListSlice.reasonsList.data,
+  );
   const fileUploadList = useAppSelector((state) => state.uploadFileSlice.state);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
 
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
+  const [textError, setTextError] = React.useState("");
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
 
-  const [valueCommentDC, setValueCommentDC] = React.useState('');
+  const [valueCommentDC, setValueCommentDC] = React.useState("");
   const [errorCommentDC, setErrorCommentDC] = React.useState(false);
 
   const [open, setOpen] = React.useState(isOpen);
-  const [openModelPreviewDocument, setOpenModelPreviewDocument] = React.useState(false);
+  const [openModelPreviewDocument, setOpenModelPreviewDocument] =
+    React.useState(false);
 
   const [statusFile, setStatusFile] = React.useState(0);
   const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
 
   const [showSnackBar, setShowSnackBar] = React.useState(false);
-  const [contentMsg, setContentMsg] = React.useState('');
+  const [contentMsg, setContentMsg] = React.useState("");
 
   const [approveDCStatus, setApproveDCStatus] = React.useState(false);
 
@@ -94,10 +106,14 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   useEffect(() => {
     setDetailDCItems(detailDC.items ? detailDC.items : []);
-    if (reasonRejectList === null || reasonRejectList.length <= 0) dispatch(fetchVerifyOrderReasonsRejectListAsync());
+    if (reasonRejectList === null || reasonRejectList.length <= 0)
+      dispatch(fetchVerifyOrderReasonsRejectListAsync());
     //if reason
     if (detailDC.verifyDCStatus === 1) {
-      setValues({ ...values, reason: detailDC.approvalReasonCode ? detailDC.approvalReasonCode : '' });
+      setValues({
+        ...values,
+        reason: detailDC.approvalReasonCode ? detailDC.approvalReasonCode : "",
+      });
     }
 
     setDisableCheckBtn(isAllowActionPermission(ACTIONS.ORDER_VER_MANAGE));
@@ -107,7 +123,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setValueCommentDC(detailDC.dcComment);
     setIDVerify(detailDC.id);
     setIsTote(detailDC.sdType === 0 ? true : false);
-    setIsDocTypeLD(detailDC.docType === 'LD' ? true : false);
+    setIsDocTypeLD(detailDC.docType === "LD" ? true : false);
   }, [open, detailDC]);
 
   const handleOpenLoading = (prop: any, event: boolean) => {
@@ -116,7 +132,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
   const handleChangeComment = (value: any) => {
     setValueCommentDC(value);
-    if (value !== '') {
+    if (value !== "") {
       setErrorCommentDC(false);
     } else {
       setErrorCommentDC(true);
@@ -124,11 +140,11 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   };
 
   const handleClearComment = () => {
-    setValueCommentDC('');
+    setValueCommentDC("");
   };
 
   const handlCheckedButton = () => {
-    if (valueCommentDC !== '') {
+    if (valueCommentDC !== "") {
       setErrorCommentDC(false);
       setOpenModelConfirm(true);
     } else {
@@ -149,21 +165,26 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
     setOpenModelConfirm(false);
   };
 
-  const payloadSearchDC = useAppSelector((state) => state.saveSearchOrderDc.searchCriteriaDc);
+  const payloadSearchDC = useAppSelector(
+    (state) => state.saveSearchOrderDc.searchCriteriaDc,
+  );
 
-  const handleGenerateBOStatus = async (issuccess: boolean, errorMsg: string) => {
-    handleOpenLoading('open', true);
+  const handleGenerateBOStatus = async (
+    issuccess: boolean,
+    errorMsg: string,
+  ) => {
+    handleOpenLoading("open", true);
     const isRefreshScreen = store.getState().dcCheckOrderDetail.isReloadScreen;
-    const msg = issuccess ? 'ตรวจสอบผลต่าง(DC) สำเร็จ' : errorMsg;
+    const msg = issuccess ? "ตรวจสอบผลต่าง(DC) สำเร็จ" : errorMsg;
     const successMessage = () => {
       setShowSnackBar(true);
       setContentMsg(msg);
       setApproveDCStatus(issuccess);
-    }
+    };
 
     if (issuccess && !isRefreshScreen) {
       await dispatch(featchOrderListDcAsync(payloadSearchDC));
-      successMessage()
+      successMessage();
       setTimeout(() => {
         handleClose();
       }, 500);
@@ -171,14 +192,14 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       await dispatch(featchOrderListDcAsync(payloadSearchDC));
       const itemId = store.getState().dcCheckOrderDetail.itemId;
       await dispatch(featchorderDetailDCAsync(itemId));
-      handleOpenLoading('open', false);
-      successMessage()
+      handleOpenLoading("open", false);
+      successMessage();
       setTimeout(() => {
         handleCloseSnackBar();
       }, 500);
       await dispatch(setReloadScreen(false));
     } else {
-      handleOpenLoading('open', false);
+      handleOpenLoading("open", false);
       setOpenAlert(true);
       setTextError(msg);
     }
@@ -191,11 +212,11 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   const handleClose = async () => {
     const isRefreshScreen = store.getState().dcCheckOrderDetail.isReloadScreen;
     if (isRefreshScreen) {
-      handleOpenLoading('open', true);
+      handleOpenLoading("open", true);
       const itemId = store.getState().dcCheckOrderDetail.itemId;
       await dispatch(featchorderDetailDCAsync(itemId));
       await dispatch(setReloadScreen(false));
-      handleOpenLoading('open', false);
+      handleOpenLoading("open", false);
     } else {
       setOpen(false);
       onClickClose();
@@ -203,7 +224,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   };
 
   const [values, setValues] = React.useState<State>({
-    reason: 'All',
+    reason: "All",
   });
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -220,25 +241,29 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
   };
 
   const handleOnClickApproveBtn = () => {
-    setAction('approve');
+    setAction("approve");
     setOpenModelConfirm(true);
   };
   const handleOnClickRejectBtn = () => {
     const isValid = validateInput();
     setOpenAlert(!isValid);
     if (isValid) {
-      setAction('reject');
+      setAction("reject");
       setOpenModelConfirm(true);
     }
   };
 
   const validateInput = () => {
     const isvalid = fileUploadList.length > 0 ? true : false;
-    if (values.reason === null || values.reason === undefined || values.reason === 'All') {
-      setTextError('กรุณาระบุเหตุผลที่แก้ไข');
+    if (
+      values.reason === null ||
+      values.reason === undefined ||
+      values.reason === "All"
+    ) {
+      setTextError("กรุณาระบุเหตุผลที่แก้ไข");
       return false;
     } else if (!isvalid) {
-      setTextError('กรุณาแนบเอกสาร');
+      setTextError("กรุณาแนบเอกสาร");
       return false;
     }
     return true;
@@ -254,7 +279,7 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
       },
       function (error: ApiError) {
         throw error;
-      }
+      },
     );
   };
 
@@ -277,127 +302,142 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         reasonCode: values.reason,
       };
     }
-    await verifyDCOrderShipmentsLD(detailDC.sdNo, payload, isApprove ? [] : fileUploadList).then(
+    await verifyDCOrderShipmentsLD(
+      detailDC.sdNo,
+      payload,
+      isApprove ? [] : fileUploadList,
+    ).then(
       function (value) {
         return;
       },
       function (error: ApiError) {
         throw error;
-      }
+      },
     );
   };
 
   const updateDCOrder = async () => {
     await dispatch(featchorderDetailDCAsync(idDC));
   };
-  const [action, setAction] = React.useState('');
+  const [action, setAction] = React.useState("");
   const handleVerfiyDoc = () => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     if (isDocTypeLD) {
-      verifyLD(action === 'approve')
+      verifyLD(action === "approve")
         .then(() => {
           updateDCOrder();
-          handleGenerateBOStatus(true, '');
+          handleGenerateBOStatus(true, "");
         })
         .catch((error: ApiError) => {
           handleGenerateBOStatus(false, error.message);
         })
-        .finally(() => handleOpenLoading('open', false));
+        .finally(() => handleOpenLoading("open", false));
     } else {
       verifyBT()
         .then(() => {
           updateDCOrder();
-          handleGenerateBOStatus(true, '');
+          handleGenerateBOStatus(true, "");
         })
         .catch((error: ApiError) => {
           handleGenerateBOStatus(false, error.message);
         })
-        .finally(() => handleOpenLoading('open', false));
+        .finally(() => handleOpenLoading("open", false));
     }
   };
 
   return (
     <div>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}>
-          <Typography sx={{ fontSize: '1em' }}>ตรวจสอบผลต่าง (DC)</Typography>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleClose}
+        >
+          <Typography sx={{ fontSize: "1em" }}>ตรวจสอบผลต่าง (DC)</Typography>
         </BootstrapDialogTitle>
         <DialogContent>
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={2}>
-                <Typography variant='body2'>เลขที่เอกสาร:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{detailDC.docRefNo}</Typography>
+                <Typography variant="body2">{detailDC.docRefNo}</Typography>
               </Grid>
               <Grid item xs={2}>
-                <Typography variant='body2'>สถานะการตรวจสอบผลต่าง:</Typography>
+                <Typography variant="body2">สถานะการตรวจสอบผลต่าง:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{getDCStatus(detailDC.verifyDCStatus)}</Typography>
+                <Typography variant="body2">
+                  {getDCStatus(detailDC.verifyDCStatus)}
+                </Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={2}>
-                <Typography variant='body2'>เลขที่เอกสาร SD:</Typography>
+                <Typography variant="body2">เลขที่เอกสาร SD:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{detailDC.sdNo}</Typography>
+                <Typography variant="body2">{detailDC.sdNo}</Typography>
               </Grid>
               <Grid item xs={2}>
-                <Typography variant='body2'>ประเภท:</Typography>
+                <Typography variant="body2">ประเภท:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{getSdType(detailDC.sdType)}</Typography>
+                <Typography variant="body2">
+                  {getSdType(detailDC.sdType)}
+                </Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={1}>
               <Grid item xs={2}>
-                <Typography variant='body2'>สาขาต้นทาง:</Typography>
+                <Typography variant="body2">สาขาต้นทาง:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{`${detailDC.shipBranchFrom.code}-${detailDC.shipBranchFrom.name}`}</Typography>
+                <Typography variant="body2">{`${detailDC.shipBranchFrom.code}-${detailDC.shipBranchFrom.name}`}</Typography>
               </Grid>
               <Grid item xs={2}>
-                <Typography variant='body2'>สาขาปลายทาง:</Typography>
+                <Typography variant="body2">สาขาปลายทาง:</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant='body2'>{`${detailDC.shipBranchTo.code}-${detailDC.shipBranchTo.name}`}</Typography>
+                <Typography variant="body2">{`${detailDC.shipBranchTo.code}-${detailDC.shipBranchTo.name}`}</Typography>
               </Grid>
             </Grid>
             {!isDocTypeLD && (
               <>
                 <Grid container spacing={2} mb={1}>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>วันที่:</Typography>
+                    <Typography variant="body2">วันที่:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
+                    <Typography variant="body2">
+                      {convertUtcToBkkDate(detailDC.receivedDate)}
+                    </Typography>
                   </Grid>
                   <Grid item xs={2}></Grid>
                   <Grid item xs={4}></Grid>
                 </Grid>
                 <Grid container spacing={2} mb={1}>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>แนบเอกสาร:</Typography>
+                    <Typography variant="body2">แนบเอกสาร:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+                    {detailDC.files && detailDC.files.length > 0 && (
+                      <AccordionHuaweiFile files={detailDC.files} />
+                    )}
                   </Grid>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>หมายเหตุ:</Typography>
+                    <Typography variant="body2">หมายเหตุ:</Typography>
                   </Grid>
                   <Grid item xs={4}>
                     <TextBoxComment
-                      fieldName=''
+                      fieldName=""
                       defaultValue={valueCommentDC}
                       maxLength={100}
                       onChangeComment={handleChangeComment}
                       isDisable={detailDC.verifyDCStatus !== 0}
                       rowDisplay={2}
                       isError={errorCommentDC}
-                      hypterText='กรุณากรอก หมายเหตุ'
+                      hypterText="กรุณากรอก หมายเหตุ"
                     />
                   </Grid>
                 </Grid>
@@ -407,26 +447,29 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
               <>
                 <Grid container spacing={2} mb={1}>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>วันที่:</Typography>
+                    <Typography variant="body2">วันที่:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography variant='body2'>{convertUtcToBkkDate(detailDC.receivedDate)}</Typography>
+                    <Typography variant="body2">
+                      {convertUtcToBkkDate(detailDC.receivedDate)}
+                    </Typography>
                   </Grid>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>เหตุผล-การแก้ไข:</Typography>
+                    <Typography variant="body2">เหตุผล-การแก้ไข:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    {' '}
+                    {" "}
                     <FormControl fullWidth className={classes.Mselect}>
                       <Select
-                        data-testid='testid-reason'
-                        id='reason'
-                        name='reason'
+                        data-testid="testid-reason"
+                        id="reason"
+                        name="reason"
                         value={values.reason}
                         onChange={handleChange}
-                        inputProps={{ 'aria-label': 'Without label' }}
-                        disabled={detailDC.verifyDCStatus !== 0}>
-                        <MenuItem value={'All'} selected={true}>
+                        inputProps={{ "aria-label": "Without label" }}
+                        disabled={detailDC.verifyDCStatus !== 0}
+                      >
+                        <MenuItem value={"All"} selected={true}>
                           กรุณาระบุเหตุผล
                         </MenuItem>
                         {reasonRejectList.map((reason) => (
@@ -441,13 +484,15 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
                 <Grid container spacing={2} mb={1}>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>แนบเอกสาร:</Typography>
+                    <Typography variant="body2">แนบเอกสาร:</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    {detailDC.files && detailDC.files.length > 0 && <AccordionHuaweiFile files={detailDC.files} />}
+                    {detailDC.files && detailDC.files.length > 0 && (
+                      <AccordionHuaweiFile files={detailDC.files} />
+                    )}
                   </Grid>
                   <Grid item xs={2}>
-                    <Typography variant='body2'>แนบเอกสาร-การแก้ไข:</Typography>
+                    <Typography variant="body2">แนบเอกสาร-การแก้ไข:</Typography>
                   </Grid>
                   <Grid item xs={4}>
                     {detailDC.verifyDCStatus === 0 && (
@@ -460,9 +505,10 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
                         enabledControl={true}
                       />
                     )}
-                    {detailDC.approvalFiles && detailDC.approvalFiles.length > 0 && (
-                      <AccordionHuaweiFile files={detailDC.approvalFiles} />
-                    )}
+                    {detailDC.approvalFiles &&
+                      detailDC.approvalFiles.length > 0 && (
+                        <AccordionHuaweiFile files={detailDC.approvalFiles} />
+                      )}
                   </Grid>
                 </Grid>
               </>
@@ -470,41 +516,48 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
             {isDocTypeLD && (
               <>
-                <Grid container spacing={2} justifyContent='right' sx={{ mt: 1 }}>
+                <Grid
+                  container
+                  spacing={2}
+                  justifyContent="right"
+                  sx={{ mt: 1 }}
+                >
                   <Grid item>
                     {detailDC.verifyDCStatus === 0 && (
                       <>
                         <Button
-                          data-testid='testid-btnApprove'
-                          id='btnApprove'
-                          name='btnApprove'
-                          variant='contained'
-                          color='secondary'
+                          data-testid="testid-btnApprove"
+                          id="btnApprove"
+                          name="btnApprove"
+                          variant="contained"
+                          color="secondary"
                           startIcon={<ContentPaste />}
                           onClick={handleOnClickApproveBtn}
                           sx={{
-                            borderRadius: '5px',
-                            width: '200px',
-                            padding: '8px',
-                            display: `${isAllowApproveBtn ? 'none' : ''}`,
-                          }}>
+                            borderRadius: "5px",
+                            width: "200px",
+                            padding: "8px",
+                            display: `${isAllowApproveBtn ? "none" : ""}`,
+                          }}
+                        >
                           อนุมัติ
                         </Button>
 
                         <Button
-                          data-testid='testid-btnReject'
-                          id='btnReject'
-                          variant='contained'
-                          color='error'
+                          data-testid="testid-btnReject"
+                          id="btnReject"
+                          variant="contained"
+                          color="error"
                           startIcon={<ContentPaste />}
                           onClick={handleOnClickRejectBtn}
                           sx={{
                             ml: 1,
-                            borderRadius: '5px',
-                            width: '200px',
-                            padding: '8px',
-                            display: `${isAllowRejectBtn ? 'none' : ''}`,
-                          }}>
+                            borderRadius: "5px",
+                            width: "200px",
+                            padding: "8px",
+                            display: `${isAllowRejectBtn ? "none" : ""}`,
+                          }}
+                        >
                           ไม่อนุมัติ
                         </Button>
                       </>
@@ -516,22 +569,28 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
 
             {!isDocTypeLD && (
               <>
-                <Grid container spacing={2} justifyContent='right' sx={{ mt: 1 }}>
+                <Grid
+                  container
+                  spacing={2}
+                  justifyContent="right"
+                  sx={{ mt: 1 }}
+                >
                   <Grid item>
                     {detailDC.verifyDCStatus === 0 && (
                       <Button
-                        data-testid='testid-btnChecked'
-                        id='btnChecked'
-                        variant='contained'
-                        color='primary'
+                        data-testid="testid-btnChecked"
+                        id="btnChecked"
+                        variant="contained"
+                        color="primary"
                         startIcon={<ContentPaste />}
                         onClick={handlCheckedButton}
                         sx={{
-                          borderRadius: '5px',
-                          width: '200px',
-                          padding: '8px',
-                          display: `${disableCheckBtn ? 'none' : ''}`,
-                        }}>
+                          borderRadius: "5px",
+                          width: "200px",
+                          padding: "8px",
+                          display: `${disableCheckBtn ? "none" : ""}`,
+                        }}
+                      >
                         ยืนยันยอด
                       </Button>
                     )}
@@ -564,10 +623,10 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         handleActionVerify={handleVerfiyDoc}
         subject={
           isDocTypeLD
-            ? action === 'approve'
-              ? 'ยืนยันอนุมัติผลต่างการรับสินค้า'
-              : 'ยืนยันไม่อนุมัติผลต่างการรับสินค้า'
-            : 'ยืนยันการตรวจสอบผลต่าง (DC)'
+            ? action === "approve"
+              ? "ยืนยันอนุมัติผลต่างการรับสินค้า"
+              : "ยืนยันไม่อนุมัติผลต่างการรับสินค้า"
+            : "ยืนยันการตรวจสอบผลต่าง (DC)"
         }
       />
 
@@ -577,7 +636,11 @@ function DCOrderDetail({ isOpen, idDC, onClickClose }: Props): ReactElement {
         isSuccess={approveDCStatus}
         contentMsg={contentMsg}
       />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+      />
       <LoadingModal open={openLoadingModal.open} />
     </div>
   );

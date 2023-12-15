@@ -1,25 +1,25 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../../adapters/posback-adapter';
-import { environment } from '../../../environment-base';
-import { featchCloseSaleShiftRsMockup } from '../../../mockdata/branch-accounting';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "../../../adapters/posback-adapter";
+import { environment } from "../../../environment-base";
+import { featchCloseSaleShiftRsMockup } from "../../../mockdata/branch-accounting";
 import {
   CloseSaleShiftRequest,
   CloseSaleShiftResponse,
   ExternalIncomeItemInfo,
-} from '../../../models/branch-accounting-model';
+} from "../../../models/branch-accounting-model";
 
 type State = {
   closeSaleShift: CloseSaleShiftResponse;
-  error: '';
+  error: "";
   payloadSearch: CloseSaleShiftRequest;
 };
 
 const initialState: State = {
   closeSaleShift: {
-    timestamp: '',
-    ref: '',
+    timestamp: "",
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
@@ -28,29 +28,30 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
   payloadSearch: {
-    shiftDate: '',
-    branchCode: '',
-    status: '',
+    shiftDate: "",
+    branchCode: "",
+    status: "",
     page: 0,
     limit: 0,
   },
 };
 
 export const featchCloseSaleShiptListAsync = createAsyncThunk(
-  'closeSaleShipList',
+  "closeSaleShipList",
   async (payload: CloseSaleShiftRequest) => {
     try {
-      const apiRootPath = environment.branchAccounting.closeSaleShift.search.url;
+      const apiRootPath =
+        environment.branchAccounting.closeSaleShift.search.url;
       let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&shiftDate=${payload.shiftDate}`;
-      if (payload.status !== 'ALL') {
+      if (payload.status !== "ALL") {
         path += `&status=${payload.status}`;
       }
-      if (payload.branchCode != '') {
+      if (payload.branchCode != "") {
         path += `&branchCode=${payload.branchCode}`;
       }
-      if (payload.bypassStatus != 'ALL') {
+      if (payload.bypassStatus != "ALL") {
         path += `&bypassStatus=${payload.bypassStatus}`;
       }
 
@@ -59,11 +60,11 @@ export const featchCloseSaleShiptListAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const closeSaleShiftSlice = createSlice({
-  name: 'CloseSaleShipList',
+  name: "CloseSaleShipList",
   initialState,
   reducers: {
     clearCloseSaleShiftList: (state, action: PayloadAction<any>) => {
@@ -77,13 +78,20 @@ const closeSaleShiftSlice = createSlice({
     builer.addCase(featchCloseSaleShiptListAsync.pending, (state, action) => {
       initialState;
     }),
-      builer.addCase(featchCloseSaleShiptListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.closeSaleShift = action.payload;
-      }),
-      builer.addCase(featchCloseSaleShiptListAsync.rejected, (state, action) => {
-        initialState;
-      });
+      builer.addCase(
+        featchCloseSaleShiptListAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.closeSaleShift = action.payload;
+        },
+      ),
+      builer.addCase(
+        featchCloseSaleShiptListAsync.rejected,
+        (state, action) => {
+          initialState;
+        },
+      );
   },
 });
-export const { clearCloseSaleShiftList, savePayloadSearch } = closeSaleShiftSlice.actions;
+export const { clearCloseSaleShiftList, savePayloadSearch } =
+  closeSaleShiftSlice.actions;
 export default closeSaleShiftSlice.reducer;

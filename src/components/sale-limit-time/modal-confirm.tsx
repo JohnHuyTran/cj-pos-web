@@ -1,14 +1,14 @@
-import React, { ReactElement, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
-import LoadingModal from '../commons/ui/loading-modal';
-import { Box } from '@mui/system';
-import { Grid, TextField } from '@mui/material';
-import { useStyles } from '../../styles/makeTheme';
+import React, { ReactElement, useEffect } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
+import LoadingModal from "../commons/ui/loading-modal";
+import { Box } from "@mui/system";
+import { Grid, TextField } from "@mui/material";
+import { useStyles } from "../../styles/makeTheme";
 
 interface Props {
   open: boolean;
@@ -36,9 +36,10 @@ export default function ModelConfirm({
   headerTitle,
   error,
 }: Props): ReactElement {
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
   const [errorRemark, setErrorRemark] = React.useState(false);
   const classes = useStyles();
   const [characterCount, setCharacterCount] = React.useState(0);
@@ -65,9 +66,9 @@ export default function ModelConfirm({
     if (status > 1 && !remark) {
       setErrorRemark(true);
     } else {
-      handleOpenLoading('open', true);
+      handleOpenLoading("open", true);
       await onConfirm();
-      handleOpenLoading('open', false);
+      handleOpenLoading("open", false);
       onClose();
     }
   };
@@ -82,23 +83,26 @@ export default function ModelConfirm({
         PaperProps={{ sx: { minWidth: 450 } }}
       >
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
-          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{ color: "#263238" }}
+          >
             <Typography variant="h6" align="center" sx={{ marginBottom: 1 }}>
               {headerTitle}
             </Typography>
             {!!HQCode && (
               <Typography variant="h6" align="center">
-                เลขที่เอกสาร ST{' '}
+                เลขที่เอกสาร ST{" "}
                 <label
                   style={{
-                    color: '#AEAEAE',
-                    marginLeft: '15px',
-                    marginRight: '5px',
+                    color: "#AEAEAE",
+                    marginLeft: "15px",
+                    marginRight: "5px",
                   }}
                 >
                   |
-                </label>{' '}
-                <label style={{ color: '#36C690' }}>
+                </label>{" "}
+                <label style={{ color: "#36C690" }}>
                   <b>{HQCode}</b>
                 </label>
               </Typography>
@@ -108,13 +112,13 @@ export default function ModelConfirm({
                 <Grid container spacing={2}>
                   <Grid item xs={5}>
                     <Typography variant="body2">
-                      กรุณากรอกเหตุผล<span style={{ color: 'red' }}>*</span>:{' '}
+                      กรุณากรอกเหตุผล<span style={{ color: "red" }}>*</span>:{" "}
                     </Typography>
                   </Grid>
                   <Grid item xs={2}></Grid>
                   <Grid item xs={5}>
-                    <Typography variant="body2" sx={{ color: 'red' }}>
-                      {errorRemark && 'กรุณาระบุรายละเอียด'}
+                    <Typography variant="body2" sx={{ color: "red" }}>
+                      {errorRemark && "กรุณาระบุรายละเอียด"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -134,11 +138,11 @@ export default function ModelConfirm({
 
                 <div
                   style={{
-                    fontSize: '11px',
-                    color: '#AEAEAE',
-                    width: '100%',
+                    fontSize: "11px",
+                    color: "#AEAEAE",
+                    width: "100%",
                     maxWidth: 350,
-                    textAlign: 'right',
+                    textAlign: "right",
                     // marginTop: "-1.5em",
                   }}
                 >
@@ -149,7 +153,7 @@ export default function ModelConfirm({
           </DialogContentText>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', mb: 5, mr: 5, ml: 5 }}>
+        <DialogActions sx={{ justifyContent: "center", mb: 5, mr: 5, ml: 5 }}>
           <Button
             id="btnCancle"
             variant="contained"

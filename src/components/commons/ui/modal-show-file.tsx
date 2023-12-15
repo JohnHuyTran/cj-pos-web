@@ -1,16 +1,16 @@
 //@ts-nocheck
-import { Dialog, Button, DialogContent } from '@mui/material';
-import React, { ReactElement } from 'react';
-import { useState } from 'react';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
-import { useReactToPrint } from 'react-to-print';
-import AlertError from './alert-error';
-import { HighlightOff } from '@mui/icons-material';
-import { getAccessToken } from '../../../store/sessionStore';
-import { getReport } from '../../../adapters/externalApi';
+import { Dialog, Button, DialogContent } from "@mui/material";
+import React, { ReactElement } from "react";
+import { useState } from "react";
+import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import { useReactToPrint } from "react-to-print";
+import AlertError from "./alert-error";
+import { HighlightOff } from "@mui/icons-material";
+import { getAccessToken } from "../../../store/sessionStore";
+import { getReport } from "../../../adapters/externalApi";
 
 interface ModalShowPDFProp {
   open: boolean;
@@ -43,7 +43,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           data-testid="btn-close"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
@@ -89,7 +89,7 @@ export default function ModalShowPDF({
   const [openAlert, setOpenAlert] = useState(false);
   const pdfWrapper = React.useRef<HTMLDivElement>(null);
   let token = getAccessToken();
-  token = token ? `Bearer ${token}` : '';
+  token = token ? `Bearer ${token}` : "";
   const [initialPageSize, setInitialPageSize] = React.useState(false);
   const setPdfSize = () => {
     if (pdfWrapper && pdfWrapper.current) {
@@ -101,11 +101,13 @@ export default function ModalShowPDF({
     if (!initialPageSize) {
       if (pdfWrapper && pdfWrapper.current) {
         setPageSize(
-          `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
+          `${pdfWrapper.current.getBoundingClientRect().width}px ${
+            pdfWrapper.current.getBoundingClientRect().height
+          }px`,
         );
         // setPageSize(landscape ? '12in 8in' : '8in 12in');
       } else {
-        setPageSize(landscape ? 'A4 landscape' : 'A4 portrait');
+        setPageSize(landscape ? "A4 landscape" : "A4 portrait");
       }
     }
     setInitialPageSize(true);
@@ -134,9 +136,9 @@ export default function ModalShowPDF({
   };
 
   const setPageSize = (cssPageSize: string) => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.innerHTML = `@page {size: ${cssPageSize}}`;
-    style.id = 'page-orientation';
+    style.id = "page-orientation";
     document.head.appendChild(style);
   };
   const showPrint = useReactToPrint({
@@ -169,12 +171,17 @@ export default function ModalShowPDF({
           sx={{
             minWidth: 600,
             minHeight: 600,
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
           {/* <div id="placeholderWrapper" style={{ height: "3000vh" }} /> */}
           {statusFile === 1 && (
-            <div id="pdfWrapper" style={{ width: '80vw' }} ref={pdfWrapper} data-testid="testid-pdfWrapper-1">
+            <div
+              id="pdfWrapper"
+              style={{ width: "80vw" }}
+              ref={pdfWrapper}
+              data-testid="testid-pdfWrapper-1"
+            >
               <Document
                 file={{
                   url: url,
@@ -219,7 +226,12 @@ export default function ModalShowPDF({
           )} */}
           {/* file Base64 */}
           {statusFile === 2 && (
-            <div id="pdfWrapper" style={{ width: '80vw' }} ref={pdfWrapper} data-testid="testid-pdfWrapper-2">
+            <div
+              id="pdfWrapper"
+              style={{ width: "80vw" }}
+              ref={pdfWrapper}
+              data-testid="testid-pdfWrapper-2"
+            >
               <Document
                 file={`data:application/pdf;base64,${url}`}
                 onLoadSuccess={onDocumentLoadSuccess}
@@ -240,7 +252,11 @@ export default function ModalShowPDF({
         </DialogContent>
       </Dialog>
 
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError="Failed to load PDF" />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError="Failed to load PDF"
+      />
     </div>
   );
 }

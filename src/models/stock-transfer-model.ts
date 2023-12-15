@@ -1,4 +1,4 @@
-import { iteratee } from 'lodash';
+import { iteratee } from "lodash";
 
 export interface StockTransferRequest {
   limit: string;
@@ -127,7 +127,7 @@ export interface AuditLog {
   editBy: string;
   editByName: string;
   editDate: string;
-  comment: AuditLogComment | '';
+  comment: AuditLogComment | "";
 }
 
 export interface AuditLogComment {

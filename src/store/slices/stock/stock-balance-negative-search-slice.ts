@@ -1,8 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { post } from '../../../adapters/posback-adapter';
-import { environment } from '../../../environment-base';
-import { OutstandingRequest, OutstandingResponse } from '../../../models/stock-model';
-import { ContentType } from '../../../utils/enum/common-enum';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { post } from "../../../adapters/posback-adapter";
+import { environment } from "../../../environment-base";
+import {
+  OutstandingRequest,
+  OutstandingResponse,
+} from "../../../models/stock-model";
+import { ContentType } from "../../../utils/enum/common-enum";
 
 type State = {
   stockList: OutstandingResponse;
@@ -12,9 +15,9 @@ type State = {
 
 const initialState: State = {
   stockList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
@@ -23,14 +26,15 @@ const initialState: State = {
     next: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
   savePayloadSearch: {},
 };
 
 export const featchStockBalanceNegativeSearchAsync = createAsyncThunk(
-  'stockBalanceNegativeList',
+  "stockBalanceNegativeList",
   async (payload: OutstandingRequest) => {
-    const apiRootPath = environment.stock.outStanding.stockBalance.searchByNegative.url;
+    const apiRootPath =
+      environment.stock.outStanding.stockBalance.searchByNegative.url;
 
     const response = await post(apiRootPath, payload, ContentType.JSON)
       .then((result: any) => result)
@@ -38,11 +42,11 @@ export const featchStockBalanceNegativeSearchAsync = createAsyncThunk(
         throw error;
       });
     return response;
-  }
+  },
 );
 
 const stockBalanceNegativeSearchSlice = createSlice({
-  name: 'stockBalanceNegativeSearch',
+  name: "stockBalanceNegativeSearch",
   initialState,
   reducers: {
     clearDataNegativeFilter: (state) => initialState,
@@ -54,14 +58,18 @@ const stockBalanceNegativeSearchSlice = createSlice({
     builer.addCase(featchStockBalanceNegativeSearchAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchStockBalanceNegativeSearchAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.stockList = action.payload;
-      }),
+      builer.addCase(
+        featchStockBalanceNegativeSearchAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.stockList = action.payload;
+        },
+      ),
       builer.addCase(featchStockBalanceNegativeSearchAsync.rejected, () => {
         initialState;
       });
   },
 });
 
-export const { clearDataNegativeFilter, savePayloadSearchNegative } = stockBalanceNegativeSearchSlice.actions;
+export const { clearDataNegativeFilter, savePayloadSearchNegative } =
+  stockBalanceNegativeSearchSlice.actions;
 export default stockBalanceNegativeSearchSlice.reducer;

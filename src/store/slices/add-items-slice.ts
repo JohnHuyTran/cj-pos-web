@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ErrorDetail } from '../../models/api-error-model';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ErrorDetail } from "../../models/api-error-model";
 
 type ItemsState = {
   state: any;
@@ -12,7 +12,7 @@ const initialState: ItemsState = {
 };
 
 export const AddItemsSlice = createSlice({
-  name: 'addItems',
+  name: "addItems",
   initialState,
   reducers: {
     updateAddItemsState: (state, action: PayloadAction<any>) => {

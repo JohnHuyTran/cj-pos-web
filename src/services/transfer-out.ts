@@ -1,12 +1,15 @@
-import { deleteData, get, getFile, post } from '../adapters/posback-adapter';
-import { environment } from '../environment-base';
-import { env } from '../adapters/environmentConfigs';
-import { Payload } from '../models/barcode-discount';
-import { getPathUrl } from './base-service';
+import { deleteData, get, getFile, post } from "../adapters/posback-adapter";
+import { environment } from "../environment-base";
+import { env } from "../adapters/environmentConfigs";
+import { Payload } from "../models/barcode-discount";
+import { getPathUrl } from "./base-service";
 
 export async function saveDraftTransferOut(payload: Payload) {
   try {
-    const response = await post(`${env.backEnd.url}${environment.withDraw.transferOut.save.url}`, payload);
+    const response = await post(
+      `${env.backEnd.url}${environment.withDraw.transferOut.save.url}`,
+      payload,
+    );
     return response;
   } catch (error) {
     throw error;
@@ -68,27 +71,45 @@ export async function approveTransferOutRM(id: string, payload: any) {
 }
 
 export const getPathSendForApproval = (id: string) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.sendForApproval.url}`, { id: id });
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.sendForApproval.url}`,
+    { id: id },
+  );
 };
 
 export const getPathCancelDraft = (id: string) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.cancel.url}`, { id: id });
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.cancel.url}`,
+    { id: id },
+  );
 };
 
 export const getPathApprove = (id: string) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.approve.url}`, { id: id });
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.approve.url}`,
+    { id: id },
+  );
 };
 
 export const getPathReject = (id: string) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.reject.url}`, { id: id });
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.reject.url}`,
+    { id: id },
+  );
 };
 
 export const getPathEnd = (id: string) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.end.url}`, { id: id });
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.end.url}`,
+    { id: id },
+  );
 };
 
 export const getPathApproveRM = (id: string) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.approveRM.url}`, { id: id });
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.approveRM.url}`,
+    { id: id },
+  );
 };
 
 export async function getRequistionSummary(payload: any) {
@@ -101,9 +122,15 @@ export async function getRequistionSummary(payload: any) {
 }
 
 export const getPathRS = (payload: any) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.requisitionSummary.url}`, payload);
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.requisitionSummary.url}`,
+    payload,
+  );
 };
 
 export const getLinkExportUrl = (payload: any) => {
-  return getPathUrl(`${env.backEnd.url}${environment.withDraw.transferOut.requisitionSummary.url}`, payload);
+  return getPathUrl(
+    `${env.backEnd.url}${environment.withDraw.transferOut.requisitionSummary.url}`,
+    payload,
+  );
 };

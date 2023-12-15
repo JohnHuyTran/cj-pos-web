@@ -1,9 +1,16 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get, post } from '../../adapters/posback-adapter';
-import { ItemsResponse, PayloadSearchProduct, ProductTypeResponse } from '../../models/modal-add-all-items-model';
-import { FindProductProps, FindProductRequest } from '../../models/product-model';
-import { ContentType } from '../../utils/enum/common-enum';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get, post } from "../../adapters/posback-adapter";
+import {
+  ItemsResponse,
+  PayloadSearchProduct,
+  ProductTypeResponse,
+} from "../../models/modal-add-all-items-model";
+import {
+  FindProductProps,
+  FindProductRequest,
+} from "../../models/product-model";
+import { ContentType } from "../../utils/enum/common-enum";
 
 type State = {
   itemList: ItemsResponse;
@@ -14,34 +21,34 @@ type State = {
 
 const initialState: State = {
   itemList: {
-    timestamp: '',
-    ref: '',
+    timestamp: "",
+    ref: "",
     code: 0,
-    message: '',
-    error_details: '',
+    message: "",
+    error_details: "",
     data: [],
   },
   productTypeList: {
-    timestamp: '',
-    ref: '',
+    timestamp: "",
+    ref: "",
     code: 0,
-    message: '',
-    error_details: '',
+    message: "",
+    error_details: "",
     data: [],
   },
   productByTypeList: {
-    timestamp: '',
-    ref: '',
+    timestamp: "",
+    ref: "",
     code: 0,
-    message: '',
-    error_details: '',
+    message: "",
+    error_details: "",
     data: [],
   },
-  error: '',
+  error: "",
 };
 
 export const searchAllProductAsync = createAsyncThunk(
-  'searchAllProductAsync',
+  "searchAllProductAsync",
   async (payloadSearchProduct: PayloadSearchProduct) => {
     try {
       const path = `${environment.products.addItem.allitemsList.url}/${payloadSearchProduct.search}?limit=10`;
@@ -53,9 +60,9 @@ export const searchAllProductAsync = createAsyncThunk(
 
       if (response === 204) {
         let responseCode: any = {
-          ref: '',
+          ref: "",
           code: response,
-          message: '',
+          message: "",
           data: [],
         };
 
@@ -66,78 +73,87 @@ export const searchAllProductAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
-export const newSearchAllProductAsync = createAsyncThunk('searchAllProductAsync', async (payload: FindProductProps) => {
-  try {
-    const path = `${environment.products.addItem.allitemsList.url}/${payload.search}?limit=10`;
-    const body = { ...payload.payload };
-    let response = await post(path, body, ContentType.JSON).then();
+export const newSearchAllProductAsync = createAsyncThunk(
+  "searchAllProductAsync",
+  async (payload: FindProductProps) => {
+    try {
+      const path = `${environment.products.addItem.allitemsList.url}/${payload.search}?limit=10`;
+      const body = { ...payload.payload };
+      let response = await post(path, body, ContentType.JSON).then();
 
-    if (response === 204) {
-      let responseCode: any = {
-        ref: '',
-        code: response,
-        message: '',
-        data: [],
-      };
+      if (response === 204) {
+        let responseCode: any = {
+          ref: "",
+          code: response,
+          message: "",
+          data: [],
+        };
 
-      return responseCode;
+        return responseCode;
+      }
+
+      return response;
+    } catch (error) {
+      throw error;
     }
+  },
+);
 
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+export const searchAllProductTypeAsync = createAsyncThunk(
+  "searchAllProductTypeAsync",
+  async (search: string) => {
+    try {
+      const path = `${environment.products.type.search.url}/${search}?limit=10`;
+      let response = await get(path).then();
 
-export const searchAllProductTypeAsync = createAsyncThunk('searchAllProductTypeAsync', async (search: string) => {
-  try {
-    const path = `${environment.products.type.search.url}/${search}?limit=10`;
-    let response = await get(path).then();
+      if (response === 204) {
+        let responseCode: any = {
+          ref: "",
+          code: response,
+          message: "",
+          data: [],
+        };
 
-    if (response === 204) {
-      let responseCode: any = {
-        ref: '',
-        code: response,
-        message: '',
-        data: [],
-      };
+        return responseCode;
+      }
 
-      return responseCode;
+      return response;
+    } catch (error) {
+      throw error;
     }
+  },
+);
 
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+export const getAllProductByType = createAsyncThunk(
+  "getAllProductByType",
+  async (productTypeCode: string) => {
+    try {
+      const path = `${environment.products.type.productByType.url}?product-type=${productTypeCode}`;
+      let response = await get(path).then();
 
-export const getAllProductByType = createAsyncThunk('getAllProductByType', async (productTypeCode: string) => {
-  try {
-    const path = `${environment.products.type.productByType.url}?product-type=${productTypeCode}`;
-    let response = await get(path).then();
+      if (response === 204) {
+        let responseCode: any = {
+          ref: "",
+          code: response,
+          message: "",
+          data: [],
+        };
 
-    if (response === 204) {
-      let responseCode: any = {
-        ref: '',
-        code: response,
-        message: '',
-        data: [],
-      };
+        return responseCode;
+      }
 
-      return responseCode;
+      return response;
+    } catch (error) {
+      throw error;
     }
-
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+  },
+);
 
 const searchTypeAndProduct = createSlice({
-  name: 'searchTypeAndProduct',
+  name: "searchTypeAndProduct",
   initialState,
   reducers: {
     clearSearchAllProductAsync: (state, action: PayloadAction<any>) => {
@@ -148,27 +164,36 @@ const searchTypeAndProduct = createSlice({
     builer.addCase(searchAllProductAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(searchAllProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.itemList = action.payload;
-      }),
+      builer.addCase(
+        searchAllProductAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.itemList = action.payload;
+        },
+      ),
       builer.addCase(searchAllProductAsync.rejected, () => {
         initialState;
       }),
       builer.addCase(searchAllProductTypeAsync.pending, () => {
         initialState;
       }),
-      builer.addCase(searchAllProductTypeAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.productTypeList = action.payload;
-      }),
+      builer.addCase(
+        searchAllProductTypeAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.productTypeList = action.payload;
+        },
+      ),
       builer.addCase(searchAllProductTypeAsync.rejected, () => {
         initialState;
       }),
       builer.addCase(getAllProductByType.pending, () => {
         initialState;
       }),
-      builer.addCase(getAllProductByType.fulfilled, (state, action: PayloadAction<any>) => {
-        state.productByTypeList = action.payload;
-      }),
+      builer.addCase(
+        getAllProductByType.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.productByTypeList = action.payload;
+        },
+      ),
       builer.addCase(getAllProductByType.rejected, () => {
         initialState;
       });

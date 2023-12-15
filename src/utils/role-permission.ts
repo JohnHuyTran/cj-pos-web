@@ -1,6 +1,6 @@
-import { env } from '../adapters/environmentConfigs';
-import { KeyCloakTokenInfo } from '../models/keycolak-token-info';
-import { getUserInfo } from '../store/sessionStore';
+import { env } from "../adapters/environmentConfigs";
+import { KeyCloakTokenInfo } from "../models/keycolak-token-info";
+import { getUserInfo } from "../store/sessionStore";
 import {
   ACTIONS,
   KEYCLOAK_GROUP_ACCOUNTING,
@@ -24,25 +24,31 @@ import {
   KEYCLOAK_GROUP_ACCOUNTING_MANAGER,
   KEYCLOAK_IT_SUPPORT,
   KEYCLOAK_GROUP_FINANCE,
-} from './enum/permission-enum';
+} from "./enum/permission-enum";
 
-const _ = require('lodash');
+const _ = require("lodash");
 
 export const getUserGroup = (groups: string[]) => {
-  const group = groups.length > 0 ? groups[0] : '';
+  const group = groups.length > 0 ? groups[0] : "";
   if (!group) {
-    return '';
+    return "";
   }
 
   if (group === KEYCLOAK_GROUP_DC01 || group === KEYCLOAK_GROUP_DC02) {
     return PERMISSION_GROUP.DC;
-  } else if (group === KEYCLOAK_GROUP_BRANCH_MANAGER01 || group === KEYCLOAK_GROUP_BRANCH_MANAGER) {
+  } else if (
+    group === KEYCLOAK_GROUP_BRANCH_MANAGER01 ||
+    group === KEYCLOAK_GROUP_BRANCH_MANAGER
+  ) {
     return PERMISSION_GROUP.BRANCH;
   } else if (group === KEYCLOAK_GROUP_SCM01) {
     return PERMISSION_GROUP.SCM;
   } else if (group === KEYCLOAK_GROUP_OC01) {
     return PERMISSION_GROUP.OC;
-  } else if (group === KEYCLOAK_GROUP_AREA_MANAGER01 || group === KEYCLOAK_GROUP_AREA_MANAGER02) {
+  } else if (
+    group === KEYCLOAK_GROUP_AREA_MANAGER01 ||
+    group === KEYCLOAK_GROUP_AREA_MANAGER02
+  ) {
     return PERMISSION_GROUP.AREA_MANAGER;
   } else if (group === KEYCLOAK_GROUP_AUDIT) {
     return PERMISSION_GROUP.AUDIT;
@@ -66,7 +72,7 @@ export const getUserGroup = (groups: string[]) => {
     return PERMISSION_GROUP.FINANCE;
   }
 
-  return '';
+  return "";
 };
 
 export const isAllowActionPermission = (key: string) => {
@@ -129,7 +135,7 @@ export const isPreferredUsername = () => {
 };
 
 export const isChannelBranch = () => {
-  return env.branch.channel === 'branch' ? true : false;
+  return env.branch.channel === "branch" ? true : false;
 };
 
 const permission = {
@@ -138,7 +144,12 @@ const permission = {
       mainmenu: [MAINMENU.STOCK_TRANSFER, MAINMENU.PRODUCT_INFO],
       submenu: [SUBMENU.ST_REQUEST, SUBMENU.PI_PRODUCT_MASTER],
     },
-    action: [ACTIONS.STOCK_RT_APPROVE, ACTIONS.STOCK_RT_REJECT, ACTIONS.STOCK_RT_VIEW, ACTIONS.STOCK_RT_MANAGE],
+    action: [
+      ACTIONS.STOCK_RT_APPROVE,
+      ACTIONS.STOCK_RT_REJECT,
+      ACTIONS.STOCK_RT_VIEW,
+      ACTIONS.STOCK_RT_MANAGE,
+    ],
   },
   oc: {
     menu: {
@@ -174,7 +185,12 @@ const permission = {
       mainmenu: [MAINMENU.STOCK_TRANSFER, MAINMENU.ORDER_RECEIVE],
       submenu: [SUBMENU.OR_DIFF, SUBMENU.OR_ORDER_RECEIVE, SUBMENU.ST_TRANSFER],
     },
-    action: [ACTIONS.STOCK_BT_VIEW, ACTIONS.STOCK_BT_EXPORT, ACTIONS.ORDER_VER_VIEW, ACTIONS.ORDER_VER_MANAGE],
+    action: [
+      ACTIONS.STOCK_BT_VIEW,
+      ACTIONS.STOCK_BT_EXPORT,
+      ACTIONS.ORDER_VER_VIEW,
+      ACTIONS.ORDER_VER_MANAGE,
+    ],
   },
   branch: {
     menu: {
@@ -270,9 +286,17 @@ const permission = {
   storeManagement: {
     menu: {
       mainmenu: [MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT, SUBMENU.PI_PRODUCT_MASTER],
+      submenu: [
+        SUBMENU.PI_STOCK_BALANCE,
+        SUBMENU.PI_STOCK_MOVEMENT,
+        SUBMENU.PI_PRODUCT_MASTER,
+      ],
     },
-    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW],
+    action: [
+      ACTIONS.STOCK_BL_LOCATION,
+      ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
+    ],
   },
   audit: {
     menu: {
@@ -285,14 +309,26 @@ const permission = {
         SUBMENU.PI_STOCK_MOVEMENT,
       ],
     },
-    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW],
+    action: [
+      ACTIONS.STOCK_BL_LOCATION,
+      ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
+    ],
   },
   districtManager: {
     menu: {
       mainmenu: [MAINMENU.PRODUCT_INFO],
-      submenu: [SUBMENU.PI_STOCK_BALANCE, SUBMENU.PI_STOCK_MOVEMENT, SUBMENU.PI_PRODUCT_MASTER],
+      submenu: [
+        SUBMENU.PI_STOCK_BALANCE,
+        SUBMENU.PI_STOCK_MOVEMENT,
+        SUBMENU.PI_PRODUCT_MASTER,
+      ],
     },
-    action: [ACTIONS.STOCK_BL_LOCATION, ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW],
+    action: [
+      ACTIONS.STOCK_BL_LOCATION,
+      ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
+    ],
   },
   accounting: {
     menu: {
@@ -323,14 +359,24 @@ const permission = {
         SUBMENU.PR_CREATE_PURCHASE_BRANCH,
       ],
     },
-    action: [ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW, ACTIONS.STOCK_BL_LOCATION, ACTIONS.PURCHASE_BR_VIEW],
+    action: [
+      ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
+      ACTIONS.STOCK_BL_LOCATION,
+      ACTIONS.PURCHASE_BR_VIEW,
+    ],
   },
   procurement: {
     menu: {
       mainmenu: [MAINMENU.PRODUCT_INFO, MAINMENU.PURCHASE_BRANCH],
       submenu: [SUBMENU.PI_PRODUCT_MASTER, SUBMENU.PR_CREATE_PURCHASE_BRANCH],
     },
-    action: [ACTIONS.STOCK_BL_SKU, ACTIONS.STOCK_MOVEMENT_VIEW, ACTIONS.STOCK_BL_LOCATION, ACTIONS.PURCHASE_BR_VIEW],
+    action: [
+      ACTIONS.STOCK_BL_SKU,
+      ACTIONS.STOCK_MOVEMENT_VIEW,
+      ACTIONS.STOCK_BL_LOCATION,
+      ACTIONS.PURCHASE_BR_VIEW,
+    ],
   },
   data: {
     menu: {

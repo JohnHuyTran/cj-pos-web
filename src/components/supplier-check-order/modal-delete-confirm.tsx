@@ -1,13 +1,13 @@
-import React, { ReactElement } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
-import LoadingModal from '../commons/ui/loading-modal';
+import React, { ReactElement } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { updateItemsState } from "../../store/slices/supplier-add-items-slice";
+import LoadingModal from "../commons/ui/loading-modal";
 
 interface Props {
   open: boolean;
@@ -17,7 +17,13 @@ interface Props {
   barCode: string;
 }
 
-export default function ModelConfirm({ open, onClose, productName, skuCode, barCode }: Props): ReactElement {
+export default function ModelConfirm({
+  open,
+  onClose,
+  productName,
+  skuCode,
+  barCode,
+}: Props): ReactElement {
   const dispatch = useAppDispatch();
   const payloadItem = useAppSelector((state) => state.supplierAddItems.state);
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
@@ -44,28 +50,36 @@ export default function ModelConfirm({ open, onClose, productName, skuCode, barC
       sx={{ minWidth: 800 }}
     >
       <DialogContent sx={{ pl: 6, pr: 8 }}>
-        <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+        <DialogContentText
+          id="alert-dialog-description"
+          sx={{ color: "#263238" }}
+        >
           <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
             ต้องการลบสินค้า
           </Typography>
           <Typography variant="body1" align="left">
-            สินค้า <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
-            <label style={{ color: '#36C690' }}>
+            สินค้า <label style={{ color: "#AEAEAE", marginRight: 5 }}>|</label>{" "}
+            <label style={{ color: "#36C690" }}>
               <b>{productName}</b>
               <br />
-              <label style={{ color: '#AEAEAE', fontSize: 14, marginLeft: '3.8em' }}>{skuCode}</label>
+              <label
+                style={{ color: "#AEAEAE", fontSize: 14, marginLeft: "3.8em" }}
+              >
+                {skuCode}
+              </label>
             </label>
           </Typography>
           <Typography variant="body1" align="left">
-            บาร์โค้ด <label style={{ color: '#AEAEAE', marginRight: 5 }}>|</label>{' '}
-            <label style={{ color: '#36C690' }}>
+            บาร์โค้ด{" "}
+            <label style={{ color: "#AEAEAE", marginRight: 5 }}>|</label>{" "}
+            <label style={{ color: "#36C690" }}>
               <b>{barCode}</b>
             </label>
           </Typography>
         </DialogContentText>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: 'center', mb: 2, pl: 6, pr: 8 }}>
+      <DialogActions sx={{ justifyContent: "center", mb: 2, pl: 6, pr: 8 }}>
         <Button
           id="btnCancle"
           variant="contained"

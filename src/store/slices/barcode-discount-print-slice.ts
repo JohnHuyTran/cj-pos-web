@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type ItemsState = {
   state: any;
@@ -7,11 +7,11 @@ type ItemsState = {
 
 const initialState: ItemsState = {
   state: [],
-  inDetail: false
+  inDetail: false,
 };
 
 export const barcodeDiscountPrintSlice = createSlice({
-  name: 'barcodeDiscountPrintSlice',
+  name: "barcodeDiscountPrintSlice",
   initialState,
   reducers: {
     updateBarcodeDiscountPrintState: (state, action: PayloadAction<any>) => {
@@ -23,9 +23,7 @@ export const barcodeDiscountPrintSlice = createSlice({
   },
 });
 
-export const {
-  updateBarcodeDiscountPrintState,
-  updatePrintInDetail
-} = barcodeDiscountPrintSlice.actions;
+export const { updateBarcodeDiscountPrintState, updatePrintInDetail } =
+  barcodeDiscountPrintSlice.actions;
 
 export default barcodeDiscountPrintSlice.reducer;

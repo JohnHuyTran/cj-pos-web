@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
-import TextField from '@mui/material/TextField';
-import { Autocomplete } from '@mui/material';
-import { useStyles } from '../../../styles/makeTheme';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-import { featchBranchListAsync } from '../../../store/slices/search-branches-slice';
-import { BranchInfo } from '../../../models/search-branch-model';
-import { BranchListOptionType } from '../../../models/branch-model';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-import { featchAuthorizedBranchListAsync } from '../../../store/slices/authorized-branch-slice';
+import React, { useEffect } from "react";
+import TextField from "@mui/material/TextField";
+import { Autocomplete } from "@mui/material";
+import { useStyles } from "../../../styles/makeTheme";
+import { useAppSelector, useAppDispatch } from "../../../store/store";
+import { featchBranchListAsync } from "../../../store/slices/search-branches-slice";
+import { BranchInfo } from "../../../models/search-branch-model";
+import { BranchListOptionType } from "../../../models/branch-model";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
+import { featchAuthorizedBranchListAsync } from "../../../store/slices/authorized-branch-slice";
 interface Props {
   valueBranch?: BranchListOptionType | null;
-  sourceBranchCode: string | null | undefined | '';
+  sourceBranchCode: string | null | undefined | "";
   onChangeBranch: (branchCode: string) => void;
   isClear: boolean;
   disable?: boolean;
@@ -36,12 +36,16 @@ function BranchListDropDown({
 }: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const [valueBranchList, setValueBranchList] = React.useState<BranchListOptionType | null>(null);
+  const [valueBranchList, setValueBranchList] =
+    React.useState<BranchListOptionType | null>(null);
   let branchList = useAppSelector((state) => state.searchBranchSlice);
-  let authorizedBranchList = useAppSelector((state) => state.authorizedhBranchSlice);
+  let authorizedBranchList = useAppSelector(
+    (state) => state.authorizedhBranchSlice,
+  );
   let superviseBranchList = useAppSelector((state) => state.superviseBranch);
   useEffect(() => {
-    if (branchList === null || branchList.branchList.data.length <= 0) dispatch(featchBranchListAsync());
+    if (branchList === null || branchList.branchList.data.length <= 0)
+      dispatch(featchBranchListAsync());
     if (
       authorizedBranchList === null ||
       authorizedBranchList.branchList.data?.branches === null ||
@@ -61,20 +65,30 @@ function BranchListDropDown({
     if (!isFilterAuthorizedBranch) {
       return true;
     }
-    return authorizedBranchList.branchList.data?.branches.some((item: BranchInfo) => {
-      return branch.code === item.code;
-    });
+    return authorizedBranchList.branchList.data?.branches.some(
+      (item: BranchInfo) => {
+        return branch.code === item.code;
+      },
+    );
   };
   const getOptionsBranch = () => {
-    const branchListFilter: any = branchList.branchList.data.filter((branch: BranchInfo) => {
-      return branch.code !== sourceBranchCode && filterAuthorizedBranch(branch) && filterDC(branch);
-    });
+    const branchListFilter: any = branchList.branchList.data.filter(
+      (branch: BranchInfo) => {
+        return (
+          branch.code !== sourceBranchCode &&
+          filterAuthorizedBranch(branch) &&
+          filterDC(branch)
+        );
+      },
+    );
 
     if (superviseBranch) {
       const superviseItem: any = [];
-      superviseBranchList.branchList.data?.branches.forEach((supervise: any) => {
-        superviseItem.push(supervise);
-      });
+      superviseBranchList.branchList.data?.branches.forEach(
+        (supervise: any) => {
+          superviseItem.push(supervise);
+        },
+      );
       const superviseList = [...branchListFilter, ...superviseItem];
       return superviseList;
     }
@@ -86,12 +100,16 @@ function BranchListDropDown({
     //   return branch.code !== sourceBranchCode && filterAuthorizedBranch(branch) && filterDC(branch);
     // }),
     options: getOptionsBranch(),
-    getOptionLabel: (option: BranchListOptionType) => `${option.code}-${option.name}`,
+    getOptionLabel: (option: BranchListOptionType) =>
+      `${option.code}-${option.name}`,
   };
 
-  const handleChangeBranch = (event: any, newValue: BranchListOptionType | null) => {
+  const handleChangeBranch = (
+    event: any,
+    newValue: BranchListOptionType | null,
+  ) => {
     setValueBranchList(newValue);
-    return onChangeBranch(newValue?.code ? newValue.code : '');
+    return onChangeBranch(newValue?.code ? newValue.code : "");
   };
 
   return (
@@ -115,7 +133,7 @@ function BranchListDropDown({
         <TextField
           data-testid="textfiled-branch-list"
           {...params}
-          placeholder={placeHolder ? placeHolder : 'ทั้งหมด'}
+          placeholder={placeHolder ? placeHolder : "ทั้งหมด"}
           size="small"
           className={classes.MtextField}
           fullWidth

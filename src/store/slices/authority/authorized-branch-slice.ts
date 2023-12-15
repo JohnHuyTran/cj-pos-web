@@ -1,7 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { SuperviseBranchRequest, SuperviseBranchResponse } from '../../../models/search-branch-model';
-import { environment } from '../../../environment-base';
-import { get } from '../../../adapters/posback-adapter';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import {
+  SuperviseBranchRequest,
+  SuperviseBranchResponse,
+} from "../../../models/search-branch-model";
+import { environment } from "../../../environment-base";
+import { get } from "../../../adapters/posback-adapter";
 
 type State = {
   branchList: SuperviseBranchResponse;
@@ -10,17 +13,17 @@ type State = {
 
 const initialState: State = {
   branchList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: null,
-    timestamp: '',
+    timestamp: "",
   },
-  error: '',
+  error: "",
 };
 
 export const featchSuperviseBranchListAsync = createAsyncThunk(
-  'superviseBranch',
+  "superviseBranch",
   async (payload: SuperviseBranchRequest) => {
     try {
       const path = `${environment.authority.superviseBranch.url}/${payload.role}?branchCode=${payload.branchCode}&isDC=${payload.isDC}`;
@@ -30,11 +33,11 @@ export const featchSuperviseBranchListAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const superviseBranchSlice = createSlice({
-  name: 'superviseBranch',
+  name: "superviseBranch",
   initialState,
   reducers: {
     clearSuperviseBranchFilter: (state) => initialState,
@@ -43,9 +46,12 @@ const superviseBranchSlice = createSlice({
     builer.addCase(featchSuperviseBranchListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchSuperviseBranchListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.branchList = action.payload;
-      }),
+      builer.addCase(
+        featchSuperviseBranchListAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.branchList = action.payload;
+        },
+      ),
       builer.addCase(featchSuperviseBranchListAsync.rejected, () => {
         initialState;
       });

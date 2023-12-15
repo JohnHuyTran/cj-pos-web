@@ -1,9 +1,12 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { TaxInvoiceRequest, TaxInvoiceResponse } from '../../models/tax-invoice-model';
-import { stat } from 'fs';
-import { getInvoiceList } from '../../mockdata/sale';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
+import {
+  TaxInvoiceRequest,
+  TaxInvoiceResponse,
+} from "../../models/tax-invoice-model";
+import { stat } from "fs";
+import { getInvoiceList } from "../../mockdata/sale";
 
 type State = {
   taxInvoiceList: TaxInvoiceResponse;
@@ -13,44 +16,47 @@ type State = {
 
 const initialState: State = {
   taxInvoiceList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     perPage: 0,
     page: 0,
   },
-  error: '',
+  error: "",
   payloadSearchList: {},
 };
 
 const payloadSearchList: TaxInvoiceRequest = {
-  limit: '',
-  page: '',
-  docNo: '',
+  limit: "",
+  page: "",
+  docNo: "",
 };
 
-export const featchTaxInvoiceListAsync = createAsyncThunk('TaxInvoiceList', async (payload: TaxInvoiceRequest) => {
-  try {
-    const apiRootPath = environment.sale.taxInvoice.search.url;
-    let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
-    if (payload.docNo) {
-      path = path + `&docNo=${payload.docNo}`;
-    }
-    if (payload.citizenId) {
-      path = path + `&citizenId=${payload.citizenId}`;
-    }
+export const featchTaxInvoiceListAsync = createAsyncThunk(
+  "TaxInvoiceList",
+  async (payload: TaxInvoiceRequest) => {
+    try {
+      const apiRootPath = environment.sale.taxInvoice.search.url;
+      let path = `${apiRootPath}?limit=${payload.limit}&page=${payload.page}`;
+      if (payload.docNo) {
+        path = path + `&docNo=${payload.docNo}`;
+      }
+      if (payload.citizenId) {
+        path = path + `&citizenId=${payload.citizenId}`;
+      }
 
-    let response = await get(path).then();
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+      let response = await get(path).then();
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const taxInvoiceListSlice = createSlice({
-  name: 'taxInvoiceList',
+  name: "taxInvoiceList",
   initialState,
   reducers: {
     savePayloadSearchList: (state, action: PayloadAction<any>) => {
@@ -61,9 +67,9 @@ const taxInvoiceListSlice = createSlice({
       resposeData.push(action.payload.data);
       state.taxInvoiceList = {
         data: resposeData,
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         total: 1,
         perPage: 10,
         page: 1,
@@ -71,9 +77,9 @@ const taxInvoiceListSlice = createSlice({
     },
     saveTaxInvoiceListIsFailed: (state, action: PayloadAction<any>) => {
       state.taxInvoiceList = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         perPage: 0,
@@ -84,23 +90,26 @@ const taxInvoiceListSlice = createSlice({
   extraReducers: (builer) => {
     builer.addCase(featchTaxInvoiceListAsync.pending, (state, action) => {
       state.taxInvoiceList = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         perPage: 0,
         page: 0,
       };
     }),
-      builer.addCase(featchTaxInvoiceListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.taxInvoiceList = action.payload;
-      }),
+      builer.addCase(
+        featchTaxInvoiceListAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.taxInvoiceList = action.payload;
+        },
+      ),
       builer.addCase(featchTaxInvoiceListAsync.rejected, (state, action) => {
         state.taxInvoiceList = {
-          ref: '',
+          ref: "",
           code: 0,
-          message: '',
+          message: "",
           data: [],
           total: 0,
           perPage: 0,
@@ -110,5 +119,9 @@ const taxInvoiceListSlice = createSlice({
   },
 });
 
-export const { savePayloadSearchList, saveTaxInvoiceList, saveTaxInvoiceListIsFailed } = taxInvoiceListSlice.actions;
+export const {
+  savePayloadSearchList,
+  saveTaxInvoiceList,
+  saveTaxInvoiceListIsFailed,
+} = taxInvoiceListSlice.actions;
 export default taxInvoiceListSlice.reducer;

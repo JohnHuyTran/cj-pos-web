@@ -1,14 +1,28 @@
-import React, { useEffect } from 'react';
-import { useAppSelector } from '../../../store/store';
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
-import { Box } from '@material-ui/core';
+import React, { useEffect } from "react";
+import { useAppSelector } from "../../../store/store";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
+import { Box } from "@material-ui/core";
 import {
   Checkbox,
-  Dialog, DialogContent, FormControl, FormControlLabel, FormGroup, Grid,
+  Dialog,
+  DialogContent,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Grid,
   Typography,
-} from '@mui/material';
-import { useStyles } from '../../../styles/makeTheme';
-import { DateFormat, StockActionStatus, STORE_TYPE } from '../../../utils/enum/common-enum';
+} from "@mui/material";
+import { useStyles } from "../../../styles/makeTheme";
+import {
+  DateFormat,
+  StockActionStatus,
+  STORE_TYPE,
+} from "../../../utils/enum/common-enum";
 import HtmlTooltip from "../../commons/ui/html-tooltip";
 import Button from "@mui/material/Button";
 import { BootstrapDialogTitle } from "../../commons/ui/dialog-title";
@@ -23,36 +37,53 @@ export interface DataGridProps {
   selectedSCs: any[];
 }
 
-const _ = require('lodash');
+const _ = require("lodash");
 
 export const ModalAddStockCount = (props: DataGridProps) => {
   const { open, onClose, onClickAdd, selectedSCs } = props;
   const classes = useStyles();
   const [dataTable, setDataTable] = React.useState<any[]>([]);
   const [checkAll, setCheckAll] = React.useState<boolean>(false);
-  const dataDetailAP = useAppSelector((state) => state.auditPlanDetailSlice.auditPlanDetail.data);
+  const dataDetailAP = useAppSelector(
+    (state) => state.auditPlanDetailSlice.auditPlanDetail.data,
+  );
 
   useEffect(() => {
-    if (dataDetailAP && dataDetailAP.relatedScDocuments && dataDetailAP.relatedScDocuments.length > 0) {
-      let lstSCConfirmed = dataDetailAP.relatedScDocuments.filter((itF: any) => StockActionStatus.CONFIRM === itF.status);
+    if (
+      dataDetailAP &&
+      dataDetailAP.relatedScDocuments &&
+      dataDetailAP.relatedScDocuments.length > 0
+    ) {
+      let lstSCConfirmed = dataDetailAP.relatedScDocuments.filter(
+        (itF: any) => StockActionStatus.CONFIRM === itF.status,
+      );
       if (lstSCConfirmed && lstSCConfirmed.length > 0) {
         let rows = lstSCConfirmed.map((item: any, index: number) => {
-          let inSelectedSCs = selectedSCs.filter((it: any) => (it.documentNumber === item.documentNumber && it.countingTime === item.countingTime));
+          let inSelectedSCs = selectedSCs.filter(
+            (it: any) =>
+              it.documentNumber === item.documentNumber &&
+              it.countingTime === item.countingTime,
+          );
           return {
-            checked: (inSelectedSCs && inSelectedSCs.length > 0),
+            checked: inSelectedSCs && inSelectedSCs.length > 0,
             id: item.id,
             index: index + 1,
             documentNumber: item.documentNumber,
             countingTime: item.countingTime,
             storeType: item.storeType,
-            createdDate: convertUtcToBkkDate(item.createdDate, DateFormat.DATE_FORMAT),
+            createdDate: convertUtcToBkkDate(
+              item.createdDate,
+              DateFormat.DATE_FORMAT,
+            ),
             status: item.status,
             createdBy: item.createdBy,
-            disabledChecked: (inSelectedSCs && inSelectedSCs.length > 0),
+            disabledChecked: inSelectedSCs && inSelectedSCs.length > 0,
           };
         });
         setDataTable(rows);
-        setCheckAll(rows.filter((it: any) => it.checked).length === dataTable.length);
+        setCheckAll(
+          rows.filter((it: any) => it.checked).length === dataTable.length,
+        );
       } else {
         setDataTable([]);
         setCheckAll(false);
@@ -84,24 +115,29 @@ export const ModalAddStockCount = (props: DataGridProps) => {
 
   const columns: GridColDef[] = [
     {
-      field: 'checked',
-      headerName: 'นับทวน',
+      field: "checked",
+      headerName: "นับทวน",
       flex: 0.6,
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       renderHeader: (params) => (
-        <FormControl component="fieldset" sx={{ marginLeft: '-16px' }}>
+        <FormControl component="fieldset" sx={{ marginLeft: "-16px" }}>
           <FormGroup aria-label="position" row>
             <FormControlLabel
               className={classes.MFormControlLabel}
               value="top"
-              control={<Checkbox
-                checked={checkAll}
-                onClick={onCheckAll.bind(this)}
-                disabled={dataTable.filter((it: any) => it.disabledChecked).length === dataTable.length}
-              />}
-              label={''}
+              control={
+                <Checkbox
+                  checked={checkAll}
+                  onClick={onCheckAll.bind(this)}
+                  disabled={
+                    dataTable.filter((it: any) => it.disabledChecked).length ===
+                    dataTable.length
+                  }
+                />
+              }
+              label={""}
               labelPlacement="top"
             />
           </FormGroup>
@@ -110,81 +146,81 @@ export const ModalAddStockCount = (props: DataGridProps) => {
       renderCell: (params) => (
         <Checkbox
           checked={Boolean(params.value)}
-          disabled={Boolean(params.getValue(params.id, 'disabledChecked'))}
+          disabled={Boolean(params.getValue(params.id, "disabledChecked"))}
           onClick={onCheckCell.bind(this, params)}
         />
       ),
     },
     {
-      field: 'documentNumber',
-      headerName: 'เลขที่เอกสาร',
+      field: "documentNumber",
+      headerName: "เลขที่เอกสาร",
       flex: 1.5,
-      headerAlign: 'center',
+      headerAlign: "center",
       disableColumnMenu: false,
       sortable: false,
     },
     {
-      field: 'countingTime',
-      headerName: 'นับครั้งที่',
+      field: "countingTime",
+      headerName: "นับครั้งที่",
       flex: 0.8,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       disableColumnMenu: false,
       sortable: false,
     },
     {
-      field: 'storeType',
-      headerName: 'คลัง',
+      field: "storeType",
+      headerName: "คลัง",
       flex: 1,
-      headerAlign: 'center',
+      headerAlign: "center",
       disableColumnMenu: true,
       sortable: false,
       renderCell: (params) => genStoreType(params),
     },
     {
-      field: 'createdDate',
-      headerName: 'วันที่เอกสาร',
-      headerAlign: 'center',
-      align: 'center',
+      field: "createdDate",
+      headerName: "วันที่เอกสาร",
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       flex: 1,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '0.2rem' }}>
+        <Box component="div" sx={{ marginLeft: "0.2rem" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'status',
-      headerName: 'สถานะ',
-      headerAlign: 'center',
-      align: 'center',
+      field: "status",
+      headerName: "สถานะ",
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       flex: 1,
       renderCell: (params) => genRowStatus(params),
     },
     {
-      field: 'createdBy',
-      headerName: 'ผู้ทำรายการ',
-      headerAlign: 'center',
+      field: "createdBy",
+      headerName: "ผู้ทำรายการ",
+      headerAlign: "center",
       sortable: false,
       flex: 1,
       renderCell: (params) => (
-        <Box component="div" sx={{ marginLeft: '1rem' }}>
+        <Box component="div" sx={{ marginLeft: "1rem" }}>
           {params.value}
         </Box>
       ),
-    }
+    },
   ];
 
   const genStoreType = (params: GridValueGetterParams) => {
-    let valueDisplay = '';
+    let valueDisplay = "";
     switch (params.value) {
       case STORE_TYPE.FRONT:
-        valueDisplay = 'หน้าร้าน';
+        valueDisplay = "หน้าร้าน";
         break;
       case STORE_TYPE.BACK:
-        valueDisplay = 'หลังร้าน';
+        valueDisplay = "หลังร้าน";
         break;
     }
     return valueDisplay;
@@ -192,18 +228,18 @@ export const ModalAddStockCount = (props: DataGridProps) => {
 
   const genRowStatus = (params: GridValueGetterParams) => {
     let statusDisplay;
-    let status = params.value ? params.value.toString() : '';
+    let status = params.value ? params.value.toString() : "";
     switch (status) {
       case StockActionStatus.DRAFT:
-        statusDisplay = genRowStatusValue('บันทึก', {
-          color: '#FBA600',
-          backgroundColor: '#FFF0CA',
+        statusDisplay = genRowStatusValue("บันทึก", {
+          color: "#FBA600",
+          backgroundColor: "#FFF0CA",
         });
         break;
       case StockActionStatus.CONFIRM:
-        statusDisplay = genRowStatusValue('ยืนยัน', {
-          color: '#20AE79',
-          backgroundColor: '#E7FFE9',
+        statusDisplay = genRowStatusValue("ยืนยัน", {
+          color: "#20AE79",
+          backgroundColor: "#E7FFE9",
         });
         break;
     }
@@ -230,7 +266,7 @@ export const ModalAddStockCount = (props: DataGridProps) => {
         selectedSCs.push({
           id: it.id,
           documentNumber: it.documentNumber,
-          countingTime: it.countingTime
+          countingTime: it.countingTime,
         });
       }
     }
@@ -239,13 +275,20 @@ export const ModalAddStockCount = (props: DataGridProps) => {
 
   return (
     <div>
-      <Dialog open={open} maxWidth={'md'} fullWidth>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={onClose}>
-          <Typography sx={{ fontSize: '1em' }}><b>เลือกรายการเอกสาร SC :</b></Typography>
+      <Dialog open={open} maxWidth={"md"} fullWidth>
+        <BootstrapDialogTitle id="customized-dialog-title" onClose={onClose}>
+          <Typography sx={{ fontSize: "1em" }}>
+            <b>เลือกรายการเอกสาร SC :</b>
+          </Typography>
         </BootstrapDialogTitle>
         <DialogContent>
-          <div style={{ width: '100%', height: dataTable.length >= 5 ? '41vh' : 'auto' }}
-               className={classes.MdataGridDetail}>
+          <div
+            style={{
+              width: "100%",
+              height: dataTable.length >= 5 ? "41vh" : "auto",
+            }}
+            className={classes.MdataGridDetail}
+          >
             <DataGrid
               rows={dataTable}
               columns={columns}
@@ -260,7 +303,12 @@ export const ModalAddStockCount = (props: DataGridProps) => {
               rowHeight={54}
               components={{
                 NoRowsOverlay: () => (
-                  <Typography position="relative" textAlign="center" top="112px" color="#AEAEAE">
+                  <Typography
+                    position="relative"
+                    textAlign="center"
+                    top="112px"
+                    color="#AEAEAE"
+                  >
                     ไม่มีข้อมูล
                   </Typography>
                 ),
@@ -268,13 +316,19 @@ export const ModalAddStockCount = (props: DataGridProps) => {
             />
           </div>
         </DialogContent>
-        <Grid item xs={12} sx={{ textAlign: 'right' }} mr={3} mb={4}>
+        <Grid item xs={12} sx={{ textAlign: "right" }} mr={3} mb={4}>
           <Button
             variant="contained"
             color="info"
-            startIcon={<AddCircleOutlineOutlinedIcon/>}
+            startIcon={<AddCircleOutlineOutlinedIcon />}
             onClick={onHandleAddSelectedSC}
-            disabled={!(dataTable && dataTable.length > 0 && dataTable.filter((it: any) => it.checked).length > 0)}
+            disabled={
+              !(
+                dataTable &&
+                dataTable.length > 0 &&
+                dataTable.filter((it: any) => it.checked).length > 0
+              )
+            }
             className={classes.MbtnSearch}
           >
             เพิ่มรายการ

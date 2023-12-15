@@ -1,6 +1,6 @@
-import { post, put, getFile } from '../adapters/posback-adapter';
-import { environment } from '../environment-base';
-import { ContentType } from '../utils/enum/common-enum';
+import { post, put, getFile } from "../adapters/posback-adapter";
+import { environment } from "../environment-base";
+import { ContentType } from "../utils/enum/common-enum";
 import {
   Approve1StockTransferRequest,
   Approve2BySCMStockRequest,
@@ -11,12 +11,12 @@ import {
   SaveStockTransferRequest,
   StockBalanceType,
   SubmitStockTransferRequest,
-} from '../models/stock-transfer-model';
-import { getPathUrl } from './base-service';
-import { env } from '../adapters/environmentConfigs';
-import { fi } from 'date-fns/locale';
-import { DOCUMENT_TYPE } from '../utils/enum/stock-transfer-enum';
-import { getStrockTransferMockup } from '../mockdata/stock-transfer';
+} from "../models/stock-transfer-model";
+import { getPathUrl } from "./base-service";
+import { env } from "../adapters/environmentConfigs";
+import { fi } from "date-fns/locale";
+import { DOCUMENT_TYPE } from "../utils/enum/stock-transfer-enum";
+import { getStrockTransferMockup } from "../mockdata/stock-transfer";
 
 export const getPathStockRequestDetail = (rtNo: string) => {
   return getPathUrl(`${environment.stock.stockRequest.detail.url}`, {
@@ -26,9 +26,11 @@ export const getPathStockRequestDetail = (rtNo: string) => {
 
 export async function saveStockRequest(payload: SaveStockTransferRequest) {
   try {
-    const response = await put(environment.stock.stockRequest.save.url, payload, ContentType.JSON).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.stock.stockRequest.save.url,
+      payload,
+      ContentType.JSON,
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
@@ -41,8 +43,15 @@ export const getPathSubmitStockRequest = (rtNo: string) => {
   });
 };
 
-export async function submitStockRequest(rtNo: string, payload: SubmitStockTransferRequest) {
-  const response = await put(getPathSubmitStockRequest(rtNo), payload, ContentType.JSON)
+export async function submitStockRequest(
+  rtNo: string,
+  payload: SubmitStockTransferRequest,
+) {
+  const response = await put(
+    getPathSubmitStockRequest(rtNo),
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -56,8 +65,15 @@ export const getPathApprove1StockRequest = (rtNo: string) => {
   });
 };
 
-export async function approve1StockRequest(rtNo: string, payload: Approve1StockTransferRequest) {
-  const response = await put(getPathApprove1StockRequest(rtNo), payload, ContentType.JSON)
+export async function approve1StockRequest(
+  rtNo: string,
+  payload: Approve1StockTransferRequest,
+) {
+  const response = await put(
+    getPathApprove1StockRequest(rtNo),
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -71,8 +87,15 @@ export const getPathApprove2StockRequest = (rtNo: string) => {
   });
 };
 
-export async function approve2StockRequest(rtNo: string, payload: Approve2StockTransferRequest) {
-  const response = await put(getPathApprove2StockRequest(rtNo), payload, ContentType.JSON)
+export async function approve2StockRequest(
+  rtNo: string,
+  payload: Approve2StockTransferRequest,
+) {
+  const response = await put(
+    getPathApprove2StockRequest(rtNo),
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -86,8 +109,15 @@ export const getPathReject1StockRequest = (rtNo: string) => {
   });
 };
 
-export async function reject1StockRequest(rtNo: string, payload: Approve1StockTransferRequest) {
-  const response = await put(getPathReject1StockRequest(rtNo), payload, ContentType.JSON)
+export async function reject1StockRequest(
+  rtNo: string,
+  payload: Approve1StockTransferRequest,
+) {
+  const response = await put(
+    getPathReject1StockRequest(rtNo),
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -101,8 +131,15 @@ export const getPathReject2StockRequest = (rtNo: string) => {
   });
 };
 
-export async function reject2StockRequest(rtNo: string, payload: Approve2StockTransferRequest) {
-  const response = await put(getPathReject2StockRequest(rtNo), payload, ContentType.JSON)
+export async function reject2StockRequest(
+  rtNo: string,
+  payload: Approve2StockTransferRequest,
+) {
+  const response = await put(
+    getPathReject2StockRequest(rtNo),
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -118,9 +155,11 @@ export const getPathBranchTransferDetail = (btNo: string) => {
 
 export async function saveBranchTransfer(payload: BranchTransferRequest) {
   try {
-    const response = await put(environment.stock.branchTransfer.save.url, payload, ContentType.JSON).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.stock.branchTransfer.save.url,
+      payload,
+      ContentType.JSON,
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
@@ -129,36 +168,45 @@ export async function saveBranchTransfer(payload: BranchTransferRequest) {
 
 export async function sendBranchTransferToDC(payload: BranchTransferRequest) {
   try {
-    const response = await post(environment.stock.branchTransfer.sendDC.url, payload, ContentType.JSON).then(
-      (result: any) => result
-    );
+    const response = await post(
+      environment.stock.branchTransfer.sendDC.url,
+      payload,
+      ContentType.JSON,
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
   }
 }
-export async function sendBranchTransferToPickup(payload: BranchTransferRequest) {
+export async function sendBranchTransferToPickup(
+  payload: BranchTransferRequest,
+) {
   try {
-    const response = await put(environment.stock.branchTransfer.sendToPickup.url, payload, ContentType.JSON).then(
-      (result: any) => result
-    );
+    const response = await put(
+      environment.stock.branchTransfer.sendToPickup.url,
+      payload,
+      ContentType.JSON,
+    ).then((result: any) => result);
     return response;
   } catch (error) {
     throw error;
   }
 }
-export async function submitStockTransfer(payload: BranchTransferRequest, files: File[]) {
+export async function submitStockTransfer(
+  payload: BranchTransferRequest,
+  files: File[],
+) {
   try {
     const bodyFormData = new FormData();
-    bodyFormData.append('requestBody', JSON.stringify(payload));
+    bodyFormData.append("requestBody", JSON.stringify(payload));
     files.map((file: File) => {
-      return bodyFormData.append('file[]', file);
+      return bodyFormData.append("file[]", file);
     });
 
     const response = await post(
       environment.stock.branchTransfer.submitTransfer.url,
       bodyFormData,
-      ContentType.MULTIPART
+      ContentType.MULTIPART,
     ).then((result: any) => result);
     return response;
   } catch (error) {
@@ -168,21 +216,36 @@ export async function submitStockTransfer(payload: BranchTransferRequest, files:
 
 export const getPathReportBT = (docType: string, btNo: string) => {
   if (docType === DOCUMENT_TYPE.BT) {
-    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBT.url}`, { btNo: btNo });
+    return getPathUrl(
+      `${env.backEnd.url}${environment.stock.branchTransfer.reportBT.url}`,
+      { btNo: btNo },
+    );
   } else if (docType === DOCUMENT_TYPE.BO) {
-    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportBO.url}`, { btNo: btNo });
+    return getPathUrl(
+      `${env.backEnd.url}${environment.stock.branchTransfer.reportBO.url}`,
+      { btNo: btNo },
+    );
   } else if (docType === DOCUMENT_TYPE.RECALL) {
-    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportReCall.url}`, { btNo: btNo });
+    return getPathUrl(
+      `${env.backEnd.url}${environment.stock.branchTransfer.reportReCall.url}`,
+      { btNo: btNo },
+    );
   } else if (docType === DOCUMENT_TYPE.BOX) {
-    return getPathUrl(`${env.backEnd.url}${environment.stock.branchTransfer.reportPaperBox.url}`, {
-      btNo: btNo,
-    });
+    return getPathUrl(
+      `${env.backEnd.url}${environment.stock.branchTransfer.reportPaperBox.url}`,
+      {
+        btNo: btNo,
+      },
+    );
   }
 };
 
 export async function checkStockBalance(payload: StockBalanceType) {
   try {
-    const response = await post(`${env.backEnd.url}${environment.stock.stockBalance.stockBalanceBySKU.url}`, payload);
+    const response = await post(
+      `${env.backEnd.url}${environment.stock.stockBalance.stockBalanceBySKU.url}`,
+      payload,
+    );
     return response;
   } catch (error) {
     throw error;
@@ -206,37 +269,48 @@ export async function removeStockRequest(rtNo: string) {
 
 export async function fetchDownloadTemplateRT() {
   try {
-    const response = await getFile(environment.stock.stockRequest.downloadTemplate.url).then((result: any) => result);
+    const response = await getFile(
+      environment.stock.stockRequest.downloadTemplate.url,
+    ).then((result: any) => result);
     return response;
   } catch (error) {
-    console.log('error = ', error);
+    console.log("error = ", error);
     throw error;
   }
 }
 
-export async function importStockRequest(payload: ImportStockRequest, files: File) {
+export async function importStockRequest(
+  payload: ImportStockRequest,
+  files: File,
+) {
   try {
     const bodyFormData = new FormData();
-    bodyFormData.append('file', files);
-    bodyFormData.append('startDate', payload.startDate);
-    bodyFormData.append('endDate', payload.endDate);
-    bodyFormData.append('transferReason', payload.transferReason);
+    bodyFormData.append("file", files);
+    bodyFormData.append("startDate", payload.startDate);
+    bodyFormData.append("endDate", payload.endDate);
+    bodyFormData.append("transferReason", payload.transferReason);
 
     const response = await post(
       environment.stock.stockRequest.importStockRequest.url,
       bodyFormData,
       ContentType.MULTIPART,
-      'Upload'
+      "Upload",
     ).then((result: any) => result);
     return response;
   } catch (error) {
-    console.log('error :', error);
+    console.log("error :", error);
     throw error;
   }
 }
 
-export async function approve2MultipleStockRequest(payload: Approve2MultipleStockRequest) {
-  const response = await put(environment.stock.stockRequest.approve2MultipleBySCM.url, payload, ContentType.JSON)
+export async function approve2MultipleStockRequest(
+  payload: Approve2MultipleStockRequest,
+) {
+  const response = await put(
+    environment.stock.stockRequest.approve2MultipleBySCM.url,
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -250,8 +324,15 @@ export const getPathApprove2BySCMStockRequest = (rtNo: string) => {
   });
 };
 
-export async function approve2BySCMStockRequest(rtNo: string, payload: Approve2BySCMStockRequest) {
-  const response = await put(getPathApprove2BySCMStockRequest(rtNo), payload, ContentType.JSON)
+export async function approve2BySCMStockRequest(
+  rtNo: string,
+  payload: Approve2BySCMStockRequest,
+) {
+  const response = await put(
+    getPathApprove2BySCMStockRequest(rtNo),
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;
@@ -259,8 +340,15 @@ export async function approve2BySCMStockRequest(rtNo: string, payload: Approve2B
   return response;
 }
 
-export async function inquiryTote(rtNo: string, payload: Approve2BySCMStockRequest) {
-  const response = await put(getPathApprove2BySCMStockRequest(rtNo), payload, ContentType.JSON)
+export async function inquiryTote(
+  rtNo: string,
+  payload: Approve2BySCMStockRequest,
+) {
+  const response = await put(
+    getPathApprove2BySCMStockRequest(rtNo),
+    payload,
+    ContentType.JSON,
+  )
     .then((result: any) => result)
     .catch((error) => {
       throw error;

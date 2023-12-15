@@ -1,16 +1,20 @@
 //@ts-nocheck
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import moment from 'moment';
+import moment from "moment";
 // npm i @date-io/moment@1.x moment
-import OverwriteMomentBE from './OverwriteMoment'; // choose your lib
-import { useStyles } from './date-picker-css';
+import OverwriteMomentBE from "./OverwriteMoment"; // choose your lib
+import { useStyles } from "./date-picker-css";
 
-import { DatePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-import CloseIcon from '@mui/icons-material/Close';
-import CalendarToday from '@mui/icons-material/CalendarToday';
-import IconButton from '@mui/material/IconButton';
+import {
+  DatePicker,
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
+import { createTheme, ThemeProvider } from "@material-ui/core/styles";
+import CloseIcon from "@mui/icons-material/Close";
+import CalendarToday from "@mui/icons-material/CalendarToday";
+import IconButton from "@mui/material/IconButton";
 
 interface StateProps {
   onClickDate: any;
@@ -23,11 +27,11 @@ interface StateProps {
 const defaultMaterialTheme = createTheme({
   palette: {
     primary: {
-      main: '#36C690',
+      main: "#36C690",
     },
   },
   typography: {
-    fontFamily: 'Kanit',
+    fontFamily: "Kanit",
   },
 });
 
@@ -44,79 +48,79 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   };
 
   let datePicker;
-  if (props.type === 'TO') {
+  if (props.type === "TO") {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable='true'
+        clearable="true"
         autoOk
         fullWidth
-        variant='inline'
-        inputVariant='outlined'
-        format='DD/MM/YYYY'
+        variant="inline"
+        inputVariant="outlined"
+        format="DD/MM/YYYY"
         className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
             <IconButton
-              size='small'
+              size="small"
               onClick={() => handleDateChange(null)}
-              data-testid='endDateIconClose'
-              id='endDateIconClose'
+              data-testid="endDateIconClose"
+              id="endDateIconClose"
             >
-              <CloseIcon fontSize='small' />
+              <CloseIcon fontSize="small" />
             </IconButton>
           ),
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
         maxDate={today}
         minDate={props.minDateTo}
-        placeholder='กรุณาเลือกวันที่'
-        minDateMessage={'วันที่ต้องมากกว่าวันที่เริ่มต้น'}
+        placeholder="กรุณาเลือกวันที่"
+        minDateMessage={"วันที่ต้องมากกว่าวันที่เริ่มต้น"}
       />
     );
   } else {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
-        clearable='true'
+        clearable="true"
         autoOk
         fullWidth
-        variant='inline'
-        inputVariant='outlined'
-        format='DD/MM/YYYY'
+        variant="inline"
+        inputVariant="outlined"
+        format="DD/MM/YYYY"
         className={props.error ? classes.MdatepickerError : classes.Mdatepicker}
         value={props.value}
         onChange={handleDateChange}
         InputProps={{
           endAdornment: (
             <IconButton
-              size='small'
+              size="small"
               onClick={() => handleDateChange(null)}
-              data-testid='startDateIconClose'
-              id='startDateIconClose'
+              data-testid="startDateIconClose"
+              id="startDateIconClose"
             >
-              <CloseIcon fontSize='small' />
+              <CloseIcon fontSize="small" />
             </IconButton>
           ),
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
         maxDate={today}
-        placeholder='กรุณาเลือกวันที่'
+        placeholder="กรุณาเลือกวันที่"
       />
     );
   }
 
   return (
     <div>
-      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale='th'>
+      <MuiPickersUtilsProvider utils={OverwriteMomentBE} locale="th">
         <ThemeProvider theme={defaultMaterialTheme}>{datePicker}</ThemeProvider>
       </MuiPickersUtilsProvider>
     </div>

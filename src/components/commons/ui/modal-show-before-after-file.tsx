@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, Grid } from '@mui/material';
-import React, { ReactElement, useEffect } from 'react';
+import { Dialog, DialogContent, Grid } from "@mui/material";
+import React, { ReactElement, useEffect } from "react";
 import ModalShowElementFile from "./modal-show-element-file";
 import { BootstrapDialogTitle } from "./dialog-title";
 
@@ -26,7 +26,7 @@ export default function ModalShowBeforeAfterFile({
   onClose,
   attachFileBefore,
   attachFileAfter,
-  currentFileOpenKey
+  currentFileOpenKey,
 }: ModalShowFileProps): ReactElement {
   const [lstAttachFileBefore, setLstAttachFileBefore] = React.useState<any>([]);
   const [lstAttachFileAfter, setLstAttachFileAfter] = React.useState<any>([]);
@@ -43,12 +43,15 @@ export default function ModalShowBeforeAfterFile({
   return (
     <div>
       <Dialog open={open} maxWidth={false} fullWidth>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose}/>
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleClose}
+        />
         <DialogContent
           sx={{
-            textAlign: 'center',
+            textAlign: "center",
             mt: 1,
-            height: '85vh'
+            height: "85vh",
           }}
         >
           <Grid container mb={2} spacing={2}>

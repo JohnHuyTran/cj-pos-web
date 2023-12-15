@@ -1,11 +1,11 @@
-import React, { ReactElement } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
-import LoadingModal from '../commons/ui/loading-modal';
+import React, { ReactElement } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
+import LoadingModal from "../commons/ui/loading-modal";
 
 interface Props {
   open: boolean;
@@ -19,19 +19,27 @@ interface loadingModalState {
   open: boolean;
 }
 
-export default function ModelConfirm({ open, onClose, onConfirm, barCode, headerTitle, documentField }: Props): ReactElement {
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+export default function ModelConfirm({
+  open,
+  onClose,
+  onConfirm,
+  barCode,
+  headerTitle,
+  documentField,
+}: Props): ReactElement {
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
   const handleConfirm = async () => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     await onConfirm();
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
     onClose();
   };
 
@@ -45,23 +53,26 @@ export default function ModelConfirm({ open, onClose, onConfirm, barCode, header
         PaperProps={{ sx: { minWidth: 450, minHeight: 241 } }}
       >
         <DialogContent sx={{ mt: 3, mr: 5, ml: 5 }}>
-          <DialogContentText id="alert-dialog-description" sx={{ color: '#263238' }}>
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{ color: "#263238" }}
+          >
             <Typography variant="h6" align="center" sx={{ marginBottom: 3 }}>
               {headerTitle}
             </Typography>
             {!!barCode && (
               <Typography variant="body1" align="center">
-                {documentField}{' '}
+                {documentField}{" "}
                 <label
                   style={{
-                    color: '#AEAEAE',
-                    marginLeft: '10px',
-                    marginRight: '5px',
+                    color: "#AEAEAE",
+                    marginLeft: "10px",
+                    marginRight: "5px",
                   }}
                 >
                   |
-                </label>{' '}
-                <label style={{ color: '#36C690' }}>
+                </label>{" "}
+                <label style={{ color: "#36C690" }}>
                   <b>{barCode}</b>
                 </label>
               </Typography>
@@ -69,7 +80,7 @@ export default function ModelConfirm({ open, onClose, onConfirm, barCode, header
           </DialogContentText>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', mb: 5, mr: 5, ml: 5 }}>
+        <DialogActions sx={{ justifyContent: "center", mb: 5, mr: 5, ml: 5 }}>
           <Button
             id="btnCancle"
             variant="contained"

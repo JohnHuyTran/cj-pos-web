@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type ItemsState = {
   state: any;
@@ -9,7 +9,7 @@ const initialState: ItemsState = {
 };
 
 export const addToDestroyProductSlice = createSlice({
-  name: 'addToDestroyProductSlice',
+  name: "addToDestroyProductSlice",
   initialState,
   reducers: {
     updateAddDestroyProductState: (state, action: PayloadAction<any>) => {
@@ -18,6 +18,7 @@ export const addToDestroyProductSlice = createSlice({
   },
 });
 
-export const { updateAddDestroyProductState } = addToDestroyProductSlice.actions;
+export const { updateAddDestroyProductState } =
+  addToDestroyProductSlice.actions;
 
 export default addToDestroyProductSlice.reducer;

@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import moment from 'moment';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import moment from "moment";
 
 type ItemsState = {
   createDraft: any;
@@ -12,31 +12,31 @@ type ItemsState = {
 };
 const initialState: ItemsState = {
   createDraft: {
-    branchId: '61dffd619bfc3701dce4eda4',
-    regionId: '61de9ddab10bfe85dfab22e9',
-    requesterId: '61de9ddab10bfe85dfab22e9',
+    branchId: "61dffd619bfc3701dce4eda4",
+    regionId: "61de9ddab10bfe85dfab22e9",
+    requesterId: "61de9ddab10bfe85dfab22e9",
     percentDiscount: true,
-    requesterNote: '',
+    requesterNote: "",
     products: [],
-    attachFiles: []
+    attachFiles: [],
   },
   validate: false,
   dataDetail: {
-    id: '',
-    documentNumber: '',
+    id: "",
+    documentNumber: "",
     status: 0,
     approvedDate: null,
     createdDate: moment(new Date()).toISOString(),
     percentDiscount: true,
   },
   approveReject: {
-    branchId: '61dffd619bfc3701dce4eda4',
-    regionId: '61de9ddab10bfe85dfab22e9',
-    requesterId: '61de9ddab10bfe85dfab22e9',
-    id: '',
+    branchId: "61dffd619bfc3701dce4eda4",
+    regionId: "61de9ddab10bfe85dfab22e9",
+    requesterId: "61de9ddab10bfe85dfab22e9",
+    id: "",
     products: [],
-    approvalNote: '',
-    reason: '',
+    approvalNote: "",
+    reason: "",
   },
   errorList: [],
   checkStock: [],
@@ -44,7 +44,7 @@ const initialState: ItemsState = {
 };
 
 const barcodeDiscountSlice = createSlice({
-  name: 'barcode',
+  name: "barcode",
   initialState,
   reducers: {
     saveBarcodeDiscount: (state, action: PayloadAction<any>) => {
@@ -77,6 +77,6 @@ export const {
   updateErrorList,
   updateCheckStock,
   updateCheckEdit,
-  updateApproveReject
+  updateApproveReject,
 } = barcodeDiscountSlice.actions;
 export default barcodeDiscountSlice.reducer;

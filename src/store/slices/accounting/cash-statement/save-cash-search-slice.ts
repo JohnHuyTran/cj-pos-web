@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CashStatementSearchRequest } from '../../../../models/branch-accounting-model';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { CashStatementSearchRequest } from "../../../../models/branch-accounting-model";
 
 type State = {
   searchCashStatement: CashStatementSearchRequest;
@@ -7,17 +7,17 @@ type State = {
 
 const initialState: State = {
   searchCashStatement: {
-    limit: '10',
-    page: '1',
-    status: '',
-    branchCode: '',
-    dateFrom: '',
-    dateTo: '',
+    limit: "10",
+    page: "1",
+    status: "",
+    branchCode: "",
+    dateFrom: "",
+    dateTo: "",
   },
 };
 
 const saveCashStatementSearchRequest = createSlice({
-  name: 'saveCashStatementSearchRequest',
+  name: "saveCashStatementSearchRequest",
   initialState,
   reducers: {
     saveCashStatementSearch: (state, action: PayloadAction<any>) => {
@@ -29,5 +29,6 @@ const saveCashStatementSearchRequest = createSlice({
   },
 });
 
-export const { saveCashStatementSearch, clearCashStatementSearch } = saveCashStatementSearchRequest.actions;
+export const { saveCashStatementSearch, clearCashStatementSearch } =
+  saveCashStatementSearchRequest.actions;
 export default saveCashStatementSearchRequest.reducer;

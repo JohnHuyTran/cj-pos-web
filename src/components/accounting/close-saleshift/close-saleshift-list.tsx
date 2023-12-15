@@ -1,163 +1,223 @@
-import { Box, Chip, TextField, Typography } from '@mui/material';
-import { DataGrid, GridCellParams, GridColDef, GridRowData } from '@mui/x-data-grid';
-import moment from 'moment';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import NumberFormat from 'react-number-format';
-import { isGroupBranch, isGroupSupport } from 'utils/role-permission';
-import { stringNullOrEmpty } from 'utils/utils';
-import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
+import { Box, Chip, TextField, Typography } from "@mui/material";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRowData,
+} from "@mui/x-data-grid";
+import moment from "moment";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import NumberFormat from "react-number-format";
+import { isGroupBranch, isGroupSupport } from "utils/role-permission";
+import { stringNullOrEmpty } from "utils/utils";
+import {
+  CloseSaleShiftInfo,
+  CloseSaleShiftRequest,
+} from "../../../models/branch-accounting-model";
 import {
   featchCloseSaleShiptListAsync,
   savePayloadSearch,
-} from '../../../store/slices/accounting/close-saleshift-slice';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { useStyles } from '../../../styles/makeTheme';
-import { convertUtcToBkkDate } from '../../../utils/date-utill';
-import { CLOSE_SALE_SHIFT_ENUM, STATUS } from '../../../utils/enum/accounting-enum';
-import LoadingModal from '../../commons/ui/loading-modal';
-import ModalBypassBySupport from './modal-bypass-support';
-import ModalSaveCloseShiftKey from './modal-save-close-shift-key';
+} from "../../../store/slices/accounting/close-saleshift-slice";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import { useStyles } from "../../../styles/makeTheme";
+import { convertUtcToBkkDate } from "../../../utils/date-utill";
+import {
+  CLOSE_SALE_SHIFT_ENUM,
+  STATUS,
+} from "../../../utils/enum/accounting-enum";
+import LoadingModal from "../../commons/ui/loading-modal";
+import ModalBypassBySupport from "./modal-bypass-support";
+import ModalSaveCloseShiftKey from "./modal-save-close-shift-key";
 
 function CloseSaleShiftSearchList() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation(['expense', 'common']);
-  const payloadSearch = useAppSelector((state) => state.closeSaleShiftSlice.payloadSearch);
-  const items = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift);
-  const cuurentPage = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift.page);
-  const limit = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift.perPage);
+  const { t } = useTranslation(["expense", "common"]);
+  const payloadSearch = useAppSelector(
+    (state) => state.closeSaleShiftSlice.payloadSearch,
+  );
+  const items = useAppSelector(
+    (state) => state.closeSaleShiftSlice.closeSaleShift,
+  );
+  const cuurentPage = useAppSelector(
+    (state) => state.closeSaleShiftSlice.closeSaleShift.page,
+  );
+  const limit = useAppSelector(
+    (state) => state.closeSaleShiftSlice.closeSaleShift.perPage,
+  );
   const [pageSize, setPageSize] = React.useState(limit);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<{
+    open: boolean;
+  }>({
     open: false,
   });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
-  const [shiftCodeSelect, setShiftCodeSelect] = React.useState('');
-  const [branchCodeSelect, setBranchCodeSelect] = React.useState('');
-  const [openPopupCloseShiftKey, setOpenPopupCloseShiftKey] = React.useState(false);
-  const [openModalBypassBySupport, setOpenModalBypassBySupport] = React.useState(false);
-  const [payloadCloseShiftKey, setPayloadCloseShiftKey] = React.useState<CloseSaleShiftInfo>();
+  const [shiftCodeSelect, setShiftCodeSelect] = React.useState("");
+  const [branchCodeSelect, setBranchCodeSelect] = React.useState("");
+  const [openPopupCloseShiftKey, setOpenPopupCloseShiftKey] =
+    React.useState(false);
+  const [openModalBypassBySupport, setOpenModalBypassBySupport] =
+    React.useState(false);
+  const [payloadCloseShiftKey, setPayloadCloseShiftKey] =
+    React.useState<CloseSaleShiftInfo>();
   const columns: GridColDef[] = [
     {
-      field: 'posUser',
+      field: "posUser",
 
-      headerName: 'รหัสพนักงาน',
+      headerName: "รหัสพนักงาน",
       width: 120,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: "20px" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'posCode',
+      field: "posCode",
 
-      headerName: 'เครื่องขาย',
+      headerName: "เครื่องขาย",
       minWidth: 100,
       // flex: 0.35,
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: "center",
+      align: "center",
       sortable: false,
     },
     {
-      field: 'shiftCode',
-      headerName: 'เลขรหัสรอบขาย',
+      field: "shiftCode",
+      headerName: "เลขรหัสรอบขาย",
       minWidth: 145,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'statusDisplay',
-      headerName: 'สถานะรหัส',
+      field: "statusDisplay",
+      headerName: "สถานะรหัส",
       width: 100,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
-      align: 'center',
+      align: "center",
       renderCell: (params) => {
-        const _status = params.getValue(params.id, 'status');
+        const _status = params.getValue(params.id, "status");
         if (_status === CLOSE_SALE_SHIFT_ENUM.DRAFT) {
-          return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+          return (
+            <Chip
+              label={params.value}
+              size="small"
+              sx={{ color: "#FBA600", backgroundColor: "#FFF0CA" }}
+            />
+          );
         } else if (_status === CLOSE_SALE_SHIFT_ENUM.CORRECT) {
-          return <Chip label={params.value} size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+          return (
+            <Chip
+              label={params.value}
+              size="small"
+              sx={{ color: "#20AE79", backgroundColor: "#E7FFE9" }}
+            />
+          );
         } else if (_status === CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW) {
-          return <Chip label={params.value} size='small' sx={{ color: '#F54949', backgroundColor: '#FFD7D7' }} />;
+          return (
+            <Chip
+              label={params.value}
+              size="small"
+              sx={{ color: "#F54949", backgroundColor: "#FFD7D7" }}
+            />
+          );
         }
       },
     },
     {
-      field: 'shiftAmount',
-      headerName: 'ยอดขายปิดรอบ',
+      field: "shiftAmount",
+      headerName: "ยอดขายปิดรอบ",
       width: 130,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
       renderCell: (params) => {
-        const billAmount = !stringNullOrEmpty(params.getValue(params.id, 'billAmount'))
-          ? params.getValue(params.id, 'billAmount')
+        const billAmount = !stringNullOrEmpty(
+          params.getValue(params.id, "billAmount"),
+        )
+          ? params.getValue(params.id, "billAmount")
           : 0;
-        const shiftAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
+        const shiftAmount = !stringNullOrEmpty(params.value)
+          ? Number(params.value)
+          : 0;
         const isDiff = shiftAmount != billAmount;
         const _status = params.row.status;
         if (!stringNullOrEmpty(params.value)) {
           return (
             <NumberFormat
               value={String(params.value)}
-              displayType={'text'}
+              displayType={"text"}
               fixedDecimalScale
               thousandSeparator={true}
               decimalScale={2}
-              style={{ color: isDiff && _status === CLOSE_SALE_SHIFT_ENUM.DRAFT ? '#F54949' : '#000' }}
+              style={{
+                color:
+                  isDiff && _status === CLOSE_SALE_SHIFT_ENUM.DRAFT
+                    ? "#F54949"
+                    : "#000",
+              }}
             />
           );
         } else {
-          return '-';
+          return "-";
         }
       },
     },
     {
-      field: 'billAmount',
-      headerName: 'ยอดขายในบิลขาย',
+      field: "billAmount",
+      headerName: "ยอดขายในบิลขาย",
       minWidth: 140,
       // flex: 0.3,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
       renderCell: (params) => {
-        const shiftAmount = !stringNullOrEmpty(params.getValue(params.id, 'shiftAmount'))
-          ? Number(params.getValue(params.id, 'shiftAmount'))
+        const shiftAmount = !stringNullOrEmpty(
+          params.getValue(params.id, "shiftAmount"),
+        )
+          ? Number(params.getValue(params.id, "shiftAmount"))
           : 0;
-        const billAmount = !stringNullOrEmpty(params.value) ? Number(params.value) : 0;
+        const billAmount = !stringNullOrEmpty(params.value)
+          ? Number(params.value)
+          : 0;
         const isDiff = shiftAmount != billAmount;
         const _status = params.row.status;
         if (!stringNullOrEmpty(params.value)) {
           return (
             <NumberFormat
               value={String(params.value)}
-              displayType={'text'}
+              displayType={"text"}
               fixedDecimalScale
               thousandSeparator={true}
               decimalScale={2}
-              style={{ color: isDiff && _status === CLOSE_SALE_SHIFT_ENUM.DRAFT ? '#F54949' : '#000' }}
+              style={{
+                color:
+                  isDiff && _status === CLOSE_SALE_SHIFT_ENUM.DRAFT
+                    ? "#F54949"
+                    : "#000",
+              }}
             />
           );
         } else {
-          return '-';
+          return "-";
         }
       },
     },
     {
-      field: 'confirmAmount',
-      headerName: 'ยอดขายที่สาขากรอก',
+      field: "confirmAmount",
+      headerName: "ยอดขายที่สาขากรอก",
       minWidth: 160,
       // flex: 0.25,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
       renderCell: (params) => {
         const value = Number(params.value || 0);
@@ -165,91 +225,109 @@ function CloseSaleShiftSearchList() {
           return (
             <NumberFormat
               value={String(params.value)}
-              displayType={'text'}
+              displayType={"text"}
               fixedDecimalScale
               thousandSeparator={true}
               decimalScale={2}
             />
           );
         } else {
-          return '-';
+          return "-";
         }
       },
     },
     {
-      field: 'shiftKey',
-      headerName: 'รหัสปิดรอบ',
+      field: "shiftKey",
+      headerName: "รหัสปิดรอบ",
       width: 120,
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       renderCell: (params) => {
-        const value = !stringNullOrEmpty(params.value) ? params.value : '-';
+        const value = !stringNullOrEmpty(params.value) ? params.value : "-";
         return value;
       },
     },
     {
-      field: 'noOfSaleBill',
-      headerName: 'จำนวนบิลขาย',
+      field: "noOfSaleBill",
+      headerName: "จำนวนบิลขาย",
       width: 120,
-      align: 'right',
+      align: "right",
       sortable: false,
-      headerAlign: 'center',
+      headerAlign: "center",
       renderCell: (params) => {
-        const value = !stringNullOrEmpty(params.value) ? params.value : '0';
+        const value = !stringNullOrEmpty(params.value) ? params.value : "0";
         return value;
       },
     },
     {
-      field: 'noOfReturnBill',
-      headerName: 'จำนวนบิลคืน',
+      field: "noOfReturnBill",
+      headerName: "จำนวนบิลคืน",
       width: 120,
-      align: 'right',
+      align: "right",
       sortable: false,
-      headerAlign: 'center',
+      headerAlign: "center",
       renderCell: (params) => {
-        const value = !stringNullOrEmpty(params.value) ? params.value : '0';
+        const value = !stringNullOrEmpty(params.value) ? params.value : "0";
         return value;
       },
     },
     {
-      field: 'shiftDate',
-      headerName: 'วันที่บันทึก',
+      field: "shiftDate",
+      headerName: "วันที่บันทึก",
       width: 150,
-      align: 'center',
+      align: "center",
       sortable: false,
-      headerAlign: 'center',
+      headerAlign: "center",
     },
     {
-      field: 'bypassStatusDisplay',
-      headerName: 'การ Bypass',
+      field: "bypassStatusDisplay",
+      headerName: "การ Bypass",
       width: 110,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
-      align: 'center',
+      align: "center",
       renderCell: (params) => {
-        const _status = params.getValue(params.id, 'bypassStatus');
+        const _status = params.getValue(params.id, "bypassStatus");
         if (_status === CLOSE_SALE_SHIFT_ENUM.NONE) {
-          return <Chip label={params.value} size='small' sx={{ color: '#AEAEAE', backgroundColor: '#EEEEEE' }} />;
+          return (
+            <Chip
+              label={params.value}
+              size="small"
+              sx={{ color: "#AEAEAE", backgroundColor: "#EEEEEE" }}
+            />
+          );
         } else if (_status === CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW) {
-          return <Chip label={params.value} size='small' sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }} />;
+          return (
+            <Chip
+              label={params.value}
+              size="small"
+              sx={{ color: "#FBA600", backgroundColor: "#FFF0CA" }}
+            />
+          );
         } else if (_status === CLOSE_SALE_SHIFT_ENUM.REVIEWED) {
-          return <Chip label={params.value} size='small' sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }} />;
+          return (
+            <Chip
+              label={params.value}
+              size="small"
+              sx={{ color: "#20AE79", backgroundColor: "#E7FFE9" }}
+            />
+          );
         }
       },
     },
     {
-      field: 'bypassComment',
-      headerName: 'หมายเหตุ',
+      field: "bypassComment",
+      headerName: "หมายเหตุ",
       width: 150,
-      align: 'center',
+      align: "center",
       sortable: false,
-      headerAlign: 'center',
+      headerAlign: "center",
     },
   ];
 
   const handlePageChange = async (newPage: number) => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     let page: number = newPage + 1;
     const payload: CloseSaleShiftRequest = {
       shiftDate: payloadSearch.shiftDate,
@@ -262,12 +340,12 @@ function CloseSaleShiftSearchList() {
 
     await dispatch(featchCloseSaleShiptListAsync(payload));
     await dispatch(savePayloadSearch(payload));
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
 
   const handlePageSizeChange = async (pageSize: number) => {
     setPageSize(pageSize);
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     const payload: CloseSaleShiftRequest = {
       shiftDate: payloadSearch.shiftDate,
       branchCode: payloadSearch.branchCode,
@@ -279,15 +357,20 @@ function CloseSaleShiftSearchList() {
 
     await dispatch(featchCloseSaleShiptListAsync(payload));
     await dispatch(savePayloadSearch(payload));
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
   const currentlySelected = async (params: GridCellParams) => {
     const shiftAmount = params.row.shiftAmount;
     const billAmount = params.row.billAmount;
     const status = params.row.status;
     const byPassStatus = params.row.bypassStatus;
-    if (shiftAmount != null && shiftAmount === billAmount && status === STATUS.DRAFT && isGroupBranch()) {
-      handleOpenLoading('open', true);
+    if (
+      shiftAmount != null &&
+      shiftAmount === billAmount &&
+      status === STATUS.DRAFT &&
+      isGroupBranch()
+    ) {
+      handleOpenLoading("open", true);
       const payload: CloseSaleShiftInfo = {
         branchCode: params.row.branchCode,
         shiftCode: params.row.shiftCode,
@@ -298,12 +381,12 @@ function CloseSaleShiftSearchList() {
         confirmAmount: params.row.confirmAmount,
         noOfSaleBill: params.row.noOfSaleBill,
         noOfReturnBill: params.row.noOfReturnBill,
-        status: '',
+        status: "",
         posCode: params.row.posCode,
         posUser: params.row.posUser,
       };
       setPayloadCloseShiftKey(payload);
-      handleOpenLoading('open', false);
+      handleOpenLoading("open", false);
       setOpenPopupCloseShiftKey(true);
     } else if (
       isGroupSupport() &&
@@ -329,7 +412,9 @@ function CloseSaleShiftSearchList() {
       shiftKey: item.shiftKey,
       noOfSaleBill: item.noOfSaleBill,
       noOfReturnBill: item.noOfReturnBill,
-      shiftDate: `${convertUtcToBkkDate(item.shiftDate)} ${moment(item.shiftDate).format('HH:mm ')}`,
+      shiftDate: `${convertUtcToBkkDate(item.shiftDate)} ${moment(
+        item.shiftDate,
+      ).format("HH:mm ")}`,
       branchCode: item.branchCode,
       bypassStatus: item.bypass?.status,
       bypassStatusDisplay: t(`status.${item.bypass?.status}`),
@@ -337,7 +422,10 @@ function CloseSaleShiftSearchList() {
     };
   });
   return (
-    <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+    <div
+      className={classes.MdataGridPaginationTop}
+      style={{ height: rows.length >= 10 ? "80vh" : "auto" }}
+    >
       <DataGrid
         rows={rows}
         columns={columns}
@@ -349,7 +437,7 @@ function CloseSaleShiftSearchList() {
         pageSize={pageSize}
         rowsPerPageOptions={[10, 20, 50, 100]}
         rowCount={items.total}
-        paginationMode='server'
+        paginationMode="server"
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onCellClick={currentlySelected}

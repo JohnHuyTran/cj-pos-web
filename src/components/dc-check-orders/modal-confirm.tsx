@@ -1,16 +1,16 @@
-import React, { ReactElement } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Typography from '@mui/material/Typography';
-import { ApiError } from '../../models/api-error-model';
-import { verifyDCOrderShipmentsBT } from '../../services/order-shipment';
-import { DCOrderApproveRequest } from '../../models/dc-check-order-model';
-import LoadingModal from '../commons/ui/loading-modal';
-import { featchorderDetailDCAsync } from '../../store/slices/dc-check-order-detail-slice';
-import { useAppDispatch } from '../../store/store';
+import React, { ReactElement } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
+import { ApiError } from "../../models/api-error-model";
+import { verifyDCOrderShipmentsBT } from "../../services/order-shipment";
+import { DCOrderApproveRequest } from "../../models/dc-check-order-model";
+import LoadingModal from "../commons/ui/loading-modal";
+import { featchorderDetailDCAsync } from "../../store/slices/dc-check-order-detail-slice";
+import { useAppDispatch } from "../../store/store";
 
 interface Props {
   open: boolean;
@@ -79,49 +79,55 @@ export default function ModelConfirm({
   return (
     <div>
       <Dialog
-        data-testid='testid-alert-confirm'
+        data-testid="testid-alert-confirm"
         open={open}
-        aria-labelledby='alert-dialog-title'
-        aria-describedby='alert-dialog-description'
-        maxWidth='md'
-        sx={{ minWidth: 500 }}>
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="md"
+        sx={{ minWidth: 500 }}
+      >
         <DialogContent>
-          <DialogContentText id='alert-dialog-description' sx={{ color: '#263238' }}>
-            <Typography variant='h6' align='center' sx={{ marginBottom: 2 }}>
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{ color: "#263238" }}
+          >
+            <Typography variant="h6" align="center" sx={{ marginBottom: 2 }}>
               {subject}
             </Typography>
-            <Typography variant='body1' align='center'>
-              เลขที่เอกสาร <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
+            <Typography variant="body1" align="center">
+              เลขที่เอกสาร <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+              <label style={{ color: "#36C690" }}>
                 <b>{docRefNo}</b>
               </label>
             </Typography>
 
-            <Typography variant='body1' align='center'>
-              เลขที่เอกสาร SD <label style={{ color: '#AEAEAE' }}>|</label>{' '}
-              <label style={{ color: '#36C690' }}>
+            <Typography variant="body1" align="center">
+              เลขที่เอกสาร SD <label style={{ color: "#AEAEAE" }}>|</label>{" "}
+              <label style={{ color: "#36C690" }}>
                 <b>{sdNo}</b>
               </label>
             </Typography>
           </DialogContentText>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+        <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
           <Button
-            id='btnCancle'
-            variant='contained'
-            color='cancelColor'
+            id="btnCancle"
+            variant="contained"
+            color="cancelColor"
             sx={{ borderRadius: 2, width: 80, mr: 2 }}
-            onClick={onClose}>
+            onClick={onClose}
+          >
             ยกเลิก
           </Button>
           <Button
-            data-testid='testid-btnConfirm'
-            id='btnConfirm'
-            variant='contained'
-            color='primary'
+            data-testid="testid-btnConfirm"
+            id="btnConfirm"
+            variant="contained"
+            color="primary"
             sx={{ borderRadius: 2, width: 80 }}
-            onClick={handleConfirm}>
+            onClick={handleConfirm}
+          >
             ยืนยัน
           </Button>
         </DialogActions>

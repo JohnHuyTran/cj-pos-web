@@ -1,4 +1,4 @@
-import { useState, Fragment, useEffect } from 'react';
+import { useState, Fragment, useEffect } from "react";
 import {
   Checkbox,
   Dialog,
@@ -14,37 +14,43 @@ import {
   TextField,
   Typography,
   CircularProgress,
-} from '@mui/material';
-import { LoadingButton } from '@mui/lab';
-import { Save } from '@mui/icons-material';
-import { useStyles } from 'styles/makeTheme';
-import { expenseTypesSetting, getExpenseTypesSetting } from 'utils/enum/setting-reserve-expense-enum';
-import NumberFormat from 'react-number-format';
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { Save } from "@mui/icons-material";
+import { useStyles } from "styles/makeTheme";
+import {
+  expenseTypesSetting,
+  getExpenseTypesSetting,
+} from "utils/enum/setting-reserve-expense-enum";
+import NumberFormat from "react-number-format";
 
 //Components
-import TexboxSearchSku from 'components/commons/ui/texbox-search-sku';
-import { BootstrapDialogTitle } from 'components/commons/ui/dialog-title';
-import AlertError from 'components/commons/ui/alert-error';
-import SnackbarStatus from 'components/commons/ui/snackbar-status';
-import LoadingModal from 'components/commons/ui/loading-modal';
+import TexboxSearchSku from "components/commons/ui/texbox-search-sku";
+import { BootstrapDialogTitle } from "components/commons/ui/dialog-title";
+import AlertError from "components/commons/ui/alert-error";
+import SnackbarStatus from "components/commons/ui/snackbar-status";
+import LoadingModal from "components/commons/ui/loading-modal";
 
 //api
-import { expenseCreateConfig, expenseUpdateConfig } from 'services/accounting';
-import { ExpenseConfigCreateRequest, ExpenseConfigUpdateRequest } from 'models/branch-accounting-model';
-import { ApiError } from 'models/api-error-model';
-import { useAppSelector, useAppDispatch } from 'store/store';
-import { featchBranchAccountingConfigListAsync } from 'store/slices/accounting/accounting-search-config-slice';
+import { expenseCreateConfig, expenseUpdateConfig } from "services/accounting";
+import {
+  ExpenseConfigCreateRequest,
+  ExpenseConfigUpdateRequest,
+} from "models/branch-accounting-model";
+import { ApiError } from "models/api-error-model";
+import { useAppSelector, useAppDispatch } from "store/store";
+import { featchBranchAccountingConfigListAsync } from "store/slices/accounting/accounting-search-config-slice";
 
 const initialStateForm: any = {
-  isActive: 'true',
+  isActive: "true",
   type: [],
   typeOther: [],
-  skuCode: '',
-  accountNameTh: '',
-  accountCode: '',
-  requiredDocumentTh: '',
-  approvalLimit1: '',
-  approvalLimit2: '',
+  skuCode: "",
+  accountNameTh: "",
+  accountCode: "",
+  requiredDocumentTh: "",
+  approvalLimit1: "",
+  approvalLimit2: "",
 };
 interface Props {
   isOpen: boolean;
@@ -53,15 +59,22 @@ interface Props {
   dataSelect?: any;
 }
 
-export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, dataSelect }: Props) {
+export default function ExpenseSettingDetail({
+  isOpen,
+  onClickClose,
+  isStatus,
+  dataSelect,
+}: Props) {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  const payloadSearch = useAppSelector((state) => state.saveExpenseConfigSearchRequest.searchExpenseConfig);
+  const payloadSearch = useAppSelector(
+    (state) => state.saveExpenseConfigSearchRequest.searchExpenseConfig,
+  );
 
   const [isOpenLoading, setIsOpenLoading] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
-  const [textError, setTextError] = useState('');
+  const [textError, setTextError] = useState("");
   const [values, setValues] = useState<any>(initialStateForm);
 
   const handleChange = (event: any) => {
@@ -71,59 +84,62 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
 
   const handleChangType = (event: any) => {
     const value = event.target.value;
-    if (value === 'OTHER') {
+    if (value === "OTHER") {
       setValues({ ...values, type: value });
-    } else if (value !== 'OTHER') {
+    } else if (value !== "OTHER") {
       setValues({ ...values, type: value, typeOther: [] });
     }
   };
 
   const handleChangeMultiType = (event: any) => {
     const value = event.target.value;
-    if (values.type !== 'OTHER') {
-      alert('test');
+    if (values.type !== "OTHER") {
+      alert("test");
     }
-    setValues({ ...values, typeOther: value === 'string' ? value.split(',') : value });
+    setValues({
+      ...values,
+      typeOther: value === "string" ? value.split(",") : value,
+    });
   };
 
   const handleChangeProduct = (value: any) => {
     if (value) {
       setValues({ ...values, skuCode: value.skuCode });
     } else {
-      setValues({ ...values, skuCode: '' });
+      setValues({ ...values, skuCode: "" });
     }
   };
 
   const handleValidatRegEx = (e: any) => {
-    const reg = e.target.value.replace(/[^-()A-Za-z0-9_ก-๏]/g, '');
+    const reg = e.target.value.replace(/[^-()A-Za-z0-9_ก-๏]/g, "");
     setValues({ ...values, [e.target.name]: reg });
   };
 
   const handleChangeApprovalLimit = (event: any) => {
     const value = event.target.value;
-    const removeCommar = value.replace(/\,/g, '');
+    const removeCommar = value.replace(/\,/g, "");
     setValues({ ...values, [event.target.name]: removeCommar });
   };
 
   const validateForm = () => {
     if (
       values.type.length === 0 ||
-      values.skuCode === '' ||
-      values.accountNameTh === '' ||
-      values.accountCode === '' ||
-      values.approvalLimit1 === '' ||
-      values.approvalLimit2 === ''
+      values.skuCode === "" ||
+      values.accountNameTh === "" ||
+      values.accountCode === "" ||
+      values.approvalLimit1 === "" ||
+      values.approvalLimit2 === ""
     ) {
       setOpenAlert(true);
-      setTextError('กรุณากรอกข้อมูลให้ครบ');
+      setTextError("กรุณากรอกข้อมูลให้ครบ");
       return false;
-    } else if (values.type === 'OTHER' && values.typeOther.length === 0) {
+    } else if (values.type === "OTHER" && values.typeOther.length === 0) {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกประเภทร้านที่แสดง');
+      setTextError("กรุณาเลือกประเภทร้านที่แสดง");
       return false;
     } else if (Number(values.approvalLimit1) >= Number(values.approvalLimit2)) {
       setOpenAlert(true);
-      setTextError('วงเงินอนุมัติ ผจก.OC ต้องมีค่ามากกว่า ผจก.ส่วน');
+      setTextError("วงเงินอนุมัติ ผจก.OC ต้องมีค่ามากกว่า ผจก.ส่วน");
       return false;
     } else {
       return true;
@@ -135,8 +151,8 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     const isValidate: boolean = validateForm();
 
     if (isValidate) {
-      if (isStatus === 'Create') {
-        const conditionTypeOther = values.type === 'OTHER';
+      if (isStatus === "Create") {
+        const conditionTypeOther = values.type === "OTHER";
 
         const payloadAdd: ExpenseConfigCreateRequest = {
           types: conditionTypeOther ? values.typeOther : [values.type],
@@ -146,15 +162,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
           skuCode: values.skuCode,
           approvalLimit1: Number(values.approvalLimit1),
           approvalLimit2: Number(values.approvalLimit2),
-          isActive: values.isActive === 'true' ? true : false,
-          requiredDocumentTh: values.requiredDocumentTh ? values.requiredDocumentTh : '',
+          isActive: values.isActive === "true" ? true : false,
+          requiredDocumentTh: values.requiredDocumentTh
+            ? values.requiredDocumentTh
+            : "",
         };
 
         await expenseCreateConfig(payloadAdd)
           .then((value) => {
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
-            setContentMsg('บันทึกข้อมูลเรียบร้อยแล้ว');
+            setContentMsg("บันทึกข้อมูลเรียบร้อยแล้ว");
 
             setTimeout(() => {
               setShowSnackBar(false);
@@ -170,22 +188,24 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
         await dispatch(featchBranchAccountingConfigListAsync(payloadSearch));
 
         setIsOpenLoading(false);
-      } else if (isStatus === 'Update') {
+      } else if (isStatus === "Update") {
         const payloadUpdate: ExpenseConfigUpdateRequest = {
-          isActive: values.isActive === 'true' ? true : false,
+          isActive: values.isActive === "true" ? true : false,
           accountCode: values.accountCode,
           accountNameTh: values.accountNameTh,
           skuCode: values.skuCode,
           approvalLimit1: Number(values.approvalLimit1),
           approvalLimit2: Number(values.approvalLimit2),
-          requiredDocumentTh: values.requiredDocumentTh ? values.requiredDocumentTh : '',
+          requiredDocumentTh: values.requiredDocumentTh
+            ? values.requiredDocumentTh
+            : "",
         };
 
         await expenseUpdateConfig(dataSelect.expenseNo, payloadUpdate)
           .then((value) => {
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
-            setContentMsg('บันทึกข้อมูลเรียบร้อยแล้ว');
+            setContentMsg("บันทึกข้อมูลเรียบร้อยแล้ว");
 
             setTimeout(() => {
               setShowSnackBar(false);
@@ -219,7 +239,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
 
   //snackbar
   const [showSnackBar, setShowSnackBar] = useState(false);
-  const [contentMsg, setContentMsg] = useState('');
+  const [contentMsg, setContentMsg] = useState("");
   const [snackbarIsStatus, setSnackbarIsStatus] = useState(false);
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -229,7 +249,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
     const isotherExpense = dataSelect.isOtherExpense === true;
     setValues({
       isActive: dataSelect.isActive.toString(),
-      type: isotherExpense ? 'OTHER' : dataSelect.typeCode,
+      type: isotherExpense ? "OTHER" : dataSelect.typeCode,
       typeOther: isotherExpense ? [dataSelect.typeCode] : [],
       skuCode: dataSelect.skuCode,
       accountNameTh: dataSelect.accountNameTh,
@@ -241,7 +261,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
   };
 
   useEffect(() => {
-    if (isStatus === 'Update') {
+    if (isStatus === "Update") {
       mapDataSelect();
     }
   }, [isOpen]);
@@ -249,10 +269,15 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
   return (
     <Fragment>
       <Dialog open={isOpen} maxWidth="lg" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleOnClose}>
-          <Typography sx={{ ml: '15px', fontSize: 24, fontWeight: 400 }}>รายละเอียดตั้งค่ารายการค่าใช้จ่าย</Typography>
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleOnClose}
+        >
+          <Typography sx={{ ml: "15px", fontSize: 24, fontWeight: 400 }}>
+            รายละเอียดตั้งค่ารายการค่าใช้จ่าย
+          </Typography>
         </BootstrapDialogTitle>
-        <DialogContent sx={{ p: '40px' }}>
+        <DialogContent sx={{ p: "40px" }}>
           <Grid
             container
             rowSpacing={1}
@@ -274,14 +299,22 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   value={values.isActive}
                   onChange={handleChange}
                 >
-                  <FormControlLabel value="true" control={<Radio />} label="ใช้งาน" />
-                  <FormControlLabel value="false" control={<Radio />} label="ไม่ใช้งาน" />
+                  <FormControlLabel
+                    value="true"
+                    control={<Radio />}
+                    label="ใช้งาน"
+                  />
+                  <FormControlLabel
+                    value="false"
+                    control={<Radio />}
+                    label="ไม่ใช้งาน"
+                  />
                 </RadioGroup>
               </FormControl>
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2" mb={2}>
-                ประเภท<span style={{ color: '#F54949' }}>*</span> :
+                ประเภท<span style={{ color: "#F54949" }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
@@ -289,27 +322,29 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                 <Select
                   id="selType"
                   name="type"
-                  disabled={isStatus === 'Update'}
+                  disabled={isStatus === "Update"}
                   value={values.type}
                   onChange={handleChangType}
                   displayEmpty
                   renderValue={
-                    values.type.length !== 0 ? undefined : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือก</div>
+                    values.type.length !== 0
+                      ? undefined
+                      : () => <div style={{ color: "#CBD4DB" }}>กรุณาเลือก</div>
                   }
-                  inputProps={{ 'aria-label': 'Without label' }}
+                  inputProps={{ "aria-label": "Without label" }}
                 >
                   {expenseTypesSetting.map((item, index: number) => (
                     <MenuItem key={index} value={item.key}>
                       {item.text}
                     </MenuItem>
                   ))}
-                  <MenuItem value={'OTHER'}>อื่นๆ</MenuItem>
+                  <MenuItem value={"OTHER"}>อื่นๆ</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2" mb={2}>
-                ประเภทร้านที่แสดง<span style={{ color: '#F54949' }}>*</span> :
+                ประเภทร้านที่แสดง<span style={{ color: "#F54949" }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
@@ -322,19 +357,26 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   displayEmpty
                   renderValue={
                     values.typeOther.length !== 0
-                      ? (selected) => selected.map((v: any) => getExpenseTypesSetting(v)).join(', ')
-                      : () => <div style={{ color: '#CBD4DB' }}>กรุณาเลือก</div>
+                      ? (selected) =>
+                          selected
+                            .map((v: any) => getExpenseTypesSetting(v))
+                            .join(", ")
+                      : () => <div style={{ color: "#CBD4DB" }}>กรุณาเลือก</div>
                   }
-                  disabled={values.type !== 'OTHER' || isStatus === 'Update'}
+                  disabled={values.type !== "OTHER" || isStatus === "Update"}
                 >
                   {expenseTypesSetting.map((item, index: number) => (
                     <MenuItem key={index} value={item.key}>
-                      <Checkbox checked={values.typeOther.indexOf(item.key) > -1} />
+                      <Checkbox
+                        checked={values.typeOther.indexOf(item.key) > -1}
+                      />
                       {item.text}
                     </MenuItem>
                   ))}
                 </Select>
-                <FormHelperText sx={{ textAlign: 'right' }}>เลือกได้มากกว่า 1 ประเภท</FormHelperText>
+                <FormHelperText sx={{ textAlign: "right" }}>
+                  เลือกได้มากกว่า 1 ประเภท
+                </FormHelperText>
               </FormControl>
             </Grid>
           </Grid>
@@ -354,21 +396,21 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
           >
             <Grid item xs={2}>
               <Typography variant="body2" mb={2}>
-                สินค้า<span style={{ color: '#F54949' }}>*</span> :
+                สินค้า<span style={{ color: "#F54949" }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={4} mb={3}>
               <TexboxSearchSku
                 skuTypes="3,7"
-                skuCode={dataSelect ? dataSelect.skuCode : ''}
-                skuName={dataSelect ? dataSelect.skuName : ''}
+                skuCode={dataSelect ? dataSelect.skuCode : ""}
+                skuName={dataSelect ? dataSelect.skuName : ""}
                 onSelectItem={handleChangeProduct}
                 isClear={false}
               />
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2" mb={2}>
-                ชื่อบัญชี<span style={{ color: '#F54949' }}>*</span> :
+                ชื่อบัญชี<span style={{ color: "#F54949" }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
@@ -383,7 +425,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   inputProps={{ maxLength: 20 }}
                   autoComplete="off"
                 />
-                <FormHelperText sx={{ textAlign: 'right' }}>
+                <FormHelperText sx={{ textAlign: "right" }}>
                   [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.accountNameTh.length}/20
                 </FormHelperText>
               </FormControl>
@@ -391,7 +433,7 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
 
             <Grid item xs={2}>
               <Typography variant="body2" mb={2}>
-                รหัสบัญชี<span style={{ color: '#F54949' }}>*</span> :
+                รหัสบัญชี<span style={{ color: "#F54949" }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={4} mb={3}>
@@ -420,15 +462,17 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
                   fullWidth
                   inputProps={{ maxLength: 50 }}
                 />
-                <FormHelperText sx={{ textAlign: 'right' }}>
-                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.requiredDocumentTh.length}/50
+                <FormHelperText sx={{ textAlign: "right" }}>
+                  [ก-ฮ ,A-Z,a-z,0-9,(),-,_] {values.requiredDocumentTh.length}
+                  /50
                 </FormHelperText>
               </FormControl>
             </Grid>
 
             <Grid item xs={2}>
               <Typography variant="body2">
-                วงเงินอนุมัติ ผจก.ส่วน<span style={{ color: '#F54949' }}> * </span> :
+                วงเงินอนุมัติ ผจก.ส่วน
+                <span style={{ color: "#F54949" }}> * </span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
@@ -448,7 +492,8 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
             </Grid>
             <Grid item xs={2}>
               <Typography variant="body2">
-                วงเงินอนุมัติ ผจก.OCไม่เกิน<span style={{ color: '#F54949' }}> * </span> :
+                วงเงินอนุมัติ ผจก.OCไม่เกิน
+                <span style={{ color: "#F54949" }}> * </span> :
               </Typography>
             </Grid>
             <Grid item xs={4}>
@@ -468,7 +513,12 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
             </Grid>
           </Grid>
 
-          <Grid item container xs={12} sx={{ mt: 5, justifyContent: 'flex-end' }}>
+          <Grid
+            item
+            container
+            xs={12}
+            sx={{ mt: 5, justifyContent: "flex-end" }}
+          >
             <LoadingButton
               id="btnSave"
               variant="contained"
@@ -476,11 +526,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
               startIcon={<Save />}
               loading={isOpenLoading}
               loadingIndicator={
-                <Typography component="span" sx={{ fontSize: '11px' }}>
+                <Typography component="span" sx={{ fontSize: "11px" }}>
                   กรุณารอสักครู่ <CircularProgress color="inherit" size={15} />
                 </Typography>
               }
-              sx={{ borderRadius: 2, width: '12%', height: 43 }}
+              sx={{ borderRadius: 2, width: "12%", height: 43 }}
               onClick={handleAddButton}
             >
               บันทึก
@@ -489,7 +539,11 @@ export default function ExpenseSettingDetail({ isOpen, onClickClose, isStatus, d
         </DialogContent>
       </Dialog>
 
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+      />
 
       <SnackbarStatus
         open={showSnackBar}

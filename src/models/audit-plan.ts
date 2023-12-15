@@ -60,7 +60,7 @@ export interface AuditPlan {
   relatedSlDocuments: {
     documentNumber: string;
     id: string;
-  }
+  };
 }
 
 export interface AuditPlanProductDetail {

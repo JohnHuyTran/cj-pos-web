@@ -1,25 +1,29 @@
-import React from 'react';
-import { Chip, Grid, TextField, Typography } from '@mui/material';
-import { Box } from '@mui/material';
-import { useStyles } from '../../styles/makeTheme';
-import { Button } from '@mui/material';
-import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import React from "react";
+import { Chip, Grid, TextField, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+import { useStyles } from "../../styles/makeTheme";
+import { Button } from "@mui/material";
+import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   featchTaxInvoiceListAsync,
   savePayloadSearchList,
   saveTaxInvoiceList,
-} from '../../store/slices/tax-invoice-search-list-slice';
-import { TaxInvoiceInfo, TaxInvoiceRequest, TaxInvoiceResponse } from '../../models/tax-invoice-model';
-import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { featchTaxInvoiceDetailAsync } from '../../store/slices/tax-invoice-search-detail-slice';
-import { useTranslation } from 'react-i18next';
-import ModalTaxInvoiceDetails from './tax-invoice-details';
-import LoadingModal from '../commons/ui/loading-modal';
-import { requestTaxInvoice } from '../../services/sale';
-import { ApiError } from '../../models/api-error-model';
-import { uploadFileState } from '../../store/slices/upload-file-slice';
-import { featchTaxInvoicePrintHistoryAsync } from '../../store/slices/sale/tax-invoice-print-history-slice';
+} from "../../store/slices/tax-invoice-search-list-slice";
+import {
+  TaxInvoiceInfo,
+  TaxInvoiceRequest,
+  TaxInvoiceResponse,
+} from "../../models/tax-invoice-model";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
+import { featchTaxInvoiceDetailAsync } from "../../store/slices/tax-invoice-search-detail-slice";
+import { useTranslation } from "react-i18next";
+import ModalTaxInvoiceDetails from "./tax-invoice-details";
+import LoadingModal from "../commons/ui/loading-modal";
+import { requestTaxInvoice } from "../../services/sale";
+import { ApiError } from "../../models/api-error-model";
+import { uploadFileState } from "../../store/slices/upload-file-slice";
+import { featchTaxInvoicePrintHistoryAsync } from "../../store/slices/sale/tax-invoice-print-history-slice";
 
 interface Props {
   actionType: string;
@@ -27,92 +31,98 @@ interface Props {
 
 export default function TaxInvoiceSearchList({ actionType }: Props) {
   const classes = useStyles();
-  const { t } = useTranslation(['taxInvoice', 'common']);
+  const { t } = useTranslation(["taxInvoice", "common"]);
   const dispatch = useAppDispatch();
-  const payloadSearch = useAppSelector((state) => state.taxInvoiceSearchList.payloadSearchList);
+  const payloadSearch = useAppSelector(
+    (state) => state.taxInvoiceSearchList.payloadSearchList,
+  );
   const items = useAppSelector((state) => state.taxInvoiceSearchList);
-  const cuurentPage = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList.page);
-  const limit = useAppSelector((state) => state.taxInvoiceSearchList.taxInvoiceList.perPage);
+  const cuurentPage = useAppSelector(
+    (state) => state.taxInvoiceSearchList.taxInvoiceList.page,
+  );
+  const limit = useAppSelector(
+    (state) => state.taxInvoiceSearchList.taxInvoiceList.perPage,
+  );
 
   const res: TaxInvoiceResponse = items.taxInvoiceList;
   const [pageSize, setPageSize] = React.useState(limit.toString());
   const columns: GridColDef[] = [
     {
-      field: 'index',
-      headerName: 'ลำดับ',
+      field: "index",
+      headerName: "ลำดับ",
       width: 70,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'billNo',
-      headerName: 'เลขที่ใบเสร็จ(ย่อ)',
+      field: "billNo",
+      headerName: "เลขที่ใบเสร็จ(ย่อ)",
       minWidth: 200,
       flex: 0.5,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'docDate',
-      headerName: 'วันที่ออกใบเสร็จ(ย่อ)',
+      field: "docDate",
+      headerName: "วันที่ออกใบเสร็จ(ย่อ)",
       flex: 0.4,
       minWidth: 100,
-      align: 'left',
-      headerAlign: 'center',
+      align: "left",
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'billStatusDisplay',
-      headerName: 'สถานะ(ย่อ)',
+      field: "billStatusDisplay",
+      headerName: "สถานะ(ย่อ)",
       minWidth: 150,
       // flex: 1.2,
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       renderCell: (params) => {
-        if (params.value === 'PRINTED') {
+        if (params.value === "PRINTED") {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
-              sx={{ color: '#20AE79', backgroundColor: '#E7FFE9' }}
+              size="small"
+              sx={{ color: "#20AE79", backgroundColor: "#E7FFE9" }}
             />
           );
-        } else if (params.value === 'CANCELLED') {
+        } else if (params.value === "CANCELLED") {
           return (
             <Chip
               label={t(`status.${params.value}`)}
-              size='small'
-              sx={{ color: '#FBA600', backgroundColor: '#FFF0CA' }}
+              size="small"
+              sx={{ color: "#FBA600", backgroundColor: "#FFF0CA" }}
             />
           );
         }
       },
     },
     {
-      field: 'invoiceNo',
-      headerName: 'เลขที่ใบเสร็จ(เต็ม)',
+      field: "invoiceNo",
+      headerName: "เลขที่ใบเสร็จ(เต็ม)",
       minWidth: 200,
       flex: 0.5,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
     {
-      field: 'lastPrintedDate',
-      headerName: 'วันที่พิมพ์ใบเสร็จ(เต็ม)',
+      field: "lastPrintedDate",
+      headerName: "วันที่พิมพ์ใบเสร็จ(เต็ม)",
       minWidth: 100,
       flex: 0.4,
-      headerAlign: 'center',
-      align: 'left',
+      headerAlign: "center",
+      align: "left",
       sortable: false,
     },
     {
-      field: 'totalPrint',
-      headerName: 'พิมพ์ใบเสร็จ(เต็ม)ครั้งที่',
+      field: "totalPrint",
+      headerName: "พิมพ์ใบเสร็จ(เต็ม)ครั้งที่",
       minWidth: 70,
       flex: 0.4,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
     },
   ];
@@ -126,7 +136,9 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
       billStatusDisplay: data.status,
       billStatus: data.status,
       invoiceNo: data.invoiceNo,
-      lastPrintedDate: data.lastPrintedDate ? convertUtcToBkkDate(data.lastPrintedDate) : '',
+      lastPrintedDate: data.lastPrintedDate
+        ? convertUtcToBkkDate(data.lastPrintedDate)
+        : "",
       totalPrint: data.totalPrint,
     };
   });
@@ -152,7 +164,7 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
     setPageSize(pageSize.toString());
     const payload: TaxInvoiceRequest = {
       limit: pageSize.toString(),
-      page: '1',
+      page: "1",
       docNo: payloadSearch.docNo,
       citizenId: payloadSearch.citizenId,
     };
@@ -165,16 +177,18 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
   const currentlySelected = async (params: GridCellParams) => {
-    if (params.row.billStatus !== 'CANCELLED') {
+    if (params.row.billStatus !== "CANCELLED") {
       setOpenLoadingModal(true);
       const payload: TaxInvoiceRequest = {
         docNo: params.row.billNo,
       };
       await dispatch(uploadFileState([]));
       await dispatch(featchTaxInvoiceDetailAsync(payload)).then(() => {
-        dispatch(featchTaxInvoicePrintHistoryAsync(params.row.billNo)).then(() => {
-          setOpenDetailModal(true);
-        });
+        dispatch(featchTaxInvoicePrintHistoryAsync(params.row.billNo)).then(
+          () => {
+            setOpenDetailModal(true);
+          },
+        );
       });
       setOpenLoadingModal(false);
     }
@@ -185,23 +199,26 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
   };
 
   const reloadRequestTaxInvoice = async () => {
-    if (actionType === 'search') {
+    if (actionType === "search") {
       await dispatch(featchTaxInvoiceListAsync(payloadSearch));
-    } else if (actionType === 'request') {
+    } else if (actionType === "request") {
       await requestTaxInvoice(payloadSearch)
         .then(async (value) => {
           await dispatch(saveTaxInvoiceList(value));
         })
         .catch((error: ApiError) => {
-          console.log('error: ', error);
+          console.log("error: ", error);
         });
     }
   };
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
-        <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+      <Box mt={2} bgcolor="background.paper">
+        <div
+          className={classes.MdataGridPaginationTop}
+          style={{ height: rows.length >= 10 ? "80vh" : "auto" }}
+        >
           <DataGrid
             rows={rows}
             columns={columns}
@@ -214,7 +231,7 @@ export default function TaxInvoiceSearchList({ actionType }: Props) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}

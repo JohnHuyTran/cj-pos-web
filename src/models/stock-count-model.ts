@@ -38,7 +38,7 @@ export interface StockCount {
   relatedSaDocuments: {
     documentNumber: string;
     id: string;
-  }
+  };
 }
 
 export interface StockCountProductDetail {

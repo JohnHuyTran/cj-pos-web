@@ -1,17 +1,17 @@
-import React, { ReactElement, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import LoadingModal from '../../../commons/ui/loading-modal';
-import { useStyles } from '../../../../styles/makeTheme';
-import ConfirmContent from './confirm-content';
-import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { ExpenseInfo } from '../../../../models/branch-accounting-model';
-import { useAppSelector } from '../../../../store/store';
-import { isFilterFieldInExpense } from '../../../../utils/utils';
-import { Box, TextField } from '@mui/material';
-import NumberFormat from 'react-number-format';
+import React, { ReactElement, useEffect } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import LoadingModal from "../../../commons/ui/loading-modal";
+import { useStyles } from "../../../../styles/makeTheme";
+import ConfirmContent from "./confirm-content";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { ExpenseInfo } from "../../../../models/branch-accounting-model";
+import { useAppSelector } from "../../../../store/store";
+import { isFilterFieldInExpense } from "../../../../utils/utils";
+import { Box, TextField } from "@mui/material";
+import NumberFormat from "react-number-format";
 
 interface Props {
   open: boolean;
@@ -34,9 +34,10 @@ export default function ModelConfirmSearch({
   summarizList,
 }: Props): ReactElement {
   const classes = useStyles();
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
@@ -50,9 +51,9 @@ export default function ModelConfirmSearch({
   });
 
   const handleConfirm = async () => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     onConfirm({ period: periodData });
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
     onClose();
   };
 
@@ -65,8 +66,11 @@ export default function ModelConfirmSearch({
     setPeriodData(date);
   };
 
-  const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const expenseMasterList = useAppSelector(
+    (state) => state.masterExpenseListSlice.masterExpenseList.data,
+  );
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const [columnsList, setColumnsList] = React.useState<GridColDef[]>([]);
   const [rowList, setRowList] = React.useState<any[]>([]);
   useEffect(() => {
@@ -91,7 +95,7 @@ export default function ModelConfirmSearch({
         _newExpenseAllList.push(i);
       });
       const approvedAmountList = {
-        expenseNo: 'approvedAmount',
+        expenseNo: "approvedAmount",
         approvedAmount: summarizList.sumApprovedAmount,
       };
       _newExpenseAllList.push(approvedAmountList);
@@ -123,16 +127,16 @@ export default function ModelConfirmSearch({
         // }
 
         let accountNameTh = master?.accountNameTh;
-        if (i.expenseNo === 'SUMOTHER') accountNameTh = 'อื่นๆ';
-        if (i.expenseNo === 'approvedAmount') {
-          accountNameTh = 'รวม';
+        if (i.expenseNo === "SUMOTHER") accountNameTh = "อื่นๆ";
+        if (i.expenseNo === "approvedAmount") {
+          accountNameTh = "รวม";
           return {
             field: i.expenseNo,
             headerName: accountNameTh,
             minWidth: 120,
             flex: 0.6,
-            headerAlign: 'center',
-            align: 'right',
+            headerAlign: "center",
+            align: "right",
             sortable: false,
             hide: hideColumn,
             renderCell: (params: GridRenderCellParams) => {
@@ -145,19 +149,19 @@ export default function ModelConfirmSearch({
                   disabled={true}
                   customInput={TextField}
                   sx={{
-                    '.MuiInputBase-input.Mui-disabled': {
-                      WebkitTextFillColor: '#36C690',
-                      fontWeight: '600',
+                    ".MuiInputBase-input.Mui-disabled": {
+                      WebkitTextFillColor: "#36C690",
+                      fontWeight: "600",
                     },
-                    '.MuiOutlinedInput-notchedOutline': {
-                      border: 'none',
+                    ".MuiOutlinedInput-notchedOutline": {
+                      border: "none",
                     },
-                    '.MuiInputBase-input-MuiOutlinedInput-input': {
-                      textAlign: 'right',
+                    ".MuiInputBase-input-MuiOutlinedInput-input": {
+                      textAlign: "right",
                     },
                   }}
                   fixedDecimalScale
-                  type='text'
+                  type="text"
                 />
               );
             },
@@ -169,8 +173,8 @@ export default function ModelConfirmSearch({
           headerName: accountNameTh,
           minWidth: 120,
           flex: 0.6,
-          headerAlign: 'center',
-          align: 'right',
+          headerAlign: "center",
+          align: "right",
           sortable: false,
           hide: hideColumn,
           renderCell: (params: GridRenderCellParams) => {
@@ -183,18 +187,18 @@ export default function ModelConfirmSearch({
                 disabled={true}
                 customInput={TextField}
                 sx={{
-                  '.MuiInputBase-input.Mui-disabled': {
-                    WebkitTextFillColor: '#000',
+                  ".MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor: "#000",
                   },
-                  '.MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
+                  ".MuiOutlinedInput-notchedOutline": {
+                    border: "none",
                   },
-                  '.MuiInputBase-input-MuiOutlinedInput-input': {
-                    textAlign: 'right',
+                  ".MuiInputBase-input-MuiOutlinedInput-input": {
+                    textAlign: "right",
                   },
                 }}
                 fixedDecimalScale
-                type='text'
+                type="text"
               />
             );
           },
@@ -209,10 +213,11 @@ export default function ModelConfirmSearch({
     <div>
       <Dialog
         open={open}
-        aria-labelledby='alert-dialog-title'
-        aria-describedby='alert-dialog-description'
-        maxWidth='lg'
-        PaperProps={{ sx: { minWidth: 900 } }}>
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="lg"
+        PaperProps={{ sx: { minWidth: 900 } }}
+      >
         <DialogContent sx={{ mt: 3, mr: 3, ml: 3 }}>
           <ConfirmContent
             // startPeriod={startDate}
@@ -224,22 +229,24 @@ export default function ModelConfirmSearch({
           />
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', m: 5, mr: 5, ml: 5 }}>
+        <DialogActions sx={{ justifyContent: "center", m: 5, mr: 5, ml: 5 }}>
           <Button
-            id='btnCancle'
-            variant='contained'
-            color='cancelColor'
+            id="btnCancle"
+            variant="contained"
+            color="cancelColor"
             sx={{ borderRadius: 2, width: 120, mr: 4 }}
-            onClick={onClose}>
+            onClick={onClose}
+          >
             ยกเลิก
           </Button>
           <Button
-            id='btnConfirm'
-            variant='contained'
-            color='primary'
+            id="btnConfirm"
+            variant="contained"
+            color="primary"
             sx={{ borderRadius: 2, width: 120 }}
             onClick={handleConfirm}
-            disabled={!periodData.startDate || !periodData.endDate}>
+            disabled={!periodData.startDate || !periodData.endDate}
+          >
             ยืนยัน
           </Button>
         </DialogActions>

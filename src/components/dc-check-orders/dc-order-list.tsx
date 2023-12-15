@@ -1,158 +1,174 @@
-import React, { useEffect, useMemo } from 'react';
-import { useAppSelector, useAppDispatch } from '../../store/store';
-import { DataGrid, GridCellParams, GridColDef, GridRowData, GridRowParams, useGridApiRef } from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
-import { CheckOrderResponse, CheckOrderInfo, CheckOrderRequest } from '../../models/dc-check-order-model';
-import { featchOrderListDcAsync } from '../../store/slices/dc-check-order-slice';
-import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { getSdType, getDCStatus } from '../../utils/utils';
-import DCOrderDetail from './dc-ckeck-order-detail';
-import { useStyles } from '../../styles/makeTheme';
-import Done from '@mui/icons-material/Done';
-import { featchorderDetailDCAsync, setItemId } from '../../store/slices/dc-check-order-detail-slice';
-import LoadingModal from '../commons/ui/loading-modal';
-import { saveSearchCriteriaDc } from '../../store/slices/save-search-order-dc-slice';
-import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
-import { getUserInfo } from '../../store/sessionStore';
-import { isGroupDC } from '../../utils/role-permission';
+import React, { useEffect, useMemo } from "react";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRowData,
+  GridRowParams,
+  useGridApiRef,
+} from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+import {
+  CheckOrderResponse,
+  CheckOrderInfo,
+  CheckOrderRequest,
+} from "../../models/dc-check-order-model";
+import { featchOrderListDcAsync } from "../../store/slices/dc-check-order-slice";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
+import { getSdType, getDCStatus } from "../../utils/utils";
+import DCOrderDetail from "./dc-ckeck-order-detail";
+import { useStyles } from "../../styles/makeTheme";
+import Done from "@mui/icons-material/Done";
+import {
+  featchorderDetailDCAsync,
+  setItemId,
+} from "../../store/slices/dc-check-order-detail-slice";
+import LoadingModal from "../commons/ui/loading-modal";
+import { saveSearchCriteriaDc } from "../../store/slices/save-search-order-dc-slice";
+import { PERMISSION_GROUP } from "../../utils/enum/permission-enum";
+import { getUserInfo } from "../../store/sessionStore";
+import { isGroupDC } from "../../utils/role-permission";
 const columns: GridColDef[] = [
   {
-    field: 'index',
-    headerName: 'ลำดับ',
+    field: "index",
+    headerName: "ลำดับ",
     width: 70,
     // flex: 0.7,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: "20px" }}>
         {params.value}
       </Box>
     ),
   },
   {
-    field: 'shipmentNo',
-    headerName: 'เลขที่เอกสาร',
+    field: "shipmentNo",
+    headerName: "เลขที่เอกสาร",
     minWidth: 140,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'sdNo',
-    headerName: 'เลขที่เอกสาร SD',
+    field: "sdNo",
+    headerName: "เลขที่เอกสาร SD",
     minWidth: 160,
     // flex: 1.2,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'branchOutNo',
-    headerName: 'เลขที่เอกสาร BO',
+    field: "branchOutNo",
+    headerName: "เลขที่เอกสาร BO",
     minWidth: 128,
     // flex: 1.2,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'shipBranchFrom',
-    headerName: 'สาขาต้นทาง',
+    field: "shipBranchFrom",
+    headerName: "สาขาต้นทาง",
     minWidth: 150,
     flex: 0.9,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'shipBranchTo',
-    headerName: 'สาขาปลายทาง',
+    field: "shipBranchTo",
+    headerName: "สาขาปลายทาง",
     minWidth: 150,
     flex: 0.9,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'sdType',
-    headerName: 'ประเภท',
+    field: "sdType",
+    headerName: "ประเภท",
     minWidth: 70,
     flex: 0.75,
-    headerAlign: 'center',
-    align: 'left',
+    headerAlign: "center",
+    align: "left",
     sortable: false,
   },
   {
-    field: 'verifyDCStatus',
-    headerName: 'สถานะ',
+    field: "verifyDCStatus",
+    headerName: "สถานะ",
     minWidth: 70,
     flex: 0.7,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
   },
   {
-    field: 'hasBelow',
-    headerName: 'ขาด',
+    field: "hasBelow",
+    headerName: "ขาด",
     width: 65,
     // minWidth: 120,
     // flex: 0.8,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
-    align: 'center',
+    align: "center",
     renderCell: (params) => {
       if (params.value === true) {
-        return <Done fontSize='small' sx={{ color: '#F54949' }} />;
+        return <Done fontSize="small" sx={{ color: "#F54949" }} />;
       } else if (params.value === false) {
-        return '-';
+        return "-";
       }
     },
   },
   {
-    field: 'hasOver',
-    headerName: 'เกิน',
+    field: "hasOver",
+    headerName: "เกิน",
     width: 65,
     // minWidth: 120,
     // flex: 0.7,
     sortable: false,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     renderCell: (params) => {
       if (params.value === true) {
-        return <Done fontSize='small' sx={{ color: '#F54949' }} />;
+        return <Done fontSize="small" sx={{ color: "#F54949" }} />;
       } else if (params.value === false) {
-        return '-';
+        return "-";
       }
     },
   },
   {
-    field: 'receivedDate',
-    headerName: 'วันที่รับสินค้า',
+    field: "receivedDate",
+    headerName: "วันที่รับสินค้า",
     minWidth: 110,
     // flex: 1,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     renderCell: (params) => {
       return (
         <div
           style={{
-            textAlign: 'center',
-          }}>
+            textAlign: "center",
+          }}
+        >
           {params.value}
         </div>
       );
     },
   },
   {
-    field: 'truckID',
-    headerName: 'ทะเบียนรถ',
+    field: "truckID",
+    headerName: "ทะเบียนรถ",
     minWidth: 110,
     // flex: 1,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     renderCell: (params) => {
       return (
         <div
           style={{
-            textAlign: 'center',
-          }}>
+            textAlign: "center",
+          }}
+        >
           {params.value}
         </div>
       );
@@ -165,7 +181,7 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '',
+        field: "",
         width: 0,
         minWidth: 0,
         sortable: false,
@@ -174,7 +190,7 @@ function useApiRef() {
           return null;
         },
       }),
-    [columns]
+    [columns],
   );
 
   return { apiRef, columns: _columns };
@@ -191,15 +207,21 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
   // const classes = useStyles2();
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.dcCheckOrderList);
-  const cuurentPage = useAppSelector((state) => state.dcCheckOrderList.orderList.page);
-  const limit = useAppSelector((state) => state.dcCheckOrderList.orderList.perPage);
+  const cuurentPage = useAppSelector(
+    (state) => state.dcCheckOrderList.orderList.page,
+  );
+  const limit = useAppSelector(
+    (state) => state.dcCheckOrderList.orderList.perPage,
+  );
   const res: CheckOrderResponse = items.orderList;
-  const payload = useAppSelector((state) => state.saveSearchOrderDc.searchCriteriaDc);
+  const payload = useAppSelector(
+    (state) => state.saveSearchOrderDc.searchCriteriaDc,
+  );
   const [opensDCOrderDetail, setOpensDCOrderDetail] = React.useState(false);
-  const [shipment, setShipment] = React.useState('');
-  const [sdNo, setSdNo] = React.useState('');
+  const [shipment, setShipment] = React.useState("");
+  const [sdNo, setSdNo] = React.useState("");
 
-  const [idDC, setidDC] = React.useState('');
+  const [idDC, setidDC] = React.useState("");
   const [index, setIndex] = React.useState(1);
   const [currentpage, setCurrentpage] = React.useState(0);
 
@@ -227,16 +249,17 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
     };
   });
 
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({
-    open: false,
-  });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({
+      open: false,
+    });
 
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
 
   const currentlySelected = async (params: GridCellParams) => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     setidDC(params.row.sdNo);
 
     try {
@@ -247,7 +270,7 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
       console.log(error);
     }
 
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
 
   function isClosModal() {
@@ -287,7 +310,7 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
     const payloadNewpage: CheckOrderRequest = {
       limit: pageSize.toString(),
       // page: cuurentPages.toString(),
-      page: '1',
+      page: "1",
       docNo: payload.docNo,
       shipBranchFrom: payload.shipBranchFrom,
       shipBranchTo: payload.shipBranchTo,
@@ -320,13 +343,18 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
 
   return (
     <div>
-      <Box mt={2} bgcolor='background.paper'>
-        <div className={classes.MdataGridPaginationTop} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+      <Box mt={2} bgcolor="background.paper">
+        <div
+          className={classes.MdataGridPaginationTop}
+          style={{ height: rows.length >= 10 ? "80vh" : "auto" }}
+        >
           <DataGrid
             rows={rows}
             columns={columns}
             checkboxSelection={groupDC ? true : false}
-            isRowSelectable={(params: GridRowParams) => params.row.verifyDCStatusCode === 0}
+            isRowSelectable={(params: GridRowParams) =>
+              params.row.verifyDCStatusCode === 0
+            }
             disableColumnMenu
             onCellClick={currentlySelected}
             autoHeight={rows.length >= 10 ? false : true}
@@ -336,7 +364,7 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
             pageSize={parseInt(pageSize)}
             rowsPerPageOptions={[10, 20, 50, 100]}
             rowCount={res.total}
-            paginationMode='server'
+            paginationMode="server"
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
             loading={loading}
@@ -346,7 +374,13 @@ function DCOrderList({ onSelectRows }: DataGridProps) {
           />
         </div>
       </Box>
-      {opensDCOrderDetail && <DCOrderDetail idDC={idDC} isOpen={opensDCOrderDetail} onClickClose={isClosModal} />}
+      {opensDCOrderDetail && (
+        <DCOrderDetail
+          idDC={idDC}
+          isOpen={opensDCOrderDetail}
+          onClickClose={isClosModal}
+        />
+      )}
 
       <LoadingModal open={openLoadingModal.open} />
     </div>

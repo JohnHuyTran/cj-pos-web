@@ -1,6 +1,6 @@
-import React, { ReactElement, useEffect } from 'react';
-import DialogContent from '@mui/material/DialogContent';
-import Dialog from '@mui/material/Dialog';
+import React, { ReactElement, useEffect } from "react";
+import DialogContent from "@mui/material/DialogContent";
+import Dialog from "@mui/material/Dialog";
 import {
   Button,
   DialogActions,
@@ -11,20 +11,23 @@ import {
   Link,
   TextField,
   Typography,
-} from '@mui/material';
-import { Download, ErrorOutline, HighlightOff } from '@mui/icons-material';
-import { useStyles } from '../../styles/makeTheme';
-import { useAppDispatch } from '../../store/store';
-import DatePickerComponent from '../commons/ui/date-picker-detail';
-import ReasonsListDropDown from './transfer-reasons-list-dropdown';
-import { fetchDownloadTemplateRT, importStockRequest } from '../../services/stock-transfer';
-import moment from 'moment';
-import LoadingModal from '../commons/ui/loading-modal';
-import { ImportStockRequest } from '../../models/stock-transfer-model';
-import { ApiUploadError } from '../../models/api-error-model';
-import AlertError from '../commons/ui/alert-error';
-import SnackbarStatus from '../commons/ui/snackbar-status';
-import ConfirmModelExit from '../commons/ui/confirm-exit-model';
+} from "@mui/material";
+import { Download, ErrorOutline, HighlightOff } from "@mui/icons-material";
+import { useStyles } from "../../styles/makeTheme";
+import { useAppDispatch } from "../../store/store";
+import DatePickerComponent from "../commons/ui/date-picker-detail";
+import ReasonsListDropDown from "./transfer-reasons-list-dropdown";
+import {
+  fetchDownloadTemplateRT,
+  importStockRequest,
+} from "../../services/stock-transfer";
+import moment from "moment";
+import LoadingModal from "../commons/ui/loading-modal";
+import { ImportStockRequest } from "../../models/stock-transfer-model";
+import { ApiUploadError } from "../../models/api-error-model";
+import AlertError from "../commons/ui/alert-error";
+import SnackbarStatus from "../commons/ui/snackbar-status";
+import ConfirmModelExit from "../commons/ui/confirm-exit-model";
 
 interface Props {
   isOpen: boolean;
@@ -55,7 +58,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
@@ -73,14 +76,15 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   // const dispatch = useAppDispatch();
   const classes = useStyles();
 
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<boolean>(false);
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<boolean>(false);
   // const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
   const [values, setValues] = React.useState<State>({
-    branchFrom: '',
-    branchTo: '',
-    dateFrom: '',
-    dateTo: '',
-    transferReason: '',
+    branchFrom: "",
+    branchTo: "",
+    dateFrom: "",
+    dateTo: "",
+    transferReason: "",
   });
 
   useEffect(() => {
@@ -131,7 +135,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
       let codes = JSON.stringify(ReasonsCode);
       setValues({ ...values, transferReason: JSON.parse(codes) });
     } else {
-      setValues({ ...values, transferReason: '' });
+      setValues({ ...values, transferReason: "" });
     }
   };
 
@@ -139,13 +143,15 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
     setOpenLoadingModal(true);
     await fetchDownloadTemplateRT()
       .then((value) => {
-        var a = document.createElement('a');
+        var a = document.createElement("a");
         a.href = window.URL.createObjectURL(value.data);
-        a.download = `RT_TEMPLATE_${moment(new Date()).format('YYYYMMDDhhmmss')}.xlsx`;
+        a.download = `RT_TEMPLATE_${moment(new Date()).format(
+          "YYYYMMDDhhmmss",
+        )}.xlsx`;
         a.click();
       })
       .catch((error: any) => {
-        console.log('fetchDownloadTemplateRT:', error);
+        console.log("fetchDownloadTemplateRT:", error);
       });
 
     // console.log('fetchDownloadTemplateRT response headers: ', (await response).headers['content-disposition']);
@@ -158,18 +164,18 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
 
   const [errorUploadFile, setErrorUploadFile] = React.useState(false);
   const [errorBrowseFile, setErrorBrowseFile] = React.useState(false);
-  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState('');
+  const [msgErrorBrowseFile, setMsgErrorBrowseFile] = React.useState("");
   // const [openModelConfirm, setOpenModelConfirm] = React.useState(false);
   const [validationFile, setValidationFile] = React.useState(false);
 
   const [file, setFile] = React.useState<File>();
-  const [fileName, setFileName] = React.useState('');
+  const [fileName, setFileName] = React.useState("");
 
   const handleFileInputChange = (e: any) => {
     setFlagEdit(true);
     setValidationFile(false);
     setErrorBrowseFile(false);
-    setMsgErrorBrowseFile('');
+    setMsgErrorBrowseFile("");
     // checkSizeFile(e);
 
     let file: File = e.target.files[0];
@@ -183,19 +189,19 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const chkValidationFile = (fileName: string) => {
-    let parts = fileName.split('.');
+    let parts = fileName.split(".");
     let length = parts.length - 1;
 
-    if (parts[length].toLowerCase() !== 'xlsx') {
+    if (parts[length].toLowerCase() !== "xlsx") {
       setValidationFile(true);
       setErrorBrowseFile(true);
-      setMsgErrorBrowseFile('กรุณาแนบไฟล์.xlsx เท่านั้น');
+      setMsgErrorBrowseFile("กรุณาแนบไฟล์.xlsx เท่านั้น");
       return false;
     }
 
     setValidationFile(false);
     setErrorBrowseFile(false);
-    setMsgErrorBrowseFile('');
+    setMsgErrorBrowseFile("");
     return true;
   };
 
@@ -204,18 +210,22 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
 
     if (!startDate || !endDate) {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกวันที่โอนสินค้า');
-    } else if (values.transferReason === 'All' || values.transferReason === undefined || values.transferReason === '') {
+      setTextError("กรุณาเลือกวันที่โอนสินค้า");
+    } else if (
+      values.transferReason === "All" ||
+      values.transferReason === undefined ||
+      values.transferReason === ""
+    ) {
       setOpenAlert(true);
-      setTextError('กรุณาเลือกสาเหตุการโอน');
+      setTextError("กรุณาเลือกสาเหตุการโอน");
     } else if (!file) {
       setOpenAlert(true);
-      setTextError('กรุณาแนบไฟล์');
+      setTextError("กรุณาแนบไฟล์");
     } else {
       const payload: ImportStockRequest = {
         file: file,
-        startDate: moment(startDate).startOf('day').toISOString(),
-        endDate: moment(endDate).startOf('day').toISOString(),
+        startDate: moment(startDate).startOf("day").toISOString(),
+        endDate: moment(endDate).startOf("day").toISOString(),
         transferReason: values.transferReason,
       };
 
@@ -227,7 +237,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             setFlagEdit(false);
             setShowSnackBar(true);
             setSnackbarIsStatus(true);
-            setContentMsg('คุณได้Importข้อมูลเรียบร้อยแล้ว');
+            setContentMsg("คุณได้Importข้อมูลเรียบร้อยแล้ว");
 
             setTimeout(() => {
               onClickClose();
@@ -235,7 +245,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
           })
           .catch((error: ApiUploadError) => {
             setFile(undefined);
-            setFileName('');
+            setFileName("");
 
             if (errorUploadFile) setErrorUploadFile(false);
             else if (!errorUploadFile) setErrorUploadFile(true);
@@ -243,22 +253,22 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             if (error.code === 40000) {
               setOpenAlertFile(true);
               setOpenAlert(true);
-              setTitelError('ไม่สามารถ import file ได้');
-              setTextError('รูปแบบไฟล์ต้องเป็น excel format (.xlsx)');
-              setBase64EncodeFile('');
+              setTitelError("ไม่สามารถ import file ได้");
+              setTextError("รูปแบบไฟล์ต้องเป็น excel format (.xlsx)");
+              setBase64EncodeFile("");
               setLinkFileError(false);
             } else if (error.code === 40001) {
               setOpenAlertFile(true);
               setOpenAlert(true);
-              setTitelError('ไม่สามารถ import file ได้');
+              setTitelError("ไม่สามารถ import file ได้");
               setTextError(error.message);
-              setBase64EncodeFile('');
+              setBase64EncodeFile("");
               setLinkFileError(false);
             } else if (error.code === 40013) {
               setOpenAlertFile(true);
               setOpenAlert(true);
-              setTitelError('ไม่สามารถ import file ได้');
-              setTextError('');
+              setTitelError("ไม่สามารถ import file ได้");
+              setTextError("");
 
               const b64Data = error.data?.base64EncodeFile;
               if (b64Data) {
@@ -268,9 +278,9 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
             } else {
               setOpenAlertFile(true);
               setOpenAlert(true);
-              setTitelError('ไม่สามารถ import file ได้');
-              setTextError('');
-              setBase64EncodeFile('');
+              setTitelError("ไม่สามารถ import file ได้");
+              setTextError("");
+              setBase64EncodeFile("");
               setLinkFileError(false);
             }
           });
@@ -281,18 +291,20 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   };
 
   const handleDownloadErrorFile = () => {
-    var contentType = 'application/vnd.ms-excel';
+    var contentType = "application/vnd.ms-excel";
     const blob = b64toBlob(base64EncodeFile, contentType);
-    var a = document.createElement('a');
+    var a = document.createElement("a");
     a.href = window.URL.createObjectURL(blob);
 
-    a.download = `RT_TEMPLATE_${moment(new Date()).format('YYYYMMDDhhmmss')}.xlsx`;
+    a.download = `RT_TEMPLATE_${moment(new Date()).format(
+      "YYYYMMDDhhmmss",
+    )}.xlsx`;
     // a.text = 'ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้';
     a.click();
     handleCloseAlert();
   };
 
-  const b64toBlob = (b64Data: any, contentType = '', sliceSize = 512) => {
+  const b64toBlob = (b64Data: any, contentType = "", sliceSize = 512) => {
     const byteCharacters = atob(b64Data);
     const byteArrays = [];
 
@@ -314,17 +326,17 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
 
   const [openAlertFile, setOpenAlertFile] = React.useState(false);
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [titelError, setTitelError] = React.useState('');
-  const [textError, setTextError] = React.useState('');
+  const [titelError, setTitelError] = React.useState("");
+  const [textError, setTextError] = React.useState("");
   const [linkFileError, setLinkFileError] = React.useState(false);
-  const [base64EncodeFile, setBase64EncodeFile] = React.useState('');
+  const [base64EncodeFile, setBase64EncodeFile] = React.useState("");
   const handleCloseAlert = () => {
     setOpenAlertFile(false);
     setOpenAlert(false);
   };
 
   const [showSnackBar, setShowSnackBar] = React.useState(false);
-  const [contentMsg, setContentMsg] = React.useState('');
+  const [contentMsg, setContentMsg] = React.useState("");
   const [snackbarIsStatus, setSnackbarIsStatus] = React.useState(false);
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
@@ -333,11 +345,14 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
   return (
     <div>
       <Dialog open={open} maxWidth="sm" fullWidth={true}>
-        <BootstrapDialogTitle id="customized-dialog-title" onClose={handleChkEditClose}></BootstrapDialogTitle>
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleChkEditClose}
+        ></BootstrapDialogTitle>
 
         <DialogContent>
           <Grid container rowSpacing={2} columnSpacing={{ xs: 7 }}>
-            <Grid item xs={12} mt={2} sx={{ textAlign: 'end' }}>
+            <Grid item xs={12} mt={2} sx={{ textAlign: "end" }}>
               <Button
                 id="btnImport"
                 variant="contained"
@@ -358,24 +373,41 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
               <Typography gutterBottom variant="subtitle1" component="div">
                 ตั้งแต่*
               </Typography>
-              <DatePickerComponent onClickDate={handleStartDatePicker} value={startDate} />
+              <DatePickerComponent
+                onClickDate={handleStartDatePicker}
+                value={startDate}
+              />
             </Grid>
             <Grid item xs={6}>
-              <Typography gutterBottom variant="subtitle1" component="div" sx={{ mt: 3.5 }}>
+              <Typography
+                gutterBottom
+                variant="subtitle1"
+                component="div"
+                sx={{ mt: 3.5 }}
+              >
                 ถึง*
               </Typography>
               <DatePickerComponent
                 onClickDate={handleEndDatePicker}
                 value={endDate}
-                type={'TO'}
+                type={"TO"}
                 minDateTo={startDate}
               />
             </Grid>
             <Grid item xs={6}>
-              <Typography gutterBottom variant="subtitle1" component="div" mb={1}>
+              <Typography
+                gutterBottom
+                variant="subtitle1"
+                component="div"
+                mb={1}
+              >
                 สาเหตุการโอน*
               </Typography>
-              <ReasonsListDropDown onChangeReasons={handleChangeReasons} isClear={false} isDetail={true} />
+              <ReasonsListDropDown
+                onChangeReasons={handleChangeReasons}
+                isClear={false}
+                isDetail={true}
+              />
             </Grid>
 
             <Grid item xs={12} mt={2}>
@@ -411,7 +443,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
                       type="file"
                       accept=".xlsx"
                       onChange={handleFileInputChange}
-                      style={{ display: 'none' }}
+                      style={{ display: "none" }}
                     />
                   </>
                 )}
@@ -423,18 +455,18 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
                       type="file"
                       accept=".xlsx"
                       onChange={handleFileInputChange}
-                      style={{ display: 'none' }}
+                      style={{ display: "none" }}
                     />
                   </>
                 )}
-                <label htmlFor={'btnBrowse'}>
+                <label htmlFor={"btnBrowse"}>
                   <Button
                     id="btnPrint"
                     color="primary"
                     variant="contained"
                     component="span"
                     className={classes.MbtnSearch}
-                    style={{ marginLeft: 10, textTransform: 'none' }}
+                    style={{ marginLeft: 10, textTransform: "none" }}
                   >
                     แนบไฟล์
                   </Button>
@@ -442,13 +474,13 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
               </div>
             </Grid>
 
-            <Grid item xs={12} mt={2} sx={{ textAlign: 'center' }}>
+            <Grid item xs={12} mt={2} sx={{ textAlign: "center" }}>
               <Button
                 id="btnImport"
                 variant="contained"
                 color="cancelColor"
                 onClick={handleChkEditClose}
-                sx={{ width: '20%', mr: 2 }}
+                sx={{ width: "20%", mr: 2 }}
                 className={classes.MbtnClear}
               >
                 ยกเลิก
@@ -460,7 +492,7 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
                 startIcon={<Download />}
                 onClick={handleUpLoadFile}
                 className={classes.MbtnSearch}
-                sx={{ width: '27%' }}
+                sx={{ width: "27%" }}
               >
                 อัพโหลดเอกสาร
               </Button>
@@ -470,7 +502,13 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
       </Dialog>
 
       <LoadingModal open={openLoadingModal} />
-      {!openAlertFile && openAlert && <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />}
+      {!openAlertFile && openAlert && (
+        <AlertError
+          open={openAlert}
+          onClose={handleCloseAlert}
+          textError={textError}
+        />
+      )}
       {openAlertFile && openAlert && (
         <Dialog
           open={openAlert}
@@ -479,25 +517,33 @@ function stockRequestUploadFile({ isOpen, onClickClose }: Props): ReactElement {
           fullWidth={true}
           maxWidth="xs"
         >
-          <DialogContent sx={{ padding: '1em' }}>
-            <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line' }}>
-              <ErrorOutline sx={{ color: '#FF0000', fontSize: '4em' }} />
+          <DialogContent sx={{ padding: "1em" }}>
+            <DialogContentText
+              sx={{ textAlign: "center", whiteSpace: "pre-line" }}
+            >
+              <ErrorOutline sx={{ color: "#FF0000", fontSize: "4em" }} />
               <br />
               {titelError}
-              <div style={{ color: '#FF0000' }}>{textError}</div>
+              <div style={{ color: "#FF0000" }}>{textError}</div>
               {linkFileError && (
-                <Link onClick={handleDownloadErrorFile} style={{ color: '#FF0000', cursor: 'pointer' }}>
+                <Link
+                  onClick={handleDownloadErrorFile}
+                  style={{ color: "#FF0000", cursor: "pointer" }}
+                >
                   ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้
                 </Link>
               )}
             </DialogContentText>
           </DialogContent>
-          <DialogActions sx={{ display: 'block', textAlign: 'center' }}>
+          <DialogActions sx={{ display: "block", textAlign: "center" }}>
             <Button
               id="btnClose"
               variant="contained"
               color="error"
-              sx={{ borderRadius: '5px', display: `${linkFileError ? 'none' : ''}` }}
+              sx={{
+                borderRadius: "5px",
+                display: `${linkFileError ? "none" : ""}`,
+              }}
               onClick={handleCloseAlert}
             >
               ปิด

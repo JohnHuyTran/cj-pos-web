@@ -1,8 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../../environment-base';
-import { getParams } from '../../../adapters/posback-adapter';
-import { ContentType } from '../../../utils/enum/common-enum';
-import { SearchSubDistrictsRequest, SubDistrictsResponse } from '../../../models/search-subDistricts-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../../environment-base";
+import { getParams } from "../../../adapters/posback-adapter";
+import { ContentType } from "../../../utils/enum/common-enum";
+import {
+  SearchSubDistrictsRequest,
+  SubDistrictsResponse,
+} from "../../../models/search-subDistricts-model";
 
 type State = {
   subDistrictsList: SubDistrictsResponse;
@@ -11,16 +14,16 @@ type State = {
 
 const initialState: State = {
   subDistrictsList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
   },
-  error: '',
+  error: "",
 };
 
 export const featchsSubDistrictsListAsync = createAsyncThunk(
-  'SubDistrictsList',
+  "SubDistrictsList",
   async (payload: SearchSubDistrictsRequest) => {
     try {
       const path = `${environment.master.subDistricts.url}`;
@@ -28,9 +31,9 @@ export const featchsSubDistrictsListAsync = createAsyncThunk(
 
       if (response === 204) {
         let responseCode: any = {
-          ref: '',
+          ref: "",
           code: response,
-          message: '',
+          message: "",
           data: [],
         };
 
@@ -41,20 +44,23 @@ export const featchsSubDistrictsListAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const searchSubDistrictsSlice = createSlice({
-  name: 'searchDistricts',
+  name: "searchDistricts",
   initialState,
   reducers: {},
   extraReducers: (builer) => {
     builer.addCase(featchsSubDistrictsListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchsSubDistrictsListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.subDistrictsList = action.payload;
-      }),
+      builer.addCase(
+        featchsSubDistrictsListAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.subDistrictsList = action.payload;
+        },
+      ),
       builer.addCase(featchsSubDistrictsListAsync.rejected, () => {
         initialState;
       });

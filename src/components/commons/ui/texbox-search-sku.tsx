@@ -1,14 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 //CSS & UI
-import { Autocomplete, CircularProgress, createFilterOptions, TextField, Typography } from '@mui/material';
-import { useStyles } from '../../../styles/makeTheme';
-import SearchIcon from '@mui/icons-material/Search';
+import {
+  Autocomplete,
+  CircularProgress,
+  createFilterOptions,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useStyles } from "../../../styles/makeTheme";
+import SearchIcon from "@mui/icons-material/Search";
 
 //API
-import { findProductSKU } from '../../../services/product-master';
+import { findProductSKU } from "../../../services/product-master";
 
-import _ from 'lodash';
+import _ from "lodash";
 
 interface Props {
   skuTypes: string;
@@ -19,10 +25,17 @@ interface Props {
   skuName?: string;
 }
 
-export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disabled, skuCode, skuName }: Props) {
+export default function TexboxSearchSku({
+  skuTypes,
+  onSelectItem,
+  isClear,
+  disabled,
+  skuCode,
+  skuName,
+}: Props) {
   const classes = useStyles();
 
-  const [value, setValue] = React.useState('');
+  const [value, setValue] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [searchItem, setSearchItem] = React.useState<any | null>(null);
   const [itemsList, setItemList] = React.useState([]);
@@ -42,14 +55,18 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
     debouncedSearch(event, value, reason);
   };
 
-  const debouncedSearch = _.debounce(async function (event: any, value: string, reason: string) {
+  const debouncedSearch = _.debounce(async function (
+    event: any,
+    value: string,
+    reason: string,
+  ) {
     if (event && event.keyCode && event.keyCode === 13) {
       return false;
     }
     const keyword = value.trim();
     let payload: any;
 
-    if (keyword.length >= 3 && reason !== 'reset') {
+    if (keyword.length >= 3 && reason !== "reset") {
       setLoading(true);
       setSearchItem(keyword);
 
@@ -72,7 +89,7 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
 
   useEffect(() => {
     if (isClear) {
-      setValue('');
+      setValue("");
     }
   }, [isClear]);
 
@@ -82,9 +99,9 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
         productNamePrime: skuName,
         productNameSecnd: skuName,
         skuCode: skuCode,
-        skuType: '',
+        skuType: "",
       };
-      handleChangeItem('', testValue, '');
+      handleChangeItem("", testValue, "");
     }
   }, [skuCode]);
 
@@ -138,7 +155,9 @@ export default function TexboxSearchSku({ skuTypes, onSelectItem, isClear, disab
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
       onInputChange={onInputChange}
-      getOptionLabel={(option) => (option.skuCode ? `${option.productNamePrime} \n${option.skuCode}` : '')}
+      getOptionLabel={(option) =>
+        option.skuCode ? `${option.productNamePrime} \n${option.skuCode}` : ""
+      }
       isOptionEqualToValue={(option, value) => option.skuCode === value.skuCode}
       renderInput={autocompleteRenderInput}
       size="small"

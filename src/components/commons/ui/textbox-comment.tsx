@@ -1,7 +1,7 @@
-import React, { ReactElement, useEffect } from 'react';
-import { useStyles } from '../../../styles/makeTheme';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
+import React, { ReactElement, useEffect } from "react";
+import { useStyles } from "../../../styles/makeTheme";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
 
 interface Props {
   fieldName?: any;
@@ -30,7 +30,8 @@ function TextBoxComment({
   // const [comment, setComment] = React.useState(defaultValue);
 
   useEffect(() => {
-    if (defaultValue !== '' && defaultValue !== undefined) setCharacterCount(defaultValue.length);
+    if (defaultValue !== "" && defaultValue !== undefined)
+      setCharacterCount(defaultValue.length);
   }, []);
 
   const handleChangeComment = (event: any) => {
@@ -45,10 +46,12 @@ function TextBoxComment({
 
   return (
     <>
-      <Typography variant='body2' sx={{mb: '5px'}}>{fieldName}</Typography>
+      <Typography variant="body2" sx={{ mb: "5px" }}>
+        {fieldName}
+      </Typography>
       <TextField
-        data-testid='form-field-tbxComment'
-        id='tbxComment'
+        data-testid="form-field-tbxComment"
+        id="tbxComment"
         // label='tbxComment'
         multiline
         fullWidth
@@ -60,21 +63,22 @@ function TextBoxComment({
         inputProps={{ maxLength: maxLength }}
         sx={{ maxWidth: maxWidth }}
         disabled={isDisable}
-        helperText={isError === true ? hypterText : ' '}
+        helperText={isError === true ? hypterText : " "}
         error={isError}
       />
 
       <div
-        data-testid='div-warning-msg'
+        data-testid="div-warning-msg"
         style={{
-          fontSize: '11px',
-          color: '#AEAEAE',
-          width: '100%',
+          fontSize: "11px",
+          color: "#AEAEAE",
+          width: "100%",
           maxWidth: maxWidth,
-          textAlign: 'right',
-          marginTop: '-1.6em',
-          paddingRight: '5px'
-        }}>
+          textAlign: "right",
+          marginTop: "-1.6em",
+          paddingRight: "5px",
+        }}
+      >
         {characterCount}/{maxLength}
       </div>
     </>

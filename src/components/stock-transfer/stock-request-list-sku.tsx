@@ -1,16 +1,29 @@
-import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { DataGrid, GridColDef, GridValueGetterParams, GridCellParams, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box } from '@mui/system';
-import { useStyles } from '../../styles/makeTheme';
-import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
-import { numberWithCommas } from '../../utils/utils';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
-import StockRequestItem from './stock-request-list-item';
-import { checkStockBalance } from '../../services/stock-transfer';
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import {
+  DataGrid,
+  GridColDef,
+  GridValueGetterParams,
+  GridCellParams,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
+import { Box } from "@mui/system";
+import { useStyles } from "../../styles/makeTheme";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { numberWithCommas } from "../../utils/utils";
+import { updateAddItemsState } from "../../store/slices/add-items-slice";
+import { updatestockRequestItemsState } from "../../store/slices/stock-request-items-slice";
+import StockRequestItem from "./stock-request-list-item";
+import { checkStockBalance } from "../../services/stock-transfer";
 // import { StockBalanceBySKURequest } from '../../models/stock-transfer-model';
-import { updateItemsState } from '../../store/slices/supplier-add-items-slice';
+import { updateItemsState } from "../../store/slices/supplier-add-items-slice";
 
 export interface DataGridProps {
   type: string;
@@ -26,50 +39,50 @@ export interface DataGridProps {
 
 const columnsSKU: GridColDef[] = [
   {
-    field: 'index',
-    headerName: 'ลำดับ',
+    field: "index",
+    headerName: "ลำดับ",
     width: 80,
-    headerAlign: 'center',
+    headerAlign: "center",
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: "20px" }}>
         {params.value}
       </Box>
     ),
   },
   {
-    field: 'skuName',
-    headerName: 'รายละเอียดสินค้า',
-    headerAlign: 'center',
+    field: "skuName",
+    headerName: "รายละเอียดสินค้า",
+    headerAlign: "center",
     minWidth: 300,
     flex: 2,
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
-          {params.getValue(params.id, 'skuCode') || ''}
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, "skuCode") || ""}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'stock',
-    headerName: 'สต๊อกสินค้าคงเหลือ',
+    field: "stock",
+    headerName: "สต๊อกสินค้าคงเหลือ",
     minWidth: 150,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => numberWithCommas(params.value),
   },
   {
-    field: 'orderAllQty',
-    headerName: 'สั่ง(ชิ้น)',
+    field: "orderAllQty",
+    headerName: "สั่ง(ชิ้น)",
     minWidth: 120,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => checkStock(params),
@@ -82,24 +95,37 @@ const columnsSKU: GridColDef[] = [
 // };
 
 const checkStock = (params: GridValueGetterParams) => {
-  const stock = Number(params.getValue(params.id, 'stock'));
-  const orderAllQty = Number(params.getValue(params.id, 'orderAllQty'));
+  const stock = Number(params.getValue(params.id, "stock"));
+  const orderAllQty = Number(params.getValue(params.id, "orderAllQty"));
   if (orderAllQty > stock) {
     return (
-      <Typography variant='body2' sx={{ color: '#F54949' }}>
+      <Typography variant="body2" sx={{ color: "#F54949" }}>
         {numberWithCommas(orderAllQty)}
       </Typography>
     );
   }
 
-  return <Typography variant='body2'>{numberWithCommas(orderAllQty)}</Typography>;
+  return (
+    <Typography variant="body2">{numberWithCommas(orderAllQty)}</Typography>
+  );
 };
 
-function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, branch, status }: DataGridProps) {
+function StockRequestSKU({
+  type,
+  edit,
+  onMapSKU,
+  changeItems,
+  update,
+  stock,
+  branch,
+  status,
+}: DataGridProps) {
   const dispatch = useAppDispatch();
-  const _ = require('lodash');
+  const _ = require("lodash");
   const classes = useStyles();
-  const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
+  const stockRequestDetail = useAppSelector(
+    (state) => state.stockRequestDetail.stockRequestDetail.data,
+  );
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
 
   let rowsSKU: any = [];
@@ -122,8 +148,8 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
 
   const [stockBalanceList, setStockBalanceList] = React.useState([]);
   // const [flagCheckStock, setFlagCheckStock] = React.useState(false);
-  const [skuCodeSelect, setSkuCodeSelect] = React.useState('ALL');
-  const [skuNameDisplay, setSkuNameDisplay] = React.useState('');
+  const [skuCodeSelect, setSkuCodeSelect] = React.useState("ALL");
+  const [skuNameDisplay, setSkuNameDisplay] = React.useState("");
   const [isChecked, setIschecked] = React.useState(true);
 
   const stockBalanceBySKU = async (skuCodes: any) => {
@@ -138,13 +164,13 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
         // itemsMapStock(payloadAddItem, value.data);
       })
       .catch((error: any) => {
-        console.log('StockBalanceBySKU Error:', error);
+        console.log("StockBalanceBySKU Error:", error);
       });
   };
 
   const skuMapStock = async (items: any, stockBalance: any) => {
     //orderBy skuCode
-    items = _.orderBy(items, ['skuCode'], ['asc']);
+    items = _.orderBy(items, ["skuCode"], ["asc"]);
 
     let resultSKU: any = [];
     items.map((a: any) => {
@@ -160,7 +186,9 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
         stockRemain = a.stock;
       }
 
-      const chkduplicate: any = resultSKU.find((r: any) => r.skuCode === a.skuCode);
+      const chkduplicate: any = resultSKU.find(
+        (r: any) => r.skuCode === a.skuCode,
+      );
 
       if (chkduplicate) {
         let duplicateSKU: any = [];
@@ -205,7 +233,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
         id: `${item.skuCode}-${index + 1}`,
         index: index + 1,
         skuCode: item.skuCode,
-        skuName: item.skuName ? item.skuName : '',
+        skuName: item.skuName ? item.skuName : "",
         stock: item.stock ? item.stock : 0,
         orderAllQty: item.orderAllQty ? item.orderAllQty : 0,
         qty: item.qty ? item.qty : 0,
@@ -220,7 +248,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
     rowsSKU.map((data: any) => {
       let skuCode = data.skuCode;
       let i = items.filter((r: any) => r.skuCode === skuCode);
-      i = _.orderBy(i, ['skuCode', 'baseUnit'], ['asc', 'asc']);
+      i = _.orderBy(i, ["skuCode", "baseUnit"], ["asc", "asc"]);
       i.forEach((data: any) => {
         itemsOrderBy.push(data);
       });
@@ -241,15 +269,20 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
   const mapStockRequestDetail = async () => {
     let _item: any = [];
     if (stockRequestDetail) {
-      const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
+      const itemGroups = stockRequestDetail.itemGroups
+        ? stockRequestDetail.itemGroups
+        : [];
       const items = stockRequestDetail.items ? stockRequestDetail.items : [];
 
       if (
-        (stockRequestDetail.status === 'DRAFT' || stockRequestDetail.status === 'AWAITING_FOR_REQUESTER') &&
+        (stockRequestDetail.status === "DRAFT" ||
+          stockRequestDetail.status === "AWAITING_FOR_REQUESTER") &&
         stockBalanceList.length === 0
       ) {
         let skuCodes: any = [];
-        const itemGroups = stockRequestDetail.itemGroups ? stockRequestDetail.itemGroups : [];
+        const itemGroups = stockRequestDetail.itemGroups
+          ? stockRequestDetail.itemGroups
+          : [];
         itemGroups.map((item: any) => {
           skuCodes.push(item.skuCode);
         });
@@ -258,7 +291,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
 
       if (items.length > 0) {
         items.map((item: any) => {
-          let productName: any = '';
+          let productName: any = "";
           let remainingQty: any = 0;
           let orderAllQty: any = 0;
           if (itemGroups.length > 0) {
@@ -267,7 +300,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
               const oAllQty = i.orderAllQty;
               let sRemain = 0;
 
-              if (stockRequestDetail.status === 'DRAFT') {
+              if (stockRequestDetail.status === "DRAFT") {
                 stockBalanceList.forEach((s: any) => {
                   if (i.skuCode === s.skuCode) {
                     sRemain = s.stockRemain;
@@ -308,7 +341,7 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
 
   if (Object.keys(payloadAddItem).length > 0) {
     itemsMap(payloadAddItem);
-  } else if (!update && type !== 'Create') {
+  } else if (!update && type !== "Create") {
     mapStockRequestDetail();
   }
 
@@ -335,7 +368,10 @@ function StockRequestSKU({ type, edit, onMapSKU, changeItems, update, stock, bra
 
   return (
     <div>
-      <div style={{ width: '100%', height: rowsSKU.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+      <div
+        style={{ width: "100%", height: rowsSKU.length >= 8 ? "70vh" : "auto" }}
+        className={classes.MdataGridDetail}
+      >
         <DataGrid
           rows={rowsSKU}
           columns={columnsSKU}

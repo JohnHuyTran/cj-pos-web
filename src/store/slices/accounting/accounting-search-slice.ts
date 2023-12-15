@@ -1,9 +1,12 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { ExpenseSearchRequest, ExpenseSearchResponse } from '../../../models/branch-accounting-model';
-import { environment } from '../../../environment-base';
-import { get } from '../../../adapters/posback-adapter';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import {
+  ExpenseSearchRequest,
+  ExpenseSearchResponse,
+} from "../../../models/branch-accounting-model";
+import { environment } from "../../../environment-base";
+import { get } from "../../../adapters/posback-adapter";
 
-import { BranchAccountingSearch } from '../../../mockdata/branch-accounting-search';
+import { BranchAccountingSearch } from "../../../mockdata/branch-accounting-search";
 
 type State = {
   branchAccountingList: ExpenseSearchResponse;
@@ -12,23 +15,23 @@ type State = {
 
 const initialState: State = {
   branchAccountingList: {
-    ref: '',
-    timestamp: '',
+    ref: "",
+    timestamp: "",
     prev: 0,
     next: 0,
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
     perPage: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const featchBranchAccountingListAsync = createAsyncThunk(
-  'ExpenseSearchRequest',
+  "ExpenseSearchRequest",
   async (payload: ExpenseSearchRequest) => {
     try {
       const apiRootPath = environment.branchAccounting.expense.search.url;
@@ -36,22 +39,22 @@ export const featchBranchAccountingListAsync = createAsyncThunk(
         `${apiRootPath}?limit=${payload.limit}&page=${payload.page}&type=${payload.type}` +
         `&month=${payload.month}&year=${payload.year}`;
 
-      if (payload.branchCode !== '') {
+      if (payload.branchCode !== "") {
         path = `${path}&branchCode=${payload.branchCode}`;
       }
-      if (payload.status !== 'ALL') {
+      if (payload.status !== "ALL") {
         path = `${path}&status=${payload.status}`;
       }
       if (payload.period !== 0) {
         path = `${path}&period=${payload.period}`;
       }
       let response: ExpenseSearchResponse = {
-        ref: '',
-        timestamp: '',
+        ref: "",
+        timestamp: "",
         prev: 0,
         next: 0,
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -65,11 +68,11 @@ export const featchBranchAccountingListAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const searchBranchAccountingSlice = createSlice({
-  name: 'searchBranchAccounting',
+  name: "searchBranchAccounting",
   initialState,
   reducers: {
     clearDataSearchBranchAccounting: (state) => initialState,
@@ -78,14 +81,18 @@ const searchBranchAccountingSlice = createSlice({
     builer.addCase(featchBranchAccountingListAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchBranchAccountingListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.branchAccountingList = action.payload;
-      }),
+      builer.addCase(
+        featchBranchAccountingListAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.branchAccountingList = action.payload;
+        },
+      ),
       builer.addCase(featchBranchAccountingListAsync.rejected, () => {
         initialState;
       });
   },
 });
 
-export const { clearDataSearchBranchAccounting } = searchBranchAccountingSlice.actions;
+export const { clearDataSearchBranchAccounting } =
+  searchBranchAccountingSlice.actions;
 export default searchBranchAccountingSlice.reducer;

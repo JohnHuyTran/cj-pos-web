@@ -1,8 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { get } from '../../adapters/posback-adapter';
-import { stringNullOrEmpty } from '../../utils/utils';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { get } from "../../adapters/posback-adapter";
+import { stringNullOrEmpty } from "../../utils/utils";
 import { environment } from "../../environment-base";
-import { StockAdjustmentSearchRequest, StockAdjustmentSearchResponse } from "../../models/stock-adjustment-model";
+import {
+  StockAdjustmentSearchRequest,
+  StockAdjustmentSearchResponse,
+} from "../../models/stock-adjustment-model";
 
 type State = {
   toSearchResponse: StockAdjustmentSearchResponse;
@@ -11,20 +14,20 @@ type State = {
 
 const initialState: State = {
   toSearchResponse: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
     total: 0,
     page: 0,
     perPage: 0,
     totalPage: 0,
   },
-  error: '',
+  error: "",
 };
 
 export const getStockAdjustmentSearch = createAsyncThunk(
-  'getStockAdjustmentSearch',
+  "getStockAdjustmentSearch",
   async (payload: StockAdjustmentSearchRequest) => {
     try {
       const apiRootPath = environment.checkStock.stockAdjustment.search.url;
@@ -32,10 +35,10 @@ export const getStockAdjustmentSearch = createAsyncThunk(
       if (!stringNullOrEmpty(payload.docNo)) {
         path = path + `&docNo=${payload.docNo}`;
       }
-      if (!stringNullOrEmpty(payload.branch) && 'ALL' !== payload.branch) {
+      if (!stringNullOrEmpty(payload.branch) && "ALL" !== payload.branch) {
         path = path + `&branch=${payload.branch}`;
       }
-      if (!stringNullOrEmpty(payload.status) && 'ALL' !== payload.status) {
+      if (!stringNullOrEmpty(payload.status) && "ALL" !== payload.status) {
         path = path + `&status=${payload.status}`;
       }
       if (!stringNullOrEmpty(payload.creationDateFrom)) {
@@ -45,9 +48,9 @@ export const getStockAdjustmentSearch = createAsyncThunk(
         path = path + `&creationDateTo=${payload.creationDateTo}`;
       }
       let response: StockAdjustmentSearchResponse = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: [],
         total: 0,
         page: 0,
@@ -61,11 +64,11 @@ export const getStockAdjustmentSearch = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const StockAdjustmentSearchSlice = createSlice({
-  name: 'StockAdjustmentSearchSlice',
+  name: "StockAdjustmentSearchSlice",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -74,9 +77,12 @@ const StockAdjustmentSearchSlice = createSlice({
     builer.addCase(getStockAdjustmentSearch.pending, () => {
       initialState;
     }),
-      builer.addCase(getStockAdjustmentSearch.fulfilled, (state, action: PayloadAction<any>) => {
-        state.toSearchResponse = action.payload;
-      }),
+      builer.addCase(
+        getStockAdjustmentSearch.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.toSearchResponse = action.payload;
+        },
+      ),
       builer.addCase(getStockAdjustmentSearch.rejected, () => {
         initialState;
       });

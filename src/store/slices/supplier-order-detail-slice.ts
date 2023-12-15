@@ -35,7 +35,7 @@ export const featchSupplierOrderDetailAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const supplierCheckOrderSlice = createSlice({
@@ -52,7 +52,7 @@ const supplierCheckOrderSlice = createSlice({
         featchSupplierOrderDetailAsync.fulfilled,
         (state, action: PayloadAction<any>) => {
           state.purchaseDetail = action.payload;
-        }
+        },
       ),
       builer.addCase(featchSupplierOrderDetailAsync.rejected, () => {
         initialState;

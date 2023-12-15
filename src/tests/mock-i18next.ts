@@ -1,5 +1,5 @@
 export const i18nextMock = () => {
-  return jest.mock('react-i18next', () => ({
+  return jest.mock("react-i18next", () => ({
     // this mock makes sure any components using the translate hook can use it without a warning being shown
     useTranslation: () => {
       return {
@@ -10,7 +10,7 @@ export const i18nextMock = () => {
       };
     },
     initReactI18next: {
-      type: '3rdParty',
+      type: "3rdParty",
       init: jest.fn(),
     },
   }));

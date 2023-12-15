@@ -1,12 +1,15 @@
 //@ts-nocheck
-import React, { useState } from 'react';
+import React, { useState } from "react";
 // npm i @date-io/moment@1.x moment
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import OverwriteMomentBE from '../commons/ui/OverwriteMoment';
-import { useStyles } from '../commons/ui/date-picker-css';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
+import { createTheme, ThemeProvider } from "@material-ui/core/styles";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import OverwriteMomentBE from "../commons/ui/OverwriteMoment";
+import { useStyles } from "../commons/ui/date-picker-css";
 
 interface StateProps {
   onClickDate: any;
@@ -20,11 +23,11 @@ interface StateProps {
 const defaultMaterialTheme = createTheme({
   palette: {
     primary: {
-      main: '#36C690',
+      main: "#36C690",
     },
   },
   typography: {
-    fontFamily: 'Kanit',
+    fontFamily: "Kanit",
   },
 });
 
@@ -36,7 +39,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
   };
 
   let datePicker;
-  if (props.type === 'TO') {
+  if (props.type === "TO") {
     datePicker = (
       <KeyboardDatePicker
         disableToolbar
@@ -46,8 +49,10 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        style={{ backgroundColor: props.disabled ? '#f1f1f1' : 'transparent' }}
-        className={props.error ? classes.MdatepickerError : classes.MdatepickerDetail}
+        style={{ backgroundColor: props.disabled ? "#f1f1f1" : "transparent" }}
+        className={
+          props.error ? classes.MdatepickerError : classes.MdatepickerDetail
+        }
         value={props.value}
         disabled={props.disabled}
         onChange={handleDateChange}
@@ -60,7 +65,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
         // maxDate={today}
         minDate={props.minDateTo}
@@ -77,8 +82,10 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
         variant="inline"
         inputVariant="outlined"
         format="DD/MM/YYYY"
-        style={{ backgroundColor: props.disabled ? '#f1f1f1' : 'transparent' }}
-        className={props.error ? classes.MdatepickerError : classes.MdatepickerDetail}
+        style={{ backgroundColor: props.disabled ? "#f1f1f1" : "transparent" }}
+        className={
+          props.error ? classes.MdatepickerError : classes.MdatepickerDetail
+        }
         value={props.value}
         disabled={props.disabled}
         onChange={handleDateChange}
@@ -91,7 +98,7 @@ const DatePickerComponent: React.FC<StateProps> = (props) => {
           readOnly: true,
         }}
         InputAdornmentProps={{
-          position: 'start',
+          position: "start",
         }}
         // maxDate={today}
         minDate={today}

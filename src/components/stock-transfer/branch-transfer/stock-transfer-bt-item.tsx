@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
-import { useStyles } from '../../../styles/makeTheme';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import { numberWithCommas, stringNullOrEmpty } from '../../../utils/utils';
+import React, { useEffect, useMemo } from "react";
+import { useStyles } from "../../../styles/makeTheme";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import { numberWithCommas, stringNullOrEmpty } from "../../../utils/utils";
 import {
   DataGrid,
   GridCellParams,
@@ -12,16 +12,20 @@ import {
   GridRowData,
   GridRowId,
   useGridApiRef,
-} from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
+} from "@mui/x-data-grid";
+import Typography from "@mui/material/Typography";
 
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { ErrorItem, Item, ItemGroups } from '../../../models/stock-transfer-model';
-import { isGroupBranch } from '../../../utils/role-permission';
-import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-import { DeleteForever, Tune } from '@mui/icons-material';
-import ModalDeleteItem from '../modal-delete-item-confirm';
-import { ErrorDetail } from '../../../models/api-error-model';
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import {
+  ErrorItem,
+  Item,
+  ItemGroups,
+} from "../../../models/stock-transfer-model";
+import { isGroupBranch } from "../../../utils/role-permission";
+import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { DeleteForever, Tune } from "@mui/icons-material";
+import ModalDeleteItem from "../modal-delete-item-confirm";
+import { ErrorDetail } from "../../../models/api-error-model";
 
 interface Props {
   skuCodeSelect: string;
@@ -31,128 +35,128 @@ interface Props {
 }
 const columns: GridColDef[] = [
   {
-    field: 'index',
-    headerName: 'ลำดับ',
+    field: "index",
+    headerName: "ลำดับ",
     minWidth: 70,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
     renderCell: (params) => (
-      <Box component='div' sx={{ paddingLeft: '20px' }}>
+      <Box component="div" sx={{ paddingLeft: "20px" }}>
         {params.value}
       </Box>
     ),
   },
   {
-    field: 'barcode',
-    headerName: 'บาร์โค้ด',
+    field: "barcode",
+    headerName: "บาร์โค้ด",
     minWidth: 150,
     flex: 0.7,
-    headerAlign: 'center',
+    headerAlign: "center",
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: 'barcodeName',
-    headerName: 'รายละเอียดสินค้า',
-    headerAlign: 'center',
+    field: "barcodeName",
+    headerName: "รายละเอียดสินค้า",
+    headerAlign: "center",
     minWidth: 200,
     flex: 1,
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Typography variant='body2'>{params.value}</Typography>
-        <Typography color='textSecondary' sx={{ fontSize: 12 }}>
-          {params.getValue(params.id, 'skuCode') || ''}
+        <Typography variant="body2">{params.value}</Typography>
+        <Typography color="textSecondary" sx={{ fontSize: 12 }}>
+          {params.getValue(params.id, "skuCode") || ""}
         </Typography>
       </div>
     ),
   },
   {
-    field: 'orderQty',
-    headerName: 'จำนวนที่สั่ง',
+    field: "orderQty",
+    headerName: "จำนวนที่สั่ง",
     minWidth: 120,
-    headerAlign: 'center',
-    align: 'right',
+    headerAlign: "center",
+    align: "right",
     sortable: false,
     renderCell: (params) => numberWithCommas(params.value),
   },
   {
-    field: 'unitName',
-    headerName: 'หน่วย',
+    field: "unitName",
+    headerName: "หน่วย",
     minWidth: 110,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
   },
   {
-    field: 'actualQty',
-    headerName: 'จำนวนโอนจริง',
+    field: "actualQty",
+    headerName: "จำนวนโอนจริง",
     minWidth: 120,
-    headerAlign: 'center',
+    headerAlign: "center",
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant='outlined'
-        name='txnActualQty'
-        type='number'
-        inputProps={{ style: { textAlign: 'right' } }}
+        variant="outlined"
+        name="txnActualQty"
+        type="number"
+        inputProps={{ style: { textAlign: "right" } }}
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
-          var value = e.target.value ? parseInt(e.target.value, 10) : '0';
-          var returnQty = Number(params.getValue(params.id, 'actualQty'));
+          var value = e.target.value ? parseInt(e.target.value, 10) : "0";
+          var returnQty = Number(params.getValue(params.id, "actualQty"));
           if (returnQty === 0) value = chkReturnQty(value);
           if (value < 0) value = 0;
           params.api.updateRows([{ ...params.row, actualQty: value }]);
         }}
-        disabled={params.getValue(params.id, 'isDisable') ? true : false}
-        autoComplete='off'
+        disabled={params.getValue(params.id, "isDisable") ? true : false}
+        autoComplete="off"
       />
     ),
   },
   {
-    field: 'toteCode',
-    headerName: 'เลข Tote/ลัง',
+    field: "toteCode",
+    headerName: "เลข Tote/ลัง",
     minWidth: 120,
-    headerAlign: 'center',
+    headerAlign: "center",
     flex: 0.45,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <TextField
-        variant='outlined'
-        name='txbToteCode'
-        inputProps={{ style: { textAlign: 'right' } }}
+        variant="outlined"
+        name="txbToteCode"
+        inputProps={{ style: { textAlign: "right" } }}
         value={params.value}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           params.api.updateRows([{ ...params.row, toteCode: e.target.value }]);
         }}
-        disabled={params.getValue(params.id, 'isDisable') ? true : false}
-        autoComplete='off'
-        error={isToteErrot(params.getValue(params.id, 'isToteError'))}
+        disabled={params.getValue(params.id, "isDisable") ? true : false}
+        autoComplete="off"
+        error={isToteErrot(params.getValue(params.id, "isToteError"))}
       />
     ),
   },
   {
-    field: 'boNo',
-    headerName: 'เลขที่ BO',
+    field: "boNo",
+    headerName: "เลขที่ BO",
     minWidth: 150,
     flex: 0.35,
-    headerAlign: 'center',
+    headerAlign: "center",
     disableColumnMenu: true,
     sortable: false,
   },
   {
-    field: 'delete',
-    headerName: ' ',
+    field: "delete",
+    headerName: " ",
     width: 50,
-    align: 'center',
+    align: "center",
     sortable: false,
     renderCell: (params) => {
-      var orderQty = Number(params.getValue(params.id, 'orderQty'));
-      if (params.getValue(params.id, 'edit') || orderQty <= 0) {
+      var orderQty = Number(params.getValue(params.id, "orderQty"));
+      if (params.getValue(params.id, "edit") || orderQty <= 0) {
         return (
           <div>
-            <DeleteForever fontSize='medium' sx={{ color: '#F54949' }} />
+            <DeleteForever fontSize="medium" sx={{ color: "#F54949" }} />
           </div>
         );
       } else {
@@ -167,7 +171,7 @@ const isToteErrot = (value: any) => {
 };
 const chkReturnQty = (value: any) => {
   let v = String(value);
-  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  if (v.substring(1) === "0") return Number(v.substring(0, 1));
   return value;
 };
 function useApiRef() {
@@ -175,7 +179,7 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '',
+        field: "",
         width: 0,
         sortable: false,
         renderCell: (params) => {
@@ -183,28 +187,39 @@ function useApiRef() {
           return null;
         },
       }),
-    [columns]
+    [columns],
   );
 
   return { apiRef, columns: _columns };
 }
 
-function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUpdateItemList }: Props) {
+function BranchTransferListItem({
+  skuCodeSelect,
+  skuNameSelect,
+  isClickSKU,
+  onUpdateItemList,
+}: Props) {
   const classes = useStyles();
-  const _ = require('lodash');
+  const _ = require("lodash");
   const { apiRef, columns } = useApiRef();
   const dispatch = useAppDispatch();
 
-  const errorList = useAppSelector((state) => state.branchTransferDetailSlice.errorLists);
-  const branchTransferRslList = useAppSelector((state) => state.branchTransferDetailSlice.branchTransferRs);
-  const branchTransferInfo: any = branchTransferRslList.data ? branchTransferRslList.data : null;
+  const errorList = useAppSelector(
+    (state) => state.branchTransferDetailSlice.errorLists,
+  );
+  const branchTransferRslList = useAppSelector(
+    (state) => state.branchTransferDetailSlice.branchTransferRs,
+  );
+  const branchTransferInfo: any = branchTransferRslList.data
+    ? branchTransferRslList.data
+    : null;
   const [branchTransferItems, setBranchTransferItems] = React.useState<Item[]>(
-    branchTransferInfo.items ? branchTransferInfo.items : []
+    branchTransferInfo.items ? branchTransferInfo.items : [],
   );
 
   const payloadAddItem = useAppSelector((state) => state.addItems.state);
   const [skuGroupItems, setskuGroupItems] = React.useState<ItemGroups[]>(
-    branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : []
+    branchTransferInfo.itemGroups ? branchTransferInfo.itemGroups : [],
   );
 
   const [isDisable, setIsDisable] = React.useState(false);
@@ -232,11 +247,13 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
         unitName: item.unitName,
         orderQty: item.orderQty ? item.orderQty : 0,
         actualQty: item.actualQty ? item.actualQty : 0,
-        toteCode: item.toteCode ? item.toteCode : '',
+        toteCode: item.toteCode ? item.toteCode : "",
         isDisable: isDisable,
         boNo: item.boNo,
         edit: item.edit ? item.edit : false,
-        isToteError: item.toteCode ? errorList.some((i: ErrorDetail) => i.toteCode == item.toteCode) : false,
+        isToteError: item.toteCode
+          ? errorList.some((i: ErrorDetail) => i.toteCode == item.toteCode)
+          : false,
       };
     });
 
@@ -253,7 +270,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
   }, [isClickSKU]);
 
   React.useEffect(() => {
-    const isCreate = branchTransferInfo.status === 'CREATED';
+    const isCreate = branchTransferInfo.status === "CREATED";
     setIsDisable(isGroupBranch() && isCreate ? false : true);
     setskuGroupItems(branchTransferInfo.itemGroups);
   }, []);
@@ -263,12 +280,16 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
     let _sku = [...skuGroupItems];
     if (Object.keys(_newItem).length !== 0) {
       _newItem.map((data: any, index: number) => {
-        const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
-          return item.barcode === data.barcode;
-        });
-        const dupSku: any = skuGroupItems.find((item: ItemGroups, index: number) => {
-          return item.skuCode === data.skuCode;
-        });
+        const dupItem: any = branchTransferItems.find(
+          (item: Item, index: number) => {
+            return item.barcode === data.barcode;
+          },
+        );
+        const dupSku: any = skuGroupItems.find(
+          (item: ItemGroups, index: number) => {
+            return item.skuCode === data.skuCode;
+          },
+        );
 
         if (dupSku) {
           const newData: ItemGroups = {
@@ -324,7 +345,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
             unitName: data.unitName,
             orderQty: data.orderQty ? data.orderQty : 0,
             actualQty: data.qty,
-            toteCode: '',
+            toteCode: "",
             isDisable: isDisable,
             edit: true,
           };
@@ -332,8 +353,12 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
         }
       });
     }
-    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    return onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    setBranchTransferItems(
+      _.orderBy(_items, ["skuCode", "barFactor"], ["asc", "asc"]),
+    );
+    return onUpdateItemList(
+      _.orderBy(_items, ["skuCode", "barFactor"], ["asc", "asc"]),
+    );
   };
 
   const storeItem = async () => {
@@ -343,9 +368,11 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
 
     const rowsEdit: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
     rowsEdit.forEach((dataRow: GridRowData) => {
-      const dupItem: any = branchTransferItems.find((item: Item, index: number) => {
-        return item.barcode === dataRow.barcode;
-      });
+      const dupItem: any = branchTransferItems.find(
+        (item: Item, index: number) => {
+          return item.barcode === dataRow.barcode;
+        },
+      );
 
       if (dupItem) {
         let _toteCode: string = dataRow.toteCode;
@@ -380,7 +407,11 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
         })
         .reduce((sum, dataItem: Item) => {
           return (
-            sum + Number((dataItem.actualQty ? dataItem.actualQty : 0) * (dataItem.barFactor ? dataItem.barFactor : 0))
+            sum +
+            Number(
+              (dataItem.actualQty ? dataItem.actualQty : 0) *
+                (dataItem.barFactor ? dataItem.barFactor : 0),
+            )
           );
         }, 0);
 
@@ -393,8 +424,12 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
       };
       _newSku.push(newData);
     });
-    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    return onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    setBranchTransferItems(
+      _.orderBy(_items, ["skuCode", "barFactor"], ["asc", "asc"]),
+    );
+    return onUpdateItemList(
+      _.orderBy(_items, ["skuCode", "barFactor"], ["asc", "asc"]),
+    );
   };
 
   const deleteItem = async () => {
@@ -403,17 +438,21 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
     _.remove(_items, function (item: Item) {
       return item.barcode === itemDelete.barcode;
     });
-    setBranchTransferItems(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
-    return onUpdateItemList(_.orderBy(_items, ['skuCode', 'barFactor'], ['asc', 'asc']));
+    setBranchTransferItems(
+      _.orderBy(_items, ["skuCode", "barFactor"], ["asc", "asc"]),
+    );
+    return onUpdateItemList(
+      _.orderBy(_items, ["skuCode", "barFactor"], ["asc", "asc"]),
+    );
   };
 
   let newColumns = [...columns];
-  if (branchTransferInfo.status != 'CREATED') {
-    newColumns[7]['hide'] = false;
-    newColumns[8]['hide'] = true;
+  if (branchTransferInfo.status != "CREATED") {
+    newColumns[7]["hide"] = false;
+    newColumns[8]["hide"] = true;
   } else {
-    newColumns[7]['hide'] = true;
-    newColumns[8]['hide'] = false;
+    newColumns[7]["hide"] = true;
+    newColumns[8]["hide"] = false;
   }
 
   const handleOnFocusOut = async (params: GridEditCellValueParams) => {
@@ -421,7 +460,7 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
   };
 
   const handleOnCellOut = (params: GridCellParams) => {
-    if (params.field === 'actualQty' || params.field === 'toteCode') {
+    if (params.field === "actualQty" || params.field === "toteCode") {
       storeItem();
     }
   };
@@ -431,23 +470,24 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
 
     if (ischeck) {
       setIschecked(true);
-      skuCodeSelect = '';
+      skuCodeSelect = "";
     } else {
       setIschecked(false);
     }
   };
 
   const [itemDelete, setItemDelete] = React.useState<Item>({
-    barcode: '',
-    barcodeName: '',
+    barcode: "",
+    barcodeName: "",
   });
-  const [openModalDeleteConfirm, setOpenModalDeleteConfirm] = React.useState(false);
+  const [openModalDeleteConfirm, setOpenModalDeleteConfirm] =
+    React.useState(false);
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
     const isEdit = params.row.edit;
     const orderQty = params.row.orderqty;
 
-    if (value === 'delete' && (isEdit || orderQty <= 0)) {
+    if (value === "delete" && (isEdit || orderQty <= 0)) {
       const _item: Item = {
         barcode: params.row.barcode,
         barcodeName: params.row.barcodeName,
@@ -466,19 +506,23 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
 
   return (
     <React.Fragment>
-      <Box mt={2} bgcolor='background.paper'>
-        <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+      <Box mt={2} bgcolor="background.paper">
+        <div
+          style={{ width: "100%", height: rows.length >= 8 ? "70vh" : "auto" }}
+          className={classes.MdataGridDetail}
+        >
           <Box mt={3}>
             <Typography>
-              รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuNameSelect} (${skuCodeSelect})`}
+              รายการสินค้า: {isChecked && "รายการสินค้าทั้งหมด"}{" "}
+              {!isChecked && `${skuNameSelect} (${skuCodeSelect})`}
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
+          <Box sx={{ display: "flex", alignItems: "center" }} mt={1}>
             <FormGroup>
               <FormControlLabel
                 control={<Checkbox />}
                 checked={isChecked}
-                label='รายการสินค้าทั้งหมด'
+                label="รายการสินค้าทั้งหมด"
                 onChange={handleCheckboxChange}
               />
             </FormGroup>
@@ -500,7 +544,11 @@ function BranchTransferListItem({ skuCodeSelect, skuNameSelect, isClickSKU, onUp
             columnBuffer={10}
           />
         </div>
-        <ModalDeleteItem open={openModalDeleteConfirm} itemInfo={itemDelete} onClose={handleDeleteIterm} />
+        <ModalDeleteItem
+          open={openModalDeleteConfirm}
+          itemInfo={itemDelete}
+          onClose={handleDeleteIterm}
+        />
       </Box>
     </React.Fragment>
   );

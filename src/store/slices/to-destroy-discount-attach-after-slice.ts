@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type UploadFileState = {
   state: any;
@@ -9,7 +9,7 @@ const initialState: UploadFileState = {
 };
 
 export const toDestroyDiscountAttachAfterSlice = createSlice({
-  name: 'toDestroyDiscountAttachAfterSlice',
+  name: "toDestroyDiscountAttachAfterSlice",
   initialState,
   reducers: {
     uploadFileAfterState: (state, action: PayloadAction<any>) => {
@@ -21,6 +21,7 @@ export const toDestroyDiscountAttachAfterSlice = createSlice({
   },
 });
 
-export const { uploadFileAfterState, clearUploadFileState } = toDestroyDiscountAttachAfterSlice.actions;
+export const { uploadFileAfterState, clearUploadFileState } =
+  toDestroyDiscountAttachAfterSlice.actions;
 
 export default toDestroyDiscountAttachAfterSlice.reducer;

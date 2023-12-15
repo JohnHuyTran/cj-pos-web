@@ -1,8 +1,8 @@
-import React, { ReactElement, useEffect } from 'react';
-import { Step, StepLabel, Stepper } from '@mui/material';
-import { Box } from '@mui/system';
-import { useStyles } from '../../../styles/makeTheme';
-import { expenseStatusList, STATUS } from '../../../utils/enum/accounting-enum';
+import React, { ReactElement, useEffect } from "react";
+import { Step, StepLabel, Stepper } from "@mui/material";
+import { Box } from "@mui/system";
+import { useStyles } from "../../../styles/makeTheme";
+import { expenseStatusList, STATUS } from "../../../utils/enum/accounting-enum";
 
 interface Props {
   status: string;
@@ -18,29 +18,29 @@ function Steppers({ status }: Props): ReactElement {
     expenseStatusList.map((item: any, index: number) => {
       if (item.stepperGrp === 1 && item.key === status) {
         if (status === STATUS.DRAFT) {
-          stepsList.push('บันทึก');
+          stepsList.push("บันทึก");
         } else {
           stepsList.push(`บันทึก: ${item.text}`);
         }
 
-        stepsList.push('สาขา');
-        stepsList.push('บัญชี');
-        stepsList.push('อนุมัติ');
+        stepsList.push("สาขา");
+        stepsList.push("บัญชี");
+        stepsList.push("อนุมัติ");
       } else if (item.stepperGrp === 2 && item.key === status) {
-        stepsList.push('บันทึก');
+        stepsList.push("บันทึก");
         stepsList.push(`สาขา: ${item.text}`);
-        stepsList.push('บัญชี');
-        stepsList.push('อนุมัติ');
+        stepsList.push("บัญชี");
+        stepsList.push("อนุมัติ");
       } else if (item.stepperGrp === 3 && item.key === status) {
-        stepsList.push('บันทึก');
+        stepsList.push("บันทึก");
         stepsList.push(`สาขา`);
         stepsList.push(`บัญชี: ${item.text}`);
-        stepsList.push('อนุมัติ');
+        stepsList.push("อนุมัติ");
       } else if (item.stepperGrp === 4 && item.key === status) {
-        stepsList.push('บันทึก');
+        stepsList.push("บันทึก");
         stepsList.push(`สาขา`);
-        stepsList.push('บัญชี');
-        stepsList.push('อนุมัติ');
+        stepsList.push("บัญชี");
+        stepsList.push("อนุมัติ");
       }
 
       //setSteps
@@ -61,7 +61,7 @@ function Steppers({ status }: Props): ReactElement {
 
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>
-      <Box sx={{ width: '50%', margin: 'auto', marginTop: '-1em' }}>
+      <Box sx={{ width: "50%", margin: "auto", marginTop: "-1em" }}>
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((label) => (
             <Step key={label}>

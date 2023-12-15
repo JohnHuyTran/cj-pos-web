@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TransferOutSearchRequest } from '../../models/transfer-out-model';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { TransferOutSearchRequest } from "../../models/transfer-out-model";
 
 type State = {
   searchCriteria: TransferOutSearchRequest;
@@ -7,18 +7,18 @@ type State = {
 
 const initialState: State = {
   searchCriteria: {
-    perPage: '10',
-    page: '1',
-    query: '',
-    branch: '',
-    status: '',
-    startDate: '',
-    endDate: '',
+    perPage: "10",
+    page: "1",
+    query: "",
+    branch: "",
+    status: "",
+    startDate: "",
+    endDate: "",
   },
 };
 
 const transferOutCriteriaSearchSlice = createSlice({
-  name: 'transferOutCriteriaSearchSlice',
+  name: "transferOutCriteriaSearchSlice",
   initialState,
   reducers: {
     saveSearchCriteriaTO: (state, action: PayloadAction<any>) => {

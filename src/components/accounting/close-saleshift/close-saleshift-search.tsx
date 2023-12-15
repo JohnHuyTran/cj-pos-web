@@ -1,92 +1,119 @@
-import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
-import React from 'react';
-import store, { useAppDispatch, useAppSelector } from '../../../store/store';
-import { useStyles } from '../../../styles/makeTheme';
-import BranchListDropDown from '../../commons/ui/branch-list-dropdown';
-import DatePickerAllComponent from '../../commons/ui/date-picker-all';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import UpdateIcon from '@mui/icons-material/Update';
-import { getUserInfo } from '../../../store/sessionStore';
-import { getBranchName, stringNullOrEmpty } from '../../../utils/utils';
-import { env } from '../../../adapters/environmentConfigs';
-import { BranchListOptionType } from '../../../models/branch-model';
-import { isAllowActionPermission, isGroupBranch } from '../../../utils/role-permission';
-import { closeSaleShift, CLOSE_SALE_SHIFT_ENUM, bypassStatusReq } from '../../../utils/enum/accounting-enum';
-import CloseSaleShiftSearchList from './close-saleshift-list';
-import LoadingModal from '../../commons/ui/loading-modal';
-import AlertError from '../../commons/ui/alert-error';
-import { SearchOff } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
+import React from "react";
+import store, { useAppDispatch, useAppSelector } from "../../../store/store";
+import { useStyles } from "../../../styles/makeTheme";
+import BranchListDropDown from "../../commons/ui/branch-list-dropdown";
+import DatePickerAllComponent from "../../commons/ui/date-picker-all";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import UpdateIcon from "@mui/icons-material/Update";
+import { getUserInfo } from "../../../store/sessionStore";
+import { getBranchName, stringNullOrEmpty } from "../../../utils/utils";
+import { env } from "../../../adapters/environmentConfigs";
+import { BranchListOptionType } from "../../../models/branch-model";
+import {
+  isAllowActionPermission,
+  isGroupBranch,
+} from "../../../utils/role-permission";
+import {
+  closeSaleShift,
+  CLOSE_SALE_SHIFT_ENUM,
+  bypassStatusReq,
+} from "../../../utils/enum/accounting-enum";
+import CloseSaleShiftSearchList from "./close-saleshift-list";
+import LoadingModal from "../../commons/ui/loading-modal";
+import AlertError from "../../commons/ui/alert-error";
+import { SearchOff } from "@mui/icons-material";
 import {
   clearCloseSaleShiftList,
   featchCloseSaleShiptListAsync,
   savePayloadSearch,
-} from '../../../store/slices/accounting/close-saleshift-slice';
-import { CloseSaleShiftInfo, CloseSaleShiftRequest } from '../../../models/branch-accounting-model';
-import moment from 'moment';
-import ModalCloseSale from './modal-close-sale';
-import { shiftClose, shiftCloseCheckInfo } from '../../../services/accounting';
-import { ApiError } from '../../../models/api-error-model';
-import { ACTIONS } from 'utils/enum/permission-enum';
-import ModalDetailCash from '../open-end/modal-detail-cash';
-import { featchOpenEndDeatilAsync } from 'store/slices/accounting/open-end/open-end-slice';
-import ModalByPassByBranch from './modal-bypass-branch';
-import { useTranslation } from 'react-i18next';
+} from "../../../store/slices/accounting/close-saleshift-slice";
+import {
+  CloseSaleShiftInfo,
+  CloseSaleShiftRequest,
+} from "../../../models/branch-accounting-model";
+import moment from "moment";
+import ModalCloseSale from "./modal-close-sale";
+import { shiftClose, shiftCloseCheckInfo } from "../../../services/accounting";
+import { ApiError } from "../../../models/api-error-model";
+import { ACTIONS } from "utils/enum/permission-enum";
+import ModalDetailCash from "../open-end/modal-detail-cash";
+import { featchOpenEndDeatilAsync } from "store/slices/accounting/open-end/open-end-slice";
+import ModalByPassByBranch from "./modal-bypass-branch";
+import { useTranslation } from "react-i18next";
 
 function CloseSaleShiftSearch() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation(['expense', 'common']);
+  const { t } = useTranslation(["expense", "common"]);
   const page = 1;
-  const items = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift);
-  const limit = useAppSelector((state) => state.closeSaleShiftSlice.closeSaleShift.perPage);
+  const items = useAppSelector(
+    (state) => state.closeSaleShiftSlice.closeSaleShift,
+  );
+  const limit = useAppSelector(
+    (state) => state.closeSaleShiftSlice.closeSaleShift.perPage,
+  );
   const [startDate, setStartDate] = React.useState<Date | null>(new Date());
   const handleStartDatePicker = (value: any) => {
     setStartDate(value);
     setIsPickerDateError(false);
-    setPickerDateErrorMsg('');
+    setPickerDateErrorMsg("");
   };
   const [values, setValues] = React.useState({
-    status: 'ALL',
-    branchFrom: '',
-    bypassStatus: 'ALL',
+    status: "ALL",
+    branchFrom: "",
+    bypassStatus: "ALL",
   });
-  const branchList = useAppSelector((state) => state.searchBranchSlice).branchList.data;
+  const branchList = useAppSelector((state) => state.searchBranchSlice)
+    .branchList.data;
   const [groupBranch, setGroupBranch] = React.useState(isGroupBranch);
-  const [branchFromCode, setBranchFromCode] = React.useState('');
-  const [clearBranchDropDown, setClearBranchDropDown] = React.useState<boolean>(false);
+  const [branchFromCode, setBranchFromCode] = React.useState("");
+  const [clearBranchDropDown, setClearBranchDropDown] =
+    React.useState<boolean>(false);
   const [ownBranch, setOwnBranch] = React.useState(
     getUserInfo().branch
       ? getBranchName(branchList, getUserInfo().branch)
         ? getUserInfo().branch
         : env.branch.code
-      : env.branch.code
+      : env.branch.code,
   );
 
   const branchFrom = getBranchName(branchList, ownBranch);
   const branchFromMap: BranchListOptionType = {
     code: ownBranch,
-    name: branchFrom ? branchFrom : '',
+    name: branchFrom ? branchFrom : "",
   };
-  const [valuebranchFrom, setValuebranchFrom] = React.useState<BranchListOptionType | null>(
-    groupBranch ? branchFromMap : null
-  );
+  const [valuebranchFrom, setValuebranchFrom] =
+    React.useState<BranchListOptionType | null>(
+      groupBranch ? branchFromMap : null,
+    );
   const [flagSearch, setFlagSearch] = React.useState(false);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<{ open: boolean }>({
+  const [openLoadingModal, setOpenLoadingModal] = React.useState<{
+    open: boolean;
+  }>({
     open: false,
   });
   const handleOpenLoading = (prop: any, event: boolean) => {
     setOpenLoadingModal({ ...openLoadingModal, [prop]: event });
   };
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
+  const [textError, setTextError] = React.useState("");
 
   const [disableCloseShiftKey, setDisableCloseShiftKey] = React.useState(true);
   const [disableBtnBypass, setDisableBtnBypass] = React.useState(true);
   const [openModalCloseSale, setOpenModalCloseSale] = React.useState(false);
-  const [docNo, setDocNo] = React.useState('');
-  const [noOfShiftKey, setNoOfShiftKey] = React.useState('');
+  const [docNo, setDocNo] = React.useState("");
+  const [noOfShiftKey, setNoOfShiftKey] = React.useState("");
   const [isPickerDateError, setIsPickerDateError] = React.useState(false);
-  const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState('');
+  const [pickerDateErrorMsg, setPickerDateErrorMsg] = React.useState("");
   const [disableBtnSearch, setDisableBtnSearch] = React.useState(true);
   const [disableBtnManage, setDisableBtnManage] = React.useState(true);
   const [modalBypass, setModalByPass] = React.useState(false);
@@ -99,12 +126,14 @@ function CloseSaleShiftSearch() {
       setBranchFromCode(branchCode);
       setValues({ ...values, branchFrom: JSON.parse(codes) });
     } else {
-      setValues({ ...values, branchFrom: '' });
+      setValues({ ...values, branchFrom: "" });
     }
   };
 
   const checkSaleShipInfo = async () => {
-    await shiftCloseCheckInfo({ shiftDate: moment(startDate).endOf('day').toISOString() })
+    await shiftCloseCheckInfo({
+      shiftDate: moment(startDate).endOf("day").toISOString(),
+    })
       .then(async (value) => {
         if (value.data) {
           setDisableCloseShiftKey(!value.data.canProceedEnd);
@@ -120,7 +149,7 @@ function CloseSaleShiftSearch() {
   };
 
   const onClickSearch = async () => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     if (groupBranch) {
       setDisableCloseShiftKey(true);
       checkSaleShipInfo();
@@ -133,7 +162,7 @@ function CloseSaleShiftSearch() {
         limits = limit;
       }
       const payload: CloseSaleShiftRequest = {
-        shiftDate: moment(startDate).endOf('day').toISOString(),
+        shiftDate: moment(startDate).endOf("day").toISOString(),
         branchCode: branchFromCode,
         status: values.status,
         bypassStatus: values.bypassStatus,
@@ -144,7 +173,8 @@ function CloseSaleShiftSearch() {
       await dispatch(featchCloseSaleShiptListAsync(payload));
       await dispatch(savePayloadSearch(payload));
       const datas = store.getState().closeSaleShiftSlice.closeSaleShift.data;
-      const _noOfShiftKey = store.getState().closeSaleShiftSlice.closeSaleShift.total;
+      const _noOfShiftKey =
+        store.getState().closeSaleShiftSlice.closeSaleShift.total;
       if (datas && datas.length > 0) {
         setNoOfShiftKey(_noOfShiftKey.toString());
       }
@@ -152,44 +182,45 @@ function CloseSaleShiftSearch() {
       setFlagSearch(true);
     } else {
       setIsPickerDateError(true);
-      setPickerDateErrorMsg('กรุณาเลือกวันที่ยอดขาย');
+      setPickerDateErrorMsg("กรุณาเลือกวันที่ยอดขาย");
     }
 
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
   const onClickClearBtn = async () => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     if (!isGroupBranch()) {
       setStartDate(null);
-      setBranchFromCode('');
+      setBranchFromCode("");
       setValues({
         ...values,
         status: CLOSE_SALE_SHIFT_ENUM.CORRECT,
-        branchFrom: '',
+        branchFrom: "",
         bypassStatus: CLOSE_SALE_SHIFT_ENUM.PENDING_REVIEW,
       });
     } else {
-      setValues({ ...values, status: 'ALL', bypassStatus: 'ALL' });
+      setValues({ ...values, status: "ALL", bypassStatus: "ALL" });
     }
 
     setClearBranchDropDown(!clearBranchDropDown);
     setIsPickerDateError(false);
-    setPickerDateErrorMsg('');
+    setPickerDateErrorMsg("");
     dispatch(clearCloseSaleShiftList({}));
     setTimeout(() => {
       setFlagSearch(false);
-      handleOpenLoading('open', false);
+      handleOpenLoading("open", false);
     }, 300);
   };
   const handleOpenCloseSale = async () => {
-    handleOpenLoading('open', true);
+    handleOpenLoading("open", true);
     const payload: CloseSaleShiftRequest = {
-      shiftDate: moment(new Date()).endOf('day').toISOString(),
+      shiftDate: moment(new Date()).endOf("day").toISOString(),
     };
     await shiftClose(payload)
       .then(async (value) => {
         setDocNo(value.docNo);
-        const payloadSearch = store.getState().closeSaleShiftSlice.payloadSearch;
+        const payloadSearch =
+          store.getState().closeSaleShiftSlice.payloadSearch;
         await dispatch(featchCloseSaleShiptListAsync(payloadSearch));
         setOpenModalCloseSale(true);
       })
@@ -198,7 +229,7 @@ function CloseSaleShiftSearch() {
         setTextError(error.message);
       });
 
-    handleOpenLoading('open', false);
+    handleOpenLoading("open", false);
   };
   const handleOnBypass = () => {
     setModalByPass(true);
@@ -227,7 +258,7 @@ function CloseSaleShiftSearch() {
   React.useEffect(() => {
     if (groupBranch) {
       const payload: CloseSaleShiftRequest = {
-        shiftDate: moment(startDate).endOf('day').toISOString(),
+        shiftDate: moment(startDate).endOf("day").toISOString(),
         branchCode: branchFromCode,
         status: values.status,
         bypassStatus: values.bypassStatus,
@@ -270,9 +301,9 @@ function CloseSaleShiftSearch() {
                 value={values.status}
                 onChange={handleChange}
                 disabled={true}
-                inputProps={{ 'aria-label': 'Without label' }}
+                inputProps={{ "aria-label": "Without label" }}
               >
-                <MenuItem value={'ALL'} selected={true}>
+                <MenuItem value={"ALL"} selected={true}>
                   ทั้งหมด
                 </MenuItem>
                 {closeSaleShift.map((item: any, index: number) => {
@@ -294,10 +325,10 @@ function CloseSaleShiftSearch() {
                 value={values.bypassStatus}
                 onChange={handleChange}
                 disabled={groupBranch}
-                inputProps={{ 'aria-label': 'Without label' }}
+                inputProps={{ "aria-label": "Without label" }}
               >
                 {groupBranch && (
-                  <MenuItem value={'ALL'} selected={true}>
+                  <MenuItem value={"ALL"} selected={true}>
                     ทั้งหมด
                   </MenuItem>
                 )}
@@ -334,7 +365,7 @@ function CloseSaleShiftSearch() {
               color="primary"
               startIcon={<UpdateIcon />}
               onClick={handleOnupdate}
-              sx={{ minWidth: 100, display: disableBtnManage ? 'none' : '' }}
+              sx={{ minWidth: 100, display: disableBtnManage ? "none" : "" }}
               disabled={true}
               className={classes.MbtnSearch}
             >
@@ -346,7 +377,11 @@ function CloseSaleShiftSearch() {
               variant="contained"
               color="primary"
               onClick={handleOnBypass}
-              sx={{ ml: 2, minWidth: 100, display: disableBtnManage ? 'none' : '' }}
+              sx={{
+                ml: 2,
+                minWidth: 100,
+                display: disableBtnManage ? "none" : "",
+              }}
               className={classes.MbtnSearch}
               startIcon={<ArrowBackIcon />}
               disabled={disableBtnBypass}
@@ -354,13 +389,13 @@ function CloseSaleShiftSearch() {
               Bypass
             </Button>
           </Grid>
-          <Grid item xs={7} sx={{ textAlign: 'end' }}>
+          <Grid item xs={7} sx={{ textAlign: "end" }}>
             <Button
               data-testid="testid-btnCreateStockTransferModal"
               id="btnCreateStockTransferModal"
               variant="contained"
               onClick={handleOpenCloseSale}
-              sx={{ width: 150, display: disableBtnManage ? 'none' : '' }}
+              sx={{ width: 150, display: disableBtnManage ? "none" : "" }}
               className={classes.MbtnClear}
               color="secondary"
               disabled={disableCloseShiftKey}
@@ -384,7 +419,11 @@ function CloseSaleShiftSearch() {
               variant="contained"
               color="primary"
               onClick={onClickSearch}
-              sx={{ width: 110, ml: 2, display: disableBtnSearch ? 'none' : '' }}
+              sx={{
+                width: 110,
+                ml: 2,
+                display: disableBtnSearch ? "none" : "",
+              }}
               className={classes.MbtnSearch}
             >
               ค้นหา
@@ -403,7 +442,11 @@ function CloseSaleShiftSearch() {
         </Grid>
       )}
       <LoadingModal open={openLoadingModal.open} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+      />
       <ModalCloseSale
         open={openModalCloseSale}
         onClose={async () => {

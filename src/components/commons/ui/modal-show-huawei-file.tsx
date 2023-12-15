@@ -1,14 +1,14 @@
-import { Dialog, Button, DialogContent } from '@mui/material';
-import React, { ReactElement } from 'react';
-import { useState } from 'react';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
-import throttle from 'lodash.throttle';
-import { useReactToPrint } from 'react-to-print';
-import AlertError from './alert-error';
-import { HighlightOff } from '@mui/icons-material';
+import { Dialog, Button, DialogContent } from "@mui/material";
+import React, { ReactElement } from "react";
+import { useState } from "react";
+import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import throttle from "lodash.throttle";
+import { useReactToPrint } from "react-to-print";
+import AlertError from "./alert-error";
+import { HighlightOff } from "@mui/icons-material";
 
 interface ModalShowHuaweiFilerop {
   open: boolean;
@@ -35,26 +35,28 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
       {onClose ? (
         <IconButton
-          aria-label='close'
+          aria-label="close"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}>
-          <HighlightOff fontSize='large' />
+          }}
+        >
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
 
       {onPrint ? (
         <Button
-          id='btnPrint'
-          data-testid='btn-print'
-          variant='contained'
-          color='secondary'
+          id="btnPrint"
+          data-testid="btn-print"
+          variant="contained"
+          color="secondary"
           onClick={onPrint}
-          endIcon={<LocalPrintshopOutlinedIcon />}>
+          endIcon={<LocalPrintshopOutlinedIcon />}
+        >
           พิมพ์
         </Button>
       ) : null}
@@ -108,19 +110,21 @@ export default function ModalShowHuaweiFile({
     if (!initialPageSize) {
       if (pdfWrapper && pdfWrapper.current) {
         setStyle(
-          `${pdfWrapper.current.getBoundingClientRect().width}px ${pdfWrapper.current.getBoundingClientRect().height}px`
+          `${pdfWrapper.current.getBoundingClientRect().width}px ${
+            pdfWrapper.current.getBoundingClientRect().height
+          }px`,
         );
       } else {
-        setStyle('A4 landscape');
+        setStyle("A4 landscape");
       }
     }
     setInitialPageSize(true);
   };
 
   const setStyle = (cssPageSize: string) => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.innerHTML = `@page {size: ${cssPageSize}}`;
-    style.id = 'page-orientation';
+    style.id = "page-orientation";
     document.head.appendChild(style);
   };
 
@@ -138,20 +142,39 @@ export default function ModalShowHuaweiFile({
     <div>
       <Dialog open={open} maxWidth={false}>
         {isPrint !== false && (
-          <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose} onPrint={showPrint} />
+          <BootstrapDialogTitle
+            id="customized-dialog-title"
+            onClose={handleClose}
+            onPrint={showPrint}
+          />
         )}
 
-        {isPrint === false && <BootstrapDialogTitle id='customized-dialog-title' onClose={handleClose} />}
+        {isPrint === false && (
+          <BootstrapDialogTitle
+            id="customized-dialog-title"
+            onClose={handleClose}
+          />
+        )}
 
         <DialogContent
           sx={{
             minWidth: 600,
             minHeight: 600,
-            textAlign: 'center',
-          }}>
+            textAlign: "center",
+          }}
+        >
           {!isImage && (
-            <div id='pdfWrapper' style={{ width: '80vw' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-document'>
-              <Document file={{ url }} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadFail}>
+            <div
+              id="pdfWrapper"
+              style={{ width: "80vw" }}
+              ref={pdfWrapper}
+              data-testid="testid-pdfWrapper-document"
+            >
+              <Document
+                file={{ url }}
+                onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={onDocumentLoadFail}
+              >
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
                     onLoadSuccess={onSourceSuccess}
@@ -165,14 +188,29 @@ export default function ModalShowHuaweiFile({
           )}
 
           {isImage && (
-            <div id='pdfWrapper' style={{ minWidth: '200px' }} ref={pdfWrapper} data-testid='testid-pdfWrapper-image'>
-              <img src={url} style={{ width: '-webkit-fill-available', height: '-webkit-fill-available' }} />
+            <div
+              id="pdfWrapper"
+              style={{ minWidth: "200px" }}
+              ref={pdfWrapper}
+              data-testid="testid-pdfWrapper-image"
+            >
+              <img
+                src={url}
+                style={{
+                  width: "-webkit-fill-available",
+                  height: "-webkit-fill-available",
+                }}
+              />
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError='Failed to load PDF' />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError="Failed to load PDF"
+      />
     </div>
   );
 }

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { ReactElement } from 'react';
-import Box from '@mui/material/Box';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import { useStyles } from '../../styles/makeTheme';
+import * as React from "react";
+import { ReactElement } from "react";
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import { useStyles } from "../../styles/makeTheme";
 import { TOStatus } from "../../utils/enum/common-enum";
 
 interface Props {
@@ -15,9 +15,9 @@ interface Props {
 const steps = [TOStatus.DRAFT, TOStatus.APPROVED];
 
 export default function StepperBarToDestroyDiscount({
-                                                      activeStep,
-                                                      setActiveStep,
-                                                    }: Props): ReactElement {
+  activeStep,
+  setActiveStep,
+}: Props): ReactElement {
   const [rejected, setRejected] = React.useState<boolean>(false);
   const [activeStepBar, setActiveStepBar] = React.useState(0);
 
@@ -33,21 +33,21 @@ export default function StepperBarToDestroyDiscount({
   const classes = useStyles();
   return (
     <div className={classes.MStepper} style={{ paddingBottom: 5 }}>
-      <Box sx={{ width: '20%', margin: 'auto', marginTop: '-1em'}}>
+      <Box sx={{ width: "20%", margin: "auto", marginTop: "-1em" }}>
         <Stepper activeStep={activeStepBar} alternativeLabel>
           {steps.map((status, index) => {
             const labelProps: any = {};
-            let label: string = '';
+            let label: string = "";
             switch (index) {
               case 0:
-                label = 'บันทึก';
+                label = "บันทึก";
                 break;
               case 1:
-                label = 'อนุมัติ';
+                label = "อนุมัติ";
                 break;
             }
             if (index === 1 && rejected) {
-              label = 'ไม่อนุมัติ';
+              label = "ไม่อนุมัติ";
               labelProps.error = true;
             }
             return (

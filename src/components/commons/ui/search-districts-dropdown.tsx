@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import TextField from '@mui/material/TextField';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { CircularProgress, InputAdornment } from '@mui/material';
-import { useStyles } from '../../../styles/makeTheme';
-import { useAppSelector, useAppDispatch } from '../../../store/store';
-import SearchIcon from '@mui/icons-material/Search';
-import { featchDistrictsListAsync } from '../../../store/slices/master/search-districts-slice';
+import React, { useEffect } from "react";
+import TextField from "@mui/material/TextField";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import { CircularProgress, InputAdornment } from "@mui/material";
+import { useStyles } from "../../../styles/makeTheme";
+import { useAppSelector, useAppDispatch } from "../../../store/store";
+import SearchIcon from "@mui/icons-material/Search";
+import { featchDistrictsListAsync } from "../../../store/slices/master/search-districts-slice";
 
 interface Props {
   valueDistricts: string;
@@ -28,26 +28,28 @@ function DistrictsDropDown({
   const dispatch = useAppDispatch();
   const [values, setValues] = React.useState<string[]>([]);
   const [flagSearchDistricts, setFlagSearchDistricts] = React.useState(false);
-  const districtsList = useAppSelector((state) => state.searchDistrictsSlice.districtsList);
+  const districtsList = useAppSelector(
+    (state) => state.searchDistrictsSlice.districtsList,
+  );
 
   let payload: any = {
-    code: '',
-    name: '',
-    provinceCode: '',
+    code: "",
+    name: "",
+    provinceCode: "",
   };
 
   useEffect(() => {
     // console.log('isClear districts :', isClear);
     if (isClear) setValues([]);
 
-    if (provinceCode !== '') {
+    if (provinceCode !== "") {
       payload = {
         provinceCode: provinceCode,
       };
       searchDistricts(payload);
     }
 
-    if (searchDistrictsCode !== '') {
+    if (searchDistrictsCode !== "") {
       payload = {
         code: searchDistrictsCode,
       };
@@ -55,7 +57,9 @@ function DistrictsDropDown({
     }
 
     if (valueDistricts) {
-      const districtsFilter: any = districtsList.data.filter((r: any) => r.code === Number(valueDistricts));
+      const districtsFilter: any = districtsList.data.filter(
+        (r: any) => r.code === Number(valueDistricts),
+      );
       setValues(districtsFilter[0]);
     }
 
@@ -77,24 +81,27 @@ function DistrictsDropDown({
           ...params.InputProps,
           endAdornment: (
             <React.Fragment>
-              {loading ? <CircularProgress color='inherit' size={20} /> : null}
+              {loading ? <CircularProgress color="inherit" size={20} /> : null}
               {/* {params.InputProps.endAdornment} */}
-              <InputAdornment position='start'>
+              <InputAdornment position="start">
                 <SearchIcon />
               </InputAdornment>
             </React.Fragment>
           ),
         }}
-        placeholder='กรุณากรอกเขต / อำเภอ'
+        placeholder="กรุณากรอกเขต / อำเภอ"
         className={classes.MtextFieldAutocomplete}
-        variant='outlined'
-        size='small'
+        variant="outlined"
+        size="small"
         fullWidth
       />
     );
   };
 
-  let options: any = districtsList && districtsList.data && districtsList.data.length > 0 ? districtsList.data : [];
+  let options: any =
+    districtsList && districtsList.data && districtsList.data.length > 0
+      ? districtsList.data
+      : [];
   const filterOptions = createFilterOptions({
     stringify: (option: any) => option.nameTH,
   });
@@ -108,15 +115,18 @@ function DistrictsDropDown({
   };
 
   const handleChangeItem = async (event: any, option: any, reason: string) => {
-    if (option && reason === 'selectOption') {
-      return onChangeDistricts(option?.code ? option?.code : '', option?.provinceCode ? option?.provinceCode : '');
+    if (option && reason === "selectOption") {
+      return onChangeDistricts(
+        option?.code ? option?.code : "",
+        option?.provinceCode ? option?.provinceCode : "",
+      );
     }
   };
 
   if (options !== undefined && values !== undefined) {
     if (options.length === 1 && values.length === 0 && !isClear) {
       setValues(options[0]);
-      handleChangeItem('', options[0], 'selectOption');
+      handleChangeItem("", options[0], "selectOption");
     }
   }
 
@@ -126,25 +136,25 @@ function DistrictsDropDown({
     }
 
     const keyword = value.trim();
-    if (keyword.length === 0 && reason !== 'reset') {
-      return onChangeDistricts('', '');
+    if (keyword.length === 0 && reason !== "reset") {
+      return onChangeDistricts("", "");
     }
   };
 
   return (
     <Autocomplete
-      id='selAddItem'
+      id="selAddItem"
       value={values}
       fullWidth
       freeSolo
-      loadingText='กำลังโหลด...'
+      loadingText="กำลังโหลด..."
       loading={loading}
       options={options}
       filterOptions={filterOptions}
       renderOption={autocompleteRenderListItem}
       onChange={handleChangeItem}
       onInputChange={onInputChange}
-      getOptionLabel={(option) => (option.nameTH ? option.nameTH : '')}
+      getOptionLabel={(option) => (option.nameTH ? option.nameTH : "")}
       isOptionEqualToValue={(option, value) => option.nameTH === value.nameTH}
       renderInput={autocompleteRenderInput}
       disabled={disable ? true : false}

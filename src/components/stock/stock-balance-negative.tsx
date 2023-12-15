@@ -1,73 +1,81 @@
-import { Box, Grid, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import React from 'react';
-import { OutstandingRequest, StockInfo } from '../../models/stock-model';
-import { useAppSelector, useAppDispatch } from '../../store/store';
-import { useStyles } from '../../styles/makeTheme';
-import { SearchOff } from '@mui/icons-material';
+import { Box, Grid, Typography } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import React from "react";
+import { OutstandingRequest, StockInfo } from "../../models/stock-model";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import { useStyles } from "../../styles/makeTheme";
+import { SearchOff } from "@mui/icons-material";
 import {
   featchStockBalanceNegativeSearchAsync,
   savePayloadSearchNegative,
-} from '../../store/slices/stock/stock-balance-negative-search-slice';
-import { numberWithCommas } from '../../utils/utils';
+} from "../../store/slices/stock/stock-balance-negative-search-slice";
+import { numberWithCommas } from "../../utils/utils";
 
 function StockBalance() {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const savePayLoadSearch = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.savePayloadSearch);
-  const items = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList);
-  const cuurentPage = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList.page);
-  const limit = useAppSelector((state) => state.stockBalanceNegativeSearchSlice.stockList.perPage);
+  const savePayLoadSearch = useAppSelector(
+    (state) => state.stockBalanceNegativeSearchSlice.savePayloadSearch,
+  );
+  const items = useAppSelector(
+    (state) => state.stockBalanceNegativeSearchSlice.stockList,
+  );
+  const cuurentPage = useAppSelector(
+    (state) => state.stockBalanceNegativeSearchSlice.stockList.page,
+  );
+  const limit = useAppSelector(
+    (state) => state.stockBalanceNegativeSearchSlice.stockList.perPage,
+  );
   const [pageSize, setPageSize] = React.useState(limit);
 
   const columns: GridColDef[] = [
     {
-      field: 'index',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'ลำดับ',
+      field: "index",
+      headerClassName: "columnHeaderTitle",
+      headerName: "ลำดับ",
       width: 70,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
       renderCell: (params) => (
-        <Box component='div' sx={{ paddingLeft: '20px' }}>
+        <Box component="div" sx={{ paddingLeft: "20px" }}>
           {params.value}
         </Box>
       ),
     },
     {
-      field: 'skuName',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'รายละเอียดสินค้า',
-      headerAlign: 'center',
+      field: "skuName",
+      headerClassName: "columnHeaderTitle",
+      headerName: "รายละเอียดสินค้า",
+      headerAlign: "center",
       // minWidth: 235,
       flex: 0.3,
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Typography variant='body2'>{params.value}</Typography>
-          <Typography variant='body2' color='textSecondary'>
-            {params.getValue(params.id, 'skuCode') || ''}
+          <Typography variant="body2">{params.value}</Typography>
+          <Typography variant="body2" color="textSecondary">
+            {params.getValue(params.id, "skuCode") || ""}
           </Typography>
         </div>
       ),
     },
     {
-      field: 'availableQty',
-      headerClassName: 'columnHeaderTitle-BG',
-      cellClassName: 'columnFilled-BG',
-      headerName: 'สินค้าคงเหลือ',
+      field: "availableQty",
+      headerClassName: "columnHeaderTitle-BG",
+      cellClassName: "columnFilled-BG",
+      headerName: "สินค้าคงเหลือ",
       minWidth: 125,
-      headerAlign: 'center',
-      align: 'right',
+      headerAlign: "center",
+      align: "right",
       sortable: false,
       renderCell: (params) => handleNumberWithCommas(params.value),
     },
     {
-      field: 'unitName',
-      headerClassName: 'columnHeaderTitle',
-      headerName: 'หน่วย',
+      field: "unitName",
+      headerClassName: "columnHeaderTitle",
+      headerName: "หน่วย",
       minWidth: 125,
-      headerAlign: 'center',
+      headerAlign: "center",
       sortable: false,
     },
   ];
@@ -85,7 +93,7 @@ function StockBalance() {
 
   const handleNumberWithCommas = (availableQty: any) => {
     return (
-      <Typography variant='body2' sx={{ color: '#F54949' }}>
+      <Typography variant="body2" sx={{ color: "#F54949" }}>
         {numberWithCommas(availableQty)}
       </Typography>
     );
@@ -106,7 +114,10 @@ function StockBalance() {
     setLoading(false);
   };
 
-  const handleSearchStockBalanceNegative = async (pageLimit: number, page: number) => {
+  const handleSearchStockBalanceNegative = async (
+    pageLimit: number,
+    page: number,
+  ) => {
     const payloadNewpage: OutstandingRequest = {
       limit: pageLimit,
       page: page,
@@ -122,21 +133,25 @@ function StockBalance() {
     <div>
       <Box
         mt={2}
-        bgcolor='background.paper'
+        bgcolor="background.paper"
         sx={{
-          '& .columnHeaderTitle-BG': {
-            backgroundColor: '#20AE79',
-            color: '#FFFFFF !important',
+          "& .columnHeaderTitle-BG": {
+            backgroundColor: "#20AE79",
+            color: "#FFFFFF !important",
           },
-          '& .columnHeaderTitle': {
-            color: '#20AE79 !important',
+          "& .columnHeaderTitle": {
+            color: "#20AE79 !important",
           },
-          '& .columnFilled-BG': {
-            backgroundColor: '#E7FFE9',
+          "& .columnFilled-BG": {
+            backgroundColor: "#E7FFE9",
           },
-        }}>
+        }}
+      >
         {items.data.length > 0 && (
-          <div className={classes.MdataGridPaginationTopStock} style={{ height: rows.length >= 10 ? '80vh' : 'auto' }}>
+          <div
+            className={classes.MdataGridPaginationTopStock}
+            style={{ height: rows.length >= 10 ? "80vh" : "auto" }}
+          >
             <DataGrid
               rows={rows}
               columns={columns}
@@ -148,7 +163,7 @@ function StockBalance() {
               pageSize={pageSize}
               rowsPerPageOptions={[10, 20, 50, 100]}
               rowCount={items.total}
-              paginationMode='server'
+              paginationMode="server"
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               loading={loading}
@@ -157,10 +172,10 @@ function StockBalance() {
           </div>
         )}
         {items.data.length === 0 && (
-          <Grid container xs={12} justifyContent='center'>
-            <Box color='#CBD4DB' justifyContent='center'>
+          <Grid container xs={12} justifyContent="center">
+            <Box color="#CBD4DB" justifyContent="center">
               <h2>
-                ไม่มีข้อมูล <SearchOff fontSize='large' />
+                ไม่มีข้อมูล <SearchOff fontSize="large" />
               </h2>
             </Box>
           </Grid>

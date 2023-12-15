@@ -1,12 +1,12 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import { ErrorOutline } from '@mui/icons-material';
-import { Typography } from '@mui/material';
+import * as React from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import { ErrorOutline } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
 interface Props {
   isOpen: boolean;
@@ -25,10 +25,10 @@ export default function ModalValidateImport(props: Props) {
         onClose={handleClose}
         aria-labelledby="alert-dialog-title-import-st"
         aria-describedby="alert-dialog-description-import-st"
-        PaperProps={{ sx: { width: '464px' } }}
+        PaperProps={{ sx: { width: "464px" } }}
       >
-        <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>
-          <ErrorOutline sx={{ color: '#F54949', fontSize: '3em' }} />
+        <DialogTitle id="alert-dialog-title" sx={{ textAlign: "center" }}>
+          <ErrorOutline sx={{ color: "#F54949", fontSize: "3em" }} />
           <Typography>{props.title}</Typography>
         </DialogTitle>
         <DialogContent>{props.children}</DialogContent>

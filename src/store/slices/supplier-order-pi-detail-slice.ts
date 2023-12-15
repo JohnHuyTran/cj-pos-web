@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
-import { PurchaseDetailResponse } from '../../models/supplier-check-order-model';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
+import { PurchaseDetailResponse } from "../../models/supplier-check-order-model";
 
 type State = {
   purchasePIDetail: PurchaseDetailResponse;
@@ -10,33 +10,36 @@ type State = {
 
 const initialState: State = {
   purchasePIDetail: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: [],
   },
-  error: '',
+  error: "",
 };
 
-export const featchSupplierOrderPIDetailAsync = createAsyncThunk('supplierOrderPIDetail', async (piDetail: any) => {
-  try {
-    const apiRootPath = `${environment.purchase.supplierOrder.detailPI.url}/${piDetail[0].supplierCode}/${piDetail[0].docNo}`;
-    let response: PurchaseDetailResponse = {
-      ref: '',
-      code: 0,
-      message: '',
-      data: [],
-    };
+export const featchSupplierOrderPIDetailAsync = createAsyncThunk(
+  "supplierOrderPIDetail",
+  async (piDetail: any) => {
+    try {
+      const apiRootPath = `${environment.purchase.supplierOrder.detailPI.url}/${piDetail[0].supplierCode}/${piDetail[0].docNo}`;
+      let response: PurchaseDetailResponse = {
+        ref: "",
+        code: 0,
+        message: "",
+        data: [],
+      };
 
-    response = await get(apiRootPath).then();
-    return response;
-  } catch (error) {
-    throw error;
-  }
-});
+      response = await get(apiRootPath).then();
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const supplierCheckOrderSlice = createSlice({
-  name: 'supplierOrderPIDetail',
+  name: "supplierOrderPIDetail",
   initialState,
   reducers: {
     clearDataFilter: (state) => initialState,
@@ -45,9 +48,12 @@ const supplierCheckOrderSlice = createSlice({
     builer.addCase(featchSupplierOrderPIDetailAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchSupplierOrderPIDetailAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.purchasePIDetail = action.payload;
-      }),
+      builer.addCase(
+        featchSupplierOrderPIDetailAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.purchasePIDetail = action.payload;
+        },
+      ),
       builer.addCase(featchSupplierOrderPIDetailAsync.rejected, () => {
         initialState;
       });

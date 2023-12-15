@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type UploadFileState = {
   state: any;
@@ -9,7 +9,7 @@ const initialState: UploadFileState = {
 };
 
 export const UploadFileSlice = createSlice({
-  name: 'uploadFileList',
+  name: "uploadFileList",
   initialState,
   reducers: {
     uploadFileState: (state, action: PayloadAction<any>) => {
@@ -21,6 +21,7 @@ export const UploadFileSlice = createSlice({
   },
 });
 
-export const { uploadFileState, clearUploadFileState } = UploadFileSlice.actions;
+export const { uploadFileState, clearUploadFileState } =
+  UploadFileSlice.actions;
 
 export default UploadFileSlice.reducer;

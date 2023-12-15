@@ -1,27 +1,46 @@
-import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, Tooltip, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
-import React, { useEffect } from 'react';
-import { useStyles } from '../../styles/makeTheme';
-import { genColumnValue, numberWithCommas, objectNullOrEmpty, stringNullOrEmpty } from '../../utils/utils';
-import { Action, STStatus, DateFormat } from '../../utils/enum/common-enum';
-import HtmlTooltip from '../../components/commons/ui/html-tooltip';
-import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useAppSelector } from '../../store/store';
-import { updatePayloadST } from '../../store/slices/sale-limit-time-search-slice';
-import ViewBranch from '../../components/sale-limit-time/view-branch';
-import STCreateModal from '../../components/sale-limit-time/sale-limit-time-create-modal';
-import moment from 'moment';
-import { convertUtcToBkkDate } from '../../utils/date-utill';
-import { KeyCloakTokenInfo } from '../../models/keycolak-token-info';
-import { getUserInfo } from '../../store/sessionStore';
-import { getsaleLimitTimeDetail } from '../../store/slices/sale-limit-time-detail-slice';
-import LoadingModal from '../../components/commons/ui/loading-modal';
-import SnackbarStatus from '../../components/commons/ui/snackbar-status';
-import { getStartMultipeSaleLimitTime } from '../../services/sale-limit-time';
-import AlertError from '../../components/commons/ui/alert-error';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { Box } from "@mui/system";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
+import React, { useEffect } from "react";
+import { useStyles } from "../../styles/makeTheme";
+import {
+  genColumnValue,
+  numberWithCommas,
+  objectNullOrEmpty,
+  stringNullOrEmpty,
+} from "../../utils/utils";
+import { Action, STStatus, DateFormat } from "../../utils/enum/common-enum";
+import HtmlTooltip from "../../components/commons/ui/html-tooltip";
+import { useTranslation } from "react-i18next";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { updatePayloadST } from "../../store/slices/sale-limit-time-search-slice";
+import ViewBranch from "../../components/sale-limit-time/view-branch";
+import STCreateModal from "../../components/sale-limit-time/sale-limit-time-create-modal";
+import moment from "moment";
+import { convertUtcToBkkDate } from "../../utils/date-utill";
+import { KeyCloakTokenInfo } from "../../models/keycolak-token-info";
+import { getUserInfo } from "../../store/sessionStore";
+import { getsaleLimitTimeDetail } from "../../store/slices/sale-limit-time-detail-slice";
+import LoadingModal from "../../components/commons/ui/loading-modal";
+import SnackbarStatus from "../../components/commons/ui/snackbar-status";
+import { getStartMultipeSaleLimitTime } from "../../services/sale-limit-time";
+import AlertError from "../../components/commons/ui/alert-error";
 
-const _ = require('lodash');
+const _ = require("lodash");
 interface loadingModalState {
   open: boolean;
 }
@@ -33,20 +52,31 @@ interface StateProps {
 }
 const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   const classes = useStyles();
-  const { t } = useTranslation(['saleLimitTime']);
+  const { t } = useTranslation(["saleLimitTime"]);
   const [checkAll, setCheckAll] = React.useState<boolean>(false);
   const [lstST, setListST] = React.useState<any[]>([]);
-  const responveST = useAppSelector((state) => state.searchSaleLimitTime.responseST);
-  const payloadST = useAppSelector((state) => state.searchSaleLimitTime.payloadST);
-  const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail);
-  const currentPage = useAppSelector((state) => state.searchSaleLimitTime.responseST.page);
-  const limit = useAppSelector((state) => state.searchSaleLimitTime.responseST.perPage);
+  const responveST = useAppSelector(
+    (state) => state.searchSaleLimitTime.responseST,
+  );
+  const payloadST = useAppSelector(
+    (state) => state.searchSaleLimitTime.payloadST,
+  );
+  const saleLimitTimeDetail = useAppSelector(
+    (state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail,
+  );
+  const currentPage = useAppSelector(
+    (state) => state.searchSaleLimitTime.responseST.page,
+  );
+  const limit = useAppSelector(
+    (state) => state.searchSaleLimitTime.responseST.perPage,
+  );
   const [pageSize, setPageSize] = React.useState(limit.toString());
 
-  const [popupMsg, setPopupMsg] = React.useState<string>('');
+  const [popupMsg, setPopupMsg] = React.useState<string>("");
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   const [openDetailModal, setOpenDetailModal] = React.useState(false);
-  const [openLoadingModal, setOpenLoadingModal] = React.useState<loadingModalState>({ open: false });
+  const [openLoadingModal, setOpenLoadingModal] =
+    React.useState<loadingModalState>({ open: false });
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [openAlert, setOpenAlert] = React.useState(false);
   const dispatch = useAppDispatch();
@@ -79,9 +109,11 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     const userInfo: KeyCloakTokenInfo = getUserInfo();
     if (!objectNullOrEmpty(userInfo) && !objectNullOrEmpty(userInfo.acl)) {
       setIsAdmin(
-        userInfo.acl['service.posback-campaign']
-          ? userInfo.acl['service.posback-campaign'].includes('campaign.st.create')
-          : false
+        userInfo.acl["service.posback-campaign"]
+          ? userInfo.acl["service.posback-campaign"].includes(
+              "campaign.st.create",
+            )
+          : false,
       );
     }
   }, []);
@@ -96,7 +128,9 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       data[params.row.index - 1].checked = event.target.checked;
       return data;
     });
-    let lstUnCheck = lstST.filter((it: any) => !it.checked && STStatus.DRAFT == it.status);
+    let lstUnCheck = lstST.filter(
+      (it: any) => !it.checked && STStatus.DRAFT == it.status,
+    );
     if (lstUnCheck != null && lstUnCheck.length > 0) setCheckAll(false);
     else setCheckAll(true);
   };
@@ -105,7 +139,10 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     setCheckAll(event.target.checked);
     let lstSTHandle = _.cloneDeep(lstST);
     for (let item of lstSTHandle) {
-      if (STStatus.DRAFT == item.status && moment(item.stStartTime) >= moment(new Date())) {
+      if (
+        STStatus.DRAFT == item.status &&
+        moment(item.stStartTime) >= moment(new Date())
+      ) {
         item.checked = event.target.checked;
       }
     }
@@ -126,20 +163,22 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
   const columns: GridColDef[] = [
     {
-      field: 'checked',
-      headerName: t('numberOrder'),
+      field: "checked",
+      headerName: t("numberOrder"),
       width: 130,
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       hide: !isAdmin,
       renderHeader: (params) => (
-        <FormControl component="fieldset" sx={{ marginLeft: '0px' }}>
+        <FormControl component="fieldset" sx={{ marginLeft: "0px" }}>
           <FormGroup aria-label="position" row>
             <FormControlLabel
               className={classes.MFormControlLabel}
               value="top"
-              control={<Checkbox checked={checkAll} onClick={onCheckAll.bind(this)} />}
+              control={
+                <Checkbox checked={checkAll} onClick={onCheckAll.bind(this)} />
+              }
               label="เลือกทั้งหมด"
               labelPlacement="top"
             />
@@ -155,54 +194,54 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       ),
     },
     {
-      field: 'index',
-      headerName: 'ลำดับ',
-      headerAlign: 'center',
+      field: "index",
+      headerName: "ลำดับ",
+      headerAlign: "center",
       sortable: false,
       minWidth: 70,
     },
     {
-      field: 'documentNumber',
-      headerName: 'เลขที่เอกสาร ST',
-      headerAlign: 'center',
+      field: "documentNumber",
+      headerName: "เลขที่เอกสาร ST",
+      headerAlign: "center",
       sortable: false,
       minWidth: 170,
     },
     {
-      field: 'status',
-      headerName: 'สถานะ',
-      headerAlign: 'center',
+      field: "status",
+      headerName: "สถานะ",
+      headerAlign: "center",
       sortable: false,
       minWidth: 170,
       renderCell: (params) => genRowStatus(params),
     },
     {
-      field: 'description',
-      headerName: 'รายละเอียด',
-      headerAlign: 'center',
+      field: "description",
+      headerName: "รายละเอียด",
+      headerAlign: "center",
       sortable: false,
       minWidth: 170,
       renderCell: (params) => renderCell(params.value),
     },
     {
-      field: 'branch',
-      headerName: 'สาขา',
-      headerAlign: 'center',
+      field: "branch",
+      headerName: "สาขา",
+      headerAlign: "center",
       sortable: false,
       minWidth: 170,
       renderCell: (params) => genBranch(params),
     },
     {
-      field: 'createdAt',
-      headerName: 'วันที่สร้าง รายการ',
-      headerAlign: 'center',
+      field: "createdAt",
+      headerName: "วันที่สร้าง รายการ",
+      headerAlign: "center",
       sortable: false,
       minWidth: 160,
     },
     {
-      field: 'stStartTime',
-      headerName: 'วัน/เวลา ที่เริ่ม',
-      headerAlign: 'center',
+      field: "stStartTime",
+      headerName: "วัน/เวลา ที่เริ่ม",
+      headerAlign: "center",
       sortable: false,
       minWidth: 160,
       renderCell: (params) => {
@@ -210,19 +249,19 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         return (
           <div>
             <Typography variant="body2" noWrap>
-              {moment(start).add(543, 'year').format('DD/MM/YYYY')}
+              {moment(start).add(543, "year").format("DD/MM/YYYY")}
             </Typography>
             <Typography variant="body2" noWrap>
-              {moment(start).format('HH:mm ')}
+              {moment(start).format("HH:mm ")}
             </Typography>
           </div>
         );
       },
     },
     {
-      field: 'stEndTime',
-      headerName: 'วัน/เวลา ที่สิ้นสุด',
-      headerAlign: 'center',
+      field: "stEndTime",
+      headerName: "วัน/เวลา ที่สิ้นสุด",
+      headerAlign: "center",
       sortable: false,
       minWidth: 160,
       renderCell: (params) => {
@@ -230,29 +269,29 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         return (
           <div>
             <Typography variant="body2" noWrap>
-              {moment(end).add(543, 'year').format('DD/MM/YYYY')}
+              {moment(end).add(543, "year").format("DD/MM/YYYY")}
             </Typography>
             <Typography variant="body2" noWrap>
-              {moment(end).format('HH:mm ')}
+              {moment(end).format("HH:mm ")}
             </Typography>
           </div>
         );
       },
     },
     {
-      field: 'remark',
-      headerName: 'หมายเหตุ',
-      headerAlign: 'center',
+      field: "remark",
+      headerName: "หมายเหตุ",
+      headerAlign: "center",
       sortable: false,
       minWidth: 170,
       renderCell: (params) => {
         if (params.value) {
           let len = String(params.value).length;
           return (
-            <Tooltip title={params.value ? params.value : ''}>
+            <Tooltip title={params.value ? params.value : ""}>
               <Typography>
                 {String(params.value).slice(0, 31)}
-                {len > 30 ? '...' : ''}
+                {len > 30 ? "..." : ""}
               </Typography>
             </Tooltip>
           );
@@ -288,21 +327,38 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
   const genRowStatus = (params: GridValueGetterParams) => {
     let statusDisplay;
-    let status = params.value ? params.value.toString() : '';
-    const statusLabel = genColumnValue('label', 'value', status, t('lstStatus', { returnObjects: true }));
+    let status = params.value ? params.value.toString() : "";
+    const statusLabel = genColumnValue(
+      "label",
+      "value",
+      status,
+      t("lstStatus", { returnObjects: true }),
+    );
 
     switch (status) {
       case STStatus.DRAFT:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#FBA600', backgroundColor: '#FFF0CA' });
+        statusDisplay = genRowStatusValue(statusLabel, {
+          color: "#FBA600",
+          backgroundColor: "#FFF0CA",
+        });
         break;
       case STStatus.START:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#36C690', backgroundColor: '#E7FFE9' });
+        statusDisplay = genRowStatusValue(statusLabel, {
+          color: "#36C690",
+          backgroundColor: "#E7FFE9",
+        });
         break;
       case STStatus.END:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#676767', backgroundColor: '#EAEBEB;' });
+        statusDisplay = genRowStatusValue(statusLabel, {
+          color: "#676767",
+          backgroundColor: "#EAEBEB;",
+        });
         break;
       case STStatus.CANCEL:
-        statusDisplay = genRowStatusValue(statusLabel, { color: '#F54949', backgroundColor: '#FFD7D7' });
+        statusDisplay = genRowStatusValue(statusLabel, {
+          color: "#F54949",
+          backgroundColor: "#FFD7D7",
+        });
         break;
     }
     return statusDisplay;
@@ -322,10 +378,10 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
     const newPayload = {
       ...payloadST,
       perPage: cPageSize.toString(),
-      page: '1',
+      page: "1",
     };
     await dispatch(updatePayloadST(newPayload));
-    props.handleChangePagination('1', cPageSize);
+    props.handleChangePagination("1", cPageSize);
   };
   const handleCloseCreateModal = () => {
     setOpenDetailModal(false);
@@ -337,9 +393,9 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
   const handleClickCell = async (params: GridCellParams) => {
     const chkPN = params.colDef.field;
-    if (chkPN !== 'checked') {
+    if (chkPN !== "checked") {
       props.handleSetBranch(false);
-      handleOpenLoading('open', true);
+      handleOpenLoading("open", true);
       try {
         await dispatch(getsaleLimitTimeDetail(params.row.id));
         if (saleLimitTimeDetail.data.length > 0 || saleLimitTimeDetail.data) {
@@ -349,11 +405,13 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
         console.log(error);
       }
 
-      handleOpenLoading('close', false);
+      handleOpenLoading("close", false);
     }
   };
   const handleStartAll = async () => {
-    const listID = lstST.filter((el: any) => !!el.checked).map((item: any) => item.id);
+    const listID = lstST
+      .filter((el: any) => !!el.checked)
+      .map((item: any) => item.id);
     try {
       const body = {
         stIds: listID,
@@ -362,7 +420,9 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
 
       if (rs.code === 20000) {
         setOpenPopup(true);
-        setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
+        setPopupMsg(
+          "คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว",
+        );
         props.onSearch();
       } else {
         setOpenAlert(true);
@@ -375,12 +435,12 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
   return (
     <>
       {props.checkAdmin && (
-        <Box sx={{ marginBottom: '20px' }}>
+        <Box sx={{ marginBottom: "20px" }}>
           <Button
             variant="contained"
             color="primary"
             className={classes.MbtnSearch}
-            sx={{ marginRight: '20px', width: '126px' }}
+            sx={{ marginRight: "20px", width: "126px" }}
             onClick={handleStartAll}
             disabled={!lstST.find((item: any) => !!item.checked)}
           >
@@ -390,7 +450,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       )}
       <div
         className={classes.MdataGridPaginationTop}
-        style={{ height: lstST.length >= 10 ? '60vh' : 'auto', width: '100%' }}
+        style={{ height: lstST.length >= 10 ? "60vh" : "auto", width: "100%" }}
       >
         <DataGrid
           columns={columns}
@@ -412,7 +472,7 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       </div>
       {openDetailModal && (
         <STCreateModal
-          type={'Detail'}
+          type={"Detail"}
           isAdmin={isAdmin}
           setOpenPopup={setOpenPopup}
           setPopupMsg={setPopupMsg}
@@ -425,9 +485,14 @@ const SaleLimitTimeList: React.FC<StateProps> = (props) => {
       <AlertError
         open={openAlert}
         onClose={() => setOpenAlert(false)}
-        textError={'กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน'}
+        textError={"กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน"}
       />
-      <SnackbarStatus open={openPopup} onClose={handleClosePopup} isSuccess={true} contentMsg={popupMsg} />
+      <SnackbarStatus
+        open={openPopup}
+        onClose={handleClosePopup}
+        isSuccess={true}
+        contentMsg={popupMsg}
+      />
     </>
   );
 };

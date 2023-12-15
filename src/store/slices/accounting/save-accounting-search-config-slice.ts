@@ -1,5 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ExpenseSearch, ExpenseSearchCofigRequest } from '../../../models/branch-accounting-model';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  ExpenseSearch,
+  ExpenseSearchCofigRequest,
+} from "../../../models/branch-accounting-model";
 
 type State = {
   searchExpenseConfig: ExpenseSearchCofigRequest;
@@ -7,15 +10,15 @@ type State = {
 
 const initialState: State = {
   searchExpenseConfig: {
-    limit: '10',
-    page: '1',
-    type: '',
-    isActive: '',
+    limit: "10",
+    page: "1",
+    type: "",
+    isActive: "",
   },
 };
 
 const saveExpenseConfigSearchRequest = createSlice({
-  name: 'saveExpenseConfigSearchRequest',
+  name: "saveExpenseConfigSearchRequest",
   initialState,
   reducers: {
     saveExpenseConfigSearch: (state, action: PayloadAction<any>) => {
@@ -27,5 +30,6 @@ const saveExpenseConfigSearchRequest = createSlice({
   },
 });
 
-export const { saveExpenseConfigSearch, clearExpenseConfigSearch } = saveExpenseConfigSearchRequest.actions;
+export const { saveExpenseConfigSearch, clearExpenseConfigSearch } =
+  saveExpenseConfigSearchRequest.actions;
 export default saveExpenseConfigSearchRequest.reducer;

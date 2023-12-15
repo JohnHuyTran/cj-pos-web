@@ -1,10 +1,10 @@
-import React, { ReactElement, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import { DialogActions, DialogContentText, Link } from '@mui/material';
-import { ErrorOutline } from '@mui/icons-material';
-import moment from 'moment';
+import React, { ReactElement, useEffect } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import { DialogActions, DialogContentText, Link } from "@mui/material";
+import { ErrorOutline } from "@mui/icons-material";
+import moment from "moment";
 
 interface Props {
   open: boolean;
@@ -26,19 +26,21 @@ export default function ModalDownloadErrorFile({
   // useEffect(() => {}, [open === true]);
 
   const handleDownloadErrorFile = () => {
-    var contentType = 'application/vnd.ms-excel';
+    var contentType = "application/vnd.ms-excel";
     const blob = b64toBlob(base64EncodeFile, contentType);
-    var a = document.createElement('a');
+    var a = document.createElement("a");
     a.href = window.URL.createObjectURL(blob);
 
-    a.download = `FINANCE_RESULT_${moment(new Date()).format('YYYYMMDDhhmmss')}.xlsx`;
+    a.download = `FINANCE_RESULT_${moment(new Date()).format(
+      "YYYYMMDDhhmmss",
+    )}.xlsx`;
     a.click();
     onClickClose();
   };
 
-  const b64toBlob = (b64Data: any, contentType = '', sliceSize = 512) => {
+  const b64toBlob = (b64Data: any, contentType = "", sliceSize = 512) => {
     const byteCharacters = atob(b64Data);
-    const byteArrays = [];
+    const byteArrays: any = [];
 
     for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
       const slice = byteCharacters.slice(offset, offset + sliceSize);
@@ -60,30 +62,40 @@ export default function ModalDownloadErrorFile({
     <div>
       <Dialog
         open={open}
-        aria-labelledby='alert-dialog-title'
-        aria-describedby='alert-dialog-description'
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
         fullWidth={true}
-        maxWidth='xs'>
-        <DialogContent sx={{ padding: '1em' }}>
-          <DialogContentText sx={{ textAlign: 'center', whiteSpace: 'pre-line' }}>
-            <ErrorOutline sx={{ color: '#FF0000', fontSize: '4em' }} />
+        maxWidth="xs"
+      >
+        <DialogContent sx={{ padding: "1em" }}>
+          <DialogContentText
+            sx={{ textAlign: "center", whiteSpace: "pre-line" }}
+          >
+            <ErrorOutline sx={{ color: "#FF0000", fontSize: "4em" }} />
             <br />
             {titelError}
-            <div style={{ color: '#FF0000' }}>{textError}</div>
+            <div style={{ color: "#FF0000" }}>{textError}</div>
             {linkFileError && (
-              <Link onClick={handleDownloadErrorFile} style={{ color: '#FF0000', cursor: 'pointer' }}>
+              <Link
+                onClick={handleDownloadErrorFile}
+                style={{ color: "#FF0000", cursor: "pointer" }}
+              >
                 ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้
               </Link>
             )}
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ display: 'block', textAlign: 'center' }}>
+        <DialogActions sx={{ display: "block", textAlign: "center" }}>
           <Button
-            id='btnClose'
-            variant='contained'
-            color='error'
-            sx={{ borderRadius: '5px', display: `${linkFileError ? 'none' : ''}` }}
-            onClick={onClickClose}>
+            id="btnClose"
+            variant="contained"
+            color="error"
+            sx={{
+              borderRadius: "5px",
+              display: `${linkFileError ? "none" : ""}`,
+            }}
+            onClick={onClickClose}
+          >
             ปิด
           </Button>
         </DialogActions>

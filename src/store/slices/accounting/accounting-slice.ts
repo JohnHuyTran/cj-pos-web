@@ -1,10 +1,13 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { stat } from 'fs';
-import { get } from '../../../adapters/posback-adapter';
-import { environment } from '../../../environment-base';
-import { featchExpenseDetailAsyncMockup } from '../../../mockdata/branch-accounting';
-import { ExpenseDetailResponseType, ExpenseMasterResponseType } from '../../../models/branch-accounting-model';
-import { getPathExpenseDetail } from '../../../services/accounting';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { stat } from "fs";
+import { get } from "../../../adapters/posback-adapter";
+import { environment } from "../../../environment-base";
+import { featchExpenseDetailAsyncMockup } from "../../../mockdata/branch-accounting";
+import {
+  ExpenseDetailResponseType,
+  ExpenseMasterResponseType,
+} from "../../../models/branch-accounting-model";
+import { getPathExpenseDetail } from "../../../services/accounting";
 
 type State = {
   expenseAccountDetail: ExpenseDetailResponseType;
@@ -19,12 +22,12 @@ type State = {
 
 const initialState: State = {
   expenseAccountDetail: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: null,
   },
-  error: '',
+  error: "",
   summaryRows: [],
   intialRows: [],
   itemRows: [],
@@ -33,26 +36,32 @@ const initialState: State = {
   haveUpdateData: false,
 };
 
-export const featchExpenseDetailAsync = createAsyncThunk('ExpenseDetail', async (docNo: string) => {
-  try {
-    const path = getPathExpenseDetail(docNo, environment.branchAccounting.expense.detail.url);
-    return await get(path).then();
+export const featchExpenseDetailAsync = createAsyncThunk(
+  "ExpenseDetail",
+  async (docNo: string) => {
+    try {
+      const path = getPathExpenseDetail(
+        docNo,
+        environment.branchAccounting.expense.detail.url,
+      );
+      return await get(path).then();
 
-    // return featchExpenseDetailAsyncMockup();
-  } catch (error) {
-    throw error;
-  }
-});
+      // return featchExpenseDetailAsyncMockup();
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const expenseAccountDetailSlice = createSlice({
-  name: 'ExpenseDetail',
+  name: "ExpenseDetail",
   initialState,
   reducers: {
     updateToInitialState: (state) => {
       state.expenseAccountDetail = {
-        ref: '',
+        ref: "",
         code: 0,
-        message: '',
+        message: "",
         data: null,
       };
     },
@@ -79,9 +88,12 @@ const expenseAccountDetailSlice = createSlice({
     builer.addCase(featchExpenseDetailAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(featchExpenseDetailAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.expenseAccountDetail = action.payload;
-      }),
+      builer.addCase(
+        featchExpenseDetailAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.expenseAccountDetail = action.payload;
+        },
+      ),
       builer.addCase(featchExpenseDetailAsync.rejected, () => {
         initialState;
       });

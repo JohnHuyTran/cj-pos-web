@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AuditHistorySearchRequest } from "../../models/audit-history-model";
 
 type State = {
@@ -7,19 +7,19 @@ type State = {
 
 const initialState: State = {
   searchCriteria: {
-    perPage: '10',
-    page: '1',
-    docNo: '',
-    skuCodes:'',
-    branch: '',
-    type: '',
-    creationDateFrom: '',
-    creationDateTo: '',
+    perPage: "10",
+    page: "1",
+    docNo: "",
+    skuCodes: "",
+    branch: "",
+    type: "",
+    creationDateFrom: "",
+    creationDateTo: "",
   },
 };
 
 const auditHistoryCriteriaSearchSlice = createSlice({
-  name: 'auditHistoryCriteriaSearchSlice',
+  name: "auditHistoryCriteriaSearchSlice",
   initialState,
   reducers: {
     saveSearchCriteriaAH: (state, action: PayloadAction<any>) => {

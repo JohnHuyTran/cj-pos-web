@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { ReactElement } from 'react';
-import Box from '@mui/material/Box';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
+import * as React from "react";
+import { ReactElement } from "react";
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
 import { useStyles } from "../../../styles/makeTheme";
 import { stringNullOrEmpty } from "../../../utils/utils";
 import { StepItem } from "../../../models/step-item-model";
@@ -27,7 +27,9 @@ export default function StepperBar({
     if (stringNullOrEmpty(rejectStep)) {
       activeIndex = steps.findIndex((it: StepItem) => it.value === activeStep);
     } else {
-      activeIndex = steps.findIndex((it: StepItem) => it.valueReject === rejectStep);
+      activeIndex = steps.findIndex(
+        (it: StepItem) => it.valueReject === rejectStep,
+      );
     }
     setActiveStepBar(activeIndex + 1);
   }, [activeStep, open]);
@@ -40,9 +42,12 @@ export default function StepperBar({
           {steps.map((step: StepItem) => {
             const labelProps: any = {};
             let label: string | undefined = step.label;
-            if (!stringNullOrEmpty(step.rejected) && step.rejected
-              && !stringNullOrEmpty(rejectStep)
-              && step.valueReject === rejectStep) {
+            if (
+              !stringNullOrEmpty(step.rejected) &&
+              step.rejected &&
+              !stringNullOrEmpty(rejectStep) &&
+              step.valueReject === rejectStep
+            ) {
               labelProps.error = true;
               label = step.labelReject;
             }

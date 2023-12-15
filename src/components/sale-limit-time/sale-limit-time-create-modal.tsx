@@ -1,45 +1,66 @@
-import React, { ReactElement, useEffect } from 'react';
-import moment from 'moment';
-import { useAppSelector } from '../../store/store';
-import DialogContent from '@mui/material/DialogContent';
-import Dialog from '@mui/material/Dialog';
-import Typography from '@mui/material/Typography';
-import { Box, Button, DialogTitle, Grid, IconButton, Input, TextField } from '@mui/material';
-import { ControlPoint, HighlightOff, Tune } from '@mui/icons-material';
-import SaveIcon from '@mui/icons-material/Save';
+import React, { ReactElement, useEffect } from "react";
+import moment from "moment";
+import { useAppSelector } from "../../store/store";
+import DialogContent from "@mui/material/DialogContent";
+import Dialog from "@mui/material/Dialog";
+import Typography from "@mui/material/Typography";
+import {
+  Box,
+  Button,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Input,
+  TextField,
+} from "@mui/material";
+import { ControlPoint, HighlightOff, Tune } from "@mui/icons-material";
+import SaveIcon from "@mui/icons-material/Save";
 
-import { useStyles } from '../../styles/makeTheme';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { useStyles } from "../../styles/makeTheme";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-import { useAppDispatch } from '../../store/store';
-import SnackbarStatus from '../commons/ui/snackbar-status';
-import LoadingModal from '../commons/ui/loading-modal';
-import AlertError from '../commons/ui/alert-error';
-import ConfirmModelExit from '../commons/ui/confirm-exit-model';
-import StepperBar from './steppers';
-import SearchBranch from '../commons/ui/search-branch';
-import ImportAppIcon from '@mui/icons-material/ExitToApp';
-import STProductTypeItems from './ST-product-type-item';
-import STProductItems from './ST-product-item';
+import { useAppDispatch } from "../../store/store";
+import SnackbarStatus from "../commons/ui/snackbar-status";
+import LoadingModal from "../commons/ui/loading-modal";
+import AlertError from "../commons/ui/alert-error";
+import ConfirmModelExit from "../commons/ui/confirm-exit-model";
+import StepperBar from "./steppers";
+import SearchBranch from "../commons/ui/search-branch";
+import ImportAppIcon from "@mui/icons-material/ExitToApp";
+import STProductTypeItems from "./ST-product-type-item";
+import STProductItems from "./ST-product-item";
 // import ModalAddTypeProduct from '../commons/ui/modal-add-type-product';
-import ModalAddTypeProducts from '../commons/ui/modal-add-type-products';
-import { updateAddTypeAndProductState } from '../../store/slices/add-type-product-slice';
-import { fetchTotalBranch, updateExcludeSelectBranches, updatePayloadBranches } from '../../store/slices/search-branches-province-slice';
-import TextBoxComment from '../commons/ui/textbox-comment';
-import { cancelST, getStartSaleLimitTime, saveDraftST, importST } from '../../services/sale-limit-time';
-import { DateFormat } from '../../utils/enum/common-enum';
-import { setCheckEdit, setProductList, updatesaleLimitTimeState } from '../../store/slices/sale-limit-time-slice';
-import ModelConfirm from './modal-confirm';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DatePickerComponent from './date-picker-detail';
-import { objectNullOrEmpty } from '../../utils/utils';
-import ModalConfirmCopy from './modalConfirmCopy';
-import { getAllProductByType } from '../../services/common';
-import { styled } from '@mui/material/styles';
-import ModalValidateImport from './modal-validate-import';
-import SelectExcludeBranch from '../commons/ui/modal-select-exclude-branch';
+import ModalAddTypeProducts from "../commons/ui/modal-add-type-products";
+import { updateAddTypeAndProductState } from "../../store/slices/add-type-product-slice";
+import {
+  fetchTotalBranch,
+  updateExcludeSelectBranches,
+  updatePayloadBranches,
+} from "../../store/slices/search-branches-province-slice";
+import TextBoxComment from "../commons/ui/textbox-comment";
+import {
+  cancelST,
+  getStartSaleLimitTime,
+  saveDraftST,
+  importST,
+} from "../../services/sale-limit-time";
+import { DateFormat } from "../../utils/enum/common-enum";
+import {
+  setCheckEdit,
+  setProductList,
+  updatesaleLimitTimeState,
+} from "../../store/slices/sale-limit-time-slice";
+import ModelConfirm from "./modal-confirm";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DatePickerComponent from "./date-picker-detail";
+import { objectNullOrEmpty } from "../../utils/utils";
+import ModalConfirmCopy from "./modalConfirmCopy";
+import { getAllProductByType } from "../../services/common";
+import { styled } from "@mui/material/styles";
+import ModalValidateImport from "./modal-validate-import";
+import SelectExcludeBranch from "../commons/ui/modal-select-exclude-branch";
 interface State {
   description: string;
   startDate: any | Date | number | string;
@@ -65,7 +86,7 @@ export interface DialogTitleProps {
   children?: React.ReactNode;
   onClose?: () => void;
 }
-const _ = require('lodash');
+const _ = require("lodash");
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, onClose, ...other } = props;
@@ -74,15 +95,16 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
       {children}
       {onClose ? (
         <IconButton
-          aria-label='close'
+          aria-label="close"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme: any) => theme.palette.grey[400],
-          }}>
-          <HighlightOff fontSize='large' />
+          }}
+        >
+          <HighlightOff fontSize="large" />
         </IconButton>
       ) : null}
     </DialogTitle>
@@ -101,26 +123,30 @@ function STCreateModal({
   const [open, setOpen] = React.useState(isOpen);
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const payloadAddTypeProduct = useAppSelector((state) => state.addTypeAndProduct.state);
-  const payloadBranches = useAppSelector((state) => state.searchBranchProvince.excludeSelectBranch);
+  const payloadAddTypeProduct = useAppSelector(
+    (state) => state.addTypeAndProduct.state,
+  );
+  const payloadBranches = useAppSelector(
+    (state) => state.searchBranchProvince.excludeSelectBranch,
+  );
   const payLoadSt = useAppSelector((state) => state.saleLimitTime.state);
   const checkEdit = useAppSelector((state) => state.saleLimitTime.checkEdit);
   const [values, setValues] = React.useState<State>({
-    description: '',
+    description: "",
     startDate: new Date(),
     endDate: new Date(),
-    startTime: '',
-    endTime: '',
-    comment: '',
-    stStartTime: '',
-    stEndTime: '',
+    startTime: "",
+    endTime: "",
+    comment: "",
+    stStartTime: "",
+    stEndTime: "",
   });
   const [checkValue, setCheckValue] = React.useState({
     descriptionError: false,
     startDateError: false,
     endDateError: false,
-    startTimeError: '',
-    endTimeError: '',
+    startTimeError: "",
+    endTimeError: "",
     payloadBranchesError: false,
   });
 
@@ -128,27 +154,31 @@ function STCreateModal({
   const [createDate, setCreateDate] = React.useState<Date | null>(new Date());
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [showSnackBar, setShowSnackBar] = React.useState(false);
-  const [contentMsg, setContentMsg] = React.useState('');
-  const [remark, setRemark] = React.useState('');
+  const [contentMsg, setContentMsg] = React.useState("");
+  const [remark, setRemark] = React.useState("");
   const [openModalCancel, setOpenModalCancel] = React.useState<boolean>(false);
   const [openModalStart, setOpenModalStart] = React.useState<boolean>(false);
   const handleCloseSnackBar = () => {
     setShowSnackBar(false);
   };
   const [showModalProduct, setShowModalProduct] = React.useState<boolean>(true);
-  const [confirmModelExit, setConfirmModelExit] = React.useState<boolean>(false);
+  const [confirmModelExit, setConfirmModelExit] =
+    React.useState<boolean>(false);
   const [unSelectAllType, setUnSelectAllType] = React.useState<boolean>(false);
   // detail data
-  const saleLimitTimeDetail = useAppSelector((state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail.data);
+  const saleLimitTimeDetail = useAppSelector(
+    (state) => state.saleLimitTimeDetailSlice.saleLimitTimeDetail.data,
+  );
   // modal copy
   const [openModalCopy, setOpenModalCopy] = React.useState<boolean>(false);
   const [choiceCopy, setChoiceCopy] = React.useState<boolean>(false);
   //modal vaildate
-  const [openModalValidate, setOpenModalValidate] = React.useState<boolean>(false);
-  const [msgModalValidate, setMsgModalValidate] = React.useState<string>('');
-  const [urlModalValidate, setUrlModalValidate] = React.useState<string>('');
+  const [openModalValidate, setOpenModalValidate] =
+    React.useState<boolean>(false);
+  const [msgModalValidate, setMsgModalValidate] = React.useState<string>("");
+  const [urlModalValidate, setUrlModalValidate] = React.useState<string>("");
   useEffect(() => {
-    if (type === 'Detail' && !objectNullOrEmpty(saleLimitTimeDetail)) {
+    if (type === "Detail" && !objectNullOrEmpty(saleLimitTimeDetail)) {
       setStatus(saleLimitTimeDetail.status);
       setCreateDate(saleLimitTimeDetail.createdAt);
       dispatch(
@@ -156,7 +186,7 @@ function STCreateModal({
           ...payLoadSt,
           id: saleLimitTimeDetail.id,
           documentNumber: saleLimitTimeDetail.documentNumber,
-        })
+        }),
       );
       setValues({
         ...values,
@@ -164,33 +194,39 @@ function STCreateModal({
         comment: saleLimitTimeDetail.remark,
         startDate: moment(saleLimitTimeDetail.stStartTime),
         endDate: moment(saleLimitTimeDetail.stEndTime),
-        startTime: moment(saleLimitTimeDetail.stStartTime).format('HH:mm'),
-        endTime: moment(saleLimitTimeDetail.stEndTime).format('HH:mm'),
+        startTime: moment(saleLimitTimeDetail.stStartTime).format("HH:mm"),
+        endTime: moment(saleLimitTimeDetail.stEndTime).format("HH:mm"),
       });
       setRemark(saleLimitTimeDetail.remark);
-      let appliedProducts = saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts
-        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts : [];
-      let appliedCategories = saleLimitTimeDetail.stDetail.appliedProduct.appliedCategories
-        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedCategories : [];
+      let appliedProducts = saleLimitTimeDetail.stDetail.appliedProduct
+        .appliedProducts
+        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedProducts
+        : [];
+      let appliedCategories = saleLimitTimeDetail.stDetail.appliedProduct
+        .appliedCategories
+        ? saleLimitTimeDetail.stDetail.appliedProduct.appliedCategories
+        : [];
       let listCategories = appliedCategories.map((item: any) => {
-          return {
-            productTypeCode: item.code,
-            productTypeName: item.name,
-            selectedType: 1,
-          };
-        })
+        return {
+          productTypeCode: item.code,
+          productTypeName: item.name,
+          selectedType: 1,
+        };
+      });
       let listProducts = appliedProducts.map((item: any) => {
-            return {
-              barcode: item.barcode ? item.barcode : '',
-              skuCode: item.skuCode,
-              unitName: item.unitName,
-              barcodeName: item.name,
-              productTypeCode: item.categoryTypeCode,
-              selectedType: 2,
-              productByType: true
-            };
-          })
-      dispatch(updateAddTypeAndProductState(listProducts.concat(listCategories)));
+        return {
+          barcode: item.barcode ? item.barcode : "",
+          skuCode: item.skuCode,
+          unitName: item.unitName,
+          barcodeName: item.name,
+          productTypeCode: item.categoryTypeCode,
+          selectedType: 2,
+          productByType: true,
+        };
+      });
+      dispatch(
+        updateAddTypeAndProductState(listProducts.concat(listCategories)),
+      );
       dispatch(fetchTotalBranch());
       dispatch(
         updateExcludeSelectBranches({
@@ -202,15 +238,18 @@ function STCreateModal({
             branchList: saleLimitTimeDetail.stDetail.appliedBranches.branchList
               ? saleLimitTimeDetail.stDetail.appliedBranches.branchList
               : [],
-            excludedBranchList: saleLimitTimeDetail.stDetail.appliedBranches.excludedBranchList
-            ? saleLimitTimeDetail.stDetail.appliedBranches.excludedBranchList
-            : [],
-            excludedProvinceList: saleLimitTimeDetail.stDetail.appliedBranches.excludedProvinceList
-            ? saleLimitTimeDetail.stDetail.appliedBranches.excludedProvinceList
-            : [],
+            excludedBranchList: saleLimitTimeDetail.stDetail.appliedBranches
+              .excludedBranchList
+              ? saleLimitTimeDetail.stDetail.appliedBranches.excludedBranchList
+              : [],
+            excludedProvinceList: saleLimitTimeDetail.stDetail.appliedBranches
+              .excludedProvinceList
+              ? saleLimitTimeDetail.stDetail.appliedBranches
+                  .excludedProvinceList
+              : [],
           },
           saved: true,
-        })
+        }),
       );
     }
   }, [saleLimitTimeDetail]);
@@ -235,39 +274,63 @@ function STCreateModal({
           endDate: null,
         });
       }
-      if (values.startTime != '' && values.endTime != '') {
+      if (values.startTime != "" && values.endTime != "") {
         let stStartTime = compareDateTime(values.startDate, values.startTime);
         let stEndTime = compareDateTime(values.endDate, values.endTime);
-        if (stStartTime < moment(new Date(), DateFormat.DATE_TIME_DISPLAY_FORMAT)) {
+        if (
+          stStartTime < moment(new Date(), DateFormat.DATE_TIME_DISPLAY_FORMAT)
+        ) {
           if (status <= 1 && isAdmin) {
-            setCheckValue({ ...checkValue, startTimeError: 'เวลาเริ่มต้นต้องมากกว่าเวลาปัจจุบัน' });
+            setCheckValue({
+              ...checkValue,
+              startTimeError: "เวลาเริ่มต้นต้องมากกว่าเวลาปัจจุบัน",
+            });
           }
         } else if (stStartTime >= stEndTime) {
           if (status <= 1 && isAdmin) {
-            setCheckValue({ ...checkValue, endTimeError: 'เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น' });
+            setCheckValue({
+              ...checkValue,
+              endTimeError: "เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น",
+            });
           }
         } else {
-          setValues({ ...values, stStartTime: stStartTime, stEndTime: stEndTime });
-          setCheckValue({ ...checkValue, startTimeError: '', endTimeError: '' });
+          setValues({
+            ...values,
+            stStartTime: stStartTime,
+            stEndTime: stEndTime,
+          });
+          setCheckValue({
+            ...checkValue,
+            startTimeError: "",
+            endTimeError: "",
+          });
         }
       }
     }
-  }, [values.startDate, values.endDate, values.startTime, values.endTime, createDate]);
+  }, [
+    values.startDate,
+    values.endDate,
+    values.startTime,
+    values.endTime,
+    createDate,
+  ]);
 
   const clearData = async () => {
     dispatch(updatesaleLimitTimeState({}));
     dispatch(updateAddTypeAndProductState([]));
-    dispatch(setProductList('รายการสินค้าทั้งหมด'));
-    dispatch(updateExcludeSelectBranches({
-      isAllBranches: null,
-      appliedBranches: {
-        branchList: [],
-        province: [],
-        excludedBranchList: [],
-        excludedProvinceList: [],
-      },
-      saved: false,
-    }))
+    dispatch(setProductList("รายการสินค้าทั้งหมด"));
+    dispatch(
+      updateExcludeSelectBranches({
+        isAllBranches: null,
+        appliedBranches: {
+          branchList: [],
+          province: [],
+          excludedBranchList: [],
+          excludedProvinceList: [],
+        },
+        saved: false,
+      }),
+    );
   };
   const handleClose = async () => {
     setOpen(false);
@@ -276,14 +339,14 @@ function STCreateModal({
   };
 
   const compareDateTime = (date: Date, time: string | null) => {
-    let dateAppend = moment(date).format(DateFormat.DATE_FORMAT) + ' ' + time;
+    let dateAppend = moment(date).format(DateFormat.DATE_FORMAT) + " " + time;
     return moment(dateAppend, DateFormat.DATE_TIME_DISPLAY_FORMAT);
   };
 
   const topFunction = () => {
-    document.getElementById('top-item')?.scrollIntoView({
-      block: 'start',
-      behavior: 'smooth',
+    document.getElementById("top-item")?.scrollIntoView({
+      block: "start",
+      behavior: "smooth",
     });
   };
 
@@ -310,12 +373,12 @@ function STCreateModal({
 
   const handleStartTimePicker = (value: string) => {
     setValues({ ...values, startTime: value });
-    setCheckValue({ ...checkValue, startTimeError: '' });
+    setCheckValue({ ...checkValue, startTimeError: "" });
   };
 
   const handleEndTimePicker = (value: string) => {
     setValues({ ...values, endTime: value });
-    setCheckValue({ ...checkValue, endTimeError: '' });
+    setCheckValue({ ...checkValue, endTimeError: "" });
   };
 
   const handleStartDatePicker = (value: any) => {
@@ -341,7 +404,7 @@ function STCreateModal({
   };
 
   const [openAlert, setOpenAlert] = React.useState(false);
-  const [textError, setTextError] = React.useState('');
+  const [textError, setTextError] = React.useState("");
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
@@ -357,15 +420,15 @@ function STCreateModal({
       item.endDateError = true;
       valiDate = false;
     }
-    if (values.startTime === '') {
-      item.startTimeError = 'กรุณาระบุรายละเอียด';
+    if (values.startTime === "") {
+      item.startTimeError = "กรุณาระบุรายละเอียด";
       valiDate = false;
     }
-    if (values.endTime === '') {
-      item.endTimeError = 'กรุณาระบุรายละเอียด';
+    if (values.endTime === "") {
+      item.endTimeError = "กรุณาระบุรายละเอียด";
       valiDate = false;
     }
-    if (values.description === '') {
+    if (values.description === "") {
       item.descriptionError = true;
       valiDate = false;
     }
@@ -373,8 +436,8 @@ function STCreateModal({
       item.payloadBranchesError = true;
       valiDate = false;
     }
-    if (checkValue.startTimeError != '') valiDate = false;
-    if (checkValue.endTimeError != '') valiDate = false;
+    if (checkValue.startTimeError != "") valiDate = false;
+    if (checkValue.endTimeError != "") valiDate = false;
     setCheckValue(item);
     return valiDate;
   };
@@ -416,14 +479,18 @@ function STCreateModal({
         };
 
         const bodyPayload = !!payLoadSt.id
-          ? { ...body, id: payLoadSt.id, documentNumber: payLoadSt.documentNumber }
+          ? {
+              ...body,
+              id: payLoadSt.id,
+              documentNumber: payLoadSt.documentNumber,
+            }
           : body;
         const rs = await saveDraftST(bodyPayload);
         if (rs.code === 201) {
           if (!getStart) {
             dispatch(setCheckEdit(false));
             setShowSnackBar(true);
-            setContentMsg('คุณได้บันทึกข้อมูลเรียบร้อยแล้ว');
+            setContentMsg("คุณได้บันทึกข้อมูลเรียบร้อยแล้ว");
             // if (onSearchBD) onSearchBD();
           }
           dispatch(
@@ -431,7 +498,7 @@ function STCreateModal({
               ...payLoadSt,
               id: rs.data.id,
               documentNumber: rs.data.documentNumber,
-            })
+            }),
           );
           setStatus(1);
           if (getStart) {
@@ -439,11 +506,11 @@ function STCreateModal({
           }
         } else {
           setOpenAlert(true);
-          setTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+          setTextError("กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน");
         }
       } catch (error) {
         setOpenAlert(true);
-        setTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+        setTextError("กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน");
       }
     }
   };
@@ -455,16 +522,18 @@ function STCreateModal({
       if (rs.code === 20000) {
         setStatus(2);
         setOpenPopup(true);
-        setPopupMsg('คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว');
+        setPopupMsg(
+          "คุณได้เริ่มใช้งานการกำหนดเวลา (งด) ขายสินค้าเรียบร้อยแล้ว",
+        );
         handleClose();
         if (onSearch) onSearch();
       } else {
         setOpenAlert(true);
-        setTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+        setTextError("กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน");
       }
     } catch (error) {
       setOpenAlert(true);
-      setTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+      setTextError("กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน");
     }
   };
 
@@ -482,20 +551,20 @@ function STCreateModal({
         const rs = await cancelST(body);
         if (rs.code === 20000) {
           setOpenPopup(true);
-          setPopupMsg('คุณได้ยกเลิกกำหนดเวลา (งด) ขายสินค้า เรียบร้อยแล้ว');
+          setPopupMsg("คุณได้ยกเลิกกำหนดเวลา (งด) ขายสินค้า เรียบร้อยแล้ว");
           handleClose();
           if (onSearch) onSearch();
         } else {
           setOpenAlert(true);
-          setTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+          setTextError("กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน");
         }
       } catch (error) {
         setOpenAlert(true);
-        setTextError('กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน');
+        setTextError("กรุณาตรวจสอบ \n กรอกข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน");
       }
     } else {
       setOpenPopup(true);
-      setPopupMsg('คุณได้ยกเลิกกำหนดเวลา (งด) ขายสินค้า เรียบร้อยแล้ว');
+      setPopupMsg("คุณได้ยกเลิกกำหนดเวลา (งด) ขายสินค้า เรียบร้อยแล้ว");
       handleClose();
     }
   };
@@ -509,7 +578,7 @@ function STCreateModal({
     if (choiceCopy) {
       // second choice copy by update the information to the current amount
       let listItem = _.cloneDeep(payloadAddTypeProduct);
-      
+
       let listTypeItem = listItem.filter((el: any) => el.selectedType === 1);
 
       for (const el of listTypeItem) {
@@ -518,7 +587,9 @@ function STCreateModal({
           let lstProductByType = res.data;
           for (const item of lstProductByType) {
             let productItem: any = _.cloneDeep(item);
-            let productExist = listItem.find((it: any) => it.selectedType === 2 && it.barcode === item.barcode);
+            let productExist = listItem.find(
+              (it: any) => it.selectedType === 2 && it.barcode === item.barcode,
+            );
             if (objectNullOrEmpty(productExist)) {
               productItem.selectedType = 2;
               productItem.showProduct = true;
@@ -531,7 +602,9 @@ function STCreateModal({
         for (const item of payloadAddTypeProduct) {
           if (item.selectedType === 2) {
             let selectedItemFilter = listItem.filter(
-              (it: any) => it.selectedType === item.selectedType && it.barcode === item.barcode
+              (it: any) =>
+                it.selectedType === item.selectedType &&
+                it.barcode === item.barcode,
             );
             if (selectedItemFilter && selectedItemFilter.length === 0) {
               listItem.push(item);
@@ -586,7 +659,9 @@ function STCreateModal({
 
     if (selectedItemEnds && selectedItemEnds.length > 0) {
       let listTypeCodeProducts = new Set(
-        selectedItemEnds.map((item: any) => item.productTypeCode).filter((el: any) => el != undefined)
+        selectedItemEnds
+          .map((item: any) => item.productTypeCode)
+          .filter((el: any) => el != undefined),
       );
       let listCategoryCode = selectedItemEnds
         .filter((el: any) => el.selectedType === 1)
@@ -595,7 +670,9 @@ function STCreateModal({
       let listTypes = Array.from(listTypeCodeProducts);
       for (let i of listTypes) {
         if (!listCategoryCode.includes(i)) {
-          const item = selectedItemEnds.find((el: any) => i === el.productTypeCode);
+          const item = selectedItemEnds.find(
+            (el: any) => i === el.productTypeCode,
+          );
           selectedItemEnds.push({
             productTypeCode: item.productTypeCode,
             productTypeName: item.productTypeName,
@@ -611,12 +688,12 @@ function STCreateModal({
     try {
       if (e.target.files[0]) {
         const formData = new FormData();
-        formData.append('barcode', e.target.files[0]);
+        formData.append("barcode", e.target.files[0]);
         const rs = await importST(formData);
         if (!!rs.data) {
           if (rs.code == 20000) {
             handleAddProduct(rs.data.appliedProducts);
-            setUrlModalValidate('');
+            setUrlModalValidate("");
             setOpenModalValidate(false);
           }
           if (rs.code == 40002) {
@@ -625,7 +702,7 @@ function STCreateModal({
           }
         } else {
           setMsgModalValidate(rs.message);
-          setUrlModalValidate('');
+          setUrlModalValidate("");
           setOpenModalValidate(true);
         }
       }
@@ -636,47 +713,57 @@ function STCreateModal({
 
   return (
     <div>
-      <Dialog open={open} maxWidth='xl' fullWidth={true}>
-        <BootstrapDialogTitle id='customized-dialog-title' onClose={handleCheckClose}>
-          <Typography sx={{ fontSize: '1em', mb: 2 }}>{'สร้างเอกสารกำหนดเวลา (งด) ขายสินค้าใหม่'}</Typography>
+      <Dialog open={open} maxWidth="xl" fullWidth={true}>
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleCheckClose}
+        >
+          <Typography sx={{ fontSize: "1em", mb: 2 }}>
+            {"สร้างเอกสารกำหนดเวลา (งด) ขายสินค้าใหม่"}
+          </Typography>
           <StepperBar activeStep={status} />
         </BootstrapDialogTitle>
 
         <DialogContent>
-          <Grid container spacing={2} mb={2} mt={2} id='top-item'>
+          <Grid container spacing={2} mb={2} mt={2} id="top-item">
             <Grid item xs={2}>
               <Box mb={2}>เลขที่เอกสาร ST :</Box>
               <Box>วันที่สร้างรายการ :</Box>
             </Grid>
             <Grid item xs={3}>
-              <Box mb={2}>{!!payLoadSt.documentNumber ? payLoadSt.documentNumber : '-'}</Box>
-              <Box>{moment(createDate).add(543, 'y').format('DD/MM/YYYY')}</Box>
+              <Box mb={2}>
+                {!!payLoadSt.documentNumber ? payLoadSt.documentNumber : "-"}
+              </Box>
+              <Box>{moment(createDate).add(543, "y").format("DD/MM/YYYY")}</Box>
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              รายละเอียด<b style={{ fontSize: '18px' }}> *</b> :
+              รายละเอียด<b style={{ fontSize: "18px" }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
-                placeholder=' ความยาวไม่เกิน 50 ตัวอักษร'
+                placeholder=" ความยาวไม่เกิน 50 ตัวอักษร"
                 multiline
                 fullWidth
                 rows={2}
-                style={{ backgroundColor: status > 1 || !isAdmin ? '#f1f1f1' : 'transparent' }}
+                style={{
+                  backgroundColor:
+                    status > 1 || !isAdmin ? "#f1f1f1" : "transparent",
+                }}
                 error={checkValue.descriptionError}
                 className={classes.MtextField}
                 value={values.description}
                 inputProps={{
-                  maxLength: '50',
+                  maxLength: "50",
                 }}
-                variant='outlined'
+                variant="outlined"
                 onChange={(e) => {
                   handleChangeDescription(e.target.value);
                 }}
                 disabled={status > 1 || !isAdmin}
               />
               {checkValue.descriptionError && (
-                <Box textAlign='right' color='#F54949'>
+                <Box textAlign="right" color="#F54949">
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
@@ -684,7 +771,7 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2.5}>
             <Grid item xs={2}>
-              วันที่เริ่มงดใช้งาน<b style={{ fontSize: '18px' }}> *</b> :
+              วันที่เริ่มงดใช้งาน<b style={{ fontSize: "18px" }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
@@ -694,14 +781,14 @@ function STCreateModal({
                 value={values.startDate}
               />
               {checkValue.startDateError && (
-                <Box textAlign='right' color='#F54949'>
+                <Box textAlign="right" color="#F54949">
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              วันที่สิ้นสุดงดขาย<b style={{ fontSize: '18px' }}> *</b> :
+              วันที่สิ้นสุดงดขาย<b style={{ fontSize: "18px" }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <DatePickerComponent
@@ -709,11 +796,11 @@ function STCreateModal({
                 disabled={status > 1 || !isAdmin}
                 onClickDate={handleEndDatePicker}
                 value={values.endDate}
-                type='TO'
+                type="TO"
                 minDateTo={values.startDate}
               />
               {checkValue.endDateError && (
-                <Box textAlign='right' color='#F54949'>
+                <Box textAlign="right" color="#F54949">
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
@@ -722,14 +809,17 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              เวลาที่เริ่มงดขาย<b style={{ fontSize: '18px' }}> *</b> :
+              เวลาที่เริ่มงดขาย<b style={{ fontSize: "18px" }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id='time-start'
-                type='time'
+                id="time-start"
+                type="time"
                 fullWidth
-                style={{ backgroundColor: status > 1 || !isAdmin ? '#f1f1f1' : 'transparent' }}
+                style={{
+                  backgroundColor:
+                    status > 1 || !isAdmin ? "#f1f1f1" : "transparent",
+                }}
                 error={!!checkValue.startTimeError}
                 className={classes.MtimeTextField}
                 value={values.startTime}
@@ -741,22 +831,25 @@ function STCreateModal({
               />
 
               {checkValue.startTimeError && (
-                <Box textAlign='right' color='#F54949'>
+                <Box textAlign="right" color="#F54949">
                   {checkValue.startTimeError}
                 </Box>
               )}
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={2}>
-              เวลาที่สิ้นสุดงดขาย<b style={{ fontSize: '18px' }}> *</b> :
+              เวลาที่สิ้นสุดงดขาย<b style={{ fontSize: "18px" }}> *</b> :
             </Grid>
             <Grid item xs={3}>
               <TextField
-                id='time-end'
-                type='time'
+                id="time-end"
+                type="time"
                 fullWidth
                 error={!!checkValue.endTimeError}
-                style={{ backgroundColor: status > 1 || !isAdmin ? '#f1f1f1' : 'transparent' }}
+                style={{
+                  backgroundColor:
+                    status > 1 || !isAdmin ? "#f1f1f1" : "transparent",
+                }}
                 className={classes.MtimeTextField}
                 value={values.endTime}
                 onChange={(e) => handleEndTimePicker(e.target.value)}
@@ -766,7 +859,7 @@ function STCreateModal({
                 disabled={status > 1 || !isAdmin}
               />
               {checkValue.endTimeError && (
-                <Box textAlign='right' color='#F54949'>
+                <Box textAlign="right" color="#F54949">
                   {checkValue.endTimeError}
                 </Box>
               )}
@@ -775,12 +868,15 @@ function STCreateModal({
           </Grid>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={2}>
-              สาขา<b style={{ fontSize: '18px' }}> *</b> :
+              สาขา<b style={{ fontSize: "18px" }}> *</b> :
             </Grid>
             <Grid item xs={3}>
-              <SelectExcludeBranch disabled={status > 1 || !isAdmin} error={checkValue.payloadBranchesError} />
+              <SelectExcludeBranch
+                disabled={status > 1 || !isAdmin}
+                error={checkValue.payloadBranchesError}
+              />
               {checkValue.payloadBranchesError && (
-                <Box textAlign='right' color='#F54949'>
+                <Box textAlign="right" color="#F54949">
                   กรุณาระบุรายละเอียด
                 </Box>
               )}
@@ -795,33 +891,39 @@ function STCreateModal({
                   {status < 2 && (
                     <>
                       <Button
-                        id='btnAddItem'
-                        variant='contained'
-                        color='info'
+                        id="btnAddItem"
+                        variant="contained"
+                        color="info"
                         className={classes.MbtnPrint}
                         onClick={handleOpenAddItems}
                         startIcon={<ControlPoint />}
-                        sx={{ width: 126 }}>
+                        sx={{ width: 126 }}
+                      >
                         เพิ่มสินค้า
                       </Button>
-                      <label htmlFor='import-st-button-file'>
+                      <label htmlFor="import-st-button-file">
                         {Object.keys(payloadAddTypeProduct).length === 0 && (
                           <Input
-                            id='import-st-button-file'
-                            type='file'
+                            id="import-st-button-file"
+                            type="file"
                             onChange={handleImportFile}
-                            style={{ display: 'none' }}
+                            style={{ display: "none" }}
                           />
                         )}
                         <Button
-                          id='btnImport'
-                          variant='contained'
-                          color='primary'
+                          id="btnImport"
+                          variant="contained"
+                          color="primary"
                           className={classes.MbtnPrint}
-                          startIcon={<ImportAppIcon sx={{ transform: 'rotate(90deg)' }} />}
-                          sx={{ width: 126, ml: '19px' }}
-                          component='span'
-                          disabled={!!Object.keys(payloadAddTypeProduct).length}>
+                          startIcon={
+                            <ImportAppIcon
+                              sx={{ transform: "rotate(90deg)" }}
+                            />
+                          }
+                          sx={{ width: 126, ml: "19px" }}
+                          component="span"
+                          disabled={!!Object.keys(payloadAddTypeProduct).length}
+                        >
                           Import
                         </Button>
                       </label>
@@ -830,51 +932,55 @@ function STCreateModal({
                 </>
               )}
             </Grid>
-            <Grid item xs={7} sx={{ textAlign: 'end' }}>
+            <Grid item xs={7} sx={{ textAlign: "end" }}>
               {isAdmin && (
                 <>
                   {status < 2 ? (
                     <>
                       <Button
-                        variant='contained'
-                        color='warning'
+                        variant="contained"
+                        color="warning"
                         onClick={() => handleCreateSTDetail(false)}
                         startIcon={<SaveIcon />}
                         className={classes.MbtnSearch}
-                        style={{ display: status > 1 ? 'none' : undefined }}
-                        disabled={!!!Object.keys(payloadAddTypeProduct).length}>
+                        style={{ display: status > 1 ? "none" : undefined }}
+                        disabled={!!!Object.keys(payloadAddTypeProduct).length}
+                      >
                         บันทึก
                       </Button>
                       <Button
-                        variant='contained'
-                        color='primary'
-                        sx={{ margin: '0 17px' }}
+                        variant="contained"
+                        color="primary"
+                        sx={{ margin: "0 17px" }}
                         startIcon={<CheckCircleOutlineIcon />}
                         onClick={() => handleOpenStart()}
                         className={classes.MbtnSearch}
-                        disabled={!!!Object.keys(payloadAddTypeProduct).length}>
+                        disabled={!!!Object.keys(payloadAddTypeProduct).length}
+                      >
                         เริ่มใช้งาน
                       </Button>
                     </>
                   ) : (
                     <Button
-                      variant='contained'
-                      color='info'
-                      sx={{ margin: '0 17px' }}
+                      variant="contained"
+                      color="info"
+                      sx={{ margin: "0 17px" }}
                       startIcon={<ContentCopyIcon />}
                       className={classes.MbtnSearch}
-                      onClick={handleOpenModalCopy}>
+                      onClick={handleOpenModalCopy}
+                    >
                       Copy
                     </Button>
                   )}
                   {status < 3 && (
                     <Button
-                      variant='contained'
-                      color='error'
+                      variant="contained"
+                      color="error"
                       disabled={status < 1}
                       onClick={handleOpenCancel}
                       startIcon={<HighlightOffIcon />}
-                      className={classes.MbtnSearch}>
+                      className={classes.MbtnSearch}
+                    >
                       ยกเลิก
                     </Button>
                   )}
@@ -884,17 +990,23 @@ function STCreateModal({
           </Grid>
 
           <Box mb={4}>
-            <STProductTypeItems disabled={status > 1 || !isAdmin} unSelectAllType={unSelectAllType} />
+            <STProductTypeItems
+              disabled={status > 1 || !isAdmin}
+              unSelectAllType={unSelectAllType}
+            />
           </Box>
           <Box mb={4}>
             {showModalProduct && (
-              <STProductItems disabled={status > 1 || !isAdmin} unSelectAllType={handleUnSelectAllType} />
+              <STProductItems
+                disabled={status > 1 || !isAdmin}
+                unSelectAllType={handleUnSelectAllType}
+              />
             )}
           </Box>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
               <TextBoxComment
-                fieldName='หมายเหตุ :'
+                fieldName="หมายเหตุ :"
                 defaultValue={remark}
                 maxLength={100}
                 onChangeComment={handleChangeRemark}
@@ -903,21 +1015,21 @@ function STCreateModal({
               />
             </Grid>
             <Grid item xs={7}></Grid>
-            <Grid item xs={2} mt={15} textAlign='center'>
+            <Grid item xs={2} mt={15} textAlign="center">
               <IconButton onClick={topFunction}>
                 <ArrowForwardIosIcon
                   sx={{
-                    fontSize: '41px',
-                    padding: '6px',
-                    backgroundColor: '#C8E8FF',
-                    transform: 'rotate(270deg)',
-                    color: '#fff',
-                    borderRadius: '50%',
+                    fontSize: "41px",
+                    padding: "6px",
+                    backgroundColor: "#C8E8FF",
+                    transform: "rotate(270deg)",
+                    color: "#fff",
+                    borderRadius: "50%",
                   }}
                 />
               </IconButton>
 
-              <Box fontSize='13px'>กลับขึ้นด้านบน</Box>
+              <Box fontSize="13px">กลับขึ้นด้านบน</Box>
             </Grid>
           </Grid>
         </DialogContent>
@@ -931,7 +1043,7 @@ function STCreateModal({
         onClose={handleCloseModalCancel}
         onConfirm={handleDeleteDraft}
         HQCode={payLoadSt.documentNumber}
-        headerTitle={'ต้องการยกเลิกกำหนดเวลา (งด) ขายสินค้า'}
+        headerTitle={"ต้องการยกเลิกกำหนดเวลา (งด) ขายสินค้า"}
       />
 
       <ModelConfirm
@@ -942,7 +1054,7 @@ function STCreateModal({
         onClose={handleCloseModalStart}
         onConfirm={() => handleCreateSTDetail(true)}
         HQCode={payLoadSt.documentNumber}
-        headerTitle={'ยืนยันเริ่มใช้งานกำหนดเวลา (งด) ขายสินค้า'}
+        headerTitle={"ยืนยันเริ่มใช้งานกำหนดเวลา (งด) ขายสินค้า"}
       />
 
       <ModalConfirmCopy
@@ -953,15 +1065,20 @@ function STCreateModal({
         setChoiceCopy={setChoiceCopy}
       />
 
-      <SnackbarStatus open={showSnackBar} onClose={handleCloseSnackBar} isSuccess={true} contentMsg={contentMsg} />
+      <SnackbarStatus
+        open={showSnackBar}
+        onClose={handleCloseSnackBar}
+        isSuccess={true}
+        contentMsg={contentMsg}
+      />
 
       {/* <ModalAddTypeProduct open={openModelAddItems} onClose={handleCloseModalAddItems} /> */}
       <ModalAddTypeProducts
         open={openModelAddItems}
         onClose={handleCloseModalAddItems}
-        title='เพิ่มรายการสินค้า (งด) ขาย'
+        title="เพิ่มรายการสินค้า (งด) ขาย"
         showSearch={true}
-        textBtn='เพิ่มสินค้า'
+        textBtn="เพิ่มสินค้า"
         requestBody={{
           isSellable: true,
           skuTypes: [2],
@@ -969,31 +1086,41 @@ function STCreateModal({
       />
 
       <LoadingModal open={openLoadingModal} />
-      <AlertError open={openAlert} onClose={handleCloseAlert} textError={textError} />
+      <AlertError
+        open={openAlert}
+        onClose={handleCloseAlert}
+        textError={textError}
+      />
 
       <ConfirmModelExit
         open={confirmModelExit}
         onClose={handleNotExitModelConfirm}
         onConfirm={handleExitModelConfirm}
       />
-      <ModalValidateImport isOpen={openModalValidate} title='ไม่สามารถ import file ได้ '>
-        <Box sx={{ textAlign: 'center' }}>
+      <ModalValidateImport
+        isOpen={openModalValidate}
+        title="ไม่สามารถ import file ได้ "
+      >
+        <Box sx={{ textAlign: "center" }}>
           {!!urlModalValidate ? (
-            <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>
-              <a href={urlModalValidate} target='_blank'>
-                ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้{' '}
+            <Typography sx={{ color: "#F54949", marginBottom: "34px" }}>
+              <a href={urlModalValidate} target="_blank">
+                ดาวน์โหลดผลการ import file คลิ๊กที่ link นี้{" "}
               </a>
             </Typography>
           ) : (
-            <Typography sx={{ color: '#F54949', marginBottom: '34px' }}>{msgModalValidate}</Typography>
+            <Typography sx={{ color: "#F54949", marginBottom: "34px" }}>
+              {msgModalValidate}
+            </Typography>
           )}
           <Button
-            id='btnClose'
-            variant='contained'
-            color='error'
+            id="btnClose"
+            variant="contained"
+            color="error"
             onClick={() => {
               setOpenModalValidate(false);
-            }}>
+            }}
+          >
             ปิด
           </Button>
         </Box>

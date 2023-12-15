@@ -1,20 +1,35 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, Grid, TextField, Typography } from '@mui/material';
-import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { useStyles } from '../../../styles/makeTheme';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { ExpenseInfo, payLoadAdd } from '../../../models/branch-accounting-model';
-import { addSummaryItem, haveUpdateData } from '../../../store/slices/accounting/accounting-slice';
-import LoadingModal from '../../commons/ui/loading-modal';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import { useStyles } from "../../../styles/makeTheme";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import {
+  ExpenseInfo,
+  payLoadAdd,
+} from "../../../models/branch-accounting-model";
+import {
+  addSummaryItem,
+  haveUpdateData,
+} from "../../../store/slices/accounting/accounting-slice";
+import LoadingModal from "../../commons/ui/loading-modal";
 import {
   isFilterFieldInExpense,
   isFilterOutFieldForPayload,
   isFilterOutFieldInAdd,
   stringNullOrEmpty,
-} from '../../../utils/utils';
-import { BootstrapDialogTitle } from '../../commons/ui/dialog-title';
-import NumberFormat from 'react-number-format';
-import { setInit } from 'store/sessionStore';
+} from "../../../utils/utils";
+import { BootstrapDialogTitle } from "../../commons/ui/dialog-title";
+import NumberFormat from "react-number-format";
+import { setInit } from "store/sessionStore";
 
 interface Props {
   open: boolean;
@@ -27,7 +42,9 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   const [isopen, setIsopen] = React.useState(open);
   const [openLoadingModal, setOpenLoadingModal] = React.useState(false);
   const [isDisableSaveBtn, setIsDisableSaveBtn] = React.useState(false);
-  const expenseMasterList = useAppSelector((state) => state.masterExpenseListSlice.masterExpenseList.data);
+  const expenseMasterList = useAppSelector(
+    (state) => state.masterExpenseListSlice.masterExpenseList.data,
+  );
   const [values, setValues] = React.useState({});
   const [sumOther, setSumOther] = React.useState(0);
   const [testList, setTestList] = React.useState<any>([]);
@@ -47,8 +64,8 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
       if (!isFilterOutFieldForPayload(e.key)) {
         _data = value
           .toString()
-          .replace(/[^0-9.]/g, '')
-          .replace(/,/g, '');
+          .replace(/[^0-9.]/g, "")
+          .replace(/,/g, "");
         _data = parseFloat(_data);
         data = { ...data, [e.key]: _data };
       } else {
@@ -68,7 +85,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
     if (sum > 0) {
       await dispatch(addSummaryItem(data));
       await dispatch(haveUpdateData(true));
-      setInit('N');
+      setInit("N");
       setTimeout(() => {
         onClose();
       }, 300);
@@ -87,14 +104,14 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
         // .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key))
         .map((i: payLoadAdd) => {
           if (!isFilterOutFieldInAdd(i.key) && isOtherExpenseField(i.key)) {
-            if (typeof i.value === 'string') {
+            if (typeof i.value === "string") {
               _otherSum += parseFloat(i.value);
             } else {
               _otherSum += i.value;
             }
           }
           if (!isFilterOutFieldInAdd(i.key)) {
-            if (typeof i.value === 'string') {
+            if (typeof i.value === "string") {
               sum += parseFloat(i.value);
             } else {
               sum += i.value;
@@ -108,7 +125,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   }, [open, payload]);
 
   const handleChangeNew = (value: any, name: any) => {
-    const _data = value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+    const _data = value.replace(/[^0-9.]/g, "").replace(/,/g, "");
     const onlyNumber = parseFloat(_data || 0);
     let sum: number = 0;
     const data = Number(onlyNumber) || 0;
@@ -127,7 +144,7 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
   };
 
   const handleChangeNewOnOtherExpense = (value: any, name: any) => {
-    const _data = value.replace(/[^0-9.]/g, '').replace(/,/g, '');
+    const _data = value.replace(/[^0-9.]/g, "").replace(/,/g, "");
     const data = parseFloat(_data || 0);
     let _otherSum: number = 0;
     let sum: number = 0;
@@ -135,7 +152,10 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
       if (element.key === name) {
         element.value = data;
       }
-      if (!isFilterFieldInExpense(element.key) && isOtherExpenseField(element.key)) {
+      if (
+        !isFilterFieldInExpense(element.key) &&
+        isOtherExpenseField(element.key)
+      ) {
         if (element.key === name) {
           _otherSum += data;
         } else {
@@ -158,7 +178,8 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
 
     setFlagEdit(false);
   }, [flagEdit === true]);
-  const getMasterExpenInto = (key: any) => expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
+  const getMasterExpenInto = (key: any) =>
+    expenseMasterList.find((e: ExpenseInfo) => e.expenseNo === key);
   const isOtherExpenseField = (key: any) => {
     const master = getMasterExpenInto(key);
     return master?.isOtherExpense;
@@ -166,15 +187,20 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
 
   return (
     <div>
-      <Dialog open={open} maxWidth='md' fullWidth={true} key='modal-add-expense'>
-        <BootstrapDialogTitle id='dialog-title' onClose={onClose} />
+      <Dialog
+        open={open}
+        maxWidth="md"
+        fullWidth={true}
+        key="modal-add-expense"
+      >
+        <BootstrapDialogTitle id="dialog-title" onClose={onClose} />
         <DialogContent>
           <Grid container spacing={2} mb={2}>
             <Grid item xs={3}>
-              ยอดเงินอนุมัติ :{' '}
+              ยอดเงินอนุมัติ :{" "}
               <NumberFormat
                 value={sumExpense}
-                displayType={'text'}
+                displayType={"text"}
                 decimalScale={2}
                 thousandSeparator={true}
                 fixedDecimalScale
@@ -184,14 +210,20 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
             <>
               <Grid container spacing={2} mb={2} mt={2} ml={1}>
                 {testList
-                  .filter((i: payLoadAdd) => !isFilterOutFieldInAdd(i.key) && !i.isOtherExpense)
+                  .filter(
+                    (i: payLoadAdd) =>
+                      !isFilterOutFieldInAdd(i.key) && !i.isOtherExpense,
+                  )
                   .map((i: payLoadAdd) => {
                     const master = getMasterExpenInto(i.key);
                     return (
                       <>
                         <Grid item xs={2}>
-                          <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
-                            {i.title}:{' '}
+                          <Typography
+                            variant="body2"
+                            sx={{ wordWrap: "break-word" }}
+                          >
+                            {i.title}:{" "}
                           </Typography>
                         </Grid>
                         <Grid item xs={2}>
@@ -211,13 +243,15 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             id={i.key}
                             name={i.key}
                             value={i.value}
-                            onChange={(event: any) => handleChangeNew(event.target.value, i.key)}
+                            onChange={(event: any) =>
+                              handleChangeNew(event.target.value, i.key)
+                            }
                             decimalScale={2}
                             className={classes.MtextFieldNumberNotStyleDisable}
                             disabled={!master?.isActive}
                             customInput={TextField}
                             fixedDecimalScale
-                            autoComplete='off'
+                            autoComplete="off"
                             thousandSeparator={true}
                             allowNegative={false}
                           />
@@ -245,8 +279,8 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                   /> */}
 
                   <NumberFormat
-                    id='txtDocNo'
-                    name='sumOther'
+                    id="txtDocNo"
+                    name="sumOther"
                     value={String(sumOther)}
                     // onChange={handleOnChange}
                     decimalScale={2}
@@ -254,22 +288,37 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                     disabled={true}
                     customInput={TextField}
                     fixedDecimalScale
-                    autoComplete='off'
+                    autoComplete="off"
                     thousandSeparator={true}
                   />
                 </Grid>
               </Grid>
 
-              <Grid container spacing={2} mb={2} mt={2} ml={1} pr={2} pb={2} sx={{ border: 1, borderColor: '#EAEBEB' }}>
+              <Grid
+                container
+                spacing={2}
+                mb={2}
+                mt={2}
+                ml={1}
+                pr={2}
+                pb={2}
+                sx={{ border: 1, borderColor: "#EAEBEB" }}
+              >
                 {testList
-                  .filter((i: payLoadAdd) => i.isOtherExpense && !isFilterOutFieldInAdd(i.key))
+                  .filter(
+                    (i: payLoadAdd) =>
+                      i.isOtherExpense && !isFilterOutFieldInAdd(i.key),
+                  )
                   .map((i: payLoadAdd) => {
                     const master = getMasterExpenInto(i.key);
                     return (
                       <>
                         <Grid item xs={2}>
-                          <Typography variant='body2' sx={{ wordWrap: 'break-word' }}>
-                            {i.title}:{' '}
+                          <Typography
+                            variant="body2"
+                            sx={{ wordWrap: "break-word" }}
+                          >
+                            {i.title}:{" "}
                           </Typography>
                         </Grid>
                         <Grid item xs={2}>
@@ -288,13 +337,18 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
                             id={i.key}
                             name={i.key}
                             value={i.value}
-                            onChange={(event: any) => handleChangeNewOnOtherExpense(event.target.value, i.key)}
+                            onChange={(event: any) =>
+                              handleChangeNewOnOtherExpense(
+                                event.target.value,
+                                i.key,
+                              )
+                            }
                             decimalScale={2}
                             className={classes.MtextFieldNumberNotStyleDisable}
                             disabled={!master?.isActive}
                             customInput={TextField}
                             fixedDecimalScale
-                            autoComplete='off'
+                            autoComplete="off"
                             thousandSeparator={true}
                             allowNegative={false}
                           />
@@ -306,17 +360,18 @@ function ModalUpdateExpenseSummary({ open, onClose, payload }: Props) {
             </>
           </Grid>
           <DialogActions>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <Button
-                data-testid='testid-btnAdd'
-                id='btnAdd'
-                variant='contained'
-                color='secondary'
+                data-testid="testid-btnAdd"
+                id="btnAdd"
+                variant="contained"
+                color="secondary"
                 onClick={handleSaveBtn}
                 className={classes.MbtnSearch}
-                size='large'
+                size="large"
                 disabled={isDisableSaveBtn ? true : false}
-                startIcon={<AddCircleOutlineIcon />}>
+                startIcon={<AddCircleOutlineIcon />}
+              >
                 บันทึก
               </Button>
             </Box>

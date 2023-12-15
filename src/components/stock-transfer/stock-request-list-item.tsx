@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/store';
+import React, { useEffect, useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   DataGrid,
   GridColDef,
@@ -10,18 +10,25 @@ import {
   GridValueGetterParams,
   GridCellParams,
   GridEditCellValueParams,
-} from '@mui/x-data-grid';
-import { Box } from '@mui/system';
-import { useStyles } from '../../styles/makeTheme';
-import { Checkbox, FormControlLabel, FormGroup, Grid, TextField, Typography } from '@mui/material';
-import { DeleteForever } from '@mui/icons-material';
-import ModelDeleteConfirm from '../commons/ui/modal-delete-confirm';
-import { numberWithCommas } from '../../utils/utils';
-import { updateAddItemsState } from '../../store/slices/add-items-slice';
-import { updatestockRequestItemsState } from '../../store/slices/stock-request-items-slice';
-import { getUserInfo } from '../../store/sessionStore';
-import { PERMISSION_GROUP } from '../../utils/enum/permission-enum';
-import { ErrorDetail } from '../../models/api-error-model';
+} from "@mui/x-data-grid";
+import { Box } from "@mui/system";
+import { useStyles } from "../../styles/makeTheme";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { DeleteForever } from "@mui/icons-material";
+import ModelDeleteConfirm from "../commons/ui/modal-delete-confirm";
+import { numberWithCommas } from "../../utils/utils";
+import { updateAddItemsState } from "../../store/slices/add-items-slice";
+import { updatestockRequestItemsState } from "../../store/slices/stock-request-items-slice";
+import { getUserInfo } from "../../store/sessionStore";
+import { PERMISSION_GROUP } from "../../utils/enum/permission-enum";
+import { ErrorDetail } from "../../models/api-error-model";
 
 export interface DataGridProps {
   type: string;
@@ -36,21 +43,23 @@ export interface DataGridProps {
 
 const columns: GridColDef[] = [
   {
-    field: 'index',
-    headerName: 'ลำดับ',
+    field: "index",
+    headerName: "ลำดับ",
     width: 80,
-    headerAlign: 'center',
+    headerAlign: "center",
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => {
-      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+      const condition =
+        params.getValue(params.id, "isError") &&
+        params.getValue(params.id, "codeError") === 40010;
 
       return (
         <Box
           component="div"
           sx={{
-            paddingLeft: '20px',
-            color: `${condition ? '#F54949' : '#000000'}`,
+            paddingLeft: "20px",
+            color: `${condition ? "#F54949" : "#000000"}`,
           }}
         >
           {params.value}
@@ -59,21 +68,23 @@ const columns: GridColDef[] = [
     },
   },
   {
-    field: 'barcode',
-    headerName: 'บาร์โค้ด',
+    field: "barcode",
+    headerName: "บาร์โค้ด",
     minWidth: 200,
-    headerAlign: 'center',
+    headerAlign: "center",
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => {
-      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+      const condition =
+        params.getValue(params.id, "isError") &&
+        params.getValue(params.id, "codeError") === 40010;
 
       return (
         <Box
           component="div"
           sx={{
-            paddingLeft: '20px',
-            color: `${condition ? '#F54949' : '#000000'}`,
+            paddingLeft: "20px",
+            color: `${condition ? "#F54949" : "#000000"}`,
           }}
         >
           {params.value}
@@ -82,44 +93,50 @@ const columns: GridColDef[] = [
     },
   },
   {
-    field: 'productName',
-    headerName: 'รายละเอียดสินค้า',
-    headerAlign: 'center',
+    field: "productName",
+    headerName: "รายละเอียดสินค้า",
+    headerAlign: "center",
     minWidth: 300,
     flex: 2,
     sortable: false,
     renderCell: (params) => {
-      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+      const condition =
+        params.getValue(params.id, "isError") &&
+        params.getValue(params.id, "codeError") === 40010;
 
       return (
         <div
           style={{
-            color: `${condition ? '#F54949' : '#000000'}`,
+            color: `${condition ? "#F54949" : "#000000"}`,
           }}
         >
           <Typography variant="body2">{params.value}</Typography>
           <Typography
             sx={{
               fontSize: 12,
-              color: `${condition ? '#F54949' : '#999999'}`,
+              color: `${condition ? "#F54949" : "#999999"}`,
             }}
           >
-            {params.getValue(params.id, 'skuCode') || ''}
+            {params.getValue(params.id, "skuCode") || ""}
           </Typography>
         </div>
       );
     },
   },
   {
-    field: 'qty',
-    headerName: 'จำนวนที่สั่ง',
+    field: "qty",
+    headerName: "จำนวนที่สั่ง",
     minWidth: 150,
-    headerAlign: 'center',
+    headerAlign: "center",
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => {
-      const condition1 = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
-      const condition2 = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40014;
+      const condition1 =
+        params.getValue(params.id, "isError") &&
+        params.getValue(params.id, "codeError") === 40010;
+      const condition2 =
+        params.getValue(params.id, "isError") &&
+        params.getValue(params.id, "codeError") === 40014;
 
       return (
         <TextField
@@ -127,51 +144,53 @@ const columns: GridColDef[] = [
           name="txnQuantity"
           type="number"
           sx={{
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: `${condition2 ? '#F54949' : '#000000'}`,
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: `${condition2 ? "#F54949" : "#000000"}`,
               },
-              '&:hover fieldset': {
-                borderColor: `${condition2 ? '#F54949' : '#000000'}`,
+              "&:hover fieldset": {
+                borderColor: `${condition2 ? "#F54949" : "#000000"}`,
               },
             },
           }}
           inputProps={{
             style: {
-              textAlign: 'right',
-              color: `${condition1 ? '#F54949' : '#000000'}`,
+              textAlign: "right",
+              color: `${condition1 ? "#F54949" : "#000000"}`,
             },
           }}
           value={params.value}
           onChange={(e) => {
-            let qty = Number(params.getValue(params.id, 'qty'));
-            var value = e.target.value ? parseInt(e.target.value, 10) : '';
+            let qty = Number(params.getValue(params.id, "qty"));
+            var value = e.target.value ? parseInt(e.target.value, 10) : "";
             if (qty === 0) value = chkQty(value);
             if (value < 0) value = 0;
             params.api.updateRows([{ ...params.row, qty: value }]);
           }}
-          disabled={params.getValue(params.id, 'editMode') ? false : true}
+          disabled={params.getValue(params.id, "editMode") ? false : true}
           autoComplete="off"
         />
       );
     },
   },
   {
-    field: 'unitName',
-    headerName: 'หน่วย',
+    field: "unitName",
+    headerName: "หน่วย",
     minWidth: 120,
-    headerAlign: 'center',
+    headerAlign: "center",
     disableColumnMenu: true,
     sortable: false,
     renderCell: (params) => {
-      const condition = params.getValue(params.id, 'isError') && params.getValue(params.id, 'codeError') === 40010;
+      const condition =
+        params.getValue(params.id, "isError") &&
+        params.getValue(params.id, "codeError") === 40010;
 
       return (
         <Box
           component="div"
           sx={{
-            paddingLeft: '20px',
-            color: `${condition ? '#F54949' : '#000000'}`,
+            paddingLeft: "20px",
+            color: `${condition ? "#F54949" : "#000000"}`,
           }}
         >
           {params.value}
@@ -180,15 +199,17 @@ const columns: GridColDef[] = [
     },
   },
   {
-    field: 'delete',
-    headerName: ' ',
+    field: "delete",
+    headerName: " ",
     width: 40,
     minWidth: 0,
-    align: 'right',
+    align: "right",
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <div>
-        {params.getValue(params.id, 'editMode') && <DeleteForever fontSize="medium" sx={{ color: '#F54949' }} />}
+        {params.getValue(params.id, "editMode") && (
+          <DeleteForever fontSize="medium" sx={{ color: "#F54949" }} />
+        )}
       </div>
     ),
     // renderCell: () => {
@@ -199,12 +220,14 @@ const columns: GridColDef[] = [
 
 var chkQty = (value: any) => {
   let v = String(value);
-  if (v.substring(1) === '0') return Number(v.substring(0, 1));
+  if (v.substring(1) === "0") return Number(v.substring(0, 1));
   return value;
 };
 
 var calBaseUnit = function (params: GridValueGetterParams) {
-  let cal = Number(params.getValue(params.id, 'qty')) * Number(params.getValue(params.id, 'baseUnit'));
+  let cal =
+    Number(params.getValue(params.id, "qty")) *
+    Number(params.getValue(params.id, "baseUnit"));
   return numberWithCommas(cal);
 };
 
@@ -213,7 +236,7 @@ function useApiRef() {
   const _columns = useMemo(
     () =>
       columns.concat({
-        field: '',
+        field: "",
         width: 0,
         minWidth: 0,
         sortable: false,
@@ -222,19 +245,31 @@ function useApiRef() {
           return null;
         },
       }),
-    [columns]
+    [columns],
   );
 
   return { apiRef, columns: _columns };
 }
 
-function StockTransferListItem({ type, edit, onChangeItems, update, status, skuCode, skuName }: DataGridProps) {
+function StockTransferListItem({
+  type,
+  edit,
+  onChangeItems,
+  update,
+  status,
+  skuCode,
+  skuName,
+}: DataGridProps) {
   const dispatch = useAppDispatch();
-  const _ = require('lodash');
+  const _ = require("lodash");
   const classes = useStyles();
-  const stockRequestDetail = useAppSelector((state) => state.stockRequestDetail.stockRequestDetail.data);
+  const stockRequestDetail = useAppSelector(
+    (state) => state.stockRequestDetail.stockRequestDetail.data,
+  );
   // const payloadAddItem = useAppSelector((state) => state.addItems.state);
-  const stockRequestItems = useAppSelector((state) => state.stockRequestItems.state);
+  const stockRequestItems = useAppSelector(
+    (state) => state.stockRequestItems.state,
+  );
   const errorListUpdate = useAppSelector((state) => state.addItems.errorLists);
   const errorList = errorListUpdate ? errorListUpdate : null;
   const errorDetail = errorList.error_details ? errorList.error_details : [];
@@ -243,21 +278,21 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
 
   const [isChecked, setIschecked] = React.useState(true);
   // const [skuNameDisplay, setSkuNameDisplay] = React.useState(skuName);
-  const [skuCodeSelect, setSkuCodeSelect] = React.useState('ALL');
+  const [skuCodeSelect, setSkuCodeSelect] = React.useState("ALL");
 
   const handleCheckboxChange = (e: any) => {
     const ischeck = e.target.checked;
     if (ischeck) {
       setIschecked(true);
-      setSkuCodeSelect('ALL');
+      setSkuCodeSelect("ALL");
     } else {
       setIschecked(false);
-      setSkuCodeSelect('');
+      setSkuCodeSelect("");
     }
   };
 
   useEffect(() => {
-    if (skuCode !== 'ALL') {
+    if (skuCode !== "ALL") {
       setIschecked(false);
       setSkuCodeSelect(skuCode);
     }
@@ -269,14 +304,20 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
     const scm = getUserInfo().group === PERMISSION_GROUP.SCM;
 
     if (!oc) {
-      if (edit && (status === '' || status === 'DRAFT' || status === 'AWAITING_FOR_REQUESTER')) editM = true;
+      if (
+        edit &&
+        (status === "" ||
+          status === "DRAFT" ||
+          status === "AWAITING_FOR_REQUESTER")
+      )
+        editM = true;
     }
 
     rows = items.map((item: any, index: number) => {
       return {
         id: `${item.barcode}-${index + 1}`,
         index: index + 1,
-        skuName: item.skuName ? item.skuName : '',
+        skuName: item.skuName ? item.skuName : "",
         skuCode: item.skuCode,
         barcode: item.barcode,
         productName: item.productName ? item.productName : item.barcodeName,
@@ -286,7 +327,9 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
         qty: item.orderQty ? item.orderQty : item.qty ? item.qty : 0,
         editMode: editM,
         stock: item.stock,
-        isError: item.skuCode ? errorDetail.some((i: ErrorDetail) => i.skuCode == item.skuCode) : false,
+        isError: item.skuCode
+          ? errorDetail.some((i: ErrorDetail) => i.skuCode == item.skuCode)
+          : false,
         codeError: errorList ? errorList.code : 0,
       };
     });
@@ -294,9 +337,10 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
     // return onChangeItems(items ? items : []);
   };
 
-  if (skuCodeSelect === 'ALL') {
-    if (type === 'Create') {
-      if (Object.keys(stockRequestItems).length > 0) itemsMap(stockRequestItems);
+  if (skuCodeSelect === "ALL") {
+    if (type === "Create") {
+      if (Object.keys(stockRequestItems).length > 0)
+        itemsMap(stockRequestItems);
     } else {
       if (Object.keys(stockRequestItems).length > 0) {
         itemsMap(stockRequestItems);
@@ -309,13 +353,15 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
       }
     }
   } else {
-    if (skuCodeSelect === '') {
+    if (skuCodeSelect === "") {
       rows = [];
-      skuName = '';
+      skuName = "";
     } else {
       let itemsOrderBy: any = [];
-      let item = stockRequestItems.filter((r: any) => r.skuCode === skuCodeSelect);
-      item = _.orderBy(item, ['skuCode', 'baseUnit'], ['asc', 'asc']);
+      let item = stockRequestItems.filter(
+        (r: any) => r.skuCode === skuCodeSelect,
+      );
+      item = _.orderBy(item, ["skuCode", "baseUnit"], ["asc", "asc"]);
       item.forEach((data: any) => {
         itemsOrderBy.push(data);
       });
@@ -328,11 +374,11 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
 
   const { apiRef, columns } = useApiRef();
   const handleEditItems = async (params: GridEditCellValueParams) => {
-    if (params.field === 'qty') {
+    if (params.field === "qty") {
       const itemsList: any = [];
       if (rows.length > 0) {
         const rows: Map<GridRowId, GridRowData> = apiRef.current.getRowModels();
-        if (skuCodeSelect === 'ALL') {
+        if (skuCodeSelect === "ALL") {
           await rows.forEach((data: GridRowData) => {
             itemsList.push(data);
           });
@@ -352,22 +398,23 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
     }
   };
 
-  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] = React.useState(false);
+  const [openModelDeleteConfirm, setOpenModelDeleteConfirm] =
+    React.useState(false);
   const [deleteItems, setDeleteItems] = React.useState(false);
-  const [productNameDel, setProductNameDel] = React.useState('');
-  const [skuCodeDel, setSkuCodeDel] = React.useState('');
-  const [barCodeDel, setBarCodeDel] = React.useState('');
+  const [productNameDel, setProductNameDel] = React.useState("");
+  const [skuCodeDel, setSkuCodeDel] = React.useState("");
+  const [barCodeDel, setBarCodeDel] = React.useState("");
   const currentlySelected = async (params: GridCellParams) => {
     const value = params.colDef.field;
-    const isRefPO = params.getValue(params.id, 'isRefPO');
+    const isRefPO = params.getValue(params.id, "isRefPO");
     //deleteItem
     // handleUpdateRowState();
 
-    if (!isRefPO && value === 'delete') {
+    if (!isRefPO && value === "delete") {
       setDeleteItems(true);
-      setProductNameDel(String(params.getValue(params.id, 'productName')));
-      setSkuCodeDel(String(params.getValue(params.id, 'skuCode')));
-      setBarCodeDel(String(params.getValue(params.id, 'barcode')));
+      setProductNameDel(String(params.getValue(params.id, "productName")));
+      setSkuCodeDel(String(params.getValue(params.id, "skuCode")));
+      setBarCodeDel(String(params.getValue(params.id, "barcode")));
       setOpenModelDeleteConfirm(true);
     }
   };
@@ -376,14 +423,18 @@ function StockTransferListItem({ type, edit, onChangeItems, update, status, skuC
     setOpenModelDeleteConfirm(false);
   };
   return (
-    <div style={{ width: '100%', height: rows.length >= 8 ? '70vh' : 'auto' }} className={classes.MdataGridDetail}>
+    <div
+      style={{ width: "100%", height: rows.length >= 8 ? "70vh" : "auto" }}
+      className={classes.MdataGridDetail}
+    >
       <Box mt={6}>
-        {' '}
+        {" "}
         <Typography>
-          รายการสินค้า: {isChecked && 'รายการสินค้าทั้งหมด'} {!isChecked && `${skuName}`}
+          รายการสินค้า: {isChecked && "รายการสินค้าทั้งหมด"}{" "}
+          {!isChecked && `${skuName}`}
         </Typography>
       </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center' }} mt={1}>
+      <Box sx={{ display: "flex", alignItems: "center" }} mt={1}>
         <FormGroup>
           <FormControlLabel
             control={<Checkbox />}

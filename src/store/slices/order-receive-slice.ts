@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { OrderReceiveResponse } from '../../models/order-model';
-import { environment } from '../../environment-base';
-import { get } from '../../adapters/posback-adapter';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { OrderReceiveResponse } from "../../models/order-model";
+import { environment } from "../../environment-base";
+import { get } from "../../adapters/posback-adapter";
 
 type State = {
   orderReceiveList: OrderReceiveResponse;
@@ -10,41 +10,44 @@ type State = {
 
 const initialState: State = {
   orderReceiveList: {
-    ref: '',
+    ref: "",
     code: 0,
-    message: '',
+    message: "",
     data: {},
   },
-  error: '',
+  error: "",
 };
 
-export const searchOrderReceiveAsync = createAsyncThunk('searchOrderReceive', async (docNo?: string) => {
-  try {
-    let path = environment.orders.shipment.search.url;
-    if (docNo) {
-      path = path + `/${docNo}`;
-    }
-    // console.log('path : ', path);
+export const searchOrderReceiveAsync = createAsyncThunk(
+  "searchOrderReceive",
+  async (docNo?: string) => {
+    try {
+      let path = environment.orders.shipment.search.url;
+      if (docNo) {
+        path = path + `/${docNo}`;
+      }
+      // console.log('path : ', path);
 
-    let response: OrderReceiveResponse = {
-      ref: '',
-      code: 0,
-      message: '',
-      data: {},
-    };
+      let response: OrderReceiveResponse = {
+        ref: "",
+        code: 0,
+        message: "",
+        data: {},
+      };
 
-    if (docNo) {
-      return (response = await get(path).then());
-    } else {
-      return response;
+      if (docNo) {
+        return (response = await get(path).then());
+      } else {
+        return response;
+      }
+    } catch (error) {
+      throw error;
     }
-  } catch (error) {
-    throw error;
-  }
-});
+  },
+);
 
 const orderReceiveSlice = createSlice({
-  name: 'orderReceive',
+  name: "orderReceive",
   initialState,
   reducers: {
     clearDataFilter: () => {
@@ -55,9 +58,12 @@ const orderReceiveSlice = createSlice({
     builer.addCase(searchOrderReceiveAsync.pending, () => {
       initialState;
     }),
-      builer.addCase(searchOrderReceiveAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        state.orderReceiveList = action.payload;
-      }),
+      builer.addCase(
+        searchOrderReceiveAsync.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.orderReceiveList = action.payload;
+        },
+      ),
       builer.addCase(searchOrderReceiveAsync.rejected, () => {
         initialState;
       });
